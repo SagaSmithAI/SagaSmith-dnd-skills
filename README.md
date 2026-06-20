@@ -15,7 +15,7 @@ SagaSmith is a cross-platform AI DM skill pack. It bundles complete D&D 5e DM ca
 
 | Repo | Role |
 |------|------|
-| 📦 **SagaSmith-skill** (this repo) | Full skill pack (3 skills + domain code) |
+| 📦 **SagaSmith-skills** (this repo) | Full skill pack (3 skills + domain code) |
 | 🎲 [SagaSmith-agent](https://github.com/dajiaohuang/SagaSmith-agent) | Complete AI DM runtime |
 | ✍️ [SagaSmith-module-gen-skill](https://github.com/dajiaohuang/SagaSmith-module-gen-skill) | Standalone module generator |
 
@@ -187,7 +187,7 @@ Agent: ⚠️ Auto-saving current → ⏪ Restored slot 5
 ### Claude Code / Codex / Cursor / Copilot (recommended)
 
 ```bash
-npx skills add dajiaohuang/SagaSmith-skill
+npx skills add dajiaohuang/SagaSmith-skills
 ```
 
 ### ClawHub
@@ -199,12 +199,12 @@ npx clawhub install sagasmith
 ### Manual (NanoBot)
 
 ```bash
-git clone https://github.com/dajiaohuang/SagaSmith-skill.git
-cp -r SagaSmith-skill/skills/*    ~/.nanobot/skills/
-cp -r SagaSmith-skill/templates/* ~/.nanobot/templates/
-cp -r SagaSmith-skill/tools/*.py  ~/.nanobot/agent/tools/
-cp -r SagaSmith-skill/domain/*    ~/.nanobot/dnd/
-cp -r SagaSmith-skill/data/srd    ~/.nanobot/dnd/data/srd/
+git clone https://github.com/dajiaohuang/SagaSmith-skills.git
+cp -r SagaSmith-skills/skills/*    ~/.nanobot/skills/
+cp -r SagaSmith-skills/templates/* ~/.nanobot/templates/
+cp -r SagaSmith-skills/tools/*.py  ~/.nanobot/agent/tools/
+cp -r SagaSmith-skills/domain/*    ~/.nanobot/dnd/
+cp -r SagaSmith-skills/data/srd    ~/.nanobot/dnd/data/srd/
 python -m <domain-cli> rules ingest-srd
 ```
 
@@ -246,7 +246,7 @@ Default campaign: *Baldur's Gate: Descent into Avernus*. Adaptable to any advent
 ## Directory Structure
 
 ```
-SagaSmith-skill/
+SagaSmith-skills/
 ├── skills/                     # 3 Skills (pure Markdown, cross-platform)
 │   ├── dnd-dm/                 #   Core DM + 20 SRD files
 │   ├── dnd-campaign-manager/   #   Campaign management + DB contract

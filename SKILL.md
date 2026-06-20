@@ -38,4 +38,4 @@ Includes D&D 5e 2024 SRD 5.2.1 (CC-BY-4.0, 20 files). English and optional Chine
 
 ## Repository
 
-https://github.com/dajiaohuang/SagaSmith-skill
+https://github.com/dajiaohuang/SagaSmith-skills

@@ -15,7 +15,7 @@ SagaSmith 是一个跨平台 AI 跑团主持人 skill 包。它把完整的 D&D 
 
 | 仓库 | 定位 |
 |------|------|
-| 📦 **SagaSmith-skill**（本仓库） | 全家桶 skill 插件包 |
+| 📦 **SagaSmith-skills**（本仓库） | 全家桶 skill 插件包 |
 | 🎲 [SagaSmith-agent](https://github.com/dajiaohuang/SagaSmith-agent) | 完整 AI DM 运行时 |
 | ✍️ [SagaSmith-module-gen-skill](https://github.com/dajiaohuang/SagaSmith-module-gen-skill) | 独立模组生成器 |
 
@@ -186,7 +186,7 @@ Agent: ⚠️ 自动保存当前 → ⏪ 恢复 slot 5 "冰巨人之门开启前
 ### Claude Code / Codex / Cursor / Copilot（推荐）
 
 ```bash
-npx skills add dajiaohuang/SagaSmith-skill
+npx skills add dajiaohuang/SagaSmith-skills
 ```
 
 ### ClawHub
@@ -198,12 +198,12 @@ npx clawhub install sagasmith
 ### 手动安装（NanoBot）
 
 ```bash
-git clone https://github.com/dajiaohuang/SagaSmith-skill.git
-cp -r SagaSmith-skill/skills/*    ~/.nanobot/skills/
-cp -r SagaSmith-skill/templates/* ~/.nanobot/templates/
-cp -r SagaSmith-skill/tools/*.py  ~/.nanobot/agent/tools/
-cp -r SagaSmith-skill/domain/*    ~/.nanobot/dnd/
-cp -r SagaSmith-skill/data/srd    ~/.nanobot/dnd/data/srd/
+git clone https://github.com/dajiaohuang/SagaSmith-skills.git
+cp -r SagaSmith-skills/skills/*    ~/.nanobot/skills/
+cp -r SagaSmith-skills/templates/* ~/.nanobot/templates/
+cp -r SagaSmith-skills/tools/*.py  ~/.nanobot/agent/tools/
+cp -r SagaSmith-skills/domain/*    ~/.nanobot/dnd/
+cp -r SagaSmith-skills/data/srd    ~/.nanobot/dnd/data/srd/
 python -m <domain-cli> rules ingest-srd
 ```
 
@@ -245,7 +245,7 @@ python -m <domain-cli> rules ingest-srd
 ## 目录结构
 
 ```
-SagaSmith-skill/
+SagaSmith-skills/
 ├── skills/                     # 3 个 Skill（纯 Markdown，跨平台）
 │   ├── dnd-dm/                 #   核心 DM + 20 个 SRD 文件
 │   ├── dnd-campaign-manager/   #   战役管理 + 数据库约定
