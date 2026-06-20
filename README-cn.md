@@ -17,7 +17,7 @@ SagaSmith 是一个跨平台 AI 跑团主持人 skill 包。它把完整的 D&D 
 |------|------|
 | 📦 **SagaSmith-skills**（本仓库） | 全家桶 skill 插件包 |
 | 🎲 [SagaSmith-agent](https://github.com/dajiaohuang/SagaSmith-agent) | 完整 AI DM 运行时 |
-| ✍️ [SagaSmith-module-gen-skill](https://github.com/dajiaohuang/SagaSmith-module-gen-skill) | 独立模组生成器 |
+| ✍️ [SagaSmith-module-gen-skills](https://github.com/dajiaohuang/SagaSmith-module-gen-skills) | 独立模组生成器 |
 
 ---
 

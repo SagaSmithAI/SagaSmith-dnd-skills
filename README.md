@@ -17,7 +17,7 @@ SagaSmith is a cross-platform AI DM skill pack. It bundles complete D&D 5e DM ca
 |------|------|
 | 📦 **SagaSmith-skills** (this repo) | Full skill pack (3 skills + domain code) |
 | 🎲 [SagaSmith-agent](https://github.com/dajiaohuang/SagaSmith-agent) | Complete AI DM runtime |
-| ✍️ [SagaSmith-module-gen-skill](https://github.com/dajiaohuang/SagaSmith-module-gen-skill) | Standalone module generator |
+| ✍️ [SagaSmith-module-gen-skills](https://github.com/dajiaohuang/SagaSmith-module-gen-skills) | Standalone module generator |
 
 ---
 
