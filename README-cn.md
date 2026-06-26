@@ -2,6 +2,8 @@
 
 [English](README.md) | [中文](README-cn.md)
 
+<p align="center"><img src="images/Sagasmith.png" alt="SagaSmith" width="200"></p>
+
 **自主 D&D 5e AI 地下城主** — 战役管理 · 模组生成 · 自主带团
 
 > *"规则书为经文，模组为地图，骰子为审判官。"*  

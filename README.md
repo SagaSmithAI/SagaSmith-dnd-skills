@@ -2,6 +2,8 @@
 
 [English](README.md) | [中文](README-cn.md)
 
+<p align="center"><img src="images/Sagasmith.png" alt="SagaSmith" width="200"></p>
+
 **Autonomous D&D 5e AI Dungeon Master** — campaign management · module generation · autonomous DMing
 
 > *"The rulebooks are scripture, the module is the map, the dice are the judge."*  
