@@ -1,8 +1,21 @@
-"""Natural-language search over branch-effective campaign memory revisions."""
+"""Natural-language search over branch-effective campaign memory revisions.
+
+Two-tier retrieval stack:
+  1. ChromaDB HNSW dense index  (fastest, requires chromadb + embedding model)
+  2. Lexical keyword overlap     (no embedding model needed, always available)
+
+Set ``DND_DENSE_DISABLED=1`` to skip dense retrieval entirely and always use
+lexical search.  Useful on machines without a GPU where BGE-M3 encoding is
+too slow.
+
+ChromaDB is disabled when neither ``CHROMA_DB_URL`` nor ``CHROMA_DB_PATH`` is
+set.  In that case all searches fall back to lexical automatically — no
+embedding model is ever loaded.
+"""
 
 from __future__ import annotations
 
-import math
+import os
 import re
 from typing import Any, Protocol
 
@@ -15,10 +28,16 @@ from .rules.embedding import BgeM3Embedder
 from .vector.client import VectorStore
 
 COLLECTION_NAME = "dnd_campaign_memories"
+_DENSE_DISABLED = os.environ.get("DND_DENSE_DISABLED", "1") != "0"
 
 
 class Embedder(Protocol):
     def encode(self, texts: list[str]) -> list[list[float]]: ...
+
+
+def dense_enabled() -> bool:
+    """True when dense retrieval is globally allowed."""
+    return not _DENSE_DISABLED
 
 
 class CampaignMemorySearchService:
@@ -44,6 +63,7 @@ class CampaignMemorySearchService:
         save_id: str | None = None,
         statuses: list[str] | None = None,
         top_k: int = 8,
+        dense: bool = True,
     ) -> dict[str, Any]:
         scope = self.memory.scope(campaign_id, save_id=save_id)
         memories = self.memory.get_effective(
@@ -59,9 +79,15 @@ class CampaignMemorySearchService:
                 "hits": [],
             }
 
-        if self.vector_store.enabled:
+        use_dense = (
+            dense
+            and dense_enabled()
+            and self.vector_store.enabled
+        )
+
+        if use_dense:
             self.index_rows(memories)
-            scored = self._dense_scores(query, memories)
+            scored = self._dense_scores(query, memories, top_k=top_k)
             retrieval = "chroma"
         else:
             scored = self._lexical_scores(query, memories)
@@ -81,7 +107,7 @@ class CampaignMemorySearchService:
 
     def index_revision_ids(self, revision_ids: list[str]) -> int:
         ids = [value for value in revision_ids if value]
-        if not ids or not self.vector_store.enabled:
+        if not ids or not self.vector_store.enabled or not dense_enabled():
             return 0
         with self.database.transaction() as session:
             rows = session.execute(
@@ -96,7 +122,7 @@ class CampaignMemorySearchService:
         return self.index_rows(payload)
 
     def reindex(self, campaign_id: str | None = None) -> int:
-        if not self.vector_store.enabled:
+        if not self.vector_store.enabled or not dense_enabled():
             return 0
         if campaign_id:
             self.vector_store.collection(COLLECTION_NAME).delete(
@@ -122,7 +148,7 @@ class CampaignMemorySearchService:
         return self.index_rows(payload)
 
     def index_rows(self, rows: list[dict[str, Any]]) -> int:
-        if not rows or not self.vector_store.enabled:
+        if not rows or not self.vector_store.enabled or not dense_enabled():
             return 0
         texts = [_embedding_text(row) for row in rows]
         vectors = self._embedder().encode(texts)
@@ -137,7 +163,8 @@ class CampaignMemorySearchService:
 
     def status(self) -> dict[str, Any]:
         return {
-            "enabled": self.vector_store.enabled,
+            "dense_disabled": not dense_enabled(),
+            "chroma_enabled": self.vector_store.enabled,
             "collection": self.vector_store.collection_stats(COLLECTION_NAME)
             if self.vector_store.enabled
             else None,
@@ -147,23 +174,31 @@ class CampaignMemorySearchService:
         self,
         query: str,
         rows: list[dict[str, Any]],
+        *,
+        top_k: int,
     ) -> list[tuple[float, dict[str, Any]]]:
-        collection = self.vector_store.collection(COLLECTION_NAME)
-        ids = [str(row["revision_id"]) for row in rows]
-        result = collection.get(ids=ids, include=["embeddings"])
-        returned_ids = [str(value) for value in result.get("ids") or []]
-        embeddings = result.get("embeddings")
-        if embeddings is None:
-            return self._lexical_scores(query, rows)
         query_vector = self._embedder().encode([query])[0]
-        row_by_id = {str(row["revision_id"]): row for row in rows}
-        scored = [
-            (_cosine(query_vector, vector), row_by_id[revision_id])
-            for revision_id, vector in zip(returned_ids, embeddings, strict=True)
-            if revision_id in row_by_id
-        ]
-        scored.sort(key=lambda item: item[0], reverse=True)
-        return scored
+        collection = self.vector_store.collection(COLLECTION_NAME)
+        try:
+            result = collection.query(
+                query_embeddings=[query_vector],
+                n_results=min(top_k * 4, len(rows)),
+                include=["distances"],
+            )
+            ids = (result.get("ids") or [[]])[0]
+            distances = (result.get("distances") or [[]])[0]
+            if not ids:
+                return self._lexical_scores(query, rows)
+            row_by_id = {str(row["revision_id"]): row for row in rows}
+            scored = [
+                (1.0 - float(dist), row_by_id[rid])
+                for rid, dist in zip(ids, distances, strict=True)
+                if rid in row_by_id
+            ]
+            scored.sort(key=lambda item: item[0], reverse=True)
+            return scored
+        except Exception:
+            return self._lexical_scores(query, rows)
 
     @staticmethod
     def _lexical_scores(
@@ -245,18 +280,6 @@ def _metadata(row: dict[str, Any]) -> dict[str, str]:
         "priority": str(row["priority"]),
         "status": str(row["status"]),
     }
-
-
-def _cosine(left: list[float], right: Any) -> float:
-    right_values = [float(value) for value in right]
-    if len(left) != len(right_values):
-        return 0.0
-    numerator = sum(a * b for a, b in zip(left, right_values, strict=True))
-    left_norm = math.sqrt(sum(value * value for value in left))
-    right_norm = math.sqrt(sum(value * value for value in right_values))
-    if left_norm == 0 or right_norm == 0:
-        return 0.0
-    return numerator / (left_norm * right_norm)
 
 
 def _search_terms(text: str) -> set[str]:

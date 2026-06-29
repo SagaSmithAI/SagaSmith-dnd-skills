@@ -14,8 +14,6 @@ from pathlib import Path
 from chromadb import Collection, HttpClient, PersistentClient
 from chromadb.config import Settings
 
-from .._paths import get_runtime_subdir
-
 logger = logging.getLogger(__name__)
 
 _COLLECTION_NAMES = ("dnd_rules", "dnd_modules", "dnd_campaign_memories")
@@ -25,7 +23,20 @@ _COLLECTION_METADATA = {
 
 
 def _default_chroma_path() -> Path:
-    return get_runtime_subdir("dnd") / "chroma_db"
+    """Return the default ChromaDB persistent store path.
+
+    Defaults to ``<skill_dir>/data/chroma_db`` so the skill is fully
+    self-contained.  Override with ``CHROMA_DB_PATH``.
+    """
+    # Walk up from this file to find the skill root (contains domain/ and tools/)
+    current = Path(__file__).resolve().parent
+    while current.parent != current:
+        if (current / "domain").is_dir() and (current / "tools").is_dir():
+            break
+        current = current.parent
+    chroma_dir = current / "data" / "chroma_db"
+    chroma_dir.mkdir(parents=True, exist_ok=True)
+    return chroma_dir
 
 
 class VectorStore:
@@ -46,11 +57,19 @@ class VectorStore:
 
     @property
     def enabled(self) -> bool:
-        """True when ChromaDB is configured and reachable."""
+        """True when ChromaDB is reachable.
+
+        ChromaDB is disabled by default.  Set ``CHROMA_DB_URL`` or
+        ``CHROMA_DB_PATH`` to enable it, or set ``CHROMA_DB_DISABLED=0`` to
+        force-enable with the default local path.
+        """
         if self._enabled is None:
-            url = os.environ.get("CHROMA_DB_URL")
-            path = os.environ.get("CHROMA_DB_PATH")
-            self._enabled = bool(url or path)
+            if os.environ.get("CHROMA_DB_DISABLED") == "0":
+                self._enabled = True
+            else:
+                url = os.environ.get("CHROMA_DB_URL")
+                path = os.environ.get("CHROMA_DB_PATH")
+                self._enabled = bool(url or path)
         return self._enabled
 
     @staticmethod
