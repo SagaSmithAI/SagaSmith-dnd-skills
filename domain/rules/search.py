@@ -1,8 +1,13 @@
-"""Campaign-scoped exact, full-text, and BGE-M3 hybrid rule retrieval."""
+"""Campaign-scoped exact, full-text, and BGE-M3 hybrid rule retrieval.
+
+Set ``DND_DENSE_DISABLED=1`` to skip dense retrieval entirely.  Useful on
+machines without a GPU where BGE-M3 encoding is too slow.
+"""
 
 from __future__ import annotations
 
 import json
+import os
 import re
 from dataclasses import dataclass, replace
 from typing import Any
@@ -25,6 +30,10 @@ from ..vector.client import VectorStore
 from ..vector.search import chroma_dense_search
 from .embedding import BgeM3Embedder, Embedder
 from .ingest import DEFAULT_RULE_SET_ID
+
+#   unset / =1 → dense disabled (lexical only)
+#   =0         → dense enabled
+_DENSE_DISABLED = os.environ.get("DND_DENSE_DISABLED", "1") != "0"
 
 
 class RuleSearchError(RuntimeError):
@@ -129,7 +138,7 @@ class RuleSearchService:
                 session, retrieval_query, scope, limit=max(top_k * 10, 50)
             )
             dense_ranked: list[str] = []
-            if dense:
+            if dense and not _DENSE_DISABLED:
                 embedder = self.embedder or BgeM3Embedder()
                 query_vector = embedder.encode([retrieval_query])[0]
                 dense_ranked = self._dense_ids(

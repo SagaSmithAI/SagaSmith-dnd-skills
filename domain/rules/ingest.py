@@ -596,12 +596,50 @@ class RuleIngestService:
             return profile.id
 
 
-def ensure_bundled_rules_ingested(database: Database) -> dict[str, IngestResult]:
-    """No-op for skills package — bundled rules are not included here.
+def _srd_references_dir() -> Path | None:
+    """Locate the bundled SRD references directory by walking up from this file."""
+    current = Path(__file__).resolve().parent
+    while current.parent != current:
+        srd_ref = current / "skills" / "dnd-dm" / "srd" / "references"
+        if srd_ref.is_dir():
+            return srd_ref
+        current = current.parent
+    return None
 
-    In the full agent repo this ingests all bundled SRD rule sets on first
-    access.  The skills package expects rules to be ingested separately via
-    the import tool.
+
+def ensure_bundled_rules_ingested(database: Database) -> dict[str, IngestResult]:
+    """Auto-ingest bundled SRD rules on first access (lexical-first, dense optional).
+
+    Respects ``DND_DENSE_DISABLED=1`` to skip embedding generation entirely.
+    Set ``CHROMA_DB_DISABLED=0`` to enable ChromaDB storage (defaults to SQLite
+    ``embedding_json`` column for in-memory numpy search).
     """
-    return {}
+    import os
+
+    srd_dir = _srd_references_dir()
+    if srd_dir is None:
+        return {}  # No bundled SRD found, skip silently
+
+    # Check if already ingested
+    with database.transaction() as session:
+        rule_set = session.get(RuleSet, DEFAULT_RULE_SET_ID)
+        if rule_set is not None:
+            from sqlalchemy import func as _func
+            chunk_count = session.scalar(
+                select(_func.count())
+                .select_from(RuleChunk)
+                .join(RuleSource, RuleSource.id == RuleChunk.source_id)
+                .where(RuleSource.rule_set_id == DEFAULT_RULE_SET_ID)
+            )
+            if chunk_count and chunk_count > 0:
+                return {}  # Already ingested
+
+    # Default: lexical-only ingestion (no dense).  Set DND_DENSE_DISABLED=0 to
+    # generate embeddings into SQLite embedding_json for NumPy fallback search.
+    #   unset / =1 → embed=False (lexical only, zero dependency)
+    #   =0         → embed=True  (NumPy brute-force search via embedding_json)
+    embed = bool(os.environ.get("DND_DENSE_DISABLED", "1") == "0")
+    service = RuleIngestService(database)
+    result = service.ingest_srd(srd_dir, embed=embed, force=False)
+    return {DEFAULT_RULE_SET_ID: result}
 

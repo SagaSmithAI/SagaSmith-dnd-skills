@@ -23,6 +23,27 @@ SagaSmith is a cross-platform AI DM skill pack. It bundles complete D&D 5e DM ca
 
 ---
 
+## Supported Platforms
+
+SagaSmith follows the open SKILL.md standard and is theoretically compatible with all AI Agent platforms that support this standard. Below are tested/known compatible platforms:
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| 🤖 **NanoBot** | ✅ Native | Primary development & testing platform |
+| 🦞 **OpenClaw** | ✅ Compatible | Open-source Claude Code alternative |
+| 🪽 **Hermes** | ✅ Compatible | Cross-platform AI Agent runtime |
+| Claude Code | ✅ Compatible | Anthropic's official Agent |
+| 🧩 **Codex** | ✅ Compatible | OpenAI's official IDE Agent |
+| 🛠️ **TRAE** | ✅ Compatible | Volcano Engine AI IDE |
+| 🌊 **Windsurf** | ✅ Compatible | CodeLlama-based AI IDE |
+| 🤝 **WorkBuddy** | ✅ Compatible | Enterprise AI Coding Agent |
+| 🔘 **Coze (扣子)** | 🔄 In progress | ByteDance Bot platform |
+| Other SKILL.md platforms | ✅ Theoretically | Any platform supporting SKILL.md |
+
+> PRs welcome to add more platforms!
+
+---
+
 ## Why SagaSmith
 
 Most D&D AI tools do one thing: roll dice, look up a rule, or write a paragraph. SagaSmith is the **full DM**:

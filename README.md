@@ -23,6 +23,27 @@ SagaSmith 是一个跨平台 AI 跑团主持人 skill 包。它把完整的 D&D 
 
 ---
 
+## 支持平台
+
+SagaSmith 遵循 SKILL.md 开放标准，理论上支持所有兼容该标准的 AI Agent 平台。以下是已测试/已知兼容的平台：
+
+| 平台 | 状态 | 说明 |
+|------|------|------|
+| 🤖 **NanoBot** | ✅ 原生支持 | SagaSmith 主要开发与测试平台 |
+| 🦞 **OpenClaw** | ✅ 兼容 | 开源 Claude Code 替代 |
+| 🪽 **Hermes** | ✅ 兼容 | 跨平台 AI Agent 运行时 |
+| Claude Code | ✅ 兼容 | Anthropic 官方 Agent |
+| 🧩 **Codex** | ✅ 兼容 | OpenAI 官方 IDE Agent |
+| 🛠️ **TRAE** | ✅ 兼容 | 火山引擎 AI IDE |
+| 🌊 **Windsurf** | ✅ 兼容 | CodeLlama 系 AI IDE |
+| 🤝 **WorkBuddy** | ✅ 兼容 | 企业级 AI Coding Agent |
+| 🔘 **扣子 (Coze)** | 🔄 适配中 | 字节跳动 Bot 平台 |
+| 其他 SKILL.md 兼容平台 | ✅ 理论兼容 | 只要支持 SKILL.md 标准即可 |
+
+> 欢迎提交 PR 补充更多平台的适配状态！
+
+---
+
 ## 为什么是 SagaSmith
 
 大多数 D&D AI 工具只做一件事：掷骰、查规则、或者写一段描述。SagaSmith 是**完整的 DM**：

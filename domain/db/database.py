@@ -10,19 +10,29 @@ from pathlib import Path
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from .._paths import get_runtime_subdir
-
 
 class Base(DeclarativeBase):
     """Declarative base shared by all D&D domain models."""
 
 
+def _default_database_path() -> Path:
+    """Return the default SQLite database path inside the skill directory."""
+    current = Path(__file__).resolve().parent
+    while current.parent != current:
+        if (current / "domain").is_dir() and (current / "tools").is_dir():
+            break
+        current = current.parent
+    db_dir = current / "data"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    return db_dir / "dnd.db"
+
+
 def default_database_url() -> str:
-    """Return the configured URL or the instance-local SQLite database URL."""
+    """Return the configured URL or the skill-local SQLite database URL."""
     configured = os.environ.get("DND_DATABASE_URL") or os.environ.get("DATABASE_URL")
     if configured:
         return configured
-    database_path = get_runtime_subdir("dnd") / "dnd_dm.db"
+    database_path = _default_database_path()
     return f"sqlite+pysqlite:///{database_path.as_posix()}"
 
 

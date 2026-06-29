@@ -1,7 +1,12 @@
-"""Campaign-scoped lexical and BGE-M3 dense module retrieval."""
+"""Campaign-scoped lexical and BGE-M3 dense module retrieval.
+
+Set ``DND_DENSE_DISABLED=1`` to skip dense retrieval entirely.  Useful on
+machines without a GPU where BGE-M3 encoding is too slow.
+"""
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass, replace
 from typing import Any
@@ -14,6 +19,8 @@ from ..db.models import ModuleChapter, ModuleChunk, ModuleSource, SceneIndex
 from ..rules.embedding import BgeM3Embedder, Embedder
 from ..vector.client import VectorStore
 from ..vector.search import chroma_dense_search
+
+_DENSE_DISABLED = os.environ.get("DND_DENSE_DISABLED", "1") != "0"
 
 
 class ModuleSearchError(RuntimeError):
@@ -80,7 +87,7 @@ class ModuleSearchService:
             lexical = self._lexical_ids(session, query, allowed, limit=max(top_k * 10, 50))
             dense_ids: list[str] = []
             dense_scores: dict[str, float] = {}
-            if dense:
+            if dense and not _DENSE_DISABLED:
                 embedder = self.embedder or BgeM3Embedder()
                 vector = embedder.encode([query])[0]
                 dense_ids, dense_scores = self._dense_ids(
