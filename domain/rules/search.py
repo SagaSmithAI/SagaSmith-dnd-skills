@@ -1,18 +1,16 @@
-"""Campaign-scoped exact, full-text, and BGE-M3 hybrid rule retrieval.
+"""Campaign-scoped exact and full-text rule retrieval.
 
-Set ``DND_DENSE_DISABLED=1`` to skip dense retrieval entirely.  Useful on
-machines without a GPU where BGE-M3 encoding is too slow.
+Dense vector search requires ChromaDB (set ``CHROMA_DB_DISABLED=0`` to enable).
+Without ChromaDB, search falls back to lexical-only mode automatically.
 """
 
 from __future__ import annotations
 
-import json
 import os
 import re
 from dataclasses import dataclass, replace
 from typing import Any
 
-import numpy as np
 from sqlalchemy import func, or_, select, text
 
 from ..db.database import Database
@@ -109,7 +107,6 @@ class RuleSearchService:
     def __init__(self, database: Database, *, embedder: Embedder | None = None) -> None:
         self.database = database
         self.embedder = embedder
-        self._dense_cache: dict[SearchScope, tuple[list[str], np.ndarray]] = {}
 
     def search(
         self,
@@ -401,68 +398,16 @@ class RuleSearchService:
     def _dense_ids(
         self, session, query_vector: list[float], scope: SearchScope, *, limit: int
     ) -> list[str]:
-        # ── ChromaDB path ──────────────────────────────────────────
-        if VectorStore().enabled:
-            where: dict[str, Any] = {"rule_set_id": scope.rule_set_id}
-            if scope.publication_ids:
-                where["publication_id"] = {"$in": list(scope.publication_ids)}
-            results = chroma_dense_search(
-                "dnd_rules", query_vector, where, limit=limit
-            )
-            return [chunk_id for chunk_id, _ in results]
-
-        # ── PostgreSQL pgvector path ───────────────────────────────
-        if session.bind.dialect.name == "postgresql":
-            params: dict[str, Any] = {
-                "vector": json.dumps(query_vector),
-                "rule_set_id": scope.rule_set_id,
-                "limit": limit,
-            }
-            publication_sql = ""
-            if scope.publication_ids:
-                names = []
-                for index, publication_id in enumerate(scope.publication_ids):
-                    name = f"publication_{index}"
-                    names.append(f":{name}")
-                    params[name] = publication_id
-                publication_sql = f"AND rs.publication_id IN ({','.join(names)})"
-            rows = session.execute(
-                text(
-                    "SELECT rc.id, 1 - (rc.embedding_vector <=> CAST(:vector AS vector)) AS score "
-                    "FROM rule_chunks rc JOIN rule_sources rs ON rs.id = rc.source_id "
-                    "WHERE rs.rule_set_id = :rule_set_id "
-                    f"{publication_sql} AND rc.embedding_vector IS NOT NULL "
-                    "ORDER BY rc.embedding_vector <=> CAST(:vector AS vector) LIMIT :limit"
-                ),
-                params,
-            )
-            return [str(row[0]) for row in rows]
-
-        cached = self._dense_cache.get(scope)
-        if cached is None:
-            rows = list(
-                session.execute(
-                    select(RuleChunk.id, RuleChunk.embedding_json)
-                    .join(RuleSource, RuleSource.id == RuleChunk.source_id)
-                    .where(
-                        *self._scope_condition(scope),
-                        RuleChunk.embedding_json.is_not(None),
-                    )
-                )
-            )
-            chunk_ids = [str(row[0]) for row in rows]
-            matrix = np.asarray([row[1] for row in rows], dtype=np.float32)
-            cached = (chunk_ids, matrix)
-            self._dense_cache[scope] = cached
-        chunk_ids, matrix = cached
-        if matrix.size == 0:
+        """Return ChromaDB-backed dense IDs or an empty list when ChromaDB is unavailable."""
+        if not VectorStore().enabled:
             return []
-        vector = np.asarray(query_vector, dtype=np.float32)
-        scores = matrix @ vector
-        candidate_count = min(limit, len(chunk_ids))
-        indexes = np.argpartition(scores, -candidate_count)[-candidate_count:]
-        indexes = indexes[np.argsort(scores[indexes])[::-1]]
-        return [chunk_ids[int(index)] for index in indexes]
+        where: dict[str, Any] = {"rule_set_id": scope.rule_set_id}
+        if scope.publication_ids:
+            where["publication_id"] = {"$in": list(scope.publication_ids)}
+        results = chroma_dense_search(
+            "dnd_rules", query_vector, where, limit=limit
+        )
+        return [chunk_id for chunk_id, _ in results]
 
     def _materialize(
         self,
