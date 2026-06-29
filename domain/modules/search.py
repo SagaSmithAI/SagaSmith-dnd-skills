@@ -11,7 +11,6 @@ import re
 from dataclasses import dataclass, replace
 from typing import Any
 
-import numpy as np
 from sqlalchemy import func, or_, select
 
 from ..db.database import Database
@@ -53,11 +52,6 @@ class ModuleSearchService:
     def __init__(self, database: Database, *, embedder: Embedder | None = None) -> None:
         self.database = database
         self.embedder = embedder
-        self._dense_cache: dict[str, tuple[list[str], np.ndarray]] = {}
-
-    def clear_cache(self) -> None:
-        """Invalidate the in-memory dense-vector cache."""
-        self._dense_cache.clear()
 
     def search(
         self,
@@ -175,53 +169,26 @@ class ModuleSearchService:
         *,
         limit: int,
     ) -> tuple[list[str], dict[str, float]]:
-        # ── ChromaDB path ──────────────────────────────────────────
-        if VectorStore().enabled:
-            results = chroma_dense_search(
-                "dnd_modules",
-                query_vector,
-                {"campaign_id": campaign_id},
-                limit=limit,
-            )
-            # Post-filter: only return chunks that also exist in the
-            # allowed set (active module).  ChromaDB metadata stores the
-            # campaign but not whether the module is active — the SQL
-            # side owns that truth.
-            allowed_set = set(allowed)
-            filtered = [
-                (cid, score) for cid, score in results if cid in allowed_set
-            ]
-            ordered = [cid for cid, _ in filtered]
-            scores = {cid: score for cid, score in filtered}
-            return ordered, scores
-
-        # ── SQLite / PostgreSQL numpy brute-force path ─────────────
-        cached = self._dense_cache.get(campaign_id)
-        if cached is None:
-            rows = list(
-                session.execute(
-                    select(ModuleChunk.id, ModuleChunk.embedding_json).where(
-                        ModuleChunk.id.in_(allowed),
-                        ModuleChunk.embedding_json.is_not(None),
-                    )
-                )
-            )
-            chunk_ids = [str(row[0]) for row in rows]
-            matrix = np.asarray([row[1] for row in rows], dtype=np.float32)
-            cached = (chunk_ids, matrix)
-            self._dense_cache[campaign_id] = cached
-        chunk_ids, matrix = cached
-        if matrix.size == 0:
+        """Return ChromaDB-backed dense IDs or empty when ChromaDB is unavailable."""
+        if not VectorStore().enabled:
             return [], {}
-        vector = np.asarray(query_vector, dtype=np.float32)
-        scores = matrix @ vector
-        candidate_count = min(limit, len(chunk_ids))
-        indexes = np.argpartition(scores, -candidate_count)[-candidate_count:]
-        indexes = indexes[np.argsort(scores[indexes])[::-1]]
-        ordered = [chunk_ids[int(index)] for index in indexes]
-        return ordered, {
-            chunk_ids[int(index)]: float(scores[int(index)]) for index in indexes
-        }
+        results = chroma_dense_search(
+            "dnd_modules",
+            query_vector,
+            {"campaign_id": campaign_id},
+            limit=limit,
+        )
+        # Post-filter: only return chunks that also exist in the
+        # allowed set (active module).  ChromaDB metadata stores the
+        # campaign but not whether the module is active — the SQL
+        # side owns that truth.
+        allowed_set = set(allowed)
+        filtered = [
+            (cid, score) for cid, score in results if cid in allowed_set
+        ]
+        ordered = [cid for cid, _ in filtered]
+        scores = {cid: score for cid, score in filtered}
+        return ordered, scores
 
     @staticmethod
     def _materialize(

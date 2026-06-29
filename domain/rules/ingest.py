@@ -634,10 +634,10 @@ def ensure_bundled_rules_ingested(database: Database) -> dict[str, IngestResult]
             if chunk_count and chunk_count > 0:
                 return {}  # Already ingested
 
-    # Default: lexical-only ingestion (no dense).  Set DND_DENSE_DISABLED=0 to
-    # generate embeddings into SQLite embedding_json for NumPy fallback search.
+    # Default: lexical-only ingestion (no dense).  Set CHROMA_DB_DISABLED=0 and
+    # DND_DENSE_DISABLED=0 to generate embeddings into ChromaDB for dense search.
     #   unset / =1 → embed=False (lexical only, zero dependency)
-    #   =0         → embed=True  (NumPy brute-force search via embedding_json)
+    #   =0         → embed=True  (ChromaDB-backed dense search)
     embed = bool(os.environ.get("DND_DENSE_DISABLED", "1") == "0")
     service = RuleIngestService(database)
     result = service.ingest_srd(srd_dir, embed=embed, force=False)
