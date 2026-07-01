@@ -30,3 +30,22 @@
 2. Explain the target slot and branch behavior
 3. `save restore`
 4. Refresh campaign, characters, scene and memory
+
+## Session close
+
+1. Reconcile character resources, conditions, scene progress and campaign state
+2. Append the session events and durable memories
+3. `save create`
+4. Inspect the generated delta recap; use `save regenerate-recap --slot` if needed
+
+## Module generator handoff
+
+1. Ingest the existing generated Markdown without rewriting it
+2. `module index --campaign`
+3. `module export-scenes --campaign --output`
+
+## Audit recovery
+
+- `state history` inspects mutations.
+- `state undo` and `state redo` change audited state without deleting snapshots.
+- `memory scope` reports the memories effective on the current branch.
