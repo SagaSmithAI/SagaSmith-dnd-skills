@@ -30,6 +30,15 @@ sagasmith-dnd campaign rules-get --campaign <id> --json
 6. Persist important events, character state, scene progress, and memory.
 7. Save at decision points, chapter transitions, and before dangerous restores.
 
+Before running a session, read `references/DM_RULES.md`. Load the other references
+only when their workflow is active:
+
+- character creation or advancement: `references/CHAR_CREATION.md`
+- module preparation and scene transitions: `references/MODULE_INDEX.md` and
+  `references/MODULE_ARC.md`
+- tactical positioning: `references/DM_MAP_SYS.md`
+- reusable narration and state shapes: `references/DM_TEMPLATES.md`
+
 ## Rule Retrieval
 
 ```powershell

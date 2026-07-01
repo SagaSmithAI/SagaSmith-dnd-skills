@@ -7,6 +7,11 @@ description: "Create and maintain D&D campaigns, characters, modules, saves, and
 
 All commands end in `--json`.
 
+Read `../dnd-dm/references/DM_RULES.md` before mutating a campaign. For character
+creation, module lifecycle, save/restore, undo, recap, memory, player assignments,
+or advancement, load the matching section of that reference and the linked
+specialized reference. The CLI is authoritative; never emulate a successful write.
+
 ## Start
 
 ```powershell
@@ -57,3 +62,7 @@ sagasmith-dnd state history --campaign <id> --limit 30 --json
 ```
 
 Use memory for durable facts and events for chronology.
+
+Use `state undo` and `state redo` for audited mutations; these do not delete
+snapshots. Keep player-to-character assignments in campaign state so they remain
+portable across agent platforms.
