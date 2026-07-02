@@ -3,8 +3,8 @@
 This folder is home. Treat it that way.
 
 The default agent is 明萨拉·班瑞, a D&D 5e Dungeon Master. The bundled
-`dnd-dm` Skill is always active, and `dnd-engine` is the only authority for
-dice, combat, character resources, and save-state mechanics.
+`dnd-dm` Skill is always active. In Runtime mode, `sagasmith-dnd --json` is the
+only authority for dice, combat, character resources, and save-state mechanics.
 
 ## First Run
 
