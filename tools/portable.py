@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone TTRPG runtime — zero pip dependencies, file-based persistence.
+"""D&D 5e Standalone runtime — zero pip dependencies, file-based persistence.
 
 Usage:
     python tools/portable.py doctor
@@ -523,24 +523,6 @@ def cmd_roll_attack(args: argparse.Namespace) -> dict[str, Any]:
     }
 
 
-def cmd_roll_d100(args: argparse.Namespace) -> dict[str, Any]:
-    import random
-    roll = random.randint(1, 100)
-    score = args.score or 50
-    if roll == 1:
-        level = "critical"
-    elif roll <= score // 5:
-        level = "extreme"
-    elif roll <= score // 2:
-        level = "hard"
-    elif roll <= score:
-        level = "regular"
-    else:
-        level = "failure"
-    return {
-        "roll": roll, "score": score, "level": level,
-        "success": roll <= score,
-    }
 
 
 def cmd_event_add(args: argparse.Namespace) -> dict[str, Any]:
@@ -732,8 +714,6 @@ def _parser() -> argparse.ArgumentParser:
     ra.add_argument("--score", type=int)
     ra.add_argument("--proficient", action="store_true")
     ra.add_argument("--level", type=int)
-    rd100 = rlsub.add_parser("d100")
-    rd100.add_argument("--score", type=int, default=50)
     # event
     ep = sub.add_parser("event")
     esub = ep.add_subparsers(dest="action", required=True)
@@ -793,7 +773,6 @@ CMD_MAP: dict[str, dict[str, Any]] = {
     ("roll", "dice"): cmd_roll_dice,
     ("roll", "check"): cmd_roll_check,
     ("roll", "attack"): cmd_roll_attack,
-    ("roll", "d100"): cmd_roll_d100,
     ("event", "add"): cmd_event_add,
     ("event", "list"): cmd_event_list,
     ("memory", "add"): cmd_memory_add,
