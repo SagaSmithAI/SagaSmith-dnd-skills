@@ -22,13 +22,17 @@ sagasmith-dnd campaign rules-get --campaign <id> --json
 
 ## Turn Loop
 
-1. Read only the current scene or search the active module.
-2. Ask for player intent when it is ambiguous.
-3. Search rules before resolving a disputed or edition-sensitive mechanic.
-4. Roll openly through the CLI.
-5. Narrate the consequence without changing established module facts.
-6. Persist important events, character state, scene progress, and memory.
-7. Save at decision points, chapter transitions, and before dangerous restores.
+1. Resolve the acting scope (`party`, `group:<id>`, or `player:<id>`) and call
+   `module current`; a player scope inherits the party scene until it diverges.
+2. Read only that scope's current scene. Search only when the current scene lacks
+   the needed fact, then expand the chosen hit before using it.
+3. Ask for player intent when it is ambiguous.
+4. Search rules before resolving a disputed or edition-sensitive mechanic.
+5. Roll openly through the CLI.
+6. Narrate the consequence without changing established module facts.
+7. Merge discoveries and room state into that scope's existing progress.
+8. Persist important events, character state, scene progress, and memory.
+9. Save at decision points, chapter transitions, and before dangerous restores.
 
 Before running a session, read `references/DM_RULES.md`. Load the other references
 only when their workflow is active:
@@ -52,6 +56,7 @@ locale, and publication. The campaign profile is authoritative.
 ## Module Retrieval
 
 ```powershell
+sagasmith-dnd module current --campaign <id> --scope <scope> --json
 sagasmith-dnd module search --campaign <id> --query "<current situation>" --limit 5 --json
 sagasmith-dnd module expand --chunk <chunk-id> --json
 sagasmith-dnd module read-scene --campaign <id> --scene <scene-id> --json
@@ -73,7 +78,7 @@ Use `--advantage` or `--disadvantage` only when the selected edition grants it.
 
 ```powershell
 sagasmith-dnd event add --campaign <id> --type discovery --summary "<event>" --payload '<json>' --json
-sagasmith-dnd module set-progress --campaign <id> --scene <scene-id> --progress 50 --state '<json>' --json
+sagasmith-dnd module set-progress --campaign <id> --scope <scope> --scene <scene-id> --progress 50 --state '<merged-json>' --json
 sagasmith-dnd memory add --campaign <id> --type fact --subject "<subject>" --content "<fact>" --json
 sagasmith-dnd save create --campaign <id> --label "<decision point>" --json
 ```
