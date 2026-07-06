@@ -5,27 +5,26 @@ description: "Run D&D 5e 2014 or 2024 sessions with rules-first adjudication and
 
 # D&D Dungeon Master
 
-## Runtime Context
+## Mode Detection
 
-Start with:
-
-```powershell
-sagasmith-dnd doctor --json
-sagasmith-dnd campaign list --status active --json
-```
-
-Once selected, retain `campaign_id`. Read its rule profile:
+First, detect which mode is available:
 
 ```powershell
-sagasmith-dnd campaign rules-get --campaign <id> --json
+sagasmith-dnd doctor --json 2>nul && set SAGASMITH_MODE=runtime || set SAGASMITH_MODE=portable
+if "%SAGASMITH_MODE%"=="portable" python tools/portable.py doctor
 ```
+
+If `sagasmith-dnd` is found → **Runtime mode** (full persistence, FTS5 search, vector store).
+If not → **Portable mode** (file-based, zero pip deps, Python stdlib only).
+
+In Portable mode, locate `tools/portable.py` (in the skill repo root) and use it in place of `sagasmith-dnd`.
 
 ## Turn Loop
 
-1. Resolve the acting scope (`party`, `group:<id>`, or `player:<id>`) and call
-   `module current`; a player scope inherits the party scene until it diverges.
-2. Read only that scope's current scene. Search only when the current scene lacks
-   the needed fact, then expand the chosen hit before using it.
+1. Resolve the acting scope (`party`, `group:<id>`, or `player:<id>`). Run `module current`
+   to get that scope's current scene. A player scope inherits the party scene until it
+   records its own.
+2. Read that scene. Search only when it lacks the needed fact; expand before using.
 3. Ask for player intent when it is ambiguous.
 4. Search rules before resolving a disputed or edition-sensitive mechanic.
 5. Roll openly through the CLI.
@@ -43,49 +42,101 @@ only when their workflow is active:
 - tactical positioning: `references/DM_MAP_SYS.md`
 - reusable narration and state shapes: `references/DM_TEMPLATES.md`
 
-## Rule Retrieval
+## Command Reference
 
-```powershell
-sagasmith-dnd rules search --campaign <id> --query "<question>" --limit 5 --json
-sagasmith-dnd rules expand --chunk <chunk-id> --json
-```
+Use the left column in Runtime mode, the right column in Portable mode.
 
-Use search snippets to select a result, then expand one result. Cite title, edition,
-locale, and publication. The campaign profile is authoritative.
+### Service / Health
 
-## Module Retrieval
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd doctor --json` | `python tools/portable.py doctor` |
 
-```powershell
-sagasmith-dnd module current --campaign <id> --scope <scope> --json
-sagasmith-dnd module search --campaign <id> --query "<current situation>" --limit 5 --json
-sagasmith-dnd module expand --chunk <chunk-id> --json
-sagasmith-dnd module read-scene --campaign <id> --scene <scene-id> --json
-```
+### Rules Retrieval
+
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd rules search --campaign <id> --query "<q>" --limit 5 --json` | `python tools/portable.py rules search --campaign <id> --query "<q>" --limit 5` |
+| `sagasmith-dnd rules expand --chunk <id> --json` | (read the SRD file directly) |
+
+Portable mode searches the bundled SRD `.md` files in `skills/dnd-dm/srd/` using
+lexical scoring with Chinese ↔ English query expansion.
+
+### Module Retrieval
+
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd module current --campaign <id> --scope <scope> --json` | `python tools/portable.py module current --campaign <id> --scope <scope>` |
+| `sagasmith-dnd module search --campaign <id> --query "<q>" --limit 5 --json` | `python tools/portable.py module search --campaign <id> --query "<q>" --limit 5` |
+| `sagasmith-dnd module expand --chunk <id> --json` | (read the scene from its `.md` file) |
+| `sagasmith-dnd module read-scene --campaign <id> --scene <id> --json` | `python tools/portable.py module read-scene --campaign <id> --scene <id>` |
+| `sagasmith-dnd module inspect --path <path> --json` | `python tools/portable.py module inspect --path <path>` |
+| `sagasmith-dnd module ingest --campaign <id> --path <path> --json` | `python tools/portable.py module ingest --campaign <id> --path <path>` |
+| `sagasmith-dnd module index --campaign <id> --json` | `python tools/portable.py module index --campaign <id>` |
 
 Never reveal unseen rooms, future twists, hidden NPC motives, or appendix secrets.
 
-## Dice
+### Campaign
 
-```powershell
-sagasmith-dnd roll dice --expression "2d6+3" --json
-sagasmith-dnd roll check --dc 15 --score 16 --level 5 --proficient --json
-sagasmith-dnd roll attack --dc 17 --score 18 --level 5 --proficient --json
-```
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd campaign start --name <name> --edition 2024 --json` | `python tools/portable.py campaign start --name <name> --edition 2024` |
+| `sagasmith-dnd campaign list --json` | `python tools/portable.py campaign list` |
+| `sagasmith-dnd campaign rules-get --campaign <id> --json` | (not needed in portable — SRD is bundled) |
+
+### Dice
+
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd roll dice --expression "2d6+3" --json` | `python tools/portable.py roll dice --expression "2d6+3"` |
+| `sagasmith-dnd roll check --dc 15 --score 16 --proficient --level 5 --json` | `python tools/portable.py roll check --dc 15 --score 16 --proficient --level 5` |
+| `sagasmith-dnd roll attack --dc 17 --score 18 --proficient --level 5 --json` | `python tools/portable.py roll attack --dc 17 --score 18 --proficient --level 5` |
 
 Use `--advantage` or `--disadvantage` only when the selected edition grants it.
 
-## State Updates
+### State Updates
 
-```powershell
-sagasmith-dnd event add --campaign <id> --type discovery --summary "<event>" --payload '<json>' --json
-sagasmith-dnd module set-progress --campaign <id> --scope <scope> --scene <scene-id> --progress 50 --state '<merged-json>' --json
-sagasmith-dnd memory add --campaign <id> --type fact --subject "<subject>" --content "<fact>" --json
-sagasmith-dnd save create --campaign <id> --label "<decision point>" --json
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd event add --campaign <id> --type discovery --summary "<s>" --payload '<json>' --json` | `python tools/portable.py event add --campaign <id> --type discovery --summary "<s>" --payload '<json>'` |
+| `sagasmith-dnd module set-progress --campaign <id> --scope <scope> --scene <id> --progress 50 --state '<json>' --json` | `python tools/portable.py module set-progress --campaign <id> --scope <scope> --scene <id> --progress 50 --state '<json>'` |
+| `sagasmith-dnd memory add --campaign <id> --type fact --subject "<s>" --content "<f>" --json` | `python tools/portable.py memory add --campaign <id> --type fact --subject "<s>" --content "<f>"` |
+| `sagasmith-dnd save create --campaign <id> --label "<label>" --json` | `python tools/portable.py save create --campaign <id> --label "<label>"` |
+| `sagasmith-dnd save list --campaign <id> --json` | `python tools/portable.py save list --campaign <id>` |
+
+### Characters
+
+| Runtime | Portable |
+|---------|----------|
+| `sagasmith-dnd character create --campaign <id> --name <name> --sheet '<json>' --json` | `python tools/portable.py character create --campaign <id> --name <name> --sheet '<json>'` |
+| `sagasmith-dnd character list --campaign <id> --json` | `python tools/portable.py character list --campaign <id>` |
+| `sagasmith-dnd character get --campaign <id> --name <name> --json` | `python tools/portable.py character get --campaign <id> --name <name>` |
+
+## Portable Mode Data
+
+Data lives in `~/.sagasmith/`:
+
+```
+~/.sagasmith/
+  campaigns.json                  # campaign index
+  <campaign_id>/
+    campaign.json                 # metadata
+    characters/<name>.json        # character sheets
+    modules/<source_key>.md       # imported modules (Markdown)
+    progress.json                 # scoped scene progress
+    events.jsonl                  # event log
+    memories.jsonl                # campaign memory
+    saves/<slot>/                 # snapshot copies
 ```
 
-## Portable Mode
+Module files are plain Markdown with `##` headings as scenes. Progress merges
+state per-scope (`party`, `group:<id>`, `player:<id>`). Save snapshots copy the
+campaign directory with `shutil.copytree`.
 
-If Runtime is unavailable, consult the selected directory under `srd/`. Default to
-2024 unless the user selects 2014. The 2014 Chinese translation is a convenience
-reference; verify important adjudications against 2014 English. Do not simulate
-persistence.
+## Portable Mode Limitations
+
+- No SQL FTS5 — search uses Python lexical scoring with Chinese ↔ English expansion
+- No ChromaDB vector search
+- No PDF import — convert PDF to Markdown first, then `module ingest`
+- No transaction atomicity — file writes use atomic rename (write tmp → replace)
+  for individual file safety, but multi-file operations (like save) are best-effort

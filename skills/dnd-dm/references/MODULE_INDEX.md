@@ -2,6 +2,9 @@
 
 模组由 Runtime 从 PDF 或 Markdown 建立章节、场景、房间、页码和检索块。
 
+**双模式：** 有 `sagasmith-dnd` 时用下面的 CLI；没有时把每条 `sagasmith-dnd` 换成
+`python tools/portable.py` 即可。
+
 场景层级由 D&D profile 解析：
 
 - H2 默认作为场景；当 H3 数量至少为 H2 的五倍时，改用 H3；
