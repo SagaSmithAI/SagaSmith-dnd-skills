@@ -6,9 +6,10 @@
 
 **Cross-platform D&D 5e 2014/2024 Agent Skills** — provide Dungeon Master capabilities to Claude Code, NanoBot, Codex, Cursor, OpenClaw, Hermes, and any agent platform supporting the SKILL.md standard.
 
-This repository is a **SKILL definition package** — it contains no database, game engine, or platform-specific tools. It ships two variants, and your agent should **auto-select** based on the local environment:
+This repository is a **SKILL definition package** — it contains no database, game engine, or platform-specific tools. It ships two variants — **you choose** which to install:
 
 | Variant | Directory | Dependency | When to use |
+|---------|-----------|------------|-------------|
 |---------|-----------|------------|-------------|
 | 📦 Full | `full/` | `sagasmith-dnd` Python package | Persistent campaigns, PDF import, FTS5 search, Snapshot DAG |
 | 🪶 Standalone | `standalone/` | Python 3.11+ (stdlib only) | Instant setup, file-based storage, zero pip deps |
