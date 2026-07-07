@@ -121,8 +121,10 @@ sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/s
 sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
+sagasmith-dnd region create --scene <scene-id> --name "Arrow Slit" --shape '{"type":"rect","x":90,"y":90,"width":30,"height":30}' --behavior cover --metadata '{"degree":"three_quarters"}' --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
 sagasmith-dnd template place --scene <scene-id> --actor <actor-id> --item <item-id> --activity <activity-id> --x 140 --y 210 --json
+sagasmith-dnd cover check --scene <scene-id> --token <attacker-token-id> --target-id <target-token-id> --json
 sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception --dc 15 --json
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition poisoned --json
 sagasmith-dnd effect recalculate --campaign <id> --actor <actor-id> --json
@@ -156,3 +158,6 @@ call `concentration pass`.
 For area effects, place the activity template before resolving saves or damage. Treat
 the returned Region as the authoritative area for narration, token targeting, and
 duration/terrain behavior.
+
+For attacks or Dexterity saves where obstacles matter, call `cover check` before
+choosing the final DC/AC modifier. Total cover prevents direct targeting.
