@@ -126,6 +126,7 @@ sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd region create --scene <scene-id> --name "Arrow Slit" --shape '{"type":"rect","x":90,"y":90,"width":30,"height":30}' --behavior cover --metadata '{"degree":"three_quarters"}' --json
+sagasmith-dnd region create --scene <scene-id> --name "Blessing Aura" --shape '{"type":"circle","x":70,"y":70,"radius":30}' --behavior apply_active_effect --metadata '{"statuses":["blessed"]}' --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
 sagasmith-dnd template place --scene <scene-id> --actor <actor-id> --item <item-id> --activity <activity-id> --x 140 --y 210 --json
 sagasmith-dnd cover check --scene <scene-id> --token <attacker-token-id> --target-id <target-token-id> --json
@@ -187,6 +188,10 @@ If `token move` returns movement `pending`, handle those reaction windows before
 describing the creature as safely away. This is the required path for opportunity
 attacks unless the move was Disengage, teleportation, forced movement, or another
 rule-supported exception.
+
+If `token move` returns `movement.region_effects.created` or `removed`, treat those
+ActiveEffect changes as part of the movement result. Apply any needed `actor prepare`
+before resolving follow-up rolls, attacks, saves, or damage from the new position.
 
 For leveling and feature grants, use `advancement apply` with structured steps. Do
 not manually edit Actor system level, hit points, scale values, or class feature

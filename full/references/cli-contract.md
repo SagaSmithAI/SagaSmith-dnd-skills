@@ -70,3 +70,6 @@ Runtime authority rules:
 - Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
 - Use `template place` before resolving area effects with a target template; it creates the scene Region the AI DM should reference.
 - Use `cover check` before ranged attacks or Dexterity saves when map obstacles might matter.
+- Use `region create --behavior apply_active_effect` for auras, hazards, and template
+  zones that attach ActiveEffects to actors. `token move` reports created/removed
+  `movement.region_effects`; handle those state changes before final movement narration.
