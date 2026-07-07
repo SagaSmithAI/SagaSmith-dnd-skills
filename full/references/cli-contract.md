@@ -34,6 +34,8 @@ Foundry-style runtime workflows:
 - Rulesets: `ruleset list/show/validate`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
 - Actor documents: `actor create/list/show/prepare`
+- Actor Item documents: `game-item create/list/show/update`
+- Activity documents: `game-activity create/list/show/update`, then `activity use`
 - Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
 - Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
@@ -52,6 +54,9 @@ Runtime authority rules:
   `ruleset.conditionTypes`, and `ruleset.conditionEffects` as the structured rule contract.
 - Do not use `combat act`; it is intentionally disabled.
 - Do not directly edit combat JSON, HP, conditions, action economy, resources, token position, or duration.
+- Use `game-item` and `game-activity` for Foundry-style Actor Items and executable
+  activities. Use the campaign item ledger only for inventory ownership, treasure,
+  currency, containers, and mundane item accounting.
 - If `activity use` returns `pending` reaction windows, resolve or decline them before narrating final resolution.
 - If `activity use` returns `execution`, treat that attack/damage/heal/save result as authoritative and do not recalculate it in prose.
 - If `token move` returns movement `pending` reaction windows, resolve opportunity attacks before final movement narration.

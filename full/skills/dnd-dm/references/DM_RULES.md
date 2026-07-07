@@ -122,6 +122,8 @@ sagasmith-dnd ruleset validate --id dnd5e-2014 --json
 sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
 sagasmith-dnd advancement apply --campaign <id> --actor <actor-id> --payload '{"steps":[{"type":"level","value":2},{"type":"hit_points","increase":6},{"type":"item_grant","item_type":"feat","name":"Action Surge"}]}' --json
 sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/spells/1st-level --json
+sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
+sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
 sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
@@ -153,6 +155,10 @@ sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the 
 When a Foundry-style Actor/Item/Activity document exists, prefer the document command
 shape with `--item <item-id> --activity <activity-id>`. The legacy ruleset activity
 shape is only for bootstrap features that have not yet been imported as documents.
+
+Use `game-item` and `game-activity` for Actor-owned Foundry Item documents and their
+executable actions. Do not confuse them with `item ...`, which is the campaign item
+ledger for backpack ownership, treasure, currency, containers, and consumables.
 
 For attack, damage, heal, and saving throw activities, `activity use` may return an
 `execution` object. Use that object as the rules result. Do not roll again, reapply
