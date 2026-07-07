@@ -129,6 +129,7 @@ sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type charact
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd region create --scene <scene-id> --name "Arrow Slit" --shape '{"type":"rect","x":90,"y":90,"width":30,"height":30}' --behavior cover --metadata '{"degree":"three_quarters"}' --json
 sagasmith-dnd region create --scene <scene-id> --name "Blessing Aura" --shape '{"type":"circle","x":70,"y":70,"radius":30}' --behavior apply_active_effect --metadata '{"statuses":["blessed"]}' --json
+sagasmith-dnd combat start --campaign <id> --scene <scene-id> --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
 sagasmith-dnd template place --scene <scene-id> --actor <actor-id> --item <item-id> --activity <activity-id> --x 140 --y 210 --json
 sagasmith-dnd cover check --scene <scene-id> --token <attacker-token-id> --target-id <target-token-id> --json
@@ -159,6 +160,11 @@ shape is only for bootstrap features that have not yet been imported as document
 Use `game-item` and `game-activity` for Actor-owned Foundry Item documents and their
 executable actions. Do not confuse them with `item ...`, which is the campaign item
 ledger for backpack ownership, treasure, currency, containers, and consumables.
+
+When scene tokens are linked to Actor documents, prefer `combat start --scene <id>`
+after `actor prepare`. The runtime derives combatants from visible tokens and
+prepared Actor data. Use explicit `--participants` only when bootstrapping missing
+documents or overriding initiative/HP for a special case.
 
 For attack, damage, heal, and saving throw activities, `activity use` may return an
 `execution` object. Use that object as the rules result. Do not roll again, reapply

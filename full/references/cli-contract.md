@@ -50,6 +50,9 @@ Foundry-style runtime workflows:
 Runtime authority rules:
 
 - Treat `scene -> token -> combatant -> actor` as the map/combat chain.
+- When a Scene has Actor-linked Tokens, `combat start --scene <scene-id>` can derive
+  combatants from visible tokens and prepared Actor data. Use explicit
+  `--participants` only to override or bootstrap missing document data.
 - Treat `ruleset.activityActivationTypes`, `ruleset.activityTypes`, `ruleset.limitedUsePeriods`,
   `ruleset.conditionTypes`, and `ruleset.conditionEffects` as the structured rule contract.
 - Do not use `combat act`; it is intentionally disabled.
