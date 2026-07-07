@@ -170,6 +170,11 @@ For attack, damage, heal, and saving throw activities, `activity use` may return
 `execution` object. Use that object as the rules result. Do not roll again, reapply
 damage, or reinterpret hit point changes from prose.
 
+Activity execution resolves common Foundry roll data references such as `@prof`,
+`@mod`, `@abilities.dex.mod`, `@classes.<class>.levels`, and `@item.uses.spent`.
+Leave these formulas in structured activity data; do not pre-expand them in prose
+unless the runtime returns an unsupported-formula error.
+
 Before rolls, attacks, saves, and damage that depend on equipment or ActiveEffects,
 call `actor prepare` if the actor changed since the last preparation. Treat the
 returned `derived.effective_system` as the actor's current Foundry-style prepared

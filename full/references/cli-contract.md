@@ -62,6 +62,9 @@ Runtime authority rules:
   currency, containers, and mundane item accounting.
 - If `activity use` returns `pending` reaction windows, resolve or decline them before narrating final resolution.
 - If `activity use` returns `execution`, treat that attack/damage/heal/save result as authoritative and do not recalculate it in prose.
+- Activity execution resolves common Foundry roll data formulas such as `@prof`,
+  `@mod`, `@abilities.dex.mod`, `@classes.<class>.levels`, and
+  `@item.uses.spent`. Do not pre-expand those formulas in prose.
 - If `token move` returns movement `pending` reaction windows, resolve opportunity attacks before final movement narration.
 - Use `ready set` for the Ready action and `ready trigger` when the stated trigger occurs.
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.
