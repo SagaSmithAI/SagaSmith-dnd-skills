@@ -68,6 +68,9 @@ Runtime authority rules:
 - Activity execution reads Foundry-style structured `system.damage.parts`,
   `system.damage.onSave`, `system.healing`, and `system.save.dc.formula`.
   Prefer these imported/structured fields over custom flat damage strings.
+- Actor preparation applies Foundry numeric ActiveEffect change modes
+  `1=multiply`, `2=add`, `3=downgrade`, `4=upgrade`, `5=override`, with
+  priority ordering. Keep imported numeric modes intact.
 - If `token move` returns movement `pending` reaction windows, resolve opportunity attacks before final movement narration.
 - Use `ready set` for the Ready action and `ready trigger` when the stated trigger occurs.
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.

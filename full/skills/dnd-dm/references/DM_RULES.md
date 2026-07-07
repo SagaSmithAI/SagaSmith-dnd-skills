@@ -182,6 +182,10 @@ For imported or newly authored Activity documents, prefer Foundry-style structur
 semantics, keeps damage part metadata, and applies HP changes. Do not flatten them
 into one prose-calculated damage number.
 
+Imported ActiveEffects may keep Foundry numeric change modes. Actor preparation
+applies the common numeric modes and priority ordering, so do not rewrite them into
+prose or hand-calculate the resulting actor values.
+
 Before rolls, attacks, saves, and damage that depend on equipment or ActiveEffects,
 call `actor prepare` if the actor changed since the last preparation. Treat the
 returned `derived.effective_system` as the actor's current Foundry-style prepared
