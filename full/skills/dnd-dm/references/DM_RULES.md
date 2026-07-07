@@ -120,6 +120,7 @@ Common runtime commands:
 ```powershell
 sagasmith-dnd ruleset validate --id dnd5e-2014 --json
 sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
+sagasmith-dnd actor update --actor <actor-id> --payload '{"attributes":{"hp":{"value":18,"max":18}}}' --json
 sagasmith-dnd advancement apply --campaign <id> --actor <actor-id> --payload '{"steps":[{"type":"level","value":2},{"type":"hit_points","increase":6},{"type":"item_grant","item_type":"feat","name":"Action Surge"}]}' --json
 sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/spells/1st-level --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json

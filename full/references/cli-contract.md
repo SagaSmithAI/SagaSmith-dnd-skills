@@ -33,7 +33,7 @@ Foundry-style runtime workflows:
 
 - Rulesets: `ruleset list/show/validate`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
-- Actor documents: `actor create/list/show/prepare`
+- Actor documents: `actor create/list/show/update/prepare`
 - Actor Item documents: `game-item create/list/show/update`
 - Activity documents: `game-activity create/list/show/update`, then `activity use`
 - Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
