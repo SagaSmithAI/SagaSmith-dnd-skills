@@ -116,12 +116,28 @@ Common runtime commands:
 
 ```powershell
 sagasmith-dnd ruleset validate --id dnd5e-2014 --json
+sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/spells/1st-level --json
 sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
+sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception --dc 15 --json
+sagasmith-dnd effect recalculate --campaign <id> --actor <actor-id> --json
+sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
+sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
+sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
 sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity action_surge --json
 sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity second_wind --target-id <combatant-id> --payload '{"fighter_level":5}' --json
+sagasmith-dnd combat death-save --campaign <id> --target-id <combatant-id> --json
 sagasmith-dnd rest short --campaign <id> --json
 sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
 ```
+
+When a Foundry-style Actor/Item/Activity document exists, prefer the document command
+shape with `--item <item-id> --activity <activity-id>`. The legacy ruleset activity
+shape is only for bootstrap features that have not yet been imported as documents.
+
+If `activity use` returns a non-empty `pending` array, pause final narration. Call
+`reaction list`, then `reaction resolve` or `reaction decline`, and only then narrate
+the resolved outcome. Do not silently skip Shield, Counterspell, opportunity attacks,
+or similar timing windows.
