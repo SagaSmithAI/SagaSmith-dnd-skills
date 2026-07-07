@@ -116,13 +116,16 @@ Common runtime commands:
 
 ```powershell
 sagasmith-dnd ruleset validate --id dnd5e-2014 --json
+sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
 sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/spells/1st-level --json
 sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
 sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception --dc 15 --json
+sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition poisoned --json
 sagasmith-dnd effect recalculate --campaign <id> --actor <actor-id> --json
+sagasmith-dnd damage apply --campaign <id> --actor <actor-id> --amount 9 --damage-type fire --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
 sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
 sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
@@ -130,6 +133,7 @@ sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity act
 sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity second_wind --target-id <combatant-id> --payload '{"fighter_level":5}' --json
 sagasmith-dnd combat death-save --campaign <id> --target-id <combatant-id> --json
 sagasmith-dnd rest short --campaign <id> --json
+sagasmith-dnd time advance --campaign <id> --period narrative_beat --json
 sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
 ```
 

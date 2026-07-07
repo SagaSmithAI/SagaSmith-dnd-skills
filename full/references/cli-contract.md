@@ -33,11 +33,12 @@ Foundry-style runtime workflows:
 
 - Rulesets: `ruleset list/show/validate`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
+- Actor documents: `actor create/list/show`
 - Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
 - Combat: `combat start/status/attack/damage/heal/condition/death-save/end-turn/end`
 - Activities: `activity use --campaign <id> --actor <actor-or-combatant-id> --item <item-id> --activity <activity-id>`
 - Reactions: `reaction list/resolve/decline`
-- Effects and rolls: `effect recalculate`, `roll ability/skill/save/initiative`
+- Effects, conditions, damage, and rolls: `effect recalculate`, `condition add/remove`, `damage apply`, `roll ability/skill/save/initiative`
 - Effects and periods: `effect add/remove/list`, `time status/advance`, `rest short/long`
 
 Runtime authority rules:
@@ -49,5 +50,8 @@ Runtime authority rules:
 - Do not directly edit combat JSON, HP, conditions, action economy, resources, token position, or duration.
 - If `activity use` returns `pending` reaction windows, resolve or decline them before narrating final resolution.
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.
+- Use `condition add/remove` for Actor document conditions and then `effect recalculate`.
+- Use `damage apply` for Actor document damage so resistance, vulnerability, and immunity are applied.
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.
-- Use `time advance` for declared in-world time. Wall-clock time and model latency never advance durations.
+- Use `time advance --period <period>` for narrative or combat period durations.
+- Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
