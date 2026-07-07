@@ -33,7 +33,7 @@ Foundry-style runtime workflows:
 
 - Rulesets: `ruleset list/show/validate`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
-- Actor documents: `actor create/list/show`
+- Actor documents: `actor create/list/show/prepare`
 - Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
 - Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
@@ -58,6 +58,10 @@ Runtime authority rules:
 - Use `ready set` for the Ready action and `ready trigger` when the stated trigger occurs.
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.
 - Use `condition add/remove` for Actor document conditions and then `effect recalculate`.
+- Use `actor prepare` after equipment, advancement, item, condition, or ActiveEffect
+  changes that can affect derived actor math. Rolls, attacks, saves, damage, and
+  narration should read the prepared Actor state instead of hand-calculating AC,
+  proficiency, resistances, immunities, vulnerabilities, or condition statuses.
 - Use `damage apply` for Actor document damage so resistance, vulnerability, and immunity are applied.
 - If `damage apply` returns `concentration_save_required`, roll the CON save and call `concentration pass` or `concentration fail`.
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.

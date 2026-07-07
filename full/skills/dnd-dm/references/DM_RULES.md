@@ -107,6 +107,9 @@ Rules for the AI DM:
 - Use `sagasmith-dnd activity use ... --json` for player and NPC actions whenever an activity exists.
 - Use `sagasmith-dnd token move ... --json` for map movement.
 - Use `sagasmith-dnd effect add/remove/list ... --json` for active effects.
+- Use `sagasmith-dnd actor prepare ... --json` after equipment, advancement, item,
+  condition, or ActiveEffect changes that can affect AC, proficiency, traits,
+  statuses, resources, or other derived actor math.
 - Use `sagasmith-dnd rest short|long ... --json` for rest recovery.
 - Use `sagasmith-dnd time advance --minutes <n> ... --json` for declared in-world time.
 - Wall-clock time, chat delay, and LLM processing time never advance durations.
@@ -127,6 +130,7 @@ sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<j
 sagasmith-dnd template place --scene <scene-id> --actor <actor-id> --item <item-id> --activity <activity-id> --x 140 --y 210 --json
 sagasmith-dnd cover check --scene <scene-id> --token <attacker-token-id> --target-id <target-token-id> --json
 sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception --dc 15 --json
+sagasmith-dnd actor prepare --campaign <id> --actor <actor-id> --json
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition poisoned --json
 sagasmith-dnd effect recalculate --campaign <id> --actor <actor-id> --json
 sagasmith-dnd damage apply --campaign <id> --actor <actor-id> --amount 9 --damage-type fire --json
@@ -152,6 +156,12 @@ shape is only for bootstrap features that have not yet been imported as document
 For attack, damage, heal, and saving throw activities, `activity use` may return an
 `execution` object. Use that object as the rules result. Do not roll again, reapply
 damage, or reinterpret hit point changes from prose.
+
+Before rolls, attacks, saves, and damage that depend on equipment or ActiveEffects,
+call `actor prepare` if the actor changed since the last preparation. Treat the
+returned `derived.effective_system` as the actor's current Foundry-style prepared
+data. Do not hand-calculate AC, proficiency, resistance, immunity, vulnerability,
+or condition statuses from prose when prepared actor data exists.
 
 If `activity use` returns a non-empty `pending` array, pause final narration. Call
 `reaction list`, then `reaction resolve` or `reaction decline`, and only then narrate
