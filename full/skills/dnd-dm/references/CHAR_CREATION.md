@@ -28,3 +28,41 @@ sagasmith-dnd character show --id <character-id> --json
 
 角色 sheet 至少包含 abilities、level、armor_class、hit_points、
 max_hit_points、class、species、background、proficiencies、inventory 和 spells。
+
+## 背包与物品账本
+
+`sheet.inventory` 只作为创建/导入时的兼容入口。正式角色创建后，背包由
+`sagasmith-dnd item ... --json` 维护；不要再通过 `character update --sheet`
+手动改背包。
+
+标准物品对象字段：
+
+```json
+{
+  "name": "Potion of Healing",
+  "quantity": 2,
+  "category": "consumable",
+  "equipped_slot": null,
+  "attunement": "none",
+  "identified": true,
+  "charges": {},
+  "condition": "normal",
+  "state": {
+    "source": "starting equipment"
+  },
+  "template": {
+    "source_key": "srd:potion-healing",
+    "rarity": "common",
+    "value": {"gp": 50},
+    "weight": 0
+  }
+}
+```
+
+金币使用 `category="currency"`，并在模板或 state 中记录 denomination：
+`cp`、`sp`、`ep`、`gp`、`pp`。装备槽位使用稳定英文键，例如 `main_hand`、
+`off_hand`、`armor`、`shield`、`ring_1`、`ring_2`、`neck`、`belt`、`pack`。
+
+创建角色时可在 `--sheet` 中附带初始 `inventory`；CLI 会导入物品账本并返回
+`inventory_managed=true`。之后拾取、购买、转移、装备、消耗、同调、鉴定都必须使用
+`item` 子命令。

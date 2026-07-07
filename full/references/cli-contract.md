@@ -28,3 +28,20 @@ Compatibility workflows include:
 - `save regenerate-recap`
 - `memory scope` / `memory status`
 - `state history` / `state undo` / `state redo`
+
+Foundry-style runtime workflows:
+
+- Rulesets: `ruleset list/show/validate`
+- Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
+- Combat: `combat start/status/attack/damage/heal/condition/end-turn/end`
+- Activities: `activity use --campaign <id> --actor <combatant-id> --activity <activity-id>`
+- Effects and periods: `effect add/remove/list`, `time status/advance`, `rest short/long`
+
+Runtime authority rules:
+
+- Treat `scene -> token -> combatant -> actor` as the map/combat chain.
+- Treat `ruleset.activityActivationTypes`, `ruleset.activityTypes`, `ruleset.limitedUsePeriods`,
+  `ruleset.conditionTypes`, and `ruleset.conditionEffects` as the structured rule contract.
+- Do not use `combat act`; it is intentionally disabled.
+- Do not directly edit combat JSON, HP, conditions, action economy, resources, token position, or duration.
+- Use `time advance` for declared in-world time. Wall-clock time and model latency never advance durations.

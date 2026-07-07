@@ -1,10 +1,39 @@
-# Runtime 数据契约
+# Runtime Data Contract
 
-Skill 不直接访问数据库。所有写入通过 `sagasmith-dnd --json`。
+Skills never access the database directly. Every mutation goes through
+`sagasmith-dnd ... --json`.
 
-- SQL 是真实数据源。
-- 规则、模组和 embedding 是静态索引。
-- 战役、角色、场景进度、快照和记忆是可变状态。
-- 快照不复制规则或模组原文。
-- Dense 不可用时 Runtime 自动保留 exact/lexical 检索。
-- 每个战役的 edition、locale 和 publications 由 rule profile 决定。
+- SQL is the source of truth for mutable campaign state.
+- Rules, modules, and embeddings are static/reference layers.
+- Campaigns, characters, item instances, scene progress, map scenes, scene tokens,
+  scene regions, snapshots, events, and memories are mutable runtime state.
+- Each campaign's edition, locale, publications, and options are decided by its
+  rule profile.
+- Dense retrieval is optional; exact/lexical retrieval remains available.
+
+## Foundry-Style Runtime
+
+SagaSmith runtime follows this document chain:
+
+```text
+Scene -> Token -> Combatant -> Actor/Character
+Item/Feature/Spell -> Activity -> Consumption/Effect/Duration
+Region -> Terrain/Aura/Hazard/Template behavior
+```
+
+Runtime rules:
+
+- Use `scene`, `token`, and `region` commands for map state.
+- Bind combatants to scene tokens when a scene is available.
+- Use `activity use` for action economy, resources, effects, and class features.
+- Use `effect add/remove/list` for active effects.
+- Use `rest short|long` and `time advance` for period recovery and durations.
+- Never use `combat act`; it is intentionally outside the contract.
+- Do not directly edit combat JSON, HP, resources, conditions, token position, or duration.
+
+Snapshot/restore includes campaign state, characters, item instances, scene
+progress, map scenes, scene tokens, scene regions, memories, and rule profile.
+It does not copy static rules, module source text, or embeddings.
+
+Durations advance only through declared runtime periods: combat turn/round, rest,
+scene end, and `time advance`. Wall-clock time and LLM latency never count.

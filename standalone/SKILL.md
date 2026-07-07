@@ -81,6 +81,31 @@ python portable.py roll check --dc 12 --score 14 --advantage
 python portable.py roll attack --ac 17 --score 18 --proficient --level 5
 ```
 
+When Runtime mode is available for a 2014 campaign, prefer character-based checks
+over hand-built `roll check` math:
+
+```powershell
+sagasmith-dnd check ability --character <character-id> --ability strength --dc 15 --json
+sagasmith-dnd check skill --character <character-id> --skill perception --dc 15 --json
+sagasmith-dnd check save --character <character-id> --ability dexterity --dc 13 --json
+sagasmith-dnd check tool --character <character-id> --ability dexterity --tool thieves_tools --dc 15 --json
+sagasmith-dnd check initiative --character <character-id> --json
+```
+
+When Runtime mode is available, use structured combat commands instead of
+hand-editing campaign combat JSON:
+
+```powershell
+sagasmith-dnd combat start --campaign <id> --name "<encounter>" --participants '<json-array>' --json
+sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd combat attack --campaign <id> --actor <combatant-id> --target-id <combatant-id> --attack-bonus <n> --expression "1d8+3" --damage-type slashing --weapon "Longsword" --json
+sagasmith-dnd combat damage --campaign <id> --target-id <combatant-id> --amount <n> --damage-type fire --json
+sagasmith-dnd combat heal --campaign <id> --target-id <combatant-id> --expression "1d8+3" --json
+sagasmith-dnd combat condition add --campaign <id> --target-id <combatant-id> --condition prone --json
+sagasmith-dnd combat condition remove --campaign <id> --target-id <combatant-id> --condition prone --json
+sagasmith-dnd combat end-turn --campaign <id> --actor <combatant-id> --json
+```
+
 ### Events & Memory
 
 ```powershell

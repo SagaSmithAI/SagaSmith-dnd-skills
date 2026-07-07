@@ -16,6 +16,8 @@
 3. 判断是否真的需要检定：必须同时存在不确定性、成功与失败的意义、规则允许且
    角色有能力尝试。自动成功和不可能行动不掷骰。
 4. 读取完整角色与环境状态，确定能力、熟练、优势/劣势和 DC，再公开调用 CLI。
+   2014 角色检定优先使用 `sagasmith-dnd check ability|skill|save|tool|initiative`
+   从角色卡结算，不手算熟练和专精。
 5. 骰子结果确定后叙事；不得先写结局再倒推骰子。
 6. 一次行动造成的 HP、资源、条件、位置、线索、NPC 与世界变化要在同一轮完整写入。
 7. 追加事件；长期有效的承诺、身份、线索和关系另写 memory。
@@ -23,6 +25,9 @@
 ## 战斗
 
 - 开战时确定参与者、位置、突袭与先攻；只使用角色实际拥有的能力和资源。
+- Runtime 模式下，战斗状态必须通过 `sagasmith-dnd combat ... --json` 维护。
+  每次战斗叙事前先读取 `combat status`，按返回的 `current` 和 `legal_actions`
+  主持当前回合；不得凭聊天历史手改轮次、HP、条件或行动经济。
 - 每回合依序处理回合开始效果、移动、动作、附赠动作、反应与回合结束效果。
 - 攻击先判命中，再计算伤害、抗性/免疫、集中与濒死；不得让叙事绕过引擎结果。
 - 角色仍有可用动作时不要擅自结束其回合。NPC 只能依据其已知信息行动。
@@ -59,3 +64,64 @@
 重复、长期事实已进入 memory，并在需要时创建了 Snapshot。
 
 常用命令见仓库根目录 `references/cli-contract.md` 和 `references/workflows.md`。
+
+## Inventory and item ledger
+
+Backpacks, equipment, treasure, currency, containers, and consumables are managed by
+the campaign item ledger. Treat `sheet.inventory` as an import/display compatibility
+field only.
+
+Common commands:
+
+```powershell
+sagasmith-dnd item template create --name "Potion of Healing" --source-key "srd:potion-healing" --category consumable --value '{"gp":50}' --json
+sagasmith-dnd item add --campaign <id> --name "Potion of Healing" --owner-type character --owner-id <character-id> --quantity 2 --json
+sagasmith-dnd item list --campaign <id> --owner-type character --owner-id <character-id> --json
+sagasmith-dnd item move --item <item-id> --owner-type party --owner-id party --json
+sagasmith-dnd item equip --item <item-id> --slot main_hand --json
+sagasmith-dnd item unequip --item <item-id> --json
+sagasmith-dnd item use --item <item-id> --quantity 1 --json
+sagasmith-dnd item history --campaign <id> --item <item-id> --json
+```
+
+Always use the item ledger for gaining, losing, buying, selling, transferring,
+equipping, attuning, identifying, or consuming items. Create a snapshot after major
+treasure distribution, shopping, or equipment loadout changes.
+
+## Foundry-style runtime authority
+
+SagaSmith runtime follows the Foundry-style document chain:
+
+```text
+Scene -> Token -> Combatant -> Actor/Character
+Item/Feature/Spell -> Activity -> Consumption/Effect/Duration
+Region -> Terrain/Aura/Hazard/Template behavior
+```
+
+Rules for the AI DM:
+
+- Never directly edit combat JSON, HP, resources, conditions, action economy, token position, or duration.
+- Never call `combat act`; it is disabled by design.
+- Before combat narration, call `sagasmith-dnd combat status --campaign <id> --json` and use `current`,
+  `legal_actions`, `legal_action_details`, `turn_budget`, `effects`, and `reaction_windows`.
+- Use `sagasmith-dnd activity use ... --json` for player and NPC actions whenever an activity exists.
+- Use `sagasmith-dnd token move ... --json` for map movement.
+- Use `sagasmith-dnd effect add/remove/list ... --json` for active effects.
+- Use `sagasmith-dnd rest short|long ... --json` for rest recovery.
+- Use `sagasmith-dnd time advance --minutes <n> ... --json` for declared in-world time.
+- Wall-clock time, chat delay, and LLM processing time never advance durations.
+- Create snapshots before major combats, after major combats, before risky restores, and after major map state changes.
+
+Common runtime commands:
+
+```powershell
+sagasmith-dnd ruleset validate --id dnd5e-2014 --json
+sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
+sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
+sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
+sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
+sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity action_surge --json
+sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity second_wind --target-id <combatant-id> --payload '{"fighter_level":5}' --json
+sagasmith-dnd rest short --campaign <id> --json
+sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
+```

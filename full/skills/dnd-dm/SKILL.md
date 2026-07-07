@@ -94,6 +94,42 @@ Never reveal unseen rooms, future twists, hidden NPC motives, or appendix secret
 
 Use `--advantage` or `--disadvantage` only when the selected edition grants it.
 
+### 2014 Checks
+
+For 2014 character adjudication, prefer character-based checks over hand-built
+`roll check` math. The agent decides whether a check is needed, the DC, and any
+advantage/disadvantage after reading rules or module text; the CLI computes the
+character's ability modifier, proficiency, expertise, and total.
+
+```powershell
+sagasmith-dnd check ability --character <character-id> --ability strength --dc 15 --json
+sagasmith-dnd check skill --character <character-id> --skill perception --dc 15 --json
+sagasmith-dnd check save --character <character-id> --ability dexterity --dc 13 --json
+sagasmith-dnd check tool --character <character-id> --ability dexterity --tool thieves_tools --dc 15 --json
+sagasmith-dnd check initiative --character <character-id> --json
+```
+
+### Combat
+
+Runtime combat is structured state. Do not hand-edit campaign combat JSON during
+normal play.
+
+```powershell
+sagasmith-dnd combat start --campaign <id> --name "<encounter>" --participants '<json-array>' --json
+sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd combat attack --campaign <id> --actor <combatant-id> --target-id <combatant-id> --attack-bonus <n> --expression "1d8+3" --damage-type slashing --weapon "Longsword" --json
+sagasmith-dnd combat damage --campaign <id> --target-id <combatant-id> --amount <n> --damage-type fire --json
+sagasmith-dnd combat heal --campaign <id> --target-id <combatant-id> --expression "1d8+3" --json
+sagasmith-dnd combat condition add --campaign <id> --target-id <combatant-id> --condition prone --json
+sagasmith-dnd combat condition remove --campaign <id> --target-id <combatant-id> --condition prone --json
+sagasmith-dnd combat end-turn --campaign <id> --actor <combatant-id> --json
+sagasmith-dnd combat end --campaign <id> --json
+```
+
+Before each combat narration, run `combat status` and use its `current` and
+`legal_actions` fields. Start participants should include stable `id`, `name`,
+`ac`, `hp`, `max_hp`, and optional `initiative`, `conditions`, and `position`.
+
 ### State Updates
 
 | Runtime | Portable |

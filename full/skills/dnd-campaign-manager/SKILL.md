@@ -40,6 +40,52 @@ sagasmith-dnd character update --id <character-id> --sheet '<json>' --json
 
 Do not persist a draft until the user confirms it.
 
+## Inventory
+
+Use the item ledger for backpacks and equipment. Do not edit `sheet.inventory`
+after character creation.
+
+```powershell
+sagasmith-dnd item add --campaign <id> --name "Iron Key" --owner-type character --owner-id <character-id> --quantity 1 --json
+sagasmith-dnd item list --campaign <id> --owner-type character --owner-id <character-id> --json
+sagasmith-dnd item move --item <item-id> --owner-type party --owner-id party --json
+sagasmith-dnd item equip --item <item-id> --slot main_hand --json
+sagasmith-dnd item use --item <item-id> --quantity 1 --json
+sagasmith-dnd item history --campaign <id> --item <item-id> --json
+```
+
+Create a snapshot after major treasure, shopping, or loadout changes.
+
+## Combat
+
+Use Foundry-style runtime commands for map, initiative, HP, conditions, action
+economy, effects, periods, and turn flow. Do not use `combat act`.
+
+```powershell
+sagasmith-dnd scene create --campaign <id> --name "<battle map>" --width 1000 --height 800 --json
+sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
+sagasmith-dnd token move --token <token-id> --x 30 --y 20 --json
+sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
+sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --participants '<json-array>' --json
+sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity action_surge --json
+sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity second_wind --target-id <combatant-id> --payload '{"fighter_level":5}' --json
+sagasmith-dnd combat attack --campaign <id> --actor <combatant-id> --target-id <combatant-id> --attack-bonus <n> --expression "1d8+3" --damage-type slashing --weapon "Longsword" --json
+sagasmith-dnd combat damage --campaign <id> --target-id <combatant-id> --amount <n> --damage-type fire --json
+sagasmith-dnd combat heal --campaign <id> --target-id <combatant-id> --expression "1d8+3" --json
+sagasmith-dnd combat condition add --campaign <id> --target-id <combatant-id> --condition prone --json
+sagasmith-dnd effect add --campaign <id> --target-id <combatant-id> --payload '{"id":"bless","duration":{"period":"declared_minute","value":1}}' --json
+sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
+sagasmith-dnd rest short --campaign <id> --json
+sagasmith-dnd combat end-turn --campaign <id> --actor <combatant-id> --json
+sagasmith-dnd combat end --campaign <id> --json
+```
+
+Before narrating any combat turn, read `combat status` and follow its `current`,
+`legal_actions`, `legal_action_details`, `turn_budget`, and `effects`. Create a
+snapshot before and after important encounters and map state changes. Wall-clock
+time never advances duration; only runtime period commands do.
+
 ## Saves
 
 ```powershell
