@@ -167,3 +167,8 @@ choosing the final DC/AC modifier. Total cover prevents direct targeting.
 For the Ready action, call `ready set` immediately when the actor readies. When the
 trigger occurs, call `ready trigger` before resolving the readied payload; do not
 track readied actions only in prose.
+
+If `token move` returns movement `pending`, handle those reaction windows before
+describing the creature as safely away. This is the required path for opportunity
+attacks unless the move was Disengage, teleportation, forced movement, or another
+rule-supported exception.

@@ -52,6 +52,7 @@ Runtime authority rules:
 - Do not use `combat act`; it is intentionally disabled.
 - Do not directly edit combat JSON, HP, conditions, action economy, resources, token position, or duration.
 - If `activity use` returns `pending` reaction windows, resolve or decline them before narrating final resolution.
+- If `token move` returns movement `pending` reaction windows, resolve opportunity attacks before final movement narration.
 - Use `ready set` for the Ready action and `ready trigger` when the stated trigger occurs.
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.
 - Use `condition add/remove` for Actor document conditions and then `effect recalculate`.
