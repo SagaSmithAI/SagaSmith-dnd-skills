@@ -122,6 +122,7 @@ sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
+sagasmith-dnd template place --scene <scene-id> --actor <actor-id> --item <item-id> --activity <activity-id> --x 140 --y 210 --json
 sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception --dc 15 --json
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition poisoned --json
 sagasmith-dnd effect recalculate --campaign <id> --actor <actor-id> --json
@@ -151,3 +152,7 @@ or similar timing windows.
 If `damage apply` returns `concentration_save_required`, immediately call `roll save`
 for Constitution at the returned DC. On failure call `concentration fail`; on success
 call `concentration pass`.
+
+For area effects, place the activity template before resolving saves or damage. Treat
+the returned Region as the authoritative area for narration, token targeting, and
+duration/terrain behavior.

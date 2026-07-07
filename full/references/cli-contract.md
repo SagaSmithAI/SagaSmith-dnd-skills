@@ -35,6 +35,7 @@ Foundry-style runtime workflows:
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
 - Actor documents: `actor create/list/show`
 - Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
+- Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
 - Combat: `combat start/status/attack/damage/heal/condition/death-save/end-turn/end`
 - Activities: `activity use --campaign <id> --actor <actor-or-combatant-id> --item <item-id> --activity <activity-id>`
 - Reactions: `reaction list/resolve/decline`
@@ -56,3 +57,4 @@ Runtime authority rules:
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.
 - Use `time advance --period <period>` for narrative or combat period durations.
 - Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
+- Use `template place` before resolving area effects with a target template; it creates the scene Region the AI DM should reference.
