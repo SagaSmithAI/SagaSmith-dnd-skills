@@ -149,6 +149,10 @@ When a Foundry-style Actor/Item/Activity document exists, prefer the document co
 shape with `--item <item-id> --activity <activity-id>`. The legacy ruleset activity
 shape is only for bootstrap features that have not yet been imported as documents.
 
+For attack, damage, heal, and saving throw activities, `activity use` may return an
+`execution` object. Use that object as the rules result. Do not roll again, reapply
+damage, or reinterpret hit point changes from prose.
+
 If `activity use` returns a non-empty `pending` array, pause final narration. Call
 `reaction list`, then `reaction resolve` or `reaction decline`, and only then narrate
 the resolved outcome. Do not silently skip Shield, Counterspell, opportunity attacks,
