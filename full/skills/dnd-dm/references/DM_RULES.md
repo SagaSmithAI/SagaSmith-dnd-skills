@@ -126,6 +126,8 @@ sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception -
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition poisoned --json
 sagasmith-dnd effect recalculate --campaign <id> --actor <actor-id> --json
 sagasmith-dnd damage apply --campaign <id> --actor <actor-id> --amount 9 --damage-type fire --json
+sagasmith-dnd roll save --campaign <id> --actor <actor-id> --ability con --dc 10 --json
+sagasmith-dnd concentration fail --campaign <id> --actor <actor-id> --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
 sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
 sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
@@ -145,3 +147,7 @@ If `activity use` returns a non-empty `pending` array, pause final narration. Ca
 `reaction list`, then `reaction resolve` or `reaction decline`, and only then narrate
 the resolved outcome. Do not silently skip Shield, Counterspell, opportunity attacks,
 or similar timing windows.
+
+If `damage apply` returns `concentration_save_required`, immediately call `roll save`
+for Constitution at the returned DC. On failure call `concentration fail`; on success
+call `concentration pass`.

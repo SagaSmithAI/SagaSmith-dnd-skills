@@ -38,7 +38,7 @@ Foundry-style runtime workflows:
 - Combat: `combat start/status/attack/damage/heal/condition/death-save/end-turn/end`
 - Activities: `activity use --campaign <id> --actor <actor-or-combatant-id> --item <item-id> --activity <activity-id>`
 - Reactions: `reaction list/resolve/decline`
-- Effects, conditions, damage, and rolls: `effect recalculate`, `condition add/remove`, `damage apply`, `roll ability/skill/save/initiative`
+- Effects, conditions, damage, concentration, and rolls: `effect recalculate`, `condition add/remove`, `damage apply`, `concentration pass/fail`, `roll ability/skill/save/initiative`
 - Effects and periods: `effect add/remove/list`, `time status/advance`, `rest short/long`
 
 Runtime authority rules:
@@ -52,6 +52,7 @@ Runtime authority rules:
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.
 - Use `condition add/remove` for Actor document conditions and then `effect recalculate`.
 - Use `damage apply` for Actor document damage so resistance, vulnerability, and immunity are applied.
+- If `damage apply` returns `concentration_save_required`, roll the CON save and call `concentration pass` or `concentration fail`.
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.
 - Use `time advance --period <period>` for narrative or combat period durations.
 - Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
