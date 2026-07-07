@@ -117,6 +117,7 @@ Common runtime commands:
 ```powershell
 sagasmith-dnd ruleset validate --id dnd5e-2014 --json
 sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
+sagasmith-dnd advancement apply --campaign <id> --actor <actor-id> --payload '{"steps":[{"type":"level","value":2},{"type":"hit_points","increase":6},{"type":"item_grant","item_type":"feat","name":"Action Surge"}]}' --json
 sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/spells/1st-level --json
 sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
@@ -172,3 +173,7 @@ If `token move` returns movement `pending`, handle those reaction windows before
 describing the creature as safely away. This is the required path for opportunity
 attacks unless the move was Disengage, teleportation, forced movement, or another
 rule-supported exception.
+
+For leveling and feature grants, use `advancement apply` with structured steps. Do
+not manually edit Actor system level, hit points, scale values, or class feature
+items in prose.

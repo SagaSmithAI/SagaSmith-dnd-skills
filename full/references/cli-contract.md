@@ -34,6 +34,7 @@ Foundry-style runtime workflows:
 - Rulesets: `ruleset list/show/validate`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
 - Actor documents: `actor create/list/show`
+- Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
 - Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
 - Cover: `cover check --scene <id> --token <attacker-token-id> --target-id <target-token-id>`
@@ -59,6 +60,7 @@ Runtime authority rules:
 - Use `damage apply` for Actor document damage so resistance, vulnerability, and immunity are applied.
 - If `damage apply` returns `concentration_save_required`, roll the CON save and call `concentration pass` or `concentration fail`.
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.
+- Use `advancement apply` for level, hit point, scale value, and feature/item grants.
 - Use `time advance --period <period>` for narrative or combat period durations.
 - Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
 - Use `template place` before resolving area effects with a target template; it creates the scene Region the AI DM should reference.
