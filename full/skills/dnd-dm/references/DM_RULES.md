@@ -191,6 +191,9 @@ call `actor prepare` if the actor changed since the last preparation. Treat the
 returned `derived.effective_system` as the actor's current Foundry-style prepared
 data. Do not hand-calculate AC, proficiency, resistance, immunity, vulnerability,
 or condition statuses from prose when prepared actor data exists.
+Prepared actor data also includes ability modifiers, save totals, skill modifiers,
+and passive skill values. Use those prepared values for perception, stealth,
+initiative setup, and save/skill narration.
 
 If `activity use` returns a non-empty `pending` array, pause final narration. Call
 `reaction list`, then `reaction resolve` or `reaction decline`, and only then narrate

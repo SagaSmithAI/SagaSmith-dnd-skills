@@ -79,6 +79,9 @@ Runtime authority rules:
   changes that can affect derived actor math. Rolls, attacks, saves, damage, and
   narration should read the prepared Actor state instead of hand-calculating AC,
   proficiency, resistances, immunities, vulnerabilities, or condition statuses.
+- Prepared Actor data includes basic ability modifiers, save totals, skill
+  modifiers, and passive skill values under `derived.effective_system` and
+  `derived.rolls`.
 - Use `damage apply` for Actor document damage so resistance, vulnerability, and immunity are applied.
 - If `damage apply` returns `concentration_save_required`, roll the CON save and call `concentration pass` or `concentration fail`.
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.
