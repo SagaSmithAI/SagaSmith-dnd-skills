@@ -37,7 +37,7 @@ Foundry-style runtime workflows:
 - Actor Item documents: `game-item create/list/show/update`
 - Activity documents: `game-activity create/list/show/update`, then `activity use`
 - Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
-- Map documents: `scene create/list/show`, `token create/list/show/move`, `region create/list`
+- Map documents: `scene create/list/show`, `token create/list/show/update/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
 - Cover: `cover check --scene <id> --token <attacker-token-id> --target-id <target-token-id>`
 - Combat: `combat start/status/attack/damage/heal/condition/death-save/end-turn/end`
