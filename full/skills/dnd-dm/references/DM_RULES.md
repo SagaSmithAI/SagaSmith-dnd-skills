@@ -176,6 +176,12 @@ Activity execution resolves common Foundry roll data references such as `@prof`,
 Leave these formulas in structured activity data; do not pre-expand them in prose
 unless the runtime returns an unsupported-formula error.
 
+For imported or newly authored Activity documents, prefer Foundry-style structured
+`system.damage.parts`, `system.damage.onSave`, `system.healing`, and
+`system.save.dc.formula`. The runtime rolls those fields, applies save half/none
+semantics, keeps damage part metadata, and applies HP changes. Do not flatten them
+into one prose-calculated damage number.
+
 Before rolls, attacks, saves, and damage that depend on equipment or ActiveEffects,
 call `actor prepare` if the actor changed since the last preparation. Treat the
 returned `derived.effective_system` as the actor's current Foundry-style prepared

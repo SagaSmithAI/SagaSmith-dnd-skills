@@ -65,6 +65,9 @@ Runtime authority rules:
 - Activity execution resolves common Foundry roll data formulas such as `@prof`,
   `@mod`, `@abilities.dex.mod`, `@classes.<class>.levels`, and
   `@item.uses.spent`. Do not pre-expand those formulas in prose.
+- Activity execution reads Foundry-style structured `system.damage.parts`,
+  `system.damage.onSave`, `system.healing`, and `system.save.dc.formula`.
+  Prefer these imported/structured fields over custom flat damage strings.
 - If `token move` returns movement `pending` reaction windows, resolve opportunity attacks before final movement narration.
 - Use `ready set` for the Ready action and `ready trigger` when the stated trigger occurs.
 - Use `effect recalculate` after adding/removing ActiveEffects that change actor math.
