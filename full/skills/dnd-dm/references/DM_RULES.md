@@ -134,6 +134,8 @@ sagasmith-dnd concentration fail --campaign <id> --actor <actor-id> --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
 sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
 sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
+sagasmith-dnd ready set --campaign <id> --actor <actor-id> --condition "when the goblin leaves cover" --payload '{"activity":"longbow_attack"}' --json
+sagasmith-dnd ready trigger --campaign <id> --id <ready-id> --json
 sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity action_surge --json
 sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity second_wind --target-id <combatant-id> --payload '{"fighter_level":5}' --json
 sagasmith-dnd combat death-save --campaign <id> --target-id <combatant-id> --json
@@ -161,3 +163,7 @@ duration/terrain behavior.
 
 For attacks or Dexterity saves where obstacles matter, call `cover check` before
 choosing the final DC/AC modifier. Total cover prevents direct targeting.
+
+For the Ready action, call `ready set` immediately when the actor readies. When the
+trigger occurs, call `ready trigger` before resolving the readied payload; do not
+track readied actions only in prose.
