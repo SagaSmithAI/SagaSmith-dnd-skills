@@ -106,6 +106,8 @@ Rules for the AI DM:
 - Before combat narration, call `sagasmith-dnd combat status --campaign <id> --json` and use `current`,
   `legal_actions`, `legal_action_details`, `turn_budget`, `effects`, and `reaction_windows`.
 - Use `sagasmith-dnd activity use ... --json` for player and NPC actions whenever an activity exists.
+- Use `sagasmith-dnd scene activate ... --json` when the tactical scene changes,
+  and use `scene show`/`token show` for prepared token runtime data.
 - Use `sagasmith-dnd token move ... --json` for map movement.
 - Use `sagasmith-dnd effect add/remove/list ... --json` for active effects.
 - Use `sagasmith-dnd actor prepare ... --json` after equipment, advancement, item,
@@ -127,6 +129,8 @@ sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/s
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
 sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
 sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
+sagasmith-dnd scene activate --campaign <id> --scene <scene-id> --json
+sagasmith-dnd scene show --scene <scene-id> --json
 sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd region create --scene <scene-id> --name "Arrow Slit" --shape '{"type":"rect","x":90,"y":90,"width":30,"height":30}' --behavior cover --metadata '{"degree":"three_quarters"}' --json
@@ -147,7 +151,8 @@ sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --paylo
 sagasmith-dnd ready set --campaign <id> --actor <actor-id> --condition "when the goblin leaves cover" --payload '{"activity":"longbow_attack"}' --json
 sagasmith-dnd ready trigger --campaign <id> --id <ready-id> --json
 sagasmith-dnd combat death-save --campaign <id> --target-id <actor-id> --json
-sagasmith-dnd rest short --campaign <id> --json
+sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
+sagasmith-dnd rest long --campaign <id> --json
 sagasmith-dnd time advance --campaign <id> --period declared_minute --json
 sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
 ```
@@ -164,6 +169,11 @@ after `actor prepare`. The runtime derives combatants from visible tokens and
 prepared Actor data. Do not pass explicit participants; create or update Actor and
 Token documents first.
 
+`scene show` and `token show` expose the map state prepared for AI narration and
+future UI: Actor summary, HP bar, targetability, token size, position, elevation,
+and vision derived from Actor senses. Use those fields rather than estimating map
+visibility, health bars, or token footprint from prose.
+
 Use English runtime IDs in commands even during Chinese narration. Chinese labels
 may follow fvtt-cn terminology, but command keys and ruleset IDs remain stable
 English IDs.
@@ -171,6 +181,12 @@ English IDs.
 For attack, damage, heal, and saving throw activities, `activity use` may return an
 `execution` object. Use that object as the rules result. Do not roll again, reapply
 damage, or reinterpret hit point changes from prose.
+
+For cast activities, `activity use` handles spell slots, cantrip scaling by
+character level, upcasting by cast spell level, ritual payloads, spell attack and
+save DC defaults from Actor spellcasting data, concentration ActiveEffects,
+damage/healing/save execution, and pending reaction windows. Do not manually
+subtract spell slots or create concentration state in prose.
 
 Activity execution resolves common Foundry roll data references such as `@prof`,
 `@mod`, `@abilities.dex.mod`, `@classes.<class>.levels`, and `@item.uses.spent`.
@@ -205,6 +221,10 @@ If `damage apply` returns `concentration_save_required`, immediately call `roll 
 for Constitution at the returned DC. On failure call `concentration fail`; on success
 call `concentration pass`.
 
+When a creature at 0 HP makes a death save, call `combat death-save`. The runtime
+updates both combat state and the Actor document's death-save fields. Do not track
+successes, failures, stable, dead, or natural-20 recovery only in narration.
+
 For area effects, place the activity template before resolving saves or damage. Treat
 the returned Region as the authoritative area for narration, token targeting, and
 duration/terrain behavior.
@@ -224,6 +244,10 @@ rule-supported exception.
 If `token move` returns `movement.region_effects.created` or `removed`, treat those
 ActiveEffect changes as part of the movement result. Apply any needed `actor prepare`
 before resolving follow-up rolls, attacks, saves, or damage from the new position.
+
+Short rests may spend hit dice through `rest short --payload '{"hit_dice":n}'`.
+Long rests restore HP, spell slots, short/long-rest resources, death saves, and a
+portion of spent hit dice. Use the returned `document_recovery` as authoritative.
 
 For leveling and feature grants, use `advancement apply` with structured steps. Do
 not manually edit Actor system level, hit points, scale values, or class feature

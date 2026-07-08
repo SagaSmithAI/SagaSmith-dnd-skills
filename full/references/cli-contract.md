@@ -37,10 +37,12 @@ Foundry-style runtime workflows:
 - Actor Item documents: `game-item create/list/show/update`
 - Activity documents: `game-activity create/list/show/update`, then `activity use`
 - Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
-- Map documents: `scene create/list/show`, `token create/list/show/update/move`, `region create/list`
+- Map documents: `scene create/list/show/activate`, `token create/list/show/update/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
 - Cover: `cover check --scene <id> --token <attacker-token-id> --target-id <target-token-id>`
-- Combat: `combat start/status/attack/damage/heal/condition/death-save/end-turn/end`
+- Combat: `combat start/status/death-save/end-turn/end`; low-level
+  `combat attack/damage/heal/condition` commands are debug fallbacks, not the
+  normal AI DM action path
 - Activities: `activity use --campaign <id> --actor <actor-or-combatant-id> --item <item-id> --activity <activity-id>`
 - Reactions: `reaction list/resolve/decline`
 - Ready actions: `ready set/trigger/clear`
@@ -50,11 +52,13 @@ Foundry-style runtime workflows:
 Runtime authority rules:
 
 - Treat `scene -> token -> combatant -> actor` as the map/combat chain.
-- When a Scene has Actor-linked Tokens, `combat start --scene <scene-id>` can derive
-  combatants from visible tokens and prepared Actor data. Use explicit
-  `--participants` only to override or bootstrap missing document data.
+- When a Scene has Actor-linked Tokens, `combat start --scene <scene-id>` derives
+  combatants from visible tokens and prepared Actor data. Do not pass free-form
+  participants; create or update Actor and Token documents first.
 - Treat `ruleset.activityActivationTypes`, `ruleset.activityTypes`, `ruleset.limitedUsePeriods`,
-  `ruleset.conditionTypes`, and `ruleset.conditionEffects` as the structured rule contract.
+  `ruleset.conditionTypes`, `ruleset.conditionEffects`, `ruleset.spellcasting`,
+  `ruleset.durationPeriods`, `ruleset.mapRuntime`, `ruleset.restRecovery`, and
+  `ruleset.deathSaves` as the structured rule contract.
 - Do not use `combat act`; it is intentionally disabled.
 - Do not directly edit combat JSON, HP, conditions, action economy, resources, token position, or duration.
 - Use `game-item` and `game-activity` for Foundry-style Actor Items and executable
@@ -68,6 +72,9 @@ Runtime authority rules:
 - Activity execution reads Foundry-style structured `system.damage.parts`,
   `system.damage.onSave`, `system.healing`, and `system.save.dc.formula`.
   Prefer these imported/structured fields over custom flat damage strings.
+- Cast activities consume spell slots, support cantrip/slot scaling, use Actor
+  spellcasting attack/DC defaults, create concentration effects, and honor ritual
+  casts only when the activity/item data and payload explicitly mark ritual casting.
 - Actor preparation applies Foundry numeric ActiveEffect change modes
   `1=multiply`, `2=add`, `3=downgrade`, `4=upgrade`, `5=override`, with
   priority ordering. Keep imported numeric modes intact.
@@ -88,6 +95,15 @@ Runtime authority rules:
 - Use `advancement apply` for level, hit point, scale value, and feature/item grants.
 - Use `time advance --period <period>` for narrative or combat period durations.
 - Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
+- Use `scene activate --campaign <id> --scene <scene-id>` when the tactical scene
+  changes; this advances `scene_end` durations for the previous active scene.
+- Use `scene show` or `token show` to read prepared token runtime fields such as
+  Actor summary, HP bar, token size, position, targetability, and vision derived
+  from Actor senses.
+- Use `rest short --payload '{"hit_dice":1}'` when a character spends hit dice,
+  and `rest long` for full HP, spell slot, resource, death-save, and hit-dice recovery.
+- Use `combat death-save --target-id <actor-id>` at 0 HP; the result is also
+  synchronized to the Actor document's death-save state.
 - Use `template place` before resolving area effects with a target template; it creates the scene Region the AI DM should reference.
 - Use `cover check` before ranged attacks or Dexterity saves when map obstacles might matter.
 - Use `region create --behavior apply_active_effect` for auras, hazards, and template

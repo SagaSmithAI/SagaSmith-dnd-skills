@@ -116,14 +116,19 @@ normal play.
 
 ```powershell
 sagasmith-dnd scene create --campaign <id> --name "<battle map>" --width 1000 --height 800 --json
+sagasmith-dnd scene activate --campaign <id> --scene <scene-id> --json
+sagasmith-dnd scene show --scene <scene-id> --json
 sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-id <actor-id> --actor-type character --x 0 --y 0 --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
 sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
+sagasmith-dnd combat death-save --campaign <id> --target-id <actor-id> --json
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition prone --json
 sagasmith-dnd condition remove --campaign <id> --actor <actor-id> --condition prone --json
+sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
+sagasmith-dnd rest long --campaign <id> --json
 sagasmith-dnd combat end-turn --campaign <id> --actor <actor-id> --json
 sagasmith-dnd combat end --campaign <id> --json
 ```
@@ -131,6 +136,17 @@ sagasmith-dnd combat end --campaign <id> --json
 Before each combat narration, run `combat status` and use its `current` and
 `legal_actions` fields. Combat starts from visible Scene Tokens linked to Actor
 documents; do not pass free-form participants.
+
+Use `scene show` and `token show` for map narration; prepared token runtime
+contains Actor summary, HP bar, targetability, size, position, and vision derived
+from Actor senses. Use `scene activate` when changing tactical scenes so
+`scene_end` durations advance.
+
+Use `activity use` as the normal combat action entry point. Cast activities handle
+spell slots, cantrip scaling, upcasting, ritual payloads, spell attack/DC defaults,
+concentration, saves, damage, healing, effects, and pending reactions. Low-level
+`combat attack/damage/heal/condition` commands are debugging fallbacks, not the
+DM narration path.
 
 ### State Updates
 

@@ -7,7 +7,8 @@
 3. `campaign show`
 4. `campaign rules-get`
 5. `module list`
-6. Retrieve the current scene or recent memory.
+6. Retrieve the current module scene or recent memory.
+7. If tactical runtime is active, `scene show` the active map scene and `combat status`.
 
 ## New campaign
 
@@ -33,10 +34,19 @@
 
 ## Session close
 
-1. Reconcile character resources, conditions, scene progress and campaign state
+1. Reconcile Actor resources, conditions, rests, death saves, scene progress and campaign state
 2. Append the session events and durable memories
 3. `save create`
 4. Inspect the generated delta recap; use `save regenerate-recap --slot` if needed
+
+## Tactical combat
+
+1. `actor prepare` for each combatant after equipment/effect changes
+2. `scene activate`, then place or update Actor-linked Tokens
+3. `combat start --scene`
+4. On every turn, `combat status`, choose intent, then prefer `activity use`
+5. Resolve `pending` reactions, `token move` opportunity windows, concentration, death saves, rests, and duration periods through CLI commands
+6. Narrate from returned `execution`, `effects`, `state_delta`, `movement`, and prepared token runtime data
 
 ## Module generator handoff
 

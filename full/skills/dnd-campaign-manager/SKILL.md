@@ -65,6 +65,8 @@ economy, effects, periods, and turn flow. Do not use `combat act`.
 
 ```powershell
 sagasmith-dnd scene create --campaign <id> --name "<battle map>" --width 1000 --height 800 --json
+sagasmith-dnd scene activate --campaign <id> --scene <scene-id> --json
+sagasmith-dnd scene show --scene <scene-id> --json
 sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-type character --actor-id <character-id> --x 0 --y 0 --json
 sagasmith-dnd token move --token <token-id> --x 30 --y 20 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
@@ -73,10 +75,12 @@ sagasmith-dnd combat status --campaign <id> --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
 sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
+sagasmith-dnd combat death-save --campaign <id> --target-id <actor-id> --json
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition prone --json
 sagasmith-dnd effect add --campaign <id> --actor <actor-id> --name "Bless" --duration '{"period":"declared_minute","value":1}' --json
 sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
-sagasmith-dnd rest short --campaign <id> --json
+sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
+sagasmith-dnd rest long --campaign <id> --json
 sagasmith-dnd combat end-turn --campaign <id> --actor <actor-id> --json
 sagasmith-dnd combat end --campaign <id> --json
 ```
@@ -85,6 +89,16 @@ Before narrating any combat turn, read `combat status` and follow its `current`,
 `legal_actions`, `legal_action_details`, `turn_budget`, and `effects`. Create a
 snapshot before and after important encounters and map state changes. Wall-clock
 time never advances duration; only runtime period commands do.
+
+`scene show` and `token show` include prepared runtime fields for AI DM narration
+and future map UI: Actor summary, HP bar, token size, targetability, position,
+and vision derived from Actor senses. Use these fields instead of guessing map
+state from prose.
+
+Cast activities handle spell slots, cantrip scaling, upcasting, ritual payloads,
+spell attack/DC defaults, concentration effects, damage/healing/save execution,
+and pending reactions. Treat the returned `execution`, `effects`, `pending`, and
+`state_delta` as authoritative.
 
 Use English runtime IDs in commands even during Chinese narration. Chinese labels
 may follow fvtt-cn terminology, but command keys such as `main_action`,
