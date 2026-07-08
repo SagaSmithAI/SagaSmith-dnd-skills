@@ -115,20 +115,22 @@ Runtime combat is structured state. Do not hand-edit campaign combat JSON during
 normal play.
 
 ```powershell
-sagasmith-dnd combat start --campaign <id> --name "<encounter>" --participants '<json-array>' --json
+sagasmith-dnd scene create --campaign <id> --name "<battle map>" --width 1000 --height 800 --json
+sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-id <actor-id> --actor-type character --x 0 --y 0 --json
+sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
-sagasmith-dnd combat attack --campaign <id> --actor <combatant-id> --target-id <combatant-id> --attack-bonus <n> --expression "1d8+3" --damage-type slashing --weapon "Longsword" --json
-sagasmith-dnd combat damage --campaign <id> --target-id <combatant-id> --amount <n> --damage-type fire --json
-sagasmith-dnd combat heal --campaign <id> --target-id <combatant-id> --expression "1d8+3" --json
-sagasmith-dnd combat condition add --campaign <id> --target-id <combatant-id> --condition prone --json
-sagasmith-dnd combat condition remove --campaign <id> --target-id <combatant-id> --condition prone --json
-sagasmith-dnd combat end-turn --campaign <id> --actor <combatant-id> --json
+sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
+sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
+sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
+sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition prone --json
+sagasmith-dnd condition remove --campaign <id> --actor <actor-id> --condition prone --json
+sagasmith-dnd combat end-turn --campaign <id> --actor <actor-id> --json
 sagasmith-dnd combat end --campaign <id> --json
 ```
 
 Before each combat narration, run `combat status` and use its `current` and
-`legal_actions` fields. Start participants should include stable `id`, `name`,
-`ac`, `hp`, `max_hp`, and optional `initiative`, `conditions`, and `position`.
+`legal_actions` fields. Combat starts from visible Scene Tokens linked to Actor
+documents; do not pass free-form participants.
 
 ### State Updates
 

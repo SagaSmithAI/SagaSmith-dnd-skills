@@ -67,9 +67,10 @@
 
 ## Inventory and item ledger
 
-Backpacks, equipment, treasure, currency, containers, and consumables are managed by
-the campaign item ledger. Treat `sheet.inventory` as an import/display compatibility
-field only.
+Backpacks, treasure, currency, containers, and consumables are managed by the
+campaign item ledger. Do not use `sheet.inventory` as runtime state. Actor-owned
+`game-item` and `game-activity` documents are authoritative for weapons, spells,
+features, and combat actions.
 
 Common commands:
 
@@ -131,7 +132,6 @@ sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"ci
 sagasmith-dnd region create --scene <scene-id> --name "Arrow Slit" --shape '{"type":"rect","x":90,"y":90,"width":30,"height":30}' --behavior cover --metadata '{"degree":"three_quarters"}' --json
 sagasmith-dnd region create --scene <scene-id> --name "Blessing Aura" --shape '{"type":"circle","x":70,"y":70,"radius":30}' --behavior apply_active_effect --metadata '{"statuses":["blessed"]}' --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --json
-sagasmith-dnd combat start --campaign <id> --scene <scene-id> --participants '<json-array>' --json
 sagasmith-dnd template place --scene <scene-id> --actor <actor-id> --item <item-id> --activity <activity-id> --x 140 --y 210 --json
 sagasmith-dnd cover check --scene <scene-id> --token <attacker-token-id> --target-id <target-token-id> --json
 sagasmith-dnd roll skill --campaign <id> --actor <actor-id> --skill perception --dc 15 --json
@@ -146,17 +146,14 @@ sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
 sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
 sagasmith-dnd ready set --campaign <id> --actor <actor-id> --condition "when the goblin leaves cover" --payload '{"activity":"longbow_attack"}' --json
 sagasmith-dnd ready trigger --campaign <id> --id <ready-id> --json
-sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity action_surge --json
-sagasmith-dnd activity use --campaign <id> --actor <combatant-id> --activity second_wind --target-id <combatant-id> --payload '{"fighter_level":5}' --json
-sagasmith-dnd combat death-save --campaign <id> --target-id <combatant-id> --json
+sagasmith-dnd combat death-save --campaign <id> --target-id <actor-id> --json
 sagasmith-dnd rest short --campaign <id> --json
-sagasmith-dnd time advance --campaign <id> --period narrative_beat --json
+sagasmith-dnd time advance --campaign <id> --period declared_minute --json
 sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
 ```
 
-When a Foundry-style Actor/Item/Activity document exists, prefer the document command
-shape with `--item <item-id> --activity <activity-id>`. The legacy ruleset activity
-shape is only for bootstrap features that have not yet been imported as documents.
+Use the document command shape with `--item <item-id> --activity <activity-id>`.
+There is no free-form ruleset activity fallback in normal runtime play.
 
 Use `game-item` and `game-activity` for Actor-owned Foundry Item documents and their
 executable actions. Do not confuse them with `item ...`, which is the campaign item
@@ -164,8 +161,12 @@ ledger for backpack ownership, treasure, currency, containers, and consumables.
 
 When scene tokens are linked to Actor documents, prefer `combat start --scene <id>`
 after `actor prepare`. The runtime derives combatants from visible tokens and
-prepared Actor data. Use explicit `--participants` only when bootstrapping missing
-documents or overriding initiative/HP for a special case.
+prepared Actor data. Do not pass explicit participants; create or update Actor and
+Token documents first.
+
+Use English runtime IDs in commands even during Chinese narration. Chinese labels
+may follow fvtt-cn terminology, but command keys and ruleset IDs remain stable
+English IDs.
 
 For attack, damage, heal, and saving throw activities, `activity use` may return an
 `execution` object. Use that object as the rules result. Do not roll again, reapply
