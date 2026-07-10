@@ -111,6 +111,9 @@ Runtime authority rules:
   `time declare --elapsed PT10M --reason "..." --intent-id <stable-id>`.
   Never use wall-clock time or model latency. Retry the same declaration with
   the same intent ID after a transport failure; it is idempotent.
+- An Activity with minute/hour activation returns a `scheduled_activity`. Complete
+  it only with `time declare --operation <id> --elapsed <enough-time> ...`; use
+  `time cancel --operation <id>` if the declared activity is interrupted.
 - Use `scene activate --campaign <id> --scene <scene-id>` when the tactical scene
   changes; this advances `scene_end` durations for the previous active scene.
 - Use `scene show` or `token show` to read prepared token runtime fields such as

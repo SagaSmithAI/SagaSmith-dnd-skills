@@ -53,6 +53,8 @@
    activity is final only after its returned continuation result.
 8. For exploration, preview then declare in-world time. Resolve returned Region
    triggers, concentration, death saves, rests, and duration periods through CLI.
+9. For minute/hour Activities, retain the returned scheduled operation ID and
+   complete or cancel it through `time declare --operation` / `time cancel`.
 8. Narrate from returned `execution`, `effects`, `state_delta`, `movement`, and prepared token runtime data.
 
 ## Module generator handoff

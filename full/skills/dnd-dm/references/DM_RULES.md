@@ -118,6 +118,9 @@ Rules for the AI DM:
   `sagasmith-dnd time declare --elapsed PT10M --reason "..." --intent-id <id> ... --json`
   for declared in-world time.
 - Wall-clock time, chat delay, and LLM processing time never advance durations.
+- A minute/hour Activity first returns a scheduled operation. Its effect exists
+  only after `time declare --operation <id>` supplies sufficient in-world time;
+  use `time cancel --operation <id>` when an interruption prevents completion.
 - Create snapshots before major combats, after major combats, before risky restores, and after major map state changes.
 
 Common runtime commands:
