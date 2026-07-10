@@ -25,6 +25,7 @@ Do not put authoritative equipment or backpack state in `sheet.inventory`.
 
 ```powershell
 sagasmith-dnd item add --campaign <id> --name "Potion of Healing" --owner-type character --owner-id <character-id> --quantity 2 --json
+sagasmith-dnd advancement grant-class --campaign <id> --actor <actor-id> --class-id fighter --level 2 --json
 sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature second-wind --json
 sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell cure-wounds --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
@@ -36,7 +37,9 @@ sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack
 Advance from the existing actor/character state. Do not rebuild and overwrite prior choices.
 
 - Use structured advancement steps for level, hit points, class features, spell slots, proficiencies, and granted items.
-- Prefer `advancement grant-feature` and `advancement grant-spell` when the class feature or spell exists in ruleset data.
+- Use `ruleset coverage` first, then prefer `advancement grant-class`,
+  `advancement grant-subclass`, `advancement grant-feature`, and
+  `advancement grant-spell` when structured ruleset data exists.
 - After advancement, call `actor prepare` and verify derived AC, HP, proficiency, saves, skills, resources, and activities.
 - Record the advancement event and create a snapshot.
 

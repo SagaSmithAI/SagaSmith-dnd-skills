@@ -30,7 +30,7 @@ Runtime rules:
   part of the runtime contract.
 - Use `activity use` for action economy, resources, effects, and class features.
 - Use `effect add/remove/list` for active effects.
-- Use `rest short|long`, `combat death-save`, and `time advance` for recovery,
+- Use `rest short|long`, `combat death-save`, and `time declare` for recovery,
   death-save, and duration state.
 - Never use `combat act`; it is intentionally outside the contract.
 - Do not directly edit combat JSON, HP, resources, conditions, token position, or duration.
@@ -44,7 +44,7 @@ progress, map scenes, scene tokens, scene regions, memories, and rule profile.
 It does not copy static rules, module source text, or embeddings.
 
 Durations advance only through declared runtime periods: combat turn/round, rest,
-scene end, and `time advance`. Wall-clock time and LLM latency never count.
+scene end, and `time declare`. Wall-clock time and LLM latency never count.
 
 Rest and death-save state lives on Actor documents. Short rests can spend hit
 dice through `rest short --payload '{"hit_dice":n}'`; long rests restore HP,

@@ -114,7 +114,9 @@ Rules for the AI DM:
   condition, or ActiveEffect changes that can affect AC, proficiency, traits,
   statuses, resources, or other derived actor math.
 - Use `sagasmith-dnd rest short|long ... --json` for rest recovery.
-- Use `sagasmith-dnd time advance --minutes <n> ... --json` for declared in-world time.
+- Use `sagasmith-dnd time preview --elapsed PT10M ... --json`, then
+  `sagasmith-dnd time declare --elapsed PT10M --reason "..." --intent-id <id> ... --json`
+  for declared in-world time.
 - Wall-clock time, chat delay, and LLM processing time never advance durations.
 - Create snapshots before major combats, after major combats, before risky restores, and after major map state changes.
 
@@ -125,6 +127,8 @@ sagasmith-dnd ruleset validate --id dnd5e-2014 --json
 sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
 sagasmith-dnd actor update --actor <actor-id> --payload '{"attributes":{"hp":{"value":18,"max":18}}}' --json
 sagasmith-dnd advancement apply --campaign <id> --actor <actor-id> --payload '{"steps":[{"type":"level","value":2},{"type":"hit_points","increase":6},{"type":"item_grant","item_type":"feat","name":"Action Surge"}]}' --json
+sagasmith-dnd advancement grant-class --campaign <id> --actor <actor-id> --class-id fighter --level 2 --json
+sagasmith-dnd advancement grant-subclass --campaign <id> --actor <actor-id> --subclass champion --level 3 --json
 sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
 sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature second-wind --json
 sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
@@ -150,23 +154,24 @@ sagasmith-dnd damage apply --campaign <id> --actor <actor-id> --amount 9 --damag
 sagasmith-dnd roll save --campaign <id> --actor <actor-id> --ability con --dc 10 --json
 sagasmith-dnd concentration fail --campaign <id> --actor <actor-id> --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
-sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
-sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
+sagasmith-dnd resolution list --campaign <id> --actor <actor-id> --json
+sagasmith-dnd resolution resolve --campaign <id> --id <reaction-window-id> --payload '{"item_id":"<shield-item>","activity_id":"<shield-activity>"}' --json
 sagasmith-dnd ready set --campaign <id> --actor <actor-id> --condition "when the goblin leaves cover" --payload '{"activity":"longbow_attack"}' --json
 sagasmith-dnd ready trigger --campaign <id> --id <ready-id> --json
 sagasmith-dnd combat death-save --campaign <id> --target-id <actor-id> --json
 sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
 sagasmith-dnd rest long --campaign <id> --json
-sagasmith-dnd time advance --campaign <id> --period declared_minute --json
-sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
+sagasmith-dnd time preview --campaign <id> --elapsed PT10M --json
+sagasmith-dnd time declare --campaign <id> --elapsed PT10M --reason "searching the room" --intent-id search-room-001 --json
 ```
 
 Use the document command shape with `--item <item-id> --activity <activity-id>`.
 There is no free-form ruleset activity fallback in normal runtime play.
 
-Use ruleset-backed creation before hand-authoring common content:
-`advancement grant-feature` for core 2014/2024 class features, `advancement
-grant-spell` for core spells, and `actor create-monster` for ruleset monster
+Use ruleset-backed creation before hand-authoring common content: inspect
+`ruleset coverage`, use `advancement grant-class` and `advancement grant-subclass`
+for progression, `advancement grant-feature` for class features, `advancement
+grant-spell` for spells, and `actor create-monster` for ruleset monster
 stat blocks. These commands create Actor Items and Activities with stable ruleset
 flags so later action economy, duration, reaction, and resource logic can read
 structured data instead of prose.
@@ -224,8 +229,9 @@ and passive skill values. Use those prepared values for perception, stealth,
 initiative setup, and save/skill narration.
 
 If `activity use` returns a non-empty `pending` array, pause final narration. Call
-`reaction list`, then `reaction resolve` or `reaction decline`, and only then narrate
-the resolved outcome. Do not silently skip Shield, Counterspell, opportunity attacks,
+`resolution list`, then `resolution resolve` or `resolution decline`, and only then narrate
+the resolved outcome. A `deferred` activity is not final until its
+`continuation_result` returns. Do not silently skip Shield, Counterspell, opportunity attacks,
 or similar timing windows.
 
 If `damage apply` returns `concentration_save_required`, immediately call `roll save`
@@ -239,6 +245,11 @@ successes, failures, stable, dead, or natural-20 recovery only in narration.
 For area effects, place the activity template before resolving saves or damage. Treat
 the returned Region as the authoritative area for narration, token targeting, and
 duration/terrain behavior.
+
+For periodic areas, attach structured `metadata.triggers` with an event such as
+`declared_minute`, `turn_start_inside`, or `turn_end_inside`, plus `damage`,
+`damage_type`, and optional `save`. Timeline period resolution applies these to
+the current Tokens inside the Region; never reproduce those rolls in prose.
 
 For attacks or Dexterity saves where obstacles matter, call `cover check` before
 choosing the final DC/AC modifier. Total cover prevents direct targeting.
@@ -261,5 +272,6 @@ Long rests restore HP, spell slots, short/long-rest resources, death saves, and 
 portion of spent hit dice. Use the returned `document_recovery` as authoritative.
 
 For leveling and feature grants, use `advancement apply` with structured steps or
-the ruleset-backed `advancement grant-feature` helper. Do not manually edit Actor
+the ruleset-backed `advancement grant-class`, `advancement grant-subclass`, and
+`advancement grant-feature` helpers. Do not manually edit Actor
 system level, hit points, scale values, or class feature items in prose.

@@ -31,12 +31,15 @@ Compatibility workflows include:
 
 Foundry-style runtime workflows:
 
-- Rulesets: `ruleset list/show/validate`
+- Rulesets: `ruleset list/show/validate/coverage`; build a canonical pack with
+  `ruleset compile --path <foundry-source> --output <pack.json>`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
 - Actor documents: `actor create/create-monster/list/show/update/prepare`
 - Actor Item documents: `game-item create/list/show/update`
 - Activity documents: `game-activity create/list/show/update`, then `activity use`
-- Advancement: `advancement apply`, `advancement grant-feature`, `advancement grant-spell`
+- Advancement: `advancement apply`, `advancement grant-class`,
+  `advancement grant-subclass`, `advancement grant-feature`, and
+  `advancement grant-spell`
 - Map documents: `scene create/list/show/activate`, `token create/list/show/update/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
 - Cover: `cover check --scene <id> --token <attacker-token-id> --target-id <target-token-id>`
@@ -44,10 +47,12 @@ Foundry-style runtime workflows:
   `combat attack/damage/heal/condition` commands are debug fallbacks, not the
   normal AI DM action path
 - Activities: `activity use --campaign <id> --actor <actor-or-combatant-id> --item <item-id> --activity <activity-id>`
-- Reactions: `reaction list/resolve/decline`
+- Resolution windows: `resolution list/resolve/decline` (`reaction` remains an
+  alias for existing callers)
 - Ready actions: `ready set/trigger/clear`
 - Effects, conditions, damage, concentration, and rolls: `effect recalculate`, `condition add/remove`, `damage apply`, `concentration pass/fail`, `roll ability/skill/save/initiative`
-- Effects and periods: `effect add/remove/list`, `time status/advance`, `rest short/long`
+- Effects and periods: `effect add/remove/list`, `time status/preview/declare`,
+  and `rest short/long`
 
 Runtime authority rules:
 
@@ -65,6 +70,10 @@ Runtime authority rules:
   activities. Use the campaign item ledger only for inventory ownership, treasure,
   currency, containers, and mundane item accounting.
 - If `activity use` returns `pending` reaction windows, resolve or decline them before narrating final resolution.
+- If it returns `deferred: true`, its action cost is already spent but its
+  continuation has not rolled or dealt damage. Resolve or decline the eligible
+  response with `resolution resolve|decline`; only its `continuation_result`
+  is the final action result.
 - If `activity use` returns `execution`, treat that attack/damage/heal/save result as authoritative and do not recalculate it in prose.
 - Activity execution resolves common Foundry roll data formulas such as `@prof`,
   `@mod`, `@abilities.dex.mod`, `@classes.<class>.levels`, and
@@ -96,8 +105,12 @@ Runtime authority rules:
 - Prefer `advancement grant-feature`, `advancement grant-spell`, and
   `actor create-monster` for ruleset-backed features, spells, and monster stat
   blocks before manually creating equivalent Actor Items and Activities.
-- Use `time advance --period <period>` for narrative or combat period durations.
-- Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
+- Use `advancement grant-class` and `advancement grant-subclass` for compiled
+  2014 class progression before individual grants.
+- Before non-combat elapsed time, run `time preview --elapsed PT10M`; then use
+  `time declare --elapsed PT10M --reason "..." --intent-id <stable-id>`.
+  Never use wall-clock time or model latency. Retry the same declaration with
+  the same intent ID after a transport failure; it is idempotent.
 - Use `scene activate --campaign <id> --scene <scene-id>` when the tactical scene
   changes; this advances `scene_end` durations for the previous active scene.
 - Use `scene show` or `token show` to read prepared token runtime fields such as
@@ -108,6 +121,9 @@ Runtime authority rules:
 - Use `combat death-save --target-id <actor-id>` at 0 HP; the result is also
   synchronized to the Actor document's death-save state.
 - Use `template place` before resolving area effects with a target template; it creates the scene Region the AI DM should reference.
+- Region `metadata.triggers` is executable for period events such as
+  `declared_minute`, `turn_start_inside`, and `turn_end_inside`; do not hand-roll
+  its damage or saves after `time declare` or a combat period has resolved it.
 - Use `cover check` before ranged attacks or Dexterity saves when map obstacles might matter.
 - Use `region create --behavior apply_active_effect` for auras, hazards, and template
   zones that attach ActiveEffects to actors. `token move` reports created/removed

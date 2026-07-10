@@ -121,6 +121,8 @@ sagasmith-dnd scene show --scene <scene-id> --json
 sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-id <actor-id> --actor-type character --x 0 --y 0 --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd advancement grant-class --campaign <id> --actor <actor-id> --class-id fighter --level 2 --json
+sagasmith-dnd advancement grant-subclass --campaign <id> --actor <actor-id> --subclass champion --level 3 --json
 sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
 sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
 sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
@@ -151,9 +153,10 @@ concentration, saves, damage, healing, effects, and pending reactions. Low-level
 `combat attack/damage/heal/condition` commands are debugging fallbacks, not the
 DM narration path.
 
-Prefer ruleset-backed grants when the runtime has a template: use
-`advancement grant-feature` for core class features, `advancement grant-spell`
-for core spells, and `actor create-monster` for ruleset monsters before manually
+Prefer ruleset-backed grants when the runtime has a template: inspect
+`ruleset coverage`, establish a character with `advancement grant-class` and
+`advancement grant-subclass`, use `advancement grant-feature` for class features,
+`advancement grant-spell` for spells, and `actor create-monster` for monsters before manually
 authoring equivalent `game-item` and `game-activity` documents. Manual authoring
 is for custom content or templates not yet present in the ruleset data.
 

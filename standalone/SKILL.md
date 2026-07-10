@@ -102,11 +102,13 @@ sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
 sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-id <actor-id> --actor-type npc --x 30 --y 20 --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd advancement grant-class --campaign <id> --actor <actor-id> --class-id fighter --level 2 --json
+sagasmith-dnd advancement grant-subclass --campaign <id> --actor <actor-id> --subclass champion --level 3 --json
 sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
 sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
-sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
-sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
+sagasmith-dnd resolution list --campaign <id> --actor <actor-id> --json
+sagasmith-dnd resolution resolve --campaign <id> --id <reaction-window-id> --payload '{"item_id":"<shield-item>","activity_id":"<shield-activity>"}' --json
 sagasmith-dnd combat end-turn --campaign <id> --actor <actor-id> --json
 ```
 

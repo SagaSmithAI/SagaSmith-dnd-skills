@@ -121,10 +121,10 @@ sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type charact
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --json
 sagasmith-dnd combat status --campaign <id> --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
-sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
-sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
+sagasmith-dnd resolution list --campaign <id> --actor <actor-id> --json
+sagasmith-dnd resolution resolve --campaign <id> --id <reaction-window-id> --payload '{"item_id":"<shield-item>","activity_id":"<shield-activity>"}' --json
 sagasmith-dnd token move --token <token-id> --x 30 --y 20 --json
-sagasmith-dnd time advance --campaign <id> --period declared_minute --json
+sagasmith-dnd time declare --campaign <id> --elapsed PT1M --reason "declared time" --intent-id declared-minute-001 --json
 sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
 sagasmith-dnd rest long --campaign <id> --json
 ```

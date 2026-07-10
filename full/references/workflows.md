@@ -42,12 +42,17 @@
 ## Tactical combat
 
 1. Create or update PC Actors, then use `actor create-monster` for ruleset monsters when available.
-2. Use `advancement grant-feature` and `advancement grant-spell` for ruleset-backed PC capabilities.
+2. Use `advancement grant-class`, `advancement grant-subclass`,
+   `advancement grant-feature`, and `advancement grant-spell` for ruleset-backed
+   PC capabilities.
 3. `actor prepare` for each combatant after equipment/effect changes.
 4. `scene activate`, then place or update Actor-linked Tokens.
 5. `combat start --scene`.
 6. On every turn, `combat status`, choose intent, then prefer `activity use`.
-7. Resolve `pending` reactions, `token move` opportunity windows, concentration, death saves, rests, and duration periods through CLI commands.
+7. Resolve `pending` reactions through `resolution resolve|decline`; a deferred
+   activity is final only after its returned continuation result.
+8. For exploration, preview then declare in-world time. Resolve returned Region
+   triggers, concentration, death saves, rests, and duration periods through CLI.
 8. Narrate from returned `execution`, `effects`, `state_delta`, `movement`, and prepared token runtime data.
 
 ## Module generator handoff

@@ -73,6 +73,8 @@ sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"ci
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
 sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
+sagasmith-dnd advancement grant-class --campaign <id> --actor <actor-id> --class-id fighter --level 2 --json
+sagasmith-dnd advancement grant-subclass --campaign <id> --actor <actor-id> --subclass champion --level 3 --json
 sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
 sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
@@ -81,7 +83,8 @@ sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> -
 sagasmith-dnd combat death-save --campaign <id> --target-id <actor-id> --json
 sagasmith-dnd condition add --campaign <id> --actor <actor-id> --condition prone --json
 sagasmith-dnd effect add --campaign <id> --actor <actor-id> --name "Bless" --duration '{"period":"declared_minute","value":1}' --json
-sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the room" --json
+sagasmith-dnd time preview --campaign <id> --elapsed PT10M --json
+sagasmith-dnd time declare --campaign <id> --elapsed PT10M --reason "searching the room" --intent-id search-room-001 --json
 sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
 sagasmith-dnd rest long --campaign <id> --json
 sagasmith-dnd combat end-turn --campaign <id> --actor <actor-id> --json
@@ -103,9 +106,10 @@ spell attack/DC defaults, concentration effects, damage/healing/save execution,
 and pending reactions. Treat the returned `execution`, `effects`, `pending`, and
 `state_delta` as authoritative.
 
-For common rules content, prefer the ruleset helpers: create monsters with
-`actor create-monster`, grant class features with `advancement grant-feature`,
-and grant spells with `advancement grant-spell`. Use manual `game-item` and
+For common rules content, inspect `ruleset coverage` and prefer the ruleset helpers:
+create monsters with `actor create-monster`, establish levels with
+`advancement grant-class`/`grant-subclass`, grant class features with
+`advancement grant-feature`, and grant spells with `advancement grant-spell`. Use manual `game-item` and
 `game-activity` authoring only for custom content or missing templates.
 
 Use English runtime IDs in commands even during Chinese narration. Chinese labels
