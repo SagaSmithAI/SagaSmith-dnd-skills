@@ -72,6 +72,9 @@ sagasmith-dnd token move --token <token-id> --x 30 --y 20 --json
 sagasmith-dnd region create --scene <scene-id> --name "Web" --shape '{"type":"circle","x":10,"y":10,"radius":20}' --behavior difficult_terrain --json
 sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
+sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
+sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
 sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
 sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
@@ -99,6 +102,11 @@ Cast activities handle spell slots, cantrip scaling, upcasting, ritual payloads,
 spell attack/DC defaults, concentration effects, damage/healing/save execution,
 and pending reactions. Treat the returned `execution`, `effects`, `pending`, and
 `state_delta` as authoritative.
+
+For common rules content, prefer the ruleset helpers: create monsters with
+`actor create-monster`, grant class features with `advancement grant-feature`,
+and grant spells with `advancement grant-spell`. Use manual `game-item` and
+`game-activity` authoring only for custom content or missing templates.
 
 Use English runtime IDs in commands even during Chinese narration. Chinese labels
 may follow fvtt-cn terminology, but command keys such as `main_action`,

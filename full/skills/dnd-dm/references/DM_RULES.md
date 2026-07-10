@@ -125,6 +125,10 @@ sagasmith-dnd ruleset validate --id dnd5e-2014 --json
 sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
 sagasmith-dnd actor update --actor <actor-id> --payload '{"attributes":{"hp":{"value":18,"max":18}}}' --json
 sagasmith-dnd advancement apply --campaign <id> --actor <actor-id> --payload '{"steps":[{"type":"level","value":2},{"type":"hit_points","increase":6},{"type":"item_grant","item_type":"feat","name":"Action Surge"}]}' --json
+sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
+sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature second-wind --json
+sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
+sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
 sagasmith-dnd pack import --campaign <id> --path reference/dnd5e/packs/_source/spells/1st-level --json
 sagasmith-dnd game-item create --campaign <id> --actor <actor-id> --name "Longsword" --type weapon --payload '{"equipped":true}' --json
 sagasmith-dnd game-activity create --item <item-id> --name "Slash" --type attack --payload '{"activation":{"type":"action"},"system":{"attack_bonus":5,"damage":"1d8+3","damage_type":"slashing"}}' --json
@@ -159,6 +163,13 @@ sagasmith-dnd time advance --campaign <id> --minutes 10 --reason "searching the 
 
 Use the document command shape with `--item <item-id> --activity <activity-id>`.
 There is no free-form ruleset activity fallback in normal runtime play.
+
+Use ruleset-backed creation before hand-authoring common content:
+`advancement grant-feature` for core 2014/2024 class features, `advancement
+grant-spell` for core spells, and `actor create-monster` for ruleset monster
+stat blocks. These commands create Actor Items and Activities with stable ruleset
+flags so later action economy, duration, reaction, and resource logic can read
+structured data instead of prose.
 
 Use `game-item` and `game-activity` for Actor-owned Foundry Item documents and their
 executable actions. Do not confuse them with `item ...`, which is the campaign item
@@ -249,6 +260,6 @@ Short rests may spend hit dice through `rest short --payload '{"hit_dice":n}'`.
 Long rests restore HP, spell slots, short/long-rest resources, death saves, and a
 portion of spent hit dice. Use the returned `document_recovery` as authoritative.
 
-For leveling and feature grants, use `advancement apply` with structured steps. Do
-not manually edit Actor system level, hit points, scale values, or class feature
-items in prose.
+For leveling and feature grants, use `advancement apply` with structured steps or
+the ruleset-backed `advancement grant-feature` helper. Do not manually edit Actor
+system level, hit points, scale values, or class feature items in prose.

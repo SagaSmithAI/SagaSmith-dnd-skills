@@ -27,13 +27,14 @@ sagasmith-dnd character show --id <character-id> --json
 ```
 
 角色 sheet 至少包含 abilities、level、armor_class、hit_points、
-max_hit_points、class、species、background、proficiencies、inventory 和 spells。
+max_hit_points、class、species、background、proficiencies 和 spells。
+不要把权威装备或背包状态放进 `sheet.inventory`。
 
 ## 背包与物品账本
 
-`sheet.inventory` 只作为创建/导入时的兼容入口。正式角色创建后，背包由
-`sagasmith-dnd item ... --json` 维护；不要再通过 `character update --sheet`
-手动改背包。
+不要使用 `sheet.inventory` 作为运行时状态。正式角色创建后，背包、财宝、货币、
+容器、同调、鉴定和消耗品由 `sagasmith-dnd item ... --json` 维护；武器、法术、
+职业特性和可执行战斗能力由 Actor-owned `game-item` 与 `game-activity` 维护。
 
 标准物品对象字段：
 
@@ -63,6 +64,13 @@ max_hit_points、class、species、background、proficiencies、inventory 和 sp
 `cp`、`sp`、`ep`、`gp`、`pp`。装备槽位使用稳定英文键，例如 `main_hand`、
 `off_hand`、`armor`、`shield`、`ring_1`、`ring_2`、`neck`、`belt`、`pack`。
 
-创建角色时可在 `--sheet` 中附带初始 `inventory`；CLI 会导入物品账本并返回
-`inventory_managed=true`。之后拾取、购买、转移、装备、消耗、同调、鉴定都必须使用
-`item` 子命令。
+创建角色时不要在 `--sheet` 中附带初始 `inventory`。之后拾取、购买、转移、装备、
+消耗、同调、鉴定都必须使用 `item` 子命令；规则集已有的职业特性和法术优先使用
+`advancement grant-feature` 与 `advancement grant-spell`。
+
+```powershell
+sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature second-wind --json
+sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell cure-wounds --json
+sagasmith-dnd actor prepare --campaign <id> --actor <actor-id> --json
+sagasmith-dnd save create --campaign <id> --label "Character ready" --json
+```

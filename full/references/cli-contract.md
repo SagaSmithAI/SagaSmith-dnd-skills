@@ -33,10 +33,10 @@ Foundry-style runtime workflows:
 
 - Rulesets: `ruleset list/show/validate`
 - Pack import: `pack import --campaign <id> --path <foundry-pack-or-file>`
-- Actor documents: `actor create/list/show/update/prepare`
+- Actor documents: `actor create/create-monster/list/show/update/prepare`
 - Actor Item documents: `game-item create/list/show/update`
 - Activity documents: `game-activity create/list/show/update`, then `activity use`
-- Advancement: `advancement apply --campaign <id> --actor <actor-id> --payload '<json>'`
+- Advancement: `advancement apply`, `advancement grant-feature`, `advancement grant-spell`
 - Map documents: `scene create/list/show/activate`, `token create/list/show/update/move`, `region create/list`
 - Measured templates: `template place --scene <id> --item <id> --activity <id> --x <n> --y <n>`
 - Cover: `cover check --scene <id> --token <attacker-token-id> --target-id <target-token-id>`
@@ -93,6 +93,9 @@ Runtime authority rules:
 - If `damage apply` returns `concentration_save_required`, roll the CON save and call `concentration pass` or `concentration fail`.
 - Use `roll ability/skill/save/initiative --campaign <id> --actor <actor-id>` when an Actor document exists.
 - Use `advancement apply` for level, hit point, scale value, and feature/item grants.
+- Prefer `advancement grant-feature`, `advancement grant-spell`, and
+  `actor create-monster` for ruleset-backed features, spells, and monster stat
+  blocks before manually creating equivalent Actor Items and Activities.
 - Use `time advance --period <period>` for narrative or combat period durations.
 - Use `time advance --minutes <n>` for declared in-world elapsed time. Wall-clock time and model latency never advance durations.
 - Use `scene activate --campaign <id> --scene <scene-id>` when the tactical scene

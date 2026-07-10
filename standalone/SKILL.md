@@ -92,19 +92,28 @@ sagasmith-dnd check tool --character <character-id> --ability dexterity --tool t
 sagasmith-dnd check initiative --character <character-id> --json
 ```
 
-When Runtime mode is available, use structured combat commands instead of
-hand-editing campaign combat JSON:
+When Runtime mode is available, use structured Foundry-style combat commands
+instead of hand-editing campaign combat JSON:
 
 ```powershell
-sagasmith-dnd combat start --campaign <id> --name "<encounter>" --participants '<json-array>' --json
+sagasmith-dnd scene create --campaign <id> --name "<battle map>" --width 1000 --height 800 --json
+sagasmith-dnd scene activate --campaign <id> --scene <scene-id> --json
+sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
+sagasmith-dnd token create --scene <scene-id> --name "<name>" --actor-id <actor-id> --actor-type npc --x 30 --y 20 --json
+sagasmith-dnd combat start --campaign <id> --scene <scene-id> --name "<encounter>" --json
 sagasmith-dnd combat status --campaign <id> --json
-sagasmith-dnd combat attack --campaign <id> --actor <combatant-id> --target-id <combatant-id> --attack-bonus <n> --expression "1d8+3" --damage-type slashing --weapon "Longsword" --json
-sagasmith-dnd combat damage --campaign <id> --target-id <combatant-id> --amount <n> --damage-type fire --json
-sagasmith-dnd combat heal --campaign <id> --target-id <combatant-id> --expression "1d8+3" --json
-sagasmith-dnd combat condition add --campaign <id> --target-id <combatant-id> --condition prone --json
-sagasmith-dnd combat condition remove --campaign <id> --target-id <combatant-id> --condition prone --json
-sagasmith-dnd combat end-turn --campaign <id> --actor <combatant-id> --json
+sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
+sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
+sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
+sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
+sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
+sagasmith-dnd combat end-turn --campaign <id> --actor <actor-id> --json
 ```
+
+Do not pass free-form combat participants. Create Actors, place Actor-linked
+Tokens in a Scene, start combat from the Scene, and resolve actions through
+`activity use`. Low-level `combat attack/damage/heal/condition` commands are
+debugging fallbacks when no Activity exists.
 
 ### Events & Memory
 

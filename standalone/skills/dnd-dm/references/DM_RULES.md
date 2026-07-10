@@ -24,11 +24,15 @@
 
 ## 战斗
 
-- 开战时确定参与者、位置、突袭与先攻；只使用角色实际拥有的能力和资源。
+- 开战时先创建或读取 Actor，放置 Actor-linked Token，再用 `combat start --scene`
+  从场景启动战斗；不要传 free-form participants。
 - Runtime 模式下，战斗状态必须通过 `sagasmith-dnd combat ... --json` 维护。
-  每次战斗叙事前先读取 `combat status`，按返回的 `current` 和 `legal_actions`
-  主持当前回合；不得凭聊天历史手改轮次、HP、条件或行动经济。
+  每次战斗叙事前先读取 `combat status`，按返回的 `current`、`legal_actions`、
+  `legal_action_details`、`turn_budget` 和 `reaction_windows` 主持当前回合；
+  不得凭聊天历史手改轮次、HP、条件或行动经济。
 - 每回合依序处理回合开始效果、移动、动作、附赠动作、反应与回合结束效果。
+- 常规行动必须优先通过 `activity use`；Action Surge、Second Wind、Extra Attack、
+  bonus action、reaction、opportunity attack、Shield 等易错内容交给结构化运行时。
 - 攻击先判命中，再计算伤害、抗性/免疫、集中与濒死；不得让叙事绕过引擎结果。
 - 角色仍有可用动作时不要擅自结束其回合。NPC 只能依据其已知信息行动。
 - 战斗结束后统一结算条件、死亡、掉落、消耗、经验/里程碑和世界后果并保存。
@@ -67,9 +71,10 @@
 
 ## Inventory and item ledger
 
-Backpacks, equipment, treasure, currency, containers, and consumables are managed by
-the campaign item ledger. Treat `sheet.inventory` as an import/display compatibility
-field only.
+Backpacks, treasure, currency, containers, and consumables are managed by the
+campaign item ledger. Do not use `sheet.inventory` as runtime state. Actor-owned
+`game-item` and `game-activity` documents are authoritative for weapons, spells,
+features, and combat actions.
 
 Common commands:
 
@@ -87,3 +92,43 @@ sagasmith-dnd item history --campaign <id> --item <item-id> --json
 Always use the item ledger for gaining, losing, buying, selling, transferring,
 equipping, attuning, identifying, or consuming items. Create a snapshot after major
 treasure distribution, shopping, or equipment loadout changes.
+
+## Foundry-style runtime authority
+
+SagaSmith runtime follows the Foundry-style document chain:
+
+```text
+Scene -> Token -> Combatant -> Actor/Character
+Item/Feature/Spell -> Activity -> Consumption/Effect/Duration
+Region -> Terrain/Aura/Hazard/Template behavior
+```
+
+Use ruleset-backed creation before hand-authoring common content:
+`advancement grant-feature` for core class features, `advancement grant-spell`
+for core spells, and `actor create-monster` for ruleset monster stat blocks.
+
+Common runtime commands:
+
+```powershell
+sagasmith-dnd ruleset validate --id dnd5e-2014 --json
+sagasmith-dnd actor create --campaign <id> --name "Mira" --type character --payload '{"level":5}' --json
+sagasmith-dnd advancement grant-feature --campaign <id> --actor <actor-id> --feature action-surge --json
+sagasmith-dnd advancement grant-spell --campaign <id> --actor <actor-id> --spell fire-bolt --json
+sagasmith-dnd actor create-monster --campaign <id> --monster goblin --json
+sagasmith-dnd scene create --campaign <id> --name "Cellar" --width 1000 --height 800 --json
+sagasmith-dnd scene activate --campaign <id> --scene <scene-id> --json
+sagasmith-dnd token create --scene <scene-id> --name "Hero" --actor-type character --actor-id <actor-id> --x 0 --y 0 --json
+sagasmith-dnd combat start --campaign <id> --scene <scene-id> --json
+sagasmith-dnd combat status --campaign <id> --json
+sagasmith-dnd activity use --campaign <id> --actor <actor-id> --item <item-id> --activity <activity-id> --target-id <target-actor-id> --json
+sagasmith-dnd reaction list --campaign <id> --actor <actor-id> --json
+sagasmith-dnd reaction resolve --campaign <id> --id <reaction-window-id> --payload '{"activity":"shield"}' --json
+sagasmith-dnd token move --token <token-id> --x 30 --y 20 --json
+sagasmith-dnd time advance --campaign <id> --period declared_minute --json
+sagasmith-dnd rest short --campaign <id> --actor <actor-id> --payload '{"hit_dice":1}' --json
+sagasmith-dnd rest long --campaign <id> --json
+```
+
+If `activity use` or `token move` returns pending reactions, resolve or decline
+them before final narration. Wall-clock time, chat delay, and LLM processing time
+never advance durations; only declared runtime periods do.
