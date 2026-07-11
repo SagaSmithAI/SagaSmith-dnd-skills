@@ -6,8 +6,11 @@
 2. 确认玩家概念、等级及是否使用预设、标准数组、购点或掷骰。所有随机结果通过 CLI。
 3. 按版本依次选择物种/种族、职业、背景、属性分配、熟练项、语言、工具、装备、
    职业特定选项与法术。每一步只展示该规则档案允许的选项。
-4. 计算熟练加值、豁免、技能、AC、HP、速度、攻击、法术 DC/攻击和资源上限。
-5. 补充姓名、外观、动机、关系、信念及玩家名。
+4. 填写 `sheet v2`：完整属性、技能、战斗数值、特质、资源、法术、特性、效果和背包。
+   法术使用 `spellcasting` 与 `content.spells`，将当天已准备法术写入
+   `preparation.selected_spell_ids`；法术书、始终准备和仪式资格不能混为一项。
+5. 填写 `notes v2`：姓名、外观、动机、关系、信念及玩家名；NPC 必须有一段 summary，
+   怪物也应有简短的外观/行为描述。
 6. 展示完整草稿和来源；玩家最终确认前不得创建正式角色。
 7. 创建后重新读取并验证派生值、资源上限和 campaign/player 绑定。
 
@@ -26,5 +29,6 @@ sagasmith-dnd character list --campaign <id> --json
 sagasmith-dnd character show --id <character-id> --json
 ```
 
-角色 sheet 至少包含 abilities、level、armor_class、hit_points、
-max_hit_points、class、species、background、proficiencies、inventory 和 spells。
+角色 sheet 必须是 `schema_version: 2`。创建后执行 `character show`，核对完整 `sheet`
+和只读 `derived` 中的熟练、豁免、技能、AC、HP、速度、法术 DC、已准备法术和负重。
+字段与草稿例子见 `../../../references/character-schema-v2.md`。

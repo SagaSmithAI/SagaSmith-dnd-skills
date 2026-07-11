@@ -30,6 +30,8 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - Search first, then expand only the selected rule or module chunk.
 - Treat CLI stdout as one JSON envelope; logs belong to stderr.
 - On `ok:false`, branch on `error.code`; do not infer success.
+- Runtime character state uses `sheet v2` / `notes v2`; load
+  `references/character-schema-v2.md` before creating or mutating a character.
 - Do not load entire rulebooks or modules into context.
 
 See `references/cli-contract.md` and `references/workflows.md`.

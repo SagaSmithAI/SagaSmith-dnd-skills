@@ -8,7 +8,7 @@
 Success:
 
 ```json
-{"ok":true,"data":{},"error":null,"meta":{"command":"group.action","version":"0.2.0"}}
+{"ok":true,"data":{},"error":null,"meta":{"command":"group.action[.subaction]","version":"0.2.0"}}
 ```
 
 Failure:
@@ -28,3 +28,7 @@ Compatibility workflows include:
 - `save regenerate-recap`
 - `memory scope` / `memory status`
 - `state history` / `state undo` / `state redo`
+- `character inventory|wallet|equipment|spell|effect|memory|resource <action>`
+- `party inventory|wallet <action>`
+
+For the validated runtime character contract, read `character-schema-v2.md`.

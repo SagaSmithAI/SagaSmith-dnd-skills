@@ -40,6 +40,21 @@ sagasmith-dnd character update --id <character-id> --sheet '<json>' --json
 
 Do not persist a draft until the user confirms it.
 
+For the complete v2 contract, read `references/database-contract.md` and
+`../../references/character-schema-v2.md`. During play, mutate only the affected
+state through granular commands:
+
+```powershell
+sagasmith-dnd character inventory add --id <id> --payload '<item-json>' --json
+sagasmith-dnd character inventory transfer --id <source> --target <target> --item <item-id> --json
+sagasmith-dnd character wallet credit --id <id> --denomination gp --amount 10 --json
+sagasmith-dnd character equipment equip --id <id> --item <item-id> --slot-name main_hand --json
+sagasmith-dnd character spell prepare --id <id> --spell <spell-id> --json
+sagasmith-dnd character effect add --id <id> --payload '<effect-json>' --json
+sagasmith-dnd character memory add --id <npc-id> --payload '<memory-json>' --json
+sagasmith-dnd party inventory deposit --campaign <id> --id <character-id> --item <item-id> --json
+```
+
 ## Saves
 
 ```powershell
