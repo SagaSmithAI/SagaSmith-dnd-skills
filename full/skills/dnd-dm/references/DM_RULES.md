@@ -38,6 +38,9 @@
 - 每次转移物品或货币后重新读取来源和目的地；涉及队伍仓库时还要读取 `party show`。
 - `character show` 返回的 `derived` 只能用于裁定和展示。若 `unresolved_rules` 非空，先
   检索规则并保留需要 DM 裁定的效果，不得伪造自动计算结果。
+- 装备护甲、盾牌或防御性魔法物品时先用 `character equipment equip` 写入正确槽位，再读取
+  `derived.armor_class_breakdown`。不得手改 `combat.ac.base` 来模拟装备加值；只有无甲、
+  天然护甲或明确手工覆写才使用 `combat.ac.base` / `combat.ac.override`。
 - `state undo`/`redo` 只回退受审计变更，不删除 Snapshot。
 - 重要节点创建 Snapshot：开团基线、危险决定前、关键战斗前后、章节转换、升级、
   长休与会话结束。

@@ -67,6 +67,37 @@ Each item has a stable `id`, `name`, `kind`, `quantity`, `weight_oz`, `price_cp`
 short `description`, `source_key`, container/equipment state, identification,
 attunement, condition, uses, charges, and type-specific `mechanics`.
 
+Equipment slots are `armor`, `shield`, `main_hand`, `off_hand`, `head`, `neck`,
+`cloak`, `gloves`, `boots`, `ring_1`, and `ring_2`. The slot map and each item's
+`equipped` / `equipped_slot` fields must agree. Use `character equipment equip`
+or `unequip`; never set those fields through an inventory patch.
+
+Armor and shields have strict mechanics:
+
+```json
+{
+  "armor": {
+    "base_ac": 14,
+    "dexterity_mode": "max",
+    "dexterity_max": 2,
+    "magic_bonus": 0
+  },
+  "shield": { "ac_bonus": 2, "magic_bonus": 0 },
+  "magic_item": { "ac_bonus": 1 }
+}
+```
+
+Armor uses `dexterity_mode: "none"`, `"full"`, or `"max"`; `dexterity_max` is
+required only for `"max"`. Armor may only occupy `armor`, shields only `shield`,
+and rings must be `magic_item` records in a ring slot.
+
+`derived.armor_class` is calculated in this order: explicit `combat.ac.override`;
+otherwise armor or `combat.ac.base`; then shield, equipped magic-item AC bonuses,
+and supported active effects. `derived.armor_class_breakdown` explains every
+applied source. A supported effect change uses
+`{ "path": "derived.armor_class", "mode": "add|override", "value": <integer> }`.
+Other effect changes remain in `derived.unresolved_rules` for DM adjudication.
+
 Containers are ordinary `kind: "container"` items. Items reference their parent
 with `container_id`; containers cannot form cycles. Shared party goods use the
 same inventory structure.
