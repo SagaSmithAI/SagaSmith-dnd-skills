@@ -40,6 +40,8 @@ sagasmith-dnd character create --campaign <id> --name "<name>" --type pc|npc|mon
 
 # Character creation: atomically create the public template plus campaign instance.
 sagasmith-dnd character build --campaign <id> --name "<name>" --type pc --player "<player>" --sheet '@<pc-sheet.json>' --notes '@<pc-notes.json>' --json
+sagasmith-dnd character ability roll --edition 2014 --json
+sagasmith-dnd character build --campaign <id> --name "<name>" --type pc --player "<player>" --ability-method point_buy --assignments '<six-ability-json>' --sheet '@<pc-sheet.json>' --notes '@<pc-notes.json>' --json
 sagasmith-dnd character list --campaign <id> --json
 sagasmith-dnd character show --id <character-id> --json
 ```
@@ -63,6 +65,7 @@ state through granular commands:
 sagasmith-dnd character inventory add --id <id> --payload '<item-json>' --json
 sagasmith-dnd character inventory update --id <id> --item <item-id> --payload '<item-json>' --json
 sagasmith-dnd character inventory remove --id <id> --item <item-id> --amount <n> --json
+sagasmith-dnd character inventory use-ammunition --id <id> --item <weapon-item-id> --amount <n> --json
 sagasmith-dnd character inventory transfer --id <source> --target <target> --item <item-id> --json
 sagasmith-dnd character wallet credit --id <id> --denomination gp --amount 10 --json
 sagasmith-dnd character wallet debit --id <id> --denomination gp --amount 10 --json
@@ -80,6 +83,12 @@ sagasmith-dnd party inventory withdraw --campaign <id> --id <character-id> --ite
 sagasmith-dnd party wallet deposit --campaign <id> --id <character-id> --denomination gp --amount 10 --json
 sagasmith-dnd party wallet withdraw --campaign <id> --id <character-id> --denomination gp --amount 10 --json
 ```
+
+For new cards, use the structured identity, background grants, weapon/ammunition,
+container capacity, encumbrance, expanded senses, spell definition, concentration,
+and adventure-state fields described in the v2 contract. After item changes,
+inspect `character show` and use `derived.inventory.weapon_attacks` and
+`derived.inventory.encumbrance` as the authoritative combat-card and load view.
 
 ## Saves
 

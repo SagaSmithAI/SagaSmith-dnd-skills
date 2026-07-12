@@ -30,6 +30,7 @@ Compatibility workflows include:
 - `state history` / `state undo` / `state redo`
 - `character inventory|wallet|equipment|spell|effect|memory|resource <action>`
 - `character library list`, `character instantiate`, and `character build`
+- `character ability roll|apply` for code-validated ability generation
 - `party inventory|wallet <action>`
 
 For the validated runtime character contract, read `character-schema-v2.md`.

@@ -127,15 +127,26 @@ shared inventory or wallet write. Normal play uses granular commands:
 
 ```powershell
 sagasmith-dnd character inventory add|update|remove|transfer ... --json
+sagasmith-dnd character inventory use-ammunition --id <id> --item <weapon-item-id> --amount <n> --json
 sagasmith-dnd character wallet credit|debit|transfer ... --json
 sagasmith-dnd character equipment equip|unequip ... --json
 sagasmith-dnd character spell prepare|unprepare ... --json
 sagasmith-dnd character effect add|remove ... --json
 sagasmith-dnd character resource set ... --json
 sagasmith-dnd character memory add|resolve ... --json
+sagasmith-dnd character ability roll|apply ... --json
 sagasmith-dnd party inventory add|remove|deposit|withdraw ... --json
 sagasmith-dnd party wallet credit|debit|deposit|withdraw ... --json
 ```
+
+When creating or revising an actor card, populate structured identity and
+background grants, weapon mechanics plus linked ammunition, container capacity,
+encumbrance, every available sense, spell definitions/components, and actor
+adventure state. Represent an active concentration spell as exactly one active
+`effect` with `concentration: true` and its `source_spell_id`; never track this
+only in narration. Read `derived.inventory.weapon_attacks` and
+`derived.inventory.encumbrance` after inventory writes instead of calculating
+attack bonuses or carrying load in prose.
 
 Do not use `character update --sheet` for a one-field change. NPC and monster
 cards both require `notes.profile.summary`; record actor-specific dialogue facts
