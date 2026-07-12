@@ -50,6 +50,12 @@ python portable.py character list --campaign <id>
 python portable.py character get --campaign <id> --name "Aragorn"
 ```
 
+Portable character files are unvalidated JSON drafts. They are not the Runtime
+`sheet v2` / `notes v2` contract and do not provide granular inventory, wallet,
+equipment, prepared-spell, effect, resource, or NPC-memory mutations. For a
+complete PC, NPC, or monster card, use the Full Runtime skill and
+`references/character-schema-v2.md` there.
+
 ### Modules
 
 ```powershell

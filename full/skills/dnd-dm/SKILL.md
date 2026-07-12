@@ -10,8 +10,13 @@ description: "Run D&D 5e 2014 or 2024 sessions with rules-first adjudication and
 First, detect which mode is available:
 
 ```powershell
-sagasmith-dnd doctor --json 2>nul && set SAGASMITH_MODE=runtime || set SAGASMITH_MODE=portable
-if "%SAGASMITH_MODE%"=="portable" python tools/portable.py doctor
+sagasmith-dnd doctor --json 2>$null
+if ($LASTEXITCODE -eq 0) {
+  $env:SAGASMITH_MODE = "runtime"
+} else {
+  $env:SAGASMITH_MODE = "portable"
+  python tools/portable.py doctor
+}
 ```
 
 If `sagasmith-dnd` is found → **Runtime mode** (full persistence, FTS5 search, vector store).
@@ -37,6 +42,8 @@ Before running a session, read `references/DM_RULES.md`. Load the other referenc
 only when their workflow is active:
 
 - character creation or advancement: `references/CHAR_CREATION.md`
+- any PC, NPC, monster, item, wallet, equipment, spell, effect, or resource work:
+  `../../references/character-schema-v2.md`
 - module preparation and scene transitions: `references/MODULE_INDEX.md` and
   `references/MODULE_ARC.md`
 - tactical positioning: `references/DM_MAP_SYS.md`
@@ -104,13 +111,39 @@ Use `--advantage` or `--disadvantage` only when the selected edition grants it.
 | `sagasmith-dnd save create --campaign <id> --label "<label>" --json` | `python tools/portable.py save create --campaign <id> --label "<label>"` |
 | `sagasmith-dnd save list --campaign <id> --json` | `python tools/portable.py save list --campaign <id>` |
 
-### Characters
+### Actor Cards
 
 | Runtime | Portable |
 |---------|----------|
-| `sagasmith-dnd character create --campaign <id> --name <name> --sheet '<json>' --json` | `python tools/portable.py character create --campaign <id> --name <name> --sheet '<json>'` |
-| `sagasmith-dnd character list --campaign <id> --json` | `python tools/portable.py character list --campaign <id>` |
-| `sagasmith-dnd character get --campaign <id> --name <name> --json` | `python tools/portable.py character get --campaign <id> --name <name>` |
+| `sagasmith-dnd character build --campaign <id> --name <name> --type pc --player <player> --sheet '@<sheet.json>' --notes '@<notes.json>' --json` | `python tools/portable.py character create --campaign <id> --name <name> --sheet '<json>'` |
+| `sagasmith-dnd character create [--campaign <id>] --name <name> --type pc|npc|monster --sheet '@<sheet.json>' --notes '@<notes.json>' --json` | (no validated actor-card equivalent) |
+| `sagasmith-dnd character list --campaign <id> --type pc|npc|monster --json` | `python tools/portable.py character list --campaign <id>` |
+| `sagasmith-dnd character show --id <id> --json` | `python tools/portable.py character get --campaign <id> --name <name>` |
+
+In Runtime mode, every PC, NPC, and monster is an authoritative v2 actor card.
+Read `../../references/character-schema-v2.md` before creation or mutation. Use
+`character show --id <id>` after every affected write; use `party show` after a
+shared inventory or wallet write. Normal play uses granular commands:
+
+```powershell
+sagasmith-dnd character inventory add|update|remove|transfer ... --json
+sagasmith-dnd character wallet credit|debit|transfer ... --json
+sagasmith-dnd character equipment equip|unequip ... --json
+sagasmith-dnd character spell prepare|unprepare ... --json
+sagasmith-dnd character effect add|remove ... --json
+sagasmith-dnd character resource set ... --json
+sagasmith-dnd character memory add|resolve ... --json
+sagasmith-dnd party inventory add|remove|deposit|withdraw ... --json
+sagasmith-dnd party wallet credit|debit|deposit|withdraw ... --json
+```
+
+Do not use `character update --sheet` for a one-field change. NPC and monster
+cards both require `notes.profile.summary`; record actor-specific dialogue facts
+with `character memory`, not only in the campaign memory stream.
+PC, NPC, and monster templates may live outside campaigns. Their copied instances
+are the only actors mutated or restored during a campaign. For player character
+creation, use `character build` so the template and initial campaign instance are
+created atomically.
 
 ## Portable Mode Data
 

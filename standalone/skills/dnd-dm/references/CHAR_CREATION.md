@@ -12,7 +12,9 @@
 7. 创建后重新读取并验证派生值、资源上限和 campaign/player 绑定。
 
 新玩家使用逐步对话；熟悉规则的玩家可一次提交草稿，但仍须逐项验证并最终确认。
-NPC 可以不绑定战役作为资料库角色；进入某战役时再建立引用或战役实例。
+本 standalone 目录只保存未验证的 JSON 草稿，不能充当 Runtime 的完整角色卡。需要完整
+PC、NPC、怪物卡、物品/钱包、装备槽位与 AC 派生、准备法术、效果或 NPC 事件记忆时，必须
+切换 Full Runtime，并按 `full/references/character-schema-v2.md` 创建 `sheet v2` / `notes v2`。
 
 ## 升级
 
@@ -26,5 +28,5 @@ sagasmith-dnd character list --campaign <id> --json
 sagasmith-dnd character show --id <character-id> --json
 ```
 
-角色 sheet 至少包含 abilities、level、armor_class、hit_points、
-max_hit_points、class、species、background、proficiencies、inventory 和 spells。
+Portable 模式不校验角色字段，也不提供 Runtime 的 `character inventory|wallet|equipment|spell|effect|memory|resource`
+子命令。不得把其草稿宣称为已按规则验证的完整角色卡。

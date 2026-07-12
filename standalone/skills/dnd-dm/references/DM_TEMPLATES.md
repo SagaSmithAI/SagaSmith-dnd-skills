@@ -128,8 +128,11 @@
 战役：[名称] (`campaign_id`)
 槽位：[slot]
 位置：[章节/地点]
-审计：[audit_id]
+状态：已从文件快照恢复
 ```
+
+Standalone 恢复后重新读取 campaign、角色文件、progress、events 和 memories。它没有
+Runtime 的审计 ID、actor 派生值或 v2 状态校验。
 
 ## 13. 升级
 

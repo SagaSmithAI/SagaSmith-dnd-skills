@@ -29,6 +29,10 @@ Compatibility workflows include:
 - `memory scope` / `memory status`
 - `state history` / `state undo` / `state redo`
 - `character inventory|wallet|equipment|spell|effect|memory|resource <action>`
+- `character library list`, `character instantiate`, and `character build`
 - `party inventory|wallet <action>`
 
 For the validated runtime character contract, read `character-schema-v2.md`.
+`character update --sheet/--notes` replaces a supplied full document; it is not a
+patch API. PC, NPC, and monster cards share that contract, and NPC/monster notes
+must include `profile.summary`.
