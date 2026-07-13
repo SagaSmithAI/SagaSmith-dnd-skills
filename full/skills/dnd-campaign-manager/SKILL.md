@@ -119,9 +119,9 @@ sagasmith-dnd state history --campaign <id> --limit 30 --json
 ```
 
 Use memory for durable facts and events for chronology. Use `knowledge` for facts
-that belong to one PC, NPC, or monster; legacy `character memory` writes are mirrored
-into that actor's knowledge ledger. Use `character show` after any actor or party
-mutation to refresh the authoritative card and `derived` values.
+that belong to one PC, NPC, or monster. `character memory` remains a separate legacy
+notes field and is not imported into the actor-knowledge ledger. Use `character show`
+after any actor or party mutation to refresh the authoritative card and `derived` values.
 
 For new branch-aware work, use `knowledge` for one actor's subjective information.
 Do not treat `memory search` as player-safe narration: use `continuity context` with
