@@ -3,6 +3,8 @@
 > 本文件的完整角色卡、事务和 Snapshot 约束只在 Full Runtime 成立。Portable 模式可以保留
 > 叙事草稿和文件快照，但没有已验证的 `sheet v2` / `notes v2`、细粒度物品/装备/资源命令，
 > 不能把草稿说成完整的 PC、NPC 或怪物运行时状态。
+> Branch-aware facts, actor knowledge, scoped retrieval, and non-destructive restore
+> are Full Runtime features. Portable `saves/` are directory copies only.
 
 ## 战役启动与权威
 

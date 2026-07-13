@@ -110,12 +110,22 @@ content, and its undo/redo cursor; rules and module source text remain external.
 ```powershell
 sagasmith-dnd event list --campaign <id> --limit 30 --json
 sagasmith-dnd memory search --campaign <id> --query "<question>" --limit 8 --json
+sagasmith-dnd branch list --campaign <id> --json
+sagasmith-dnd branch create --campaign <id> --name "alternate" --from-snapshot <snapshot-id> --json
+sagasmith-dnd branch checkout --campaign <id> --branch <branch-id> --json
+sagasmith-dnd knowledge list --campaign <id> --actor-id <pc-or-npc-id> --json
+sagasmith-dnd continuity context --campaign <id> --actor-id <actor-id> --query "<question>" --json
 sagasmith-dnd state history --campaign <id> --limit 30 --json
 ```
 
-Use memory for durable facts and events for chronology. Use `character memory`
-for facts that belong to one NPC or monster, and `character show` after any actor
-or party mutation to refresh the authoritative card and `derived` values.
+Use memory for durable facts and events for chronology. Use `knowledge` for facts
+that belong to one PC, NPC, or monster; legacy `character memory` writes are mirrored
+into that actor's knowledge ledger. Use `character show` after any actor or party
+mutation to refresh the authoritative card and `derived` values.
+
+For new branch-aware work, use `knowledge` for one actor's subjective information.
+Do not treat `memory search` as player-safe narration: use `continuity context` with
+the acting actor and audience to avoid leaking DM facts or sibling-branch history.
 
 Use `state undo` and `state redo` for audited mutations; these do not delete
 snapshots. Keep player-to-character assignments in campaign state so they remain

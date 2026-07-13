@@ -27,6 +27,7 @@ Compatibility workflows include:
 - `module index` / `module export-scenes`
 - `save regenerate-recap`
 - `memory scope` / `memory status`
+- `branch list|create|checkout`, `knowledge add|revise|list|search`, and `continuity context`
 - `state history` / `state undo` / `state redo`
 - `character inventory|wallet|equipment|spell|effect|memory|resource <action>`
 - `character library list`, `character instantiate`, and `character build`

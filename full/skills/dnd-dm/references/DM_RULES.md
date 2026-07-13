@@ -72,6 +72,18 @@
 - 玩家到 PC 的映射保存在 campaign state；平台可投影到自己的用户档案，但该档案
   不是权威，也不得被整体覆盖。
 
+## 分支连续性与角色认知
+
+- `memory` 是当前分支的世界事实：承诺、身份、线索和关系。它不是任何 NPC 的全知记忆。
+- `event` 是不可变编年证据；发生事件不表示每个 PC/NPC 都知道它。
+- 角色行动前读取该 actor 在当前分支的 `knowledge`。只给目击者、被告知者、调查成功者或
+  受法术影响者写入角色认知；不能把 DM 真相、其他 NPC 的知识或兄弟分支的内容混入。
+- `knowledge` 记录 `known`、`belief`、`rumor`、`false_belief`、`forgotten`、`modified` 等主观状态。
+  `Modify Memory` 只修订目标 actor 的认知；真实 event 和 campaign memory 仍然保留。
+- 私人发现保留在 `player:<id>`/`group:<id>` scope，明确分享后才转成 party 信息或世界事实。
+- `branch create` 与 `branch checkout` 是时间线操作。不得自动合并两条 D&D 世界线；`Wish` 或
+  明确改写历史时创建 retcon 分支并记录原因。
+
 ## 输出前自检
 
 确认规则版本正确、没有剧透、骰子可追溯、资源与条件已结算、状态写入完整、事件没有

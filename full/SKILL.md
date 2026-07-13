@@ -24,6 +24,10 @@ This repository is an Agent Skill, not a Python runtime. It operates
 - `skills/dnd-dm`: play, adjudication, rule/module retrieval, and narration.
 - `skills/dnd-campaign-manager`: campaign, character, save, and memory lifecycle.
 
+Runtime continuity is branch-aware: use world facts for durable truth, actor knowledge
+for one PC/NPC/monster's subjective information, and scoped scene state for private
+discoveries. Do not use workspace `MEMORY.md` as campaign state.
+
 Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 
 ## Invariants
