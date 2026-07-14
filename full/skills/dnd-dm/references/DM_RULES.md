@@ -28,6 +28,15 @@
 9. 公用 PC/NPC/怪物模板不是活跃游戏状态。战役只读取和修改其 campaign instance；任意
    模板可 `character instantiate` 成实例。PC 车卡使用 `character build` 创建模板和实例。
 
+准备法术列表必须按版本和职业处理。车卡或升级阶段用
+`character_spell_prepare_list` 一次提交完整列表；游戏中只能把完整
+`prepared_spell_ids` 随 `character_rest` 的长休一起原子提交，禁止连续切换单个法术来
+绕过替换数量。2024 牧师/德鲁伊/法师长休可替换任意项，圣武士/游侠只可替换一项，
+吟游诗人/术士/邪术师只在获得本职业等级时替换一项；2014 吟游诗人/游侠/术士/
+邪术师使用已知法术，不建立准备列表。始终准备的法术不占名额，戏法不进入 1 环以上
+准备列表，法师只能从法术书选择，多职业按每个法术的 `grant.source_key` 和对应职业
+等级判断数量及最高环阶。
+
 ## 战斗
 
 - 开战时确定参与者、位置、突袭与先攻；只使用角色实际拥有的能力和资源。
@@ -93,6 +102,33 @@
 Runtime note: all state, rule, module, memory, and actor operations in Full mode
 go through the `sagasmith_dnd` MCP. Use `continuity_context` for player-safe
 context, keep `actor_id` explicit for every PC/NPC, and never trust a prompt role
-or `player_name` as permission. The structured combat engine is intentionally
-out of scope for this iteration; generic combat tools remain auditable state
-operations.
+or `player_name` as permission.
+
+## 自动结算与 DM 裁决边界
+
+| 自动结算（输入完整时） | 必须由 DM 建立事实或裁决 |
+|---|---|
+| 先攻、回合预算、多重攻击次数、移动消耗、2014/2024 力竭对 D20 与速度的修正 | 未记录的地形、碰撞、遮蔽、视线和距离 |
+| 角色卡武器命中、优势/劣势抵消、自然 1/20、邻接瘫痪/昏迷目标自动重击 | 创造性动作、Help/Hide/Search 的叙事结果、目标是否可感知 |
+| 逐伤害类型的免疫/抗性/易伤、一次来源的临时 HP/HP、0 HP 与巨量伤害 | 限定词不完整的伤害特性，例如“非魔法攻击造成的挥砍伤害” |
+| 一次伤害来源对应的一次专注 DC、死亡豁免、治疗、石化抗性 | 不确定的法术/专长文本、任选目标或效果、非确定性恢复 |
+| 已记录网格、敌对、触及、可见性与移动模式产生的借机攻击窗口 | 未记录触发器、强迫移动/传送的语义、剧情后果 |
+| 2014/2024 突袭差异、反应支付、每回合法术限制 | 先攻同值时玩家/DM 的最终顺序选择 |
+
+引擎只自动提交可以由规则版本、角色卡和已记录场景事实唯一确定的结果。
+其余情况先用 `combat_choice_open` 建立可审计窗口，再用
+`combat_choice_resolve` 记录 DM 决定；不得把猜测伪装成数值修正或角色卡事实。
+Reaction spell/activity 必须消费属于该 actor 的 pending reaction window。
+通用 Ready 不接受法术 payload。准备施法必须使用以下专用流程：
+
+1. 只有施法时间为 Action 的法术可调用 `combat_ready_spell`。此时立刻支付动作与法术位/
+   施法资源，声明角色可感知的触发条件，并立刻开始专注；该专注会结束原有专注。
+2. 触发事件是否真实发生、是否满足声明条件，由 DM 根据已知场景事实裁定，再调用
+   `combat_readied_spell_trigger` 打开该施法者独占的反应窗口。
+3. 施法者调用 `combat_readied_spell_resolve`：`release` 消耗反应并释放；`decline`
+   不消耗反应，法术继续保持，仍可等待下次符合条件的事件。
+4. 专注中断、施法者下回合开始或战斗结束时，尚未释放的法术无效果消散。原本需要专注
+   的法术在释放后恢复其正常专注时长；原本不需专注的法术结束临时保持专注。
+5. 释放仅表示法术被施放出去，返回 `pending_ruling`。目标是否合法、法术攻击、豁免、
+   伤害、范围和叙事后果仍须按对应工具及 DM 裁定结算，不能把触发文本当作自动命中或
+   自动生效。

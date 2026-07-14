@@ -145,10 +145,17 @@ duration, concentration, V/S/M components, material cost/consumption, and concis
 rule effect. `point_cost` supports spell-point variants. The authoritative daily choice is
 `spellcasting.preparation.selected_spell_ids`.
 
-- Clerics, druids, paladins, and prepared casters use `mode: "prepared"`.
-- Wizards use spellbook membership separately from daily preparation.
-- Known casters use `mode: "known"`; do not fabricate a prepared list.
+- In 2024, bards, clerics, druids, paladins, rangers, sorcerers, warlocks, and
+  wizards use a level 1+ prepared list with the class-table limit.
+- In 2014, clerics, druids, paladins, and wizards use prepared lists; bards,
+  rangers, sorcerers, and warlocks use `mode: "known"`.
+- Wizards use spellbook membership separately from daily preparation; a prepared
+  Wizard spell must be in that character's spellbook.
 - Always-prepared spells are returned as prepared without consuming a selection.
+- Cantrips are known and never consume a level 1+ prepared-spell selection.
+- On multiclass cards, each class-granted spell records its class in
+  `grant.source_key`; preparation limits and eligible spell level use that
+  class's level, not the combined multiclass slot table.
 - `spellcasting.casting_economy` is `slots` or `spell_points`; spell-point
   casting requires the structured `spellcasting.spell_points` resource.
 - `content.features`, `content.feats`, and `content.activities` use the same

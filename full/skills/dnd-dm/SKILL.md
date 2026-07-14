@@ -7,8 +7,9 @@ description: "Run D&D 5e 2014 or 2024 sessions through the SagaSmith D&D MCP ser
 
 ## Runtime
 
-This full skill is MCP-first. Start by calling `storage_status`; all raw tool
-names below may be prefixed by the host, for example `mcp_sagasmith_dnd_`.
+This full skill is MCP-first. Start by calling `storage_status`, then
+`game_phase_get` for the active campaign; all raw tool names below may be
+prefixed by the host, for example `mcp_sagasmith_dnd_`.
 If the server is unavailable, stop using this skill and load `standalone/` rather
 than switching to a local CLI.
 
@@ -24,6 +25,11 @@ Read `../../references/mcp-contract.md` before a mutation and
   `references/DM_TEMPLATES.md`
 
 ## Turn Loop
+
+Outside play, select `authoring` with `game_phase_set` for module writing/import,
+campaign setup, and character creation. Before the first in-character scene,
+switch to `play`. `combat_start` enters `combat` automatically and `combat_end`
+returns to `play`; never simulate a phase transition only in narration.
 
 1. Resolve `scope_id` (`party`, `group:<id>`, or `player:<id>`), then call
    `module_current`. Player scopes inherit party progress until they have their own.
@@ -49,8 +55,9 @@ Read `../../references/mcp-contract.md` before a mutation and
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll` |
 | World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
 | Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
-| Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo` |
-| Combat state | `combat_start`, `combat_status`, `combat_act`, `combat_end` |
+| Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo`, `campaign_advance_effects` |
+| Combat | `combat_start`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_end` |
+| DM choices | `combat_choice_open`, `combat_choice_resolve` |
 
 ## Actor Cards and Party State
 
@@ -61,9 +68,9 @@ sheet for a small change:
 ```text
 character_inventory_add | character_inventory_update | character_inventory_remove
 character_inventory_transfer | character_inventory_equip | character_ammunition_consume
-character_wallet_adjust | character_spell_prepare | character_effect_add
+character_wallet_adjust | character_spell_prepare | character_spell_prepare_list | character_effect_add
 character_effect_remove | character_resource_set | character_memory_add
-character_memory_resolve | character_ability_apply
+character_memory_resolve | character_ability_apply | character_rest | character_cast_spell | character_use_activity
 party_show | party_inventory_add | party_inventory_remove | party_inventory_transfer
 party_wallet_adjust | party_wallet_transfer
 ```
@@ -77,3 +84,75 @@ After item writes, treat `character_get(...).derived.inventory.weapon_attacks` a
 `character_get(...).derived.inventory.encumbrance` as authoritative. Represent one
 active concentration spell as one active effect with `concentration: true` and its
 `source_spell_id`.
+
+During authoring or level advancement, submit the complete level 1+ prepared list
+through `character_spell_prepare_list`; use the singular prepare tool only for a
+setup edit. During live play, a prepared-list change must be part of
+`character_rest(..., rest_type="long_rest", prepared_spell_ids=[...])`. Do not
+simulate a long rest by repeated toggles. The runtime enforces 2014/2024 class
+timing and replacement count, class-level spell eligibility, Wizard spellbook
+membership, always-prepared and cantrip exclusions, and multiclass
+`grant.source_key` ownership. An unprepared level 1+ spell on a prepared caster's
+card is not castable merely because its access record says it is known.
+
+## Combat boundary
+
+Use `combat_preflight_attack` before every attack commit. The engine automatically
+settles initiative, turn resources, canonical weapon attack data, attack nat-1/
+nat-20, damage dice and typed trait ordering, temporary HP, concentration save
+windows, healing, movement budget, and death saves. Surprise is an explicit scene
+fact and follows the selected 2014/2024 ruleset. It does not infer missing map
+geometry, line of sight, cover, hidden targets, or story consequences. It may
+create an opportunity-attack window only from recorded positions, reach,
+hostility, visibility, and movement mode.
+Open a choice window for those decisions and resolve it explicitly; never encode
+an unverified ruling as a character-card fact.
+
+Use `combat_common_action` for the core non-attack actions. It records their
+action payment and tactical state; it deliberately does not fabricate the
+outcome of a Hide, Search, or Help declaration. At encounter start, provide
+DM-authored `participant_config` positions, disposition, reach, initiative, and
+visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
+grid move that leaves an eligible
+hostile's recorded reach opens an owned opportunity window; read it through
+`combat_reactions`, decline it with `combat_choice_resolve`, or settle it
+atomically with `combat_reaction_attack`. Do not claim map collision, terrain,
+forced movement, line of sight, or a trigger not represented in encounter state.
+Use `combat_move.path` for bent grid routes. Set `movement_mode` to `forced` or
+`teleport` when the scene establishes that the move does not provoke a normal
+opportunity attack; do not encode terrain cost or collision unless it is part of
+the supplied scene facts.
+
+Every campaign, character, party, combat, rest, continuity, branch, snapshot,
+scene-progress, and actor-knowledge mutation must carry the current optimistic
+token exposed by that tool and a fresh `idempotency_key`. The token may be a
+campaign/character revision, actor-knowledge revision ID, branch/head ID, history
+sequence, or scene `state_version`; read the MCP contract for the exact field.
+Re-read the relevant state after a conflict; never retry a changed payload under
+the same key. Shared wallet and
+inventory adjustments are campaign writes and follow the same contract.
+
+Use `combat_use_activity` or `character_use_activity` for cards in
+`content.activities`, `features`, or `feats`. These tools pay a recorded use or
+resource and the activation timing, then return `pending_ruling` when the card
+has choices; they never infer a result from prose.
+
+Reaction spells and activities require an owned pending reaction window. Do not
+call them solely because it is another actor's turn. Do not hide a spell inside
+the generic Ready payload. For a spell with an Action casting time, call
+`combat_ready_spell`: it pays the action and spell slot or other casting resource
+immediately, replaces any existing concentration, and arms one perceivable
+trigger until the start of the caster's next turn. The DM confirms that the
+trigger occurred with `combat_readied_spell_trigger`. The caster then uses
+`combat_readied_spell_resolve` to release the spell with its reaction or decline
+that occurrence without spending the reaction; declining leaves the spell armed.
+Losing concentration, reaching the caster's next turn, or ending combat makes the
+held spell dissipate without effect. A released spell returns `pending_ruling`:
+resolve its targets, attack, save, damage, area, and narrative consequences with
+the appropriate combat tools and DM ruling rather than treating release as the
+spell's complete effect.
+
+Use `campaign_advance_effects` only after the DM establishes an elapsed
+minute/hour/day (or explicit round/encounter boundary). It advances matching
+canonical effect durations across all campaign actors atomically; it does not
+invent passage of time from chat pacing.

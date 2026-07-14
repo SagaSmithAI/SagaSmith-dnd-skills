@@ -9,6 +9,10 @@ description: "Create and maintain D&D campaigns through the SagaSmith D&D MCP se
 shell `sagasmith-dnd` commands. Read `../../references/mcp-contract.md` and
 `../dnd-dm/references/DM_RULES.md` before mutating a campaign.
 
+Call `game_phase_get` when resuming a campaign. Use the `authoring` profile for
+the setup, module, import, indexing, and character-building workflows below;
+call `game_phase_set(tool_profile="play")` only when live in-character play begins.
+
 ## Start and Modules
 
 1. Call `campaign_create` with name, edition, locale, and optional description.
@@ -43,16 +47,27 @@ For normal play, mutate only the affected structure:
 ```text
 character_inventory_add | character_inventory_update | character_inventory_remove
 character_inventory_transfer | character_inventory_equip | character_ammunition_consume
-character_wallet_adjust | character_spell_prepare | character_effect_add
+character_wallet_adjust | character_rest | character_effect_add
 character_effect_remove | character_resource_set | character_memory_add
 character_memory_resolve
 party_show | party_inventory_add | party_inventory_remove | party_inventory_transfer
 party_wallet_adjust | party_wallet_transfer
 ```
 
+Use `character_spell_prepare` or `character_spell_prepare_list` only in
+`authoring` for setup and level advancement. During live play, pass the complete
+new list as `prepared_spell_ids` on the actor's `character_rest` long-rest
+transaction; do not toggle preparations one by one.
+
 After each actor or party mutation call `character_get` or `party_show`. Use their
 derived values rather than recalculating weapon attacks, AC, or encumbrance in
 prose.
+
+Before every write, read the matching optimistic token and send a fresh
+`idempotency_key`. Character tools use the actor revision; scene progress uses
+`state_version`; knowledge revisions use `revision_id`; branch/snapshot tools use
+the campaign revision plus the current branch or snapshot-head ID. The exact
+fields are listed in `../../references/mcp-contract.md`.
 
 ## Saves, Branches, and Audit
 
