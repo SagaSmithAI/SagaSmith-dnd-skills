@@ -9,9 +9,9 @@ This Skill carries three optional corpora:
 Runtime ingestion:
 
 ```powershell
-sagasmith-dnd rules ingest --path "<file.md>" --edition 2024 --locale en --publication srd-5.2.1 --json
-sagasmith-dnd rules ingest --path "<file.md>" --edition 2014 --locale en --publication srd-5.1 --json
-sagasmith-dnd rules ingest --path "<file.md>" --edition 2014 --locale zh --publication srd-5.1-zh --json
+Call `rule_ingest` with the Markdown file content, `edition`, `locale`, and
+`publication_id` (`srd-5.2.1`, `srd-5.1`, or `srd-5.1-zh`). Then use
+`rule_search` and `rule_expand` during play.
 ```
 
 The campaign rule profile controls search isolation. Do not search both editions

@@ -1,186 +1,79 @@
 ---
 name: dnd-dm
-description: "Run D&D 5e 2014 or 2024 sessions with rules-first adjudication and scene-bounded module retrieval."
+description: "Run D&D 5e 2014 or 2024 sessions through the SagaSmith D&D MCP server."
 ---
 
 # D&D Dungeon Master
 
-## Mode Detection
+## Runtime
 
-First, detect which mode is available:
+This full skill is MCP-first. Start by calling `storage_status`; all raw tool
+names below may be prefixed by the host, for example `mcp_sagasmith_dnd_`.
+If the server is unavailable, stop using this skill and load `standalone/` rather
+than switching to a local CLI.
 
-```powershell
-sagasmith-dnd doctor --json 2>$null
-if ($LASTEXITCODE -eq 0) {
-  $env:SAGASMITH_MODE = "runtime"
-} else {
-  $env:SAGASMITH_MODE = "portable"
-  python tools/portable.py doctor
-}
-```
+Read `../../references/mcp-contract.md` before a mutation and
+`references/DM_RULES.md` before a session. Load these only when needed:
 
-If `sagasmith-dnd` is found → **Runtime mode** (full persistence, FTS5 search, vector store).
-If not → **Portable mode** (file-based, zero pip deps, Python stdlib only).
-
-In Portable mode, locate `tools/portable.py` (in the skill repo root) and use it in place of `sagasmith-dnd`.
+- actor creation or advancement: `references/CHAR_CREATION.md`
+- actor, items, wallet, spells, effects, or resources:
+  `../../references/character-schema-v2.md`
+- module preparation or scene transitions: `references/MODULE_INDEX.md` and
+  `references/MODULE_ARC.md`
+- tactical positioning or reusable narration: `references/DM_MAP_SYS.md` and
+  `references/DM_TEMPLATES.md`
 
 ## Turn Loop
 
-1. Resolve the acting scope (`party`, `group:<id>`, or `player:<id>`). Run `module current`
-   to get that scope's current scene. A player scope inherits the party scene until it
-   records its own.
-2. Read that scene. Search only when it lacks the needed fact; expand before using.
-3. Ask for player intent when it is ambiguous.
-4. Search rules before resolving a disputed or edition-sensitive mechanic.
-5. Roll openly through the CLI.
-6. Narrate the consequence without changing established module facts.
-7. Merge discoveries and room state into that scope's existing progress.
-8. Persist important events, character state, scene progress, and memory.
-9. Save at decision points, chapter transitions, and before dangerous restores.
+1. Resolve `scope_id` (`party`, `group:<id>`, or `player:<id>`), then call
+   `module_current`. Player scopes inherit party progress until they have their own.
+2. Read that scene through `module_read_scene`. Use `module_search` only to select a
+   candidate, then call `module_expand` before relying on a chunk.
+3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
+   hidden motives, or sibling-branch facts.
+4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
+5. Resolve openly with `dnd_dice_roll` or `dnd_check`.
+6. Persist events, scene progress, actor/party state, and durable facts. Use
+   `actor_knowledge_*` for what one PC/NPC believes, not `memory_*`.
+7. Call `snapshot_create` at decision points, chapter transitions, and before a
+   dangerous restore. Use `snapshot_verify` and `snapshot_lineage` before restore.
 
-Before running a session, read `references/DM_RULES.md`. Load the other references
-only when their workflow is active:
+## MCP Tool Reference
 
-- character creation or advancement: `references/CHAR_CREATION.md`
-- any PC, NPC, monster, item, wallet, equipment, spell, effect, or resource work:
-  `../../references/character-schema-v2.md`
-- module preparation and scene transitions: `references/MODULE_INDEX.md` and
-  `references/MODULE_ARC.md`
-- tactical positioning: `references/DM_MAP_SYS.md`
-- reusable narration and state shapes: `references/DM_TEMPLATES.md`
+| Workflow | MCP tools |
+|---|---|
+| Campaign | `campaign_create`, `campaign_get`, `campaign_list` |
+| Rules | `rule_ingest`, `rule_search`, `rule_expand` |
+| Module lifecycle | `module_write`, `module_inspect`, `module_import`, `module_list`, `module_index` |
+| Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_set_progress` |
+| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll` |
+| World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
+| Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
+| Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo` |
+| Combat state | `combat_start`, `combat_status`, `combat_act`, `combat_end` |
 
-## Command Reference
+## Actor Cards and Party State
 
-Use the left column in Runtime mode, the right column in Portable mode.
+Every live PC, NPC, and monster is an authoritative v2 actor card. Use
+`character_get` after every write. Use granular tools instead of replacing a whole
+sheet for a small change:
 
-### Service / Health
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd doctor --json` | `python tools/portable.py doctor` |
-
-### Rules Retrieval
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd rules search --campaign <id> --query "<q>" --limit 5 --json` | `python tools/portable.py rules search --campaign <id> --query "<q>" --limit 5` |
-| `sagasmith-dnd rules expand --chunk <id> --json` | (read the SRD file directly) |
-
-Portable mode searches the bundled SRD `.md` files in `skills/dnd-dm/srd/` using
-lexical scoring with Chinese ↔ English query expansion.
-
-### Module Retrieval
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd module current --campaign <id> --scope <scope> --json` | `python tools/portable.py module current --campaign <id> --scope <scope>` |
-| `sagasmith-dnd module search --campaign <id> --query "<q>" --limit 5 --json` | `python tools/portable.py module search --campaign <id> --query "<q>" --limit 5` |
-| `sagasmith-dnd module expand --chunk <id> --json` | (read the scene from its `.md` file) |
-| `sagasmith-dnd module read-scene --campaign <id> --scene <id> --json` | `python tools/portable.py module read-scene --campaign <id> --scene <id>` |
-| `sagasmith-dnd module inspect --path <path> --json` | `python tools/portable.py module inspect --path <path>` |
-| `sagasmith-dnd module ingest --campaign <id> --path <path> --json` | `python tools/portable.py module ingest --campaign <id> --path <path>` |
-| `sagasmith-dnd module index --campaign <id> --json` | `python tools/portable.py module index --campaign <id>` |
-
-Never reveal unseen rooms, future twists, hidden NPC motives, or appendix secrets.
-
-### Campaign
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd campaign start --name <name> --edition 2024 --json` | `python tools/portable.py campaign start --name <name> --edition 2024` |
-| `sagasmith-dnd campaign list --json` | `python tools/portable.py campaign list` |
-| `sagasmith-dnd campaign rules-get --campaign <id> --json` | (not needed in portable — SRD is bundled) |
-
-### Dice
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd roll dice --expression "2d6+3" --json` | `python tools/portable.py roll dice --expression "2d6+3"` |
-| `sagasmith-dnd roll check --dc 15 --score 16 --proficient --level 5 --json` | `python tools/portable.py roll check --dc 15 --score 16 --proficient --level 5` |
-| `sagasmith-dnd roll attack --dc 17 --score 18 --proficient --level 5 --json` | `python tools/portable.py roll attack --dc 17 --score 18 --proficient --level 5` |
-
-Use `--advantage` or `--disadvantage` only when the selected edition grants it.
-
-### State Updates
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd event add --campaign <id> --type discovery --summary "<s>" --payload '<json>' --json` | `python tools/portable.py event add --campaign <id> --type discovery --summary "<s>" --payload '<json>'` |
-| `sagasmith-dnd module set-progress --campaign <id> --scope <scope> --scene <id> --progress 50 --state '<json>' --json` | `python tools/portable.py module set-progress --campaign <id> --scope <scope> --scene <id> --progress 50 --state '<json>'` |
-| `sagasmith-dnd memory add --campaign <id> --type fact --subject "<s>" --content "<f>" --json` | `python tools/portable.py memory add --campaign <id> --type fact --subject "<s>" --content "<f>"` |
-| `sagasmith-dnd save create --campaign <id> --label "<label>" --json` | `python tools/portable.py save create --campaign <id> --label "<label>"` |
-| `sagasmith-dnd save list --campaign <id> --json` | `python tools/portable.py save list --campaign <id>` |
-
-### Actor Cards
-
-| Runtime | Portable |
-|---------|----------|
-| `sagasmith-dnd character build --campaign <id> --name <name> --type pc --player <player> --sheet '@<sheet.json>' --notes '@<notes.json>' --json` | `python tools/portable.py character create --campaign <id> --name <name> --sheet '<json>'` |
-| `sagasmith-dnd character create [--campaign <id>] --name <name> --type pc|npc|monster --sheet '@<sheet.json>' --notes '@<notes.json>' --json` | (no validated actor-card equivalent) |
-| `sagasmith-dnd character list --campaign <id> --type pc|npc|monster --json` | `python tools/portable.py character list --campaign <id>` |
-| `sagasmith-dnd character show --id <id> --json` | `python tools/portable.py character get --campaign <id> --name <name>` |
-
-In Runtime mode, every PC, NPC, and monster is an authoritative v2 actor card.
-Read `../../references/character-schema-v2.md` before creation or mutation. Use
-`character show --id <id>` after every affected write; use `party show` after a
-shared inventory or wallet write. Normal play uses granular commands:
-
-```powershell
-sagasmith-dnd character inventory add|update|remove|transfer ... --json
-sagasmith-dnd character inventory use-ammunition --id <id> --item <weapon-item-id> --amount <n> --json
-sagasmith-dnd character wallet credit|debit|transfer ... --json
-sagasmith-dnd character equipment equip|unequip ... --json
-sagasmith-dnd character spell prepare|unprepare ... --json
-sagasmith-dnd character effect add|remove ... --json
-sagasmith-dnd character resource set ... --json
-sagasmith-dnd character memory add|resolve ... --json
-sagasmith-dnd character ability roll|apply ... --json
-sagasmith-dnd party inventory add|remove|deposit|withdraw ... --json
-sagasmith-dnd party wallet credit|debit|deposit|withdraw ... --json
+```text
+character_inventory_add | character_inventory_update | character_inventory_remove
+character_inventory_transfer | character_inventory_equip | character_ammunition_consume
+character_wallet_adjust | character_spell_prepare | character_effect_add
+character_effect_remove | character_resource_set | character_memory_add
+character_memory_resolve | character_ability_apply
+party_show | party_inventory_add | party_inventory_remove | party_inventory_transfer
+party_wallet_adjust | party_wallet_transfer
 ```
 
-When creating or revising an actor card, populate structured identity and
-background grants, weapon mechanics plus linked ammunition, container capacity,
-encumbrance, every available sense, spell definitions/components, and actor
-adventure state. Represent an active concentration spell as exactly one active
-`effect` with `concentration: true` and its `source_spell_id`; never track this
-only in narration. Read `derived.inventory.weapon_attacks` and
-`derived.inventory.encumbrance` after inventory writes instead of calculating
-attack bonuses or carrying load in prose.
+Use `character_build` for a PC when a library template and its first campaign
+instance must be created atomically. Use `character_library_list` and
+`character_instantiate` for existing templates. `character_memory_*` stays a legacy
+notes field; new subjective information belongs in the actor-knowledge ledger.
 
-Do not use `character update --sheet` for a one-field change. NPC and monster
-cards both require `notes.profile.summary`; record actor-specific dialogue facts
-with `character memory`, not only in the campaign memory stream.
-PC, NPC, and monster templates may live outside campaigns. Their copied instances
-are the only actors mutated or restored during a campaign. For player character
-creation, use `character build` so the template and initial campaign instance are
-created atomically.
-
-## Portable Mode Data
-
-Data lives in `~/.sagasmith/`:
-
-```
-~/.sagasmith/
-  campaigns.json                  # campaign index
-  <campaign_id>/
-    campaign.json                 # metadata
-    characters/<name>.json        # character sheets
-    modules/<source_key>.md       # imported modules (Markdown)
-    progress.json                 # scoped scene progress
-    events.jsonl                  # event log
-    memories.jsonl                # campaign memory
-    saves/<slot>/                 # snapshot copies
-```
-
-Module files are plain Markdown with `##` headings as scenes. Progress merges
-state per-scope (`party`, `group:<id>`, `player:<id>`). Save snapshots copy the
-campaign directory with `shutil.copytree`.
-
-## Portable Mode Limitations
-
-- No SQL FTS5 — search uses Python lexical scoring with Chinese ↔ English expansion
-- No ChromaDB vector search
-- No PDF import — convert PDF to Markdown first, then `module ingest`
-- No transaction atomicity — file writes use atomic rename (write tmp → replace)
-  for individual file safety, but multi-file operations (like save) are best-effort
+After item writes, treat `character_get(...).derived.inventory.weapon_attacks` and
+`character_get(...).derived.inventory.encumbrance` as authoritative. Represent one
+active concentration spell as one active effect with `concentration: true` and its
+`source_spell_id`.

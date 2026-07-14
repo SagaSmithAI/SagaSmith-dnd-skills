@@ -1,58 +1,45 @@
 # Runtime Workflows
 
+Full Runtime uses the `sagasmith_dnd` MCP server. See `mcp-contract.md` for the
+complete operation mapping.
+
 ## Session start
 
-1. `doctor`
-2. `campaign list`
-3. `campaign show`
-4. `campaign rules-get`
-5. `module list`
-6. Retrieve the current scene, recent events, recent memory, and `party show`.
-7. Use `character show` for each PC and every NPC/monster that is currently relevant.
+1. `storage_status`, then `campaign_list` and `campaign_get`.
+2. Call `module_current` for the acting scope and `module_read_scene` if one exists.
+3. Read recent `event_list`, use `continuity_context` for the acting actor, then
+   refresh `party_show` and relevant `character_get` cards.
 
 ## New campaign
 
-1. `campaign start`
-2. Optional `module inspect` and `module ingest`
-3. Use `character build` for each confirmed PC, creating its public template and
-   initial campaign instance atomically. PC/NPC/monster templates or direct
-   instances all use complete `sheet v2` and `notes v2` documents.
-4. Record the opening event
-5. Keep the initial snapshot returned by `start`
+1. `campaign_create`.
+2. `module_write` → `module_inspect` → `module_import` → `module_index`.
+3. `character_build` for each confirmed PC; use `character_create` or
+   `character_instantiate` for NPCs and monsters.
+4. Record the opening `event_add` and `snapshot_create`.
 
 ## Rule question
 
-1. `rules search --campaign`
-2. Select by title, edition and publication
-3. `rules expand`
-4. Answer with source metadata
+1. `rule_search` with edition and locale.
+2. Select a result, then `rule_expand`.
+3. Answer with source metadata rather than unverified recollection.
 
 ## Restore
 
-1. `save verify`
-2. Explain the target slot and branch behavior
-3. `save restore`
-4. Refresh campaign, every relevant actor with `character show`, `party show`,
-   scene, events, and memory. Do not retain pre-restore chat state.
+1. `snapshot_verify`, then `snapshot_lineage`.
+2. Explain that `snapshot_restore` forks history.
+3. Refresh actors, `party_show`, `module_current`, `event_list`, and
+   `continuity_context`; discard pre-restore assumptions.
 
 ## Session close
 
-1. Reconcile PC/NPC/monster HP, resources, conditions, effects, equipment,
-   inventory, prepared spells, scene progress, party stash, and campaign state
-2. Append the session events, durable campaign memories, and actor-specific NPC
-   memories
-3. `save create`
-4. Inspect the generated delta recap; use `save regenerate-recap --slot` if needed
-
-## Module generator handoff
-
-1. Ingest the existing generated Markdown without rewriting it
-2. `module index --campaign`
-3. `module export-scenes --campaign --output`
+1. Reconcile actor and party state with granular MCP tools.
+2. Append `event_add`, `memory_add`, and actor knowledge as appropriate.
+3. `snapshot_create`; use `snapshot_regenerate_recap` when needed.
 
 ## Audit recovery
 
-- `state history` inspects mutations.
-- `state undo` and `state redo` change audited state without deleting snapshots.
-  After restore, the restored cursor deliberately cannot redo the abandoned future.
-- `memory scope` reports the memories effective on the current branch.
+- `state_history` inspects audited mutations.
+- `state_undo` and `state_redo` change audited state without deleting snapshots.
+- `memory_list` and `branch_list` show current-branch continuity; use explicit
+  `branch_id` to inspect another timeline.

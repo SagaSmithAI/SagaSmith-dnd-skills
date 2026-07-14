@@ -1,132 +1,81 @@
 ---
 name: dnd-campaign-manager
-description: "Create and maintain D&D campaigns, characters, modules, saves, and long-term memory through sagasmith-dnd."
+description: "Create and maintain D&D campaigns through the SagaSmith D&D MCP server."
 ---
 
 # D&D Campaign Manager
 
-All commands end in `--json`.
+`full/` is MCP-first. Use the raw MCP names below (a client may prefix them), not
+shell `sagasmith-dnd` commands. Read `../../references/mcp-contract.md` and
+`../dnd-dm/references/DM_RULES.md` before mutating a campaign.
 
-Read `../dnd-dm/references/DM_RULES.md` before mutating a campaign. For character
-creation, module lifecycle, save/restore, undo, recap, memory, player assignments,
-or advancement, load the matching section of that reference and the linked
-specialized reference. The CLI is authoritative; never emulate a successful write.
+## Start and Modules
 
-## Start
-
-```powershell
-sagasmith-dnd campaign start --name "<name>" --edition 2014 --locale zh --json
-sagasmith-dnd campaign start --name "<name>" --edition 2024 --locale en --json
-```
-
-Store the returned campaign ID. Import a module only after the campaign exists:
-
-```powershell
-sagasmith-dnd module inspect --path "<module.pdf>" --json
-sagasmith-dnd module ingest --campaign <id> --path "<module.pdf>" --json
-```
-
-Existing output from `SagaSmith-module-gen-skills` can be passed directly to
-`module ingest`.
+1. Call `campaign_create` with name, edition, locale, and optional description.
+2. Persist the returned `campaign_id`.
+3. Resolve the caller's stable `principal_id`; use `campaign_member_grant` and
+   `actor_grant` for access instead of treating `player_name` as authorization.
+4. Generate Markdown through `module_write`, inspect it with `module_inspect`, then
+   call `module_import`. This preserves an editable MCP-managed artifact before
+   ingestion.
+5. Use `module_index` to choose a scene; use `module_set_progress` with an explicit
+   `scope_id` to enter it. Do not narrate from a `module_search` snippet until
+   `module_expand` or `module_read_scene` has been called.
 
 ## Characters
 
-```powershell
-# Any type may be a public template or a direct campaign instance.
-sagasmith-dnd character create --name "<name>" --type pc|npc|monster --sheet '@<sheet.json>' --notes '@<notes.json>' --json
-sagasmith-dnd character library list --type pc|npc|monster --json
-sagasmith-dnd character instantiate --id <template-id> --campaign <id> --player "<player>" --json
-sagasmith-dnd character create --campaign <id> --name "<name>" --type pc|npc|monster --sheet '@<sheet.json>' --notes '@<notes.json>' --json
+| Need | MCP tool |
+|---|---|
+| Create a public template or direct instance | `character_create` |
+| List templates | `character_library_list` |
+| Instantiate a template | `character_instantiate` |
+| Atomically create PC template + instance | `character_build` |
+| List or read live actors | `character_list`, `character_get` |
+| Full reviewed replacement | `character_sheet_replace` |
+| Ability generation | `dnd_ability_roll`, `character_ability_apply` |
 
-# Character creation: atomically create the public template plus campaign instance.
-sagasmith-dnd character build --campaign <id> --name "<name>" --type pc --player "<player>" --sheet '@<pc-sheet.json>' --notes '@<pc-notes.json>' --json
-sagasmith-dnd character ability roll --edition 2014 --json
-sagasmith-dnd character build --campaign <id> --name "<name>" --type pc --player "<player>" --ability-method point_buy --assignments '<six-ability-json>' --sheet '@<pc-sheet.json>' --notes '@<pc-notes.json>' --json
-sagasmith-dnd character list --campaign <id> --json
-sagasmith-dnd character show --id <character-id> --json
+All live actors use `sheet v2` and `notes v2`. Read
+`../../references/character-schema-v2.md` before creation or mutation. Do not
+persist an unconfirmed draft.
+
+For normal play, mutate only the affected structure:
+
+```text
+character_inventory_add | character_inventory_update | character_inventory_remove
+character_inventory_transfer | character_inventory_equip | character_ammunition_consume
+character_wallet_adjust | character_spell_prepare | character_effect_add
+character_effect_remove | character_resource_set | character_memory_add
+character_memory_resolve
+party_show | party_inventory_add | party_inventory_remove | party_inventory_transfer
+party_wallet_adjust | party_wallet_transfer
 ```
 
-Do not persist a draft until the user confirms it.
+After each actor or party mutation call `character_get` or `party_show`. Use their
+derived values rather than recalculating weapon attacks, AC, or encumbrance in
+prose.
 
-All live PCs, NPCs, and monsters use the same complete `sheet v2` and `notes v2`
-documents. This skill requires `profile.summary` for every type; the runtime
-enforces it for NPCs and monsters. Every in-play item also needs a name and short
-description. For normal play, do not use `character update` to patch one field;
-it replaces an entire supplied document and is only for a reviewed full-card
-revision. A campaign actor copied from any public template is independent: mutations
-and saves affect the instance, never the template. `character build` is the standard
-PC car-creation operation and creates both in one transaction.
+## Saves, Branches, and Audit
 
-For the complete v2 contract, read `references/database-contract.md` and
-`../../references/character-schema-v2.md`. During play, mutate only the affected
-state through granular commands:
+| Need | MCP tool |
+|---|---|
+| Create/list a save | `snapshot_create`, `snapshot_list` |
+| Validate / inspect lineage | `snapshot_verify`, `snapshot_lineage` |
+| Restore without deleting future history | `snapshot_restore` |
+| Regenerate recap | `snapshot_regenerate_recap` |
+| List/create/switch timeline | `branch_list`, `branch_create`, `branch_checkout` |
+| Audit / undo / redo | `state_history`, `state_undo`, `state_redo` |
 
-```powershell
-sagasmith-dnd character inventory add --id <id> --payload '<item-json>' --json
-sagasmith-dnd character inventory update --id <id> --item <item-id> --payload '<item-json>' --json
-sagasmith-dnd character inventory remove --id <id> --item <item-id> --amount <n> --json
-sagasmith-dnd character inventory use-ammunition --id <id> --item <weapon-item-id> --amount <n> --json
-sagasmith-dnd character inventory transfer --id <source> --target <target> --item <item-id> --json
-sagasmith-dnd character wallet credit --id <id> --denomination gp --amount 10 --json
-sagasmith-dnd character wallet debit --id <id> --denomination gp --amount 10 --json
-sagasmith-dnd character equipment equip --id <id> --item <item-id> --slot-name main_hand --json
-sagasmith-dnd character equipment unequip --id <id> --item <item-id> --json
-sagasmith-dnd character spell prepare --id <id> --spell <spell-id> --json
-sagasmith-dnd character spell unprepare --id <id> --spell <spell-id> --json
-sagasmith-dnd character effect add --id <id> --payload '<effect-json>' --json
-sagasmith-dnd character effect remove --id <id> --effect <effect-id> --json
-sagasmith-dnd character resource set --id <id> --resource <resource-key> --amount <n> --json
-sagasmith-dnd character memory add --id <npc-id> --payload '<memory-json>' --json
-sagasmith-dnd character memory resolve --id <npc-id> --memory-id <memory-id> --json
-sagasmith-dnd party inventory deposit --campaign <id> --id <character-id> --item <item-id> --json
-sagasmith-dnd party inventory withdraw --campaign <id> --id <character-id> --item <item-id> --json
-sagasmith-dnd party wallet deposit --campaign <id> --id <character-id> --denomination gp --amount 10 --json
-sagasmith-dnd party wallet withdraw --campaign <id> --id <character-id> --denomination gp --amount 10 --json
-```
-
-For new cards, use the structured identity, background grants, weapon/ammunition,
-container capacity, encumbrance, expanded senses, spell definition, concentration,
-and adventure-state fields described in the v2 contract. After item changes,
-inspect `character show` and use `derived.inventory.weapon_attacks` and
-`derived.inventory.encumbrance` as the authoritative combat-card and load view.
-
-## Saves
-
-```powershell
-sagasmith-dnd save create --campaign <id> --label "<label>" --json
-sagasmith-dnd save list --campaign <id> --json
-sagasmith-dnd save verify --campaign <id> --slot <n> --json
-sagasmith-dnd save lineage --campaign <id> --json
-sagasmith-dnd save restore --campaign <id> --slot <n> --json
-```
-
-Restore automatically preserves the current state and creates a new branch. Never
-describe restore as overwriting history. A v2 snapshot restores the campaign,
-every actor document, party stash, scene progress, chronology events, active memory
-content, and its undo/redo cursor; rules and module source text remain external.
+Restore is a branch fork, never destructive overwrite. Verify the target first,
+then refresh campaign actors, party state, scene progress, events, and continuity
+context after restoring.
 
 ## Continuity
 
-```powershell
-sagasmith-dnd event list --campaign <id> --limit 30 --json
-sagasmith-dnd memory search --campaign <id> --query "<question>" --limit 8 --json
-sagasmith-dnd branch list --campaign <id> --json
-sagasmith-dnd branch create --campaign <id> --name "alternate" --from-snapshot <snapshot-id> --json
-sagasmith-dnd branch checkout --campaign <id> --branch <branch-id> --json
-sagasmith-dnd knowledge list --campaign <id> --actor-id <pc-or-npc-id> --json
-sagasmith-dnd continuity context --campaign <id> --actor-id <actor-id> --query "<question>" --json
-sagasmith-dnd state history --campaign <id> --limit 30 --json
-```
+Use `memory_*` for branch-scoped durable world facts and `event_*` for immutable
+chronology. Use `actor_knowledge_*` only for one PC/NPC/monster's subjective
+knowledge. The separate `character_memory_*` tools keep legacy notes memories and
+are not imported into the actor-knowledge ledger.
 
-Use memory for durable facts and events for chronology. Use `knowledge` for facts
-that belong to one PC, NPC, or monster. `character memory` remains a separate legacy
-notes field and is not imported into the actor-knowledge ledger. Use `character show`
-after any actor or party mutation to refresh the authoritative card and `derived` values.
-
-For new branch-aware work, use `knowledge` for one actor's subjective information.
-Do not treat `memory search` as player-safe narration: use `continuity context` with
-the acting actor and audience to avoid leaking DM facts or sibling-branch history.
-
-Use `state undo` and `state redo` for audited mutations; these do not delete
-snapshots. Keep player-to-character assignments in campaign state so they remain
-portable across agent platforms.
+For player-safe retrieval, call `continuity_context` with `actor_id`, `scope_id`,
+audience, and optionally `branch_id`. Do not substitute broad `memory_search` for
+that context; it can expose DM facts or sibling-branch history.

@@ -1,5 +1,11 @@
 # D&D Character Schema v2
 
+Full Runtime uses MCP tools, not the CLI snippets that appear in the historical
+examples below. Use `character_create`, `character_build`, `character_get`,
+`character_sheet_replace`, and the granular inventory/wallet/effect/resource
+tools. Include `principal_id`, `expected_revision`, and `idempotency_key` on
+retriable writes; `player_name` is descriptive and does not grant access.
+
 Runtime mode stores every PC, NPC, and monster as a `Character` record with the
 same validated documents. `character_type` is `pc`, `npc`, or `monster`; it does
 not change the required sheet shape.

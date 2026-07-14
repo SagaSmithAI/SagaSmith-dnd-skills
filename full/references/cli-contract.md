@@ -1,4 +1,7 @@
-# SagaSmith D&D CLI Contract
+# Legacy SagaSmith D&D CLI Contract
+
+> Full Runtime is MCP-first. Read `mcp-contract.md` for active work; retain this
+> document only when a deployment deliberately uses the direct CLI transport.
 
 - Executable: `sagasmith-dnd`
 - Agent calls always include `--json`.

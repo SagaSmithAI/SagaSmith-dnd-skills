@@ -8,7 +8,9 @@
 
 > *"The dice have been cast."*
 
-Runtime mode requires `sagasmith-core` and `sagasmith-dnd`. Every supported agent platform operates the same compact `sagasmith-dnd --json` CLI — this repository contains no database, vector runtime, game engine, or platform-specific tools.
+Runtime mode requires the `sagasmith_dnd` MCP server. The MCP server owns the
+database, vector index, bundled rules, module artifacts, and durable state; this
+repository contains the orchestration skills and does not call a local D&D CLI.
 
 ---
 
@@ -17,7 +19,8 @@ Runtime mode requires `sagasmith-core` and `sagasmith-dnd`. Every supported agen
 | Repo | Role |
 |------|------|
 | 📦 **SagaSmith-dnd-skills** (this repo) | D&D agent skill definitions |
-| ⚔️ [sagasmith-dnd](https://github.com/dajiaohuang/sagasmith-dnd) | D&D 5e runtime + CLI |
+| ⚔️ [SagaSmith-dnd-mcp](https://github.com/SagaSmithAI/SagaSmith-dnd-mcp) | D&D MCP runtime and owned storage |
+| 🧮 [sagasmith-dnd](https://github.com/dajiaohuang/sagasmith-dnd) | D&D schema and rules library |
 | 🏗️ [sagasmith-core](https://github.com/dajiaohuang/sagasmith-core) | General engine — DB, docs, RAG |
 | 🎲 [SagaSmith-agent](https://github.com/dajiaohuang/SagaSmith-agent) | Complete AI DM runtime |
 | ✍️ [SagaSmith-module-gen-skills](https://github.com/dajiaohuang/SagaSmith-module-gen-skills) | Module generator |
@@ -37,10 +40,10 @@ Runtime mode requires `sagasmith-core` and `sagasmith-dnd`. Every supported agen
 
 ### Runtime Mode (persistence)
 
-```powershell
-sagasmith-dnd module current --campaign <id> --scope player:alice --json
-sagasmith-dnd module set-progress --campaign <id> --scope party --scene <scene-id> --progress 50 --state '<merged-json>' --json
-sagasmith-dnd save create --campaign <id> --label "Before entering the dungeon" --json
+```text
+Call module_current(campaign_id, scope_id, principal_id),
+module_set_progress(...), and snapshot_create(...) through the D&D MCP.
+Use rule_search -> rule_expand and module_search -> module_read_scene for facts.
 ```
 
 ### Portable Mode (no installation)
