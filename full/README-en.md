@@ -1,88 +1,46 @@
-# 🐉 SagaSmith D&D Skills
+# SagaSmith D&D Skills — Full MCP Runtime
 
-[中文](README.md) | [English](README-en.md)
+[中文](README.md) · [English](README-en.md) · [Repository overview](../README.md)
 
-<p align="center"><img src="images/Sagasmith.png" alt="SagaSmith" width="200"></p>
+Full mode is the SagaSmithAI D&D 5e 2014/2024 table-running workflow. It requires the `sagasmith_dnd` MCP server. Persistence, retrieval, rule packs, modules, characters, branches, knowledge, and combat state all belong to that server.
 
-**Cross-platform D&D 5e 2014/2024 Agent Skills** — provide Dungeon Master capabilities to Claude Code, NanoBot, Codex, Cursor, and any agent platform supporting the SKILL.md standard.
+This directory contains agent orchestration only. It never writes SQLite/ChromaDB directly, calls a local D&D CLI, or pretends a natural-language state change has been committed.
 
-> *"The dice have been cast."*
+## Startup
 
-Runtime mode requires the `sagasmith_dnd` MCP server. The MCP server owns the
-database, vector index, bundled rules, module artifacts, and durable state; this
-repository contains the orchestration skills and does not call a local D&D CLI.
+1. Call `server_capabilities` and `storage_status`.
+2. Open a session exposure with `exposure_open`; do not model-supply a principal when the Host injects identity.
+3. For lobby work, use `exposure_search` → `exposure_inspect` → `exposure_load`.
+4. Read [`references/mcp-contract.md`](references/mcp-contract.md) and the relevant child skill.
+5. On fresh storage, verify core-rule seed state. For an existing campaign, read campaign, branch, and continuity context first.
 
----
+## Phase surfaces
 
-## Ecosystem
+| Phase | Typical work | Forbidden shortcut |
+|---|---|---|
+| `lobby` | campaigns, characters, rules/modules, access, branches, initial knowledge | settling from an uninstalled rule pack |
+| `play` | scenes, checks, resources, events, memory, actor knowledge | mutating combat state through ordinary character writes |
+| `combat` | preflight, attacks/spells/reactions/movement, choices, temporary map | inventing targets, sight lines, or distance |
 
-| Repo | Role |
-|------|------|
-| 📦 **SagaSmith-dnd-skills** (this repo) | D&D agent skill definitions |
-| ⚔️ [SagaSmith-dnd-mcp](https://github.com/SagaSmithAI/SagaSmith-dnd-mcp) | D&D MCP runtime and owned storage |
-| 🧮 [sagasmith-dnd](https://github.com/dajiaohuang/sagasmith-dnd) | D&D schema and rules library |
-| 🏗️ [sagasmith-core](https://github.com/dajiaohuang/sagasmith-core) | General engine — DB, docs, RAG |
-| 🎲 [SagaSmith-agent](https://github.com/dajiaohuang/SagaSmith-agent) | Complete AI DM runtime |
-| ✍️ [SagaSmith-module-gen-skills](https://github.com/dajiaohuang/SagaSmith-module-gen-skills) | Module generator |
+Campaign state, not the prompt, owns the phase. The MCP refreshes session exposure when the phase changes.
 
----
+## Minimal turn loop
 
-## Skill Inventory
+1. Read the active branch, continuity context, current scene, and caller-visible actor knowledge.
+2. Separate player statement, character intent, and missing rules inputs.
+3. Use `rule_search` then `rule_expand`; use the same search/expand pattern for modules.
+4. Let the engine settle deterministic mechanics and the agent/human GM rule on targets, sight, exceptions, and narrative cost.
+5. Use controlled tools for state, scene progress, events, memory, and actor knowledge.
+6. Snapshot major divergence, danger, chapter transitions, and combat boundaries.
 
-| Skill | File | Role |
-|-------|------|------|
-| 🎲 **dnd-dm** | `skills/dnd-dm/SKILL.md` | Core DM persona (always-on), rule adjudication, combat engine, SRD retrieval, scoped scene tracking |
-| 📋 **dnd-campaign-manager** | `skills/dnd-campaign-manager/SKILL.md` | Campaign lifecycle, Snapshot save/load, module import, USER.md sync |
+## Non-negotiable boundaries
 
----
+- Every PC, NPC, and monster has an independent complete Character card.
+- Actor knowledge is explicitly scoped to actor/campaign/branch; players cannot read another player's private scope.
+- Sibling branches never auto-merge; reads and retrieval follow active ancestry.
+- Retriable writes use current revisions and stable idempotency keys.
+- Retrieval supplies evidence; the campaign's core/extension lock determines executable rules.
+- Combat results always use the player-safe projection; hidden actors, mechanics, and map data remain hidden.
+- Generated modules become editable artifacts before inspection and import.
 
-## Usage
-
-### Runtime Mode (persistence)
-
-```text
-Call module_current(campaign_id, scope_id, principal_id),
-module_set_progress(...), and snapshot_create(...) through the D&D MCP.
-Use rule_search -> rule_expand and module_search -> module_read_scene for facts.
-```
-
-### Portable Mode (no installation)
-
-Without the Runtime, the bundled SRD files remain available for static, non-persistent reference — useful for quick rule lookups and session preparation.
-
----
-
-## Rules Corpus
-
-| Corpus | Edition | Locale |
-|--------|---------|--------|
-| SRD 5.2.1 | 2024 | EN |
-| SRD 5.1 | 2014 | EN |
-| SRD 5.1 | 2014 | ZH-CN (convenience translation) |
-
----
-
-## DM State Machine
-
-Each player action:
-
-1. **Scope resolution** — select `party` / `group:<id>` / `player:<id>` for the acting player, call `module current`
-2. **Scene reading** — read that scope's current scene; search candidates only when needed, always `expand` before using
-3. **Type-based execution** — `intro` setups / `combat` engagements / `dungeon` subsection progression / `transition` condition checks
-4. **State merge** — read existing `progress.state`, merge new facts, write back atomically
-5. **Record & save** — event log, memory, snapshot at decision points
-
----
-
-## Quick Install
-
-```bash
-# Claude Code / Codex / Cursor
-npx skills add dajiaohuang/SagaSmith-dnd-skills
-```
-
----
-
-## License
-
-MIT
+`../standalone/` is an explicit fallback, not a transparent replacement. See [`references/mcp-contract.md`](references/mcp-contract.md) for schemas, error semantics, grouped tools, and the exposure protocol.

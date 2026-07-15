@@ -1,14 +1,21 @@
-# 🪶 SagaSmith D&D Skills — Standalone
+# SagaSmith D&D Skills — Standalone
 
-**零依赖轻量版。** 无需安装 `sagasmith-dnd` Python 包，Python 标准库即可运行。
-
-所有命令在 `standalone/` 目录下执行：
+**无 MCP、零第三方依赖的便携模式。** 它使用 Python 标准库、随附参考和 `portable.py`，适合快速规则查阅、演示或无法运行 Full MCP 的环境。
 
 ```powershell
+cd standalone
 python portable.py doctor
 python portable.py campaign start --name "Campaign" --edition 2024
 ```
 
-数据存 `~/.sagasmith/`。不支持 PDF 导入、FTS5 检索、ChromaDB。
+加载 [`SKILL.md`](SKILL.md)。文件状态默认位于 `~/.sagasmith/`。
 
-详见 `SKILL.md`。
+## 与 Full 的差异
+
+- 没有 MCP 会话 exposure、认证 principal 或 role enforcement；
+- 没有 Core 的 actor knowledge、branch revision 与 rule receipt 保证；
+- 不导入 PDF，不使用 FTS5/ChromaDB，不编译扩展规则包；
+- 战斗与状态能力是便携子集，不能声称与 Full 结构化引擎等价；
+- portable 写入不会出现在 Full campaign 中。
+
+如果 Full MCP 不可用，Agent 必须向用户说明这些差异后再切换。随附 SRD/翻译遵循各自 NOTICE 与许可。

@@ -1,41 +1,50 @@
-# SagaSmith D&D Skills（Full MCP Runtime）
+# SagaSmith D&D Skills — Full MCP Runtime
 
-Full 模式是 MCP-first 的 D&D 5e 2014/2024 带团技能包。持久化状态、规则索引、
-模组制品、角色卡、分支和角色认知全部由 `sagasmith_dnd` MCP 服务负责。
+[中文](README.md) · [English](README-en.md) · [仓库说明](../README.md)
 
-本目录是 Agent Skill，不是 Python runtime，也不直接访问 SQLite、Chroma 或本地 CLI。
+Full 模式是 SagaSmithAI 的 D&D 5e 2014/2024 带团工作流。它要求 `sagasmith_dnd` MCP 可用；所有持久化、检索、规则包、模组、角色、分支、知识与战斗状态均由 MCP 服务拥有。
 
-## 仓库职责
+本目录只包含 Agent orchestration：它不会直接访问 SQLite/ChromaDB，不调用本地 D&D CLI，也不会用自然语言假装一次状态变更已经落库。
 
-| 仓库 | 职责 |
-|---|---|
-| `SagaSmith-dnd-skills` | DM 判断、叙事与 MCP 调用编排 |
-| `SagaSmith-dnd-mcp` | MCP 工具、状态存储、规则和模组读取 |
-| `sagasmith-core` | 分支、快照、事务、权限和 ActorKnowledge |
-| `sagasmith-dnd` | 角色 schema、D&D 规则库和运行时模型 |
-| `SagaSmith-module-gen-skills` | 生成可导入的模组制品 |
+## 启动顺序
 
-## 启动
+1. 调用 `server_capabilities` 与 `storage_status`，确认服务和存储。
+2. 为当前 MCP session 调用 `exposure_open`；身份由 Host 注入时不要让模型填写 principal。
+3. lobby 任务先 `exposure_search` → `exposure_inspect` → `exposure_load`。
+4. 读取 [`references/mcp-contract.md`](references/mcp-contract.md) 与当前 child skill。
+5. fresh storage 检查 core rules seed；进入既有团先读取 campaign、branch 与 continuity context。
 
-1. 确认 `sagasmith_dnd` MCP 可用，调用 `server_capabilities`。
-2. 调用 `storage_status`；fresh storage 使用 `rule_seed_status` 检查规则。
-3. 解析平台用户的稳定 `principal_id`，不要把 `player_name` 当作权限。
-4. 读取 `full/references/mcp-contract.md` 和对应 child skill。
+## 三阶段工具面
 
-## 运行原则
+| 阶段 | 典型任务 | 不允许的越界 |
+|---|---|---|
+| `lobby` | 建团、车卡、规则/模组导入、权限、分支、初始知识 | 未安装规则包直接参与结算 |
+| `play` | 场景、非战斗检定、资源、事件、记忆、actor knowledge | 活跃战斗中直接改 HP/资源绕过引擎 |
+| `combat` | preflight、攻击/法术/反应/移动、选择窗口、临时地图 | 从叙事猜距离/视线或替 GM 选择目标 |
 
-- 规则：`rule_search` → `rule_expand`。
-- 模组：`module_search` → `module_expand` 或 `module_read_scene`。
-- 角色：每个 PC/NPC/monster 都使用独立的完整 `Character` card。
-- 认知：每次读写都显式提供 `actor_id`、`campaign_id`、`branch_id`。
-- 写入：可重试的操作提供 `expected_revision` 和 `idempotency_key`。
-- 分支：用 `branch_compare` 检查差异，不自动合并兄弟时间线。
-- 玩家视图：使用带 `principal_id` 的 MCP 读取，让服务端过滤 keeper 内容。
-- 战斗：当前仍使用可审计的通用状态工具；结构化战斗引擎暂不在本版本范围内。
+阶段由 campaign state 决定，不由提示词声明。阶段变化后 MCP 会刷新会话 exposure。
 
-## Portable 模式
+## 每轮主持最小闭环
 
-`standalone/` 是独立的无持久化参考流程。MCP 不可用时必须显式切换到该模式，
-不能假装 portable 写入了 Runtime 状态。
+1. 获取 current branch、continuity context、当前 scene 和调用者可见 actor knowledge。
+2. 区分玩家陈述、角色意图和仍缺失的规则输入。
+3. 必要时 `rule_search`，随后 `rule_expand`；模组同样先 search 再 expand。
+4. 让引擎处理确定性 mechanics，让 Agent/GM 裁决目标、视线、例外与叙事代价。
+5. 通过受控工具更新 state、scene progress、event、memory 和 actor knowledge。
+6. 重大分歧、危险决定、章节切换或战斗前后创建 Snapshot。
 
-详细工具字段和错误语义见 `references/mcp-contract.md`。
+## 不可破坏的边界
+
+- 每个 PC、NPC、monster 使用独立完整 Character card；不要把所有人塞入 party JSON。
+- actor knowledge 每次显式关联 actor/campaign/branch；玩家不能读取其他玩家私有 scope。
+- 不自动合并兄弟分支；读取与检索只沿当前分支祖先链。
+- 可重试写入使用最新 revision 与稳定 idempotency key。
+- 规则检索只提供证据；campaign 的 core/extension lock 决定可执行规则。
+- 战斗写结果始终经过 player-safe projection；隐藏敌人、机制与地图信息不能泄露。
+- 模组生成先写 artifact，再 inspect/import；导入失败不丢失可编辑源文件。
+
+## Portable fallback
+
+`../standalone/` 是显式降级模式。MCP 不可用时，先告知能力差异并取得用户同意；不能让 portable 的文件写入冒充 Full campaign state。
+
+详细 schema、错误语义、工具合并和 exposure 流程见 [`references/mcp-contract.md`](references/mcp-contract.md)。

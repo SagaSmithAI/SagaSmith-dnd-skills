@@ -14,7 +14,9 @@ as `mcp_sagasmith_dnd_`.
 
 1. Call `storage_status`; call `storage_migrate` only when schema setup is needed.
    Start every MCP session with `exposure_open`, then use `exposure_search`,
-   `exposure_inspect`, and `exposure_load` for the current campaign phase.
+   `exposure_inspect`, and `exposure_load` for the current campaign phase. Before
+   a campaign exists, load only `lobby.bootstrap`; reopen the exposure with the
+   returned `campaign_id` before loading campaign-bound groups.
 2. Use Full Runtime only when the `sagasmith_dnd` MCP tools are available, then load
    the relevant child Skill and `references/mcp-contract.md`.
 3. If MCP is unavailable, use the separate `standalone/` skill. Do not silently

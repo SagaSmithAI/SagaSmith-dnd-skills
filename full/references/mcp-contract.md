@@ -135,15 +135,22 @@ agent must open and load its own exposure.
 
 | Phase | Intended state | Example groups |
 |---|---|---|
-| `lobby` | Game-outside setup, imports, campaign administration, character building | `lobby.campaign`, `lobby.characters`, `lobby.rules`, `lobby.modules` |
+| `lobby` | Game-outside setup, imports, campaign administration, character building | `lobby.bootstrap`, `lobby.campaign`, `lobby.characters`, `lobby.rules`, `lobby.modules` |
 | `play` | Live non-combat exploration and downtime | `play.scene`, `play.characters`, `play.resolution` |
-| `combat` | Active structured encounter | `combat.observe`, `combat.turn`, `combat.actions`, `combat.map` |
+| `combat` | Active structured encounter | `combat.observe`, `combat.turn`, `combat.actions`, `combat.save`, `combat.map` |
 
 For native clients supporting MCP `tools/list_changed`, loading or unloading a
 group changes the actual tool list. If a host cannot refresh its native schemas,
 it keeps the core and calls the same loaded domain tool through
 `exposure_call(exposure_id, tool_id, arguments)`. This is a transport fallback,
 not a permission bypass: it performs the identical session and phase check.
+
+An exposure without `campaign_id` may load only `lobby.bootstrap` (system list
+and campaign creation), plus the `system:local`-only storage administration
+group. After campaign creation or selection, call `exposure_open` again with the
+campaign id. Campaign administration, rules and module-import groups additionally
+require owner/DM membership. A campaign-bound exposure rejects arguments that
+target a different campaign, including character ids resolved to that campaign.
 
 Use `game_phase(action="set", tool_profile="lobby" | "play")` only for the
 non-combat transition. `combat_start` moves the campaign to `combat` and
