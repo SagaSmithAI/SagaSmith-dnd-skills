@@ -12,7 +12,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_get`, `campaign_list`, `campaign_update`, `campaign_member_grant`, `actor_grant` |
-| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `character_rule_artifact_add` |
+| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `content_catalog_list`, `character_content_apply`, `character_rule_artifact_add` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_write`, `module_inspect`, `module_import` |
 | Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_index`, `module_set_progress` |
@@ -23,6 +23,38 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 `module_search` only selects candidates. Call `module_expand` or
 `module_read_scene` before narrating a module fact. Always provide the active
 `scope_id` to `module_current` and `module_set_progress`.
+
+## Structured content catalog
+
+For a campaign locked to 2014, the installed `dnd5e.content.srd2014` catalog
+provides source-linked class, subclass, species, background, feat, spell, and
+item records. Use `content_catalog_list` to discover only the core edition and
+extension packs enabled on the current branch. Do not search an inactive pack
+and then apply its option by id.
+
+`character_content_apply` safely records catalog spells, feats, backgrounds,
+and a selected subclass on a character card, preserving its pack version and
+source references. Catalog presence is not a claim that every narrative effect
+is executable: an item, species, class, or an option with unresolved choices
+returns `pending_ruling` rather than inventing a settlement. Use a source-bound
+rule pack mechanic only when the rule has been reviewed and validated.
+
+## Modules, space evidence, and temporary combat maps
+
+Module re-imports are revisions: earlier sources are retained for snapshots and
+scoped scene progress, while normal `module_index` results show only the newest
+active revision. A D&D scene can contain conservative `spatial.locations`
+evidence recovered from room headings and stated dimensions. Set
+`current_location_key` with `module_set_progress` only when it names one of
+those recorded locations.
+
+When `combat_start` has a current scene (or receives `scene_id`), the server
+creates and freezes an encounter-local `battle_map`. It may enforce supplied
+grid bounds and DM-confirmed blocked cells, but never invents walls, line of
+sight, doors, terrain cost, or a global tactical map. Use `combat_map_patch`
+only for DM-confirmed world changes; it stores the patch in the encounter audit
+and the scene runtime state. End combat before treating that temporary map as a
+different scene or module revision.
 
 ## Actor cards and shared party state
 

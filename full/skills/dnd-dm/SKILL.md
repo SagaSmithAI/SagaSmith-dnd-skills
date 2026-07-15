@@ -24,6 +24,8 @@ Read `../../references/mcp-contract.md` before a mutation and
 - module preparation or scene transitions: `references/MODULE_INDEX.md` and
   `references/MODULE_ARC.md`
 - user PDF/Markdown rulebook import: `../../references/rulebook-import.md`
+- catalogued core or extension character options:
+  `../../references/content-catalog.md`
 - tactical positioning or reusable narration: `references/DM_MAP_SYS.md` and
   `references/DM_TEMPLATES.md`
 
@@ -50,10 +52,14 @@ returns to `play`; never simulate a phase transition only in narration.
    `campaign_rules_explain` must also show the locked `dnd5e.core.2014` or
    `dnd5e.core.2024` provider; treat a missing or mismatched core fingerprint as
    a hard stop, not permission to bypass the existing engine boundaries.
-6. Resolve openly with `dnd_dice_roll` or `dnd_check`.
-7. Persist events, scene progress, actor/party state, and durable facts. Use
+6. For character options, call `content_catalog_list` and present only entries
+   available to the campaign's locked Core edition and enabled branch packs.
+   Apply only a returned id through `character_content_apply`; respect a
+   `pending_ruling` response for unresolved prerequisites or effects.
+7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
+8. Persist events, scene progress, actor/party state, and durable facts. Use
    `actor_knowledge_*` for what one PC/NPC believes, not `memory_*`.
-8. Call `snapshot_create` at decision points, chapter transitions, and before a
+9. Call `snapshot_create` at decision points, chapter transitions, and before a
    dangerous restore. Use `snapshot_verify` and `snapshot_lineage` before restore.
 
 ## MCP Tool Reference
@@ -61,14 +67,14 @@ returns to `play`; never simulate a phase transition only in narration.
 | Workflow | MCP tools |
 |---|---|
 | Campaign | `campaign_create`, `campaign_get`, `campaign_list` |
-| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `character_rule_artifact_add` |
+| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `content_catalog_list`, `character_content_apply`, `character_rule_artifact_add` |
 | Module lifecycle | `module_write`, `module_inspect`, `module_import`, `module_list`, `module_index` |
 | Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_set_progress` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
 | Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo`, `campaign_advance_effects` |
-| Combat | `combat_start`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_stand`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_action_trigger`, `combat_readied_action_resolve`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_end` |
+| Combat | `combat_start`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_stand`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_action_trigger`, `combat_readied_action_resolve`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_map_patch`, `combat_end` |
 | DM choices | `combat_choice_open`, `combat_choice_resolve` |
 
 ## Actor Cards and Party State
@@ -125,6 +131,10 @@ action payment and tactical state; it deliberately does not fabricate the
 outcome of a Hide, Search, or Help declaration. At encounter start, provide
 DM-authored `participant_config` positions, disposition, reach, initiative, and
 visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
+current module scene produces a frozen temporary battle map. It enforces only
+its explicit bounds and blocked cells; it never turns room prose into inferred
+walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
+post-combat world change through `combat_map_patch`, not by rewriting the module.
 grid move that leaves an eligible
 hostile's recorded reach opens an owned opportunity window; read it through
 `combat_reactions`, decline it with `combat_choice_resolve`, or settle it
