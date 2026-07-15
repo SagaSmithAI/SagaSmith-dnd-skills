@@ -25,6 +25,11 @@ not change the required sheet shape.
 Every game entity that can take part in play is a complete `Character` record.
 Do not keep a second, abbreviated combat card in campaign state or a prose note.
 
+Content imported from an optional rule pack keeps only stable provenance and
+execution references on the card: `pack_id`, `pack_version`, `rule_refs`, and
+`mechanic_refs`. Runtime uses and actor-specific state remain on the character;
+the executable mechanic definition remains in the MCP-owned immutable pack.
+
 | Type | Required identity and narrative state | Mechanical expectations |
 |---|---|---|
 | PC | `player_name` when player-controlled; `notes.profile.summary` is required by this skill as the player-facing setting description | Full progression, abilities, skills, combat, traits, resources, spells, content, effects, and personal inventory. |

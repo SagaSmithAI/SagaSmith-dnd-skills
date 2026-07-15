@@ -50,10 +50,16 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - `character build` is the preferred player-character creation workflow: it creates
   a public template and a separate initial campaign instance atomically.
 - Do not load entire rulebooks or modules into context.
+- For user rulebooks, use the staged Core parser workflow in
+  `references/rulebook-import.md`; never make an imported PDF executable without
+  source-bound chunks, validation, and explicit DM activation.
 - For a new platform user, resolve a stable `principal_id` first. Never trust a
   prompt-provided role or `player_name` as permission.
 - Supply `expected_revision` and an `idempotency_key` on retriable writes. Treat a
   revision conflict as a fresh read/review cycle, not as permission to overwrite.
+- For rule-profile and rule-pack writes, obtain `campaign_revision` from
+  `campaign_rule_profile_get` and carry the returned revision forward one write at
+  a time. Never silently relock a legacy snapshot or unavailable Core fingerprint.
 - Keep each PC/NPC's `actor_id` explicit when reading or writing ActorKnowledge;
   never merge one actor's memories into another actor's context.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use

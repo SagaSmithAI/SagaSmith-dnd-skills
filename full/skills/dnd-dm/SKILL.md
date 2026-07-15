@@ -10,6 +10,8 @@ description: "Run D&D 5e 2014 or 2024 sessions through the SagaSmith D&D MCP ser
 This full skill is MCP-first. Start by calling `storage_status`, then
 `game_phase_get` for the active campaign; all raw tool names below may be
 prefixed by the host, for example `mcp_sagasmith_dnd_`.
+For user rulebook import, also require the structured/source-bound flags from
+`server_capabilities.rulebook_import` before exposing that workflow.
 If the server is unavailable, stop using this skill and load `standalone/` rather
 than switching to a local CLI.
 
@@ -21,6 +23,7 @@ Read `../../references/mcp-contract.md` before a mutation and
   `../../references/character-schema-v2.md`
 - module preparation or scene transitions: `references/MODULE_INDEX.md` and
   `references/MODULE_ARC.md`
+- user PDF/Markdown rulebook import: `../../references/rulebook-import.md`
 - tactical positioning or reusable narration: `references/DM_MAP_SYS.md` and
   `references/DM_TEMPLATES.md`
 
@@ -38,10 +41,19 @@ returns to `play`; never simulate a phase transition only in narration.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
-5. Resolve openly with `dnd_dice_roll` or `dnd_check`.
-6. Persist events, scene progress, actor/party state, and durable facts. Use
+5. Imported rulebook text is evidence, not executable mechanics. In `authoring`,
+   use `rule_document_stage` -> `rule_document_inspect` ->
+   `rule_document_import`, then search/expand the exact source. Draft imported
+   mechanics with `rule_pack_draft_from_source`, install it inactive, show the DM its report,
+   and enable an exact version only with explicit DM approval. Never change the
+   lock during combat or silently substitute a missing version.
+   `campaign_rules_explain` must also show the locked `dnd5e.core.2014` or
+   `dnd5e.core.2024` provider; treat a missing or mismatched core fingerprint as
+   a hard stop, not permission to bypass the existing engine boundaries.
+6. Resolve openly with `dnd_dice_roll` or `dnd_check`.
+7. Persist events, scene progress, actor/party state, and durable facts. Use
    `actor_knowledge_*` for what one PC/NPC believes, not `memory_*`.
-7. Call `snapshot_create` at decision points, chapter transitions, and before a
+8. Call `snapshot_create` at decision points, chapter transitions, and before a
    dangerous restore. Use `snapshot_verify` and `snapshot_lineage` before restore.
 
 ## MCP Tool Reference
@@ -49,10 +61,10 @@ returns to `play`; never simulate a phase transition only in narration.
 | Workflow | MCP tools |
 |---|---|
 | Campaign | `campaign_create`, `campaign_get`, `campaign_list` |
-| Rules | `rule_ingest`, `rule_search`, `rule_expand` |
+| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `character_rule_artifact_add` |
 | Module lifecycle | `module_write`, `module_inspect`, `module_import`, `module_list`, `module_index` |
 | Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_set_progress` |
-| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll` |
+| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
 | Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo`, `campaign_advance_effects` |

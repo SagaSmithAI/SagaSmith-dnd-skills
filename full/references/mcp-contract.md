@@ -3,6 +3,8 @@
 `full/` is MCP-first. Connect the `sagasmith_dnd` server and call the raw tool
 names below; a client may expose them with a prefix such as
 `mcp_sagasmith_dnd_`. Do not require a local `sagasmith-dnd` executable.
+`server_capabilities.rulebook_import` is the machine-readable contract for the
+ordered import stages, canonical citation fields, and play/combat settlement tools.
 
 ## Core turn loop
 
@@ -10,8 +12,8 @@ names below; a client may expose them with a prefix such as
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_get`, `campaign_list`, `campaign_update`, `campaign_member_grant`, `actor_grant` |
-| Rules | `rule_ingest`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled` |
-| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll` |
+| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `character_rule_artifact_add` |
+| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_write`, `module_inspect`, `module_import` |
 | Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_index`, `module_set_progress` |
 | Chronology | `event_add`, `event_list`, `memory_add`, `memory_list`, `memory_search` |
@@ -82,8 +84,8 @@ of maintaining a second hard-coded list.
 
 | Profile | Intended state | Distinct writes |
 |---|---|---|
-| `authoring` | Outside play: module writing/import/indexing, campaign setup, character creation/building, rule ingestion | `module_write`, `module_import`, `character_create`, `character_build`, `rule_ingest` |
-| `play` | Live non-combat exploration and downtime | inventory/wallet transfers, rests, non-combat spells/activities, scene progress, memory and actor knowledge |
+| `authoring` | Outside play: module writing/import/indexing, campaign setup, character creation/building, rulebook staging/import and pack validation | `module_write`, `module_import`, `character_create`, `character_build`, `rule_document_stage`, `rule_document_import`, `rule_pack_draft_from_source` |
+| `play` | Live non-combat exploration and downtime | `character_check`, inventory/wallet transfers, rests, non-combat spells/activities, scene progress, memory and actor knowledge |
 | `combat` | Active structured encounter | `combat_*` settlement and safe reads only |
 
 Use `game_phase_set` only to enter `authoring` or `play`. `combat_start`
@@ -96,6 +98,44 @@ Direct character-card mutations (sheet replacement, inventory, wallet, effects,
 resources, rests, non-combat casts, and activities) are rejected while an
 encounter is active. Do not use a profile mismatch to bypass combat action
 economy.
+
+Rule text retrieval and executable rules are separate. For user documents,
+`rule_document_stage` accepts only configured import roots, and inspect/import
+read only the MCP-managed artifact. Core performs the shared PDF/Markdown
+normalization and records the original checksum, parser warnings, and per-chunk
+page ranges. `rule_ingest` remains the direct Markdown compatibility path.
+Only the safe declarative IR accepted by
+`rule_pack_draft` can settle mechanics; arbitrary Python, expression evaluation,
+network access, and database paths are forbidden. Installation does not enable
+a pack. A DM explicitly pins a validated version per branch, and snapshots keep
+the exact version/checksum lock. Missing locked versions never fall back to a
+newer version. Use `campaign_rules_explain` to audit applied mechanic ids,
+citations, and the deterministic fingerprint.
+Use `campaign_rule_receipts` for the fingerprint and citations stored atomically
+with historical settlements.
+For a user-imported executable rule, use `rule_pack_draft_from_source`: citations
+must be imported chunk ids and are resolved server-side to the exact source id,
+document checksum, heading path, and page range. Use `character_check` outside
+combat and `combat_check` during combat when an enabled `check.before` rule needs
+DM-established `rule_facts`.
+
+Treat rule-profile and branch rule-pack changes as campaign writes. First read
+`campaign_rule_profile_get`, then pass its latest `campaign_revision` as
+`expected_revision` together with a stable `idempotency_key` to
+`campaign_rule_profile_set`, `campaign_rule_pack_set`, or
+`campaign_rule_pack_remove`. Reuse the same key only for an exact retry; a stale
+revision requires a fresh read and review.
+
+The base engine is not an implicit fallback. Every new campaign locks either
+`dnd5e.core.2014` or `dnd5e.core.2024`, including a fingerprinted coverage list
+for the existing combat, movement, reaction, damage, rest, spell, character,
+and MCP mutation boundaries. Optional packs layer on top of that core provider.
+If a runtime upgrade changes the locked core fingerprint, settlement fails until
+the DM explicitly reviews and relocks the campaign profile.
+Snapshot restore and branch checkout check the saved Core lock before changing
+live state. A legacy save without that lock, or a save requiring an unavailable
+Core fingerprint, needs an explicit conversion path and is never silently
+upgraded.
 
 ## Integrity and identity contract
 

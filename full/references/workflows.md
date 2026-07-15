@@ -24,6 +24,19 @@ complete operation mapping.
 2. Select a result, then `rule_expand`.
 3. Answer with source metadata rather than unverified recollection.
 
+## User rulebook to executable optional pack
+
+1. Read `rulebook-import.md`, then stage and inspect with
+   `rule_document_stage` and `rule_document_inspect`.
+2. Import through `rule_document_import`; use `rule_search` and `rule_expand` to
+   select evidence from its exact `source_id`.
+3. Translate the reviewed boundary into safe IR and call
+   `rule_pack_draft_from_source` with imported chunk ids.
+4. Test, inspect, install inactive, and obtain explicit DM approval before
+   `campaign_rule_pack_set`.
+5. Settle a non-combat check with `character_check` or a combat check with
+   `combat_check`, then audit `campaign_rule_receipts`.
+
 ## Restore
 
 1. `snapshot_verify`, then `snapshot_lineage`.
