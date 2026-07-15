@@ -1,6 +1,6 @@
 # User Rulebook Import
 
-Use this workflow only in the `authoring` profile. A PDF is first normalized and
+Use this workflow only in the `lobby` phase after loading `lobby.rules`. A PDF is first normalized and
 indexed as evidence; it does not become executable merely because it was imported.
 Before starting, require `server_capabilities.features.structured_rulebook_import`
 and `source_bound_rule_packs` to be true. Consume the published

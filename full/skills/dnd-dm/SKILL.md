@@ -7,9 +7,12 @@ description: "Run D&D 5e 2014 or 2024 sessions through the SagaSmith D&D MCP ser
 
 ## Runtime
 
-This full skill is MCP-first. Start by calling `storage_status`, then
-`game_phase_get` for the active campaign; all raw tool names below may be
-prefixed by the host, for example `mcp_sagasmith_dnd_`.
+This full skill is MCP-first. Start with `storage_status`, then
+`exposure_open` for the active campaign; search, inspect, and load only the
+needed `lobby`, `play`, or `combat` capability group. Hosts that cannot refresh
+native tool schemas must invoke a loaded domain tool through `exposure_call`.
+All raw tool names below may be prefixed by the host, for example
+`mcp_sagasmith_dnd_`.
 For user rulebook import, also require the structured/source-bound flags from
 `server_capabilities.rulebook_import` before exposing that workflow.
 If the server is unavailable, stop using this skill and load `standalone/` rather
@@ -31,7 +34,7 @@ Read `../../references/mcp-contract.md` before a mutation and
 
 ## Turn Loop
 
-Outside play, select `authoring` with `game_phase_set` for module writing/import,
+Outside play, select `lobby` with `game_phase(action="set")` for module writing/import,
 campaign setup, and character creation. Before the first in-character scene,
 switch to `play`. `combat_start` enters `combat` automatically and `combat_end`
 returns to `play`; never simulate a phase transition only in narration.
@@ -43,7 +46,7 @@ returns to `play`; never simulate a phase transition only in narration.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
-5. Imported rulebook text is evidence, not executable mechanics. In `authoring`,
+5. Imported rulebook text is evidence, not executable mechanics. In `lobby`,
    use `rule_document_stage` -> `rule_document_inspect` ->
    `rule_document_import`, then search/expand the exact source. Draft imported
    mechanics with `rule_pack_draft_from_source`, install it inactive, show the DM its report,
@@ -106,7 +109,7 @@ After item writes, treat `character_get(...).derived.inventory.weapon_attacks` a
 active concentration spell as one active effect with `concentration: true` and its
 `source_spell_id`.
 
-During authoring or level advancement, submit the complete level 1+ prepared list
+During lobby setup or level advancement, submit the complete level 1+ prepared list
 through `character_spell_prepare_list`; use the singular prepare tool only for a
 setup edit. During live play, a prepared-list change must be part of
 `character_rest(..., rest_type="long_rest", prepared_spell_ids=[...])`. Do not

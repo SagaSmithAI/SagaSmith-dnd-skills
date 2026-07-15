@@ -13,7 +13,8 @@ as `mcp_sagasmith_dnd_`.
 ## Startup
 
 1. Call `storage_status`; call `storage_migrate` only when schema setup is needed.
-   For an existing campaign, call `game_phase_get` before selecting any workflow.
+   Start every MCP session with `exposure_open`, then use `exposure_search`,
+   `exposure_inspect`, and `exposure_load` for the current campaign phase.
 2. Use Full Runtime only when the `sagasmith_dnd` MCP tools are available, then load
    the relevant child Skill and `references/mcp-contract.md`.
 3. If MCP is unavailable, use the separate `standalone/` skill. Do not silently
@@ -38,9 +39,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - Never mix 2014 and 2024 rules unless the user explicitly requests comparison.
 - Search first, then expand only the selected rule or module chunk.
 - Trust MCP tool results; do not emulate a successful write.
-- Use `authoring` outside play, `play` for live non-combat scenes, and the automatic
-  `combat_start`/`combat_end` transitions for combat. Never keep all phase-specific
-  tools visible merely for convenience.
+- Use `lobby` outside play, `play` for live non-combat scenes, and the automatic
+  `combat_start`/`combat_end` transitions for combat. The MCP owns the session
+  exposure; never keep all phase-specific tools visible merely for convenience.
 - Runtime character state uses `sheet v2` / `notes v2`; load
   `references/character-schema-v2.md` before creating or mutating a PC, NPC, or
   monster. All three are full `Character` records, not abbreviated stat blocks.

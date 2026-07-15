@@ -9,9 +9,10 @@ description: "Create and maintain D&D campaigns through the SagaSmith D&D MCP se
 shell `sagasmith-dnd` commands. Read `../../references/mcp-contract.md` and
 `../dnd-dm/references/DM_RULES.md` before mutating a campaign.
 
-Call `game_phase_get` when resuming a campaign. Use the `authoring` profile for
-the setup, module, import, indexing, and character-building workflows below;
-call `game_phase_set(tool_profile="play")` only when live in-character play begins.
+Open an MCP session exposure when resuming a campaign. Use `lobby` groups for
+setup, module, import, indexing, and character-building workflows; load `play`
+groups only when live in-character play begins. Use `exposure_call` only when
+the host cannot refresh the native MCP tool list.
 
 ## Start and Modules
 
@@ -55,8 +56,8 @@ party_show | party_inventory_add | party_inventory_remove | party_inventory_tran
 party_wallet_adjust | party_wallet_transfer
 ```
 
-Use `character_spell_prepare` or `character_spell_prepare_list` only in
-`authoring` for setup and level advancement. During live play, pass the complete
+Use `character_spell_prepare` only in `lobby` for setup and level advancement.
+During live play, pass the complete
 new list as `prepared_spell_ids` on the actor's `character_rest` long-rest
 transaction; do not toggle preparations one by one.
 

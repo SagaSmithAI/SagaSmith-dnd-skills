@@ -88,7 +88,7 @@ The campaign instance is authoritative. After any actor or party mutation, read
 `character_get` or `party_show` and use returned `derived` values. Do not use
 `character_sheet_replace` for a one-field mutation.
 
-Prepared-spell selection is edition- and class-aware. In `authoring`, use
+Prepared-spell selection is edition- and class-aware. In `lobby`, use
 `character_spell_prepare_list` with the complete selected list and `event: setup`
 or `event: level_up`; the singular `character_spell_prepare` is only a setup
 edit. In live `play`, supply the complete `prepared_spell_ids` list to
@@ -123,24 +123,33 @@ never substitute a broad `memory_search` result for that context.
 - `standalone/` remains a separate portable file workflow; it does not call MCP.
 - `references/cli-contract.md` documents the legacy CLI compatibility path only.
 
-## Tool profiles and game phase
+## Session exposure and game phase
 
-The MCP publishes three exact, server-owned tool profiles. `server_tool_profiles`
-returns their current membership; clients must consume the tool metadata instead
-of maintaining a second hard-coded list.
+The MCP, not an agent configuration, owns tool exposure. Every connection starts
+with a compact core: `exposure_open`, `exposure_status`, `exposure_search`,
+`exposure_inspect`, `exposure_load`, `exposure_unload`, `exposure_call`,
+`campaign_query`, `game_phase`, and server diagnostics. Start or resume with
+`exposure_open(campaign_id, principal_id)`, search/inspect a group, then load it.
+Loaded groups are scoped to that MCP session and principal; another connected
+agent must open and load its own exposure.
 
-| Profile | Intended state | Distinct writes |
+| Phase | Intended state | Example groups |
 |---|---|---|
-| `authoring` | Outside play: module writing/import/indexing, campaign setup, character creation/building, rulebook staging/import and pack validation | `module_write`, `module_import`, `character_create`, `character_build`, `rule_document_stage`, `rule_document_import`, `rule_pack_draft_from_source` |
-| `play` | Live non-combat exploration and downtime | `character_check`, inventory/wallet transfers, rests, non-combat spells/activities, scene progress, memory and actor knowledge |
-| `combat` | Active structured encounter | `combat_*` settlement and safe reads only |
+| `lobby` | Game-outside setup, imports, campaign administration, character building | `lobby.campaign`, `lobby.characters`, `lobby.rules`, `lobby.modules` |
+| `play` | Live non-combat exploration and downtime | `play.scene`, `play.characters`, `play.resolution` |
+| `combat` | Active structured encounter | `combat.observe`, `combat.turn`, `combat.actions`, `combat.map` |
 
-Use `game_phase_set` only to enter `authoring` or `play`. `combat_start`
-automatically returns `tool_profile=combat`; `combat_end` returns
-`tool_profile=play`. On a new or resumed agent session, call `game_phase_get`
-before acting so the client can restore the persisted campaign phase. The
-server's authorization, revision, and idempotency checks still apply even if a
-client fails to hide an out-of-profile tool.
+For native clients supporting MCP `tools/list_changed`, loading or unloading a
+group changes the actual tool list. If a host cannot refresh its native schemas,
+it keeps the core and calls the same loaded domain tool through
+`exposure_call(exposure_id, tool_id, arguments)`. This is a transport fallback,
+not a permission bypass: it performs the identical session and phase check.
+
+Use `game_phase(action="set", tool_profile="lobby" | "play")` only for the
+non-combat transition. `combat_start` moves the campaign to `combat` and
+`combat_end` returns it to `play`; the server invalidates incompatible loaded
+groups. Authorization, revision, idempotency, and engine checks apply even if a
+client presents a stale schema.
 Direct character-card mutations (sheet replacement, inventory, wallet, effects,
 resources, rests, non-combat casts, and activities) are rejected while an
 encounter is active. Do not use a profile mismatch to bypass combat action
