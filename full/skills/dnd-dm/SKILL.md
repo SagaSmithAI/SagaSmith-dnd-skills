@@ -56,7 +56,7 @@ returns to `play`; never simulate a phase transition only in narration.
 | World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
 | Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo`, `campaign_advance_effects` |
-| Combat | `combat_start`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_end` |
+| Combat | `combat_start`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_stand`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_action_trigger`, `combat_readied_action_resolve`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_end` |
 | DM choices | `combat_choice_open`, `combat_choice_resolve` |
 
 ## Actor Cards and Party State
@@ -122,6 +122,8 @@ Use `combat_move.path` for bent grid routes. Set `movement_mode` to `forced` or
 `teleport` when the scene establishes that the move does not provoke a normal
 opportunity attack; do not encode terrain cost or collision unless it is part of
 the supplied scene facts.
+If Prone, either use `combat_stand` (half speed, no action) or use
+`combat_move(..., crawl=true)`; crawling costs double movement.
 
 Every campaign, character, party, combat, rest, continuity, branch, snapshot,
 scene-progress, and actor-knowledge mutation must carry the current optimistic

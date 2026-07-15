@@ -84,7 +84,7 @@ of maintaining a second hard-coded list.
 |---|---|---|
 | `authoring` | Outside play: module writing/import/indexing, campaign setup, character creation/building, rule ingestion | `module_write`, `module_import`, `character_create`, `character_build`, `rule_ingest` |
 | `play` | Live non-combat exploration and downtime | inventory/wallet transfers, rests, non-combat spells/activities, scene progress, memory and actor knowledge |
-| `combat` | Active structured encounter | `combat_*` settlement plus narrow read/effect/resource tools |
+| `combat` | Active structured encounter | `combat_*` settlement and safe reads only |
 
 Use `game_phase_set` only to enter `authoring` or `play`. `combat_start`
 automatically returns `tool_profile=combat`; `combat_end` returns
@@ -92,6 +92,10 @@ automatically returns `tool_profile=combat`; `combat_end` returns
 before acting so the client can restore the persisted campaign phase. The
 server's authorization, revision, and idempotency checks still apply even if a
 client fails to hide an out-of-profile tool.
+Direct character-card mutations (sheet replacement, inventory, wallet, effects,
+resources, rests, non-combat casts, and activities) are rejected while an
+encounter is active. Do not use a profile mismatch to bypass combat action
+economy.
 
 ## Integrity and identity contract
 
@@ -153,7 +157,8 @@ one mutation. Collision, terrain, forced movement, line of sight, unrecorded
 triggers, and narrative consequences remain explicit DM choices through
 `combat_choice_open` / `combat_choice_resolve`.
 `combat_common_action` settles the action payment for Dash, Disengage, Dodge,
-Help, Hide, Search, and non-spell Ready without inventing their narrative result;
+Help, Hide, Search, Influence, Study, Utilize/Use an Object, and non-spell Ready
+without inventing their narrative result;
 `combat_reactions` exposes an eligible actor's pending reaction windows.
 The generic Ready action rejects spell payloads. Use the dedicated spell-ready
 transaction instead:
@@ -167,6 +172,12 @@ transaction instead:
 3. `combat_readied_spell_resolve` either releases the spell and consumes the
    caster's reaction, or declines that occurrence without spending the reaction.
    Declining rearms the same held spell for a later occurrence before expiry.
+
+For a generic non-spell Ready action, use `combat_common_action(action="ready")`,
+then let the DM confirm the trigger with `combat_readied_action_trigger` and let
+the actor release or decline with `combat_readied_action_resolve`. Releasing pays
+the reaction and returns `pending_ruling`; it never fabricates the declared
+effect.
 
 The held spell always requires concentration, including a spell that normally
 does not. Concentration loss, the start of the caster's next turn, or combat end
@@ -205,9 +216,20 @@ choices, targeting, and any non-deterministic result are returned for an
 explicit DM ruling rather than automatically materialized.
 
 `character_rest` applies v2-card short/long-rest recovery with a character
-revision and idempotency key. Timed card effects advance at the ending actor's
-turn; any non-deterministic healing or narrative rest consequence remains a DM
-ruling.
+revision and idempotency key. For a Short Rest, provide each spent hit die and
+its rolled result through `hit_dice_spends`; the runtime applies Constitution
+and the edition's minimum. A 2014 Long Rest may require an explicit
+`hit_dice_recovery` allocation across multiclass pools. A 2024 Long Rest restores
+all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery needs
+the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
+the ending actor's turn; any narrative rest consequence remains a DM ruling.
+
+`character_cast_spell` and `combat_cast_spell` settle only timing, casting
+resources, concentration, and recorded components. They return `pending_ruling`
+for targets and effects. Cantrips and rituals cannot be upcast; a ritual cannot
+complete in active combat. Costly or consumed material components require
+`component_ruling.material_confirmed=true` before resources are spent. Pact Magic
+uses the recorded `pact_magic.slot_level` and is counted as a slot expenditure.
 
 `module_set_progress` requires the current `expected_state_version` for that
 scene/scope row (`0` for its first write) and a fresh idempotency key.
