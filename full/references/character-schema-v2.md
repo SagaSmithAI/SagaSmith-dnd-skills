@@ -167,6 +167,10 @@ rule effect. `point_cost` supports spell-point variants. The authoritative daily
   source/description/uses/choices shape plus `resource_key`, `activation`, and
   level `scaling` for limited class, racial, item, and feat capabilities. Record
   Action Surge, Rage, Channel Divinity, and comparable features here, not in prose.
+- `content.selections` records structural catalog choices that are represented
+  elsewhere on the sheet, such as background and subclass. Each entry retains
+  `artifact_id`, kind, name, exact pack id/version, rule/mechanic references,
+  and the explicit selection payload. Artifact ids are unique in this list.
 
 ## Inventory And Wallet
 

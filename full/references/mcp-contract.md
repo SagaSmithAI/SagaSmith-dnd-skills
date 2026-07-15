@@ -30,7 +30,9 @@ For a campaign locked to 2014, the installed `dnd5e.content.srd2014` catalog
 provides source-linked class, subclass, species, background, feat, spell, and
 item records. Use `content_catalog_list` to discover only the core edition and
 extension packs enabled on the current branch. Do not search an inactive pack
-and then apply its option by id.
+and then apply its option by id. The list response includes compact
+`selection_requirements` and source citations without copying an entire rule
+entry into the catalog listing.
 
 `character_content_apply` safely records catalog spells, feats, backgrounds,
 and a selected subclass on a character card, preserving its pack version and
@@ -38,6 +40,12 @@ source references. Catalog presence is not a claim that every narrative effect
 is executable: an item, species, class, or an option with unresolved choices
 returns `pending_ruling` rather than inventing a settlement. Use a source-bound
 rule pack mechanic only when the rule has been reviewed and validated.
+
+Supply `selection.source_class` and an appropriate spell grant `method` when a
+spell has class eligibility, `selection.target_class_name` for a multiclass
+subclass choice, and all required background choices. The runtime rejects a
+spell outside the selected class list or class-level limit and never silently
+assigns a subclass to the first class on a multiclass card.
 
 ## Modules, space evidence, and temporary combat maps
 
@@ -55,6 +63,13 @@ sight, doors, terrain cost, or a global tactical map. Use `combat_map_patch`
 only for DM-confirmed world changes; it stores the patch in the encounter audit
 and the scene runtime state. End combat before treating that temporary map as a
 different scene or module revision.
+
+Call `module_inspect` before import; it uses the same D&D parser profile as
+`module_import`. Every import carries a stable campaign-wide `idempotency_key`;
+an exact retry returns the original result. A player may read `party` scope or
+their own authorized `player:<actor_id>` scope only. Keeper scene reads expose
+only the redaction marker, and player combat-map views omit blocked cells,
+difficult terrain, world patches, checksums, and DM overrides.
 
 ## Actor cards and shared party state
 
@@ -315,4 +330,5 @@ time is never treated as campaign time automatically.
 
 `module_read_scene`, `module_index`, and `module_search` accept `principal_id`.
 DM/owner reads may include keeper content; player reads are filtered to `public` or
-`party` visibility and keeper content is replaced with a redaction marker.
+`party` visibility and keeper content is replaced with a redaction marker. A
+player cannot select another player or group scope merely by knowing its ID.

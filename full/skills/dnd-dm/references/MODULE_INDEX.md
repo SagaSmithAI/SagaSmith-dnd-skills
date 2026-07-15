@@ -4,6 +4,10 @@ Full Runtime uses MCP-managed Markdown artifacts. Generate or provide module tex
 then call `module_write`, `module_inspect`, and `module_import`. Do not let the
 agent read arbitrary local module paths in Full Runtime.
 
+`module_inspect` and `module_import` use the same D&D parser profile. Pass a
+stable campaign-wide `idempotency_key` to the import and reuse it only for the
+exact same retry.
+
 Use `module_index` to choose scenes. For each player action call
 `module_current(campaign_id, scope_id)`, then `module_read_scene`. Search is only a
 selector: `module_search` must be followed by `module_expand` before a result is

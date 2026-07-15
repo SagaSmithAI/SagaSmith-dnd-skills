@@ -55,7 +55,10 @@ returns to `play`; never simulate a phase transition only in narration.
 6. For character options, call `content_catalog_list` and present only entries
    available to the campaign's locked Core edition and enabled branch packs.
    Apply only a returned id through `character_content_apply`; respect a
-   `pending_ruling` response for unresolved prerequisites or effects.
+   `pending_ruling` response for unresolved prerequisites or effects. Supply
+   the legal spell source class and grant method, the target base class for a
+   multiclass subclass, and every required background choice; never patch the
+   raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
 8. Persist events, scene progress, actor/party state, and durable facts. Use
    `actor_knowledge_*` for what one PC/NPC believes, not `memory_*`.
@@ -135,6 +138,9 @@ current module scene produces a frozen temporary battle map. It enforces only
 its explicit bounds and blocked cells; it never turns room prose into inferred
 walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
 post-combat world change through `combat_map_patch`, not by rewriting the module.
+Player map views intentionally omit blocked cells, difficult terrain, DM
+overrides, checksums, and world patches; do not disclose those fields from a DM
+read or an earlier tool result.
 grid move that leaves an eligible
 hostile's recorded reach opens an owned opportunity window; read it through
 `combat_reactions`, decline it with `combat_choice_resolve`, or settle it

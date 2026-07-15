@@ -9,7 +9,7 @@ be conflated:
    pack is enabled on the current branch.
 3. **Executable**: a reviewed rule mechanic covers the requested outcome.
 
-For the bundled 2014 SRD, `dnd5e.content.srd2014@1.0.0` is installed during MCP
+For the bundled 2014 SRD, `dnd5e.content.srd2014@1.1.0` is installed during MCP
 startup when the full D&D skill repository is configured. Its records retain a
 `bundled:srd2014/...` reference to the original Markdown file. Optional books
 must use `rule_pack_draft_from_source`; every artifact supplies imported
@@ -20,12 +20,23 @@ citations before the pack can be installed.
 
 1. Read `campaign_rule_profile_get` and the current branch state.
 2. Call `content_catalog_list(campaign_id, kind, query)`.
-3. Present only returned options and their source references to the player.
+3. Present only returned options and their source references to the player. Read
+   `selection_requirements` for spell eligibility, subclass class/level,
+   background choices, and feat prerequisites; do not infer these from names.
 4. For a supported card target, call `character_content_apply` with the
-   character's latest revision and an idempotency key.
+   character's latest revision, an idempotency key, and every required
+   `selection` value. A spell selection identifies its `source_class` and grant
+   `method`; a subclass identifies its target class on multiclass cards; a
+   background supplies its required language choices.
 5. If the response is `pending_ruling`, obtain the required choices or resolve
    the effect as a DM decision. Do not bypass the result by editing raw sheets.
 
 An imported extension is not automatically enabled, and installation is not a
 mechanics claim. The DM selects its exact pack version per branch. Snapshots
 then retain that version/checksum lock for replay and audit.
+
+The bundled catalog is built from leaf records, not index pages: individual
+spell files, twelve class files, twelve subclass sections, nine species files,
+the SRD Acolyte background, the Grappler feat, and structured equipment rows.
+Spell catalog cards retain class eligibility, but a character card records only
+the class actually chosen in `grant.source_key`.

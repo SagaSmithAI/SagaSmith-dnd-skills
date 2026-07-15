@@ -20,8 +20,9 @@ call `game_phase_set(tool_profile="play")` only when live in-character play begi
 3. Resolve the caller's stable `principal_id`; use `campaign_member_grant` and
    `actor_grant` for access instead of treating `player_name` as authorization.
 4. Generate Markdown through `module_write`, inspect it with `module_inspect`, then
-   call `module_import`. This preserves an editable MCP-managed artifact before
-   ingestion.
+   call `module_import` with a stable campaign-wide `idempotency_key`. This
+   preserves an editable MCP-managed artifact before ingestion and makes an
+   exact retry return the original import result.
 5. Use `module_index` to choose a scene; use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_read_scene` has been called.
