@@ -355,6 +355,17 @@ weapon with the Thrown property, `attack_mode` defaults to `melee`; send
 `attack_mode: "ranged"` to use its thrown range. The selected mode also determines
 whether melee-only modifiers apply.
 
+A successful attack may return `status: pending_reaction` with no damage. The
+engine has committed its attack roll, Action/attack payment, ammunition use, Help
+consumption, and hidden-attacker reveal, while blocking further actions. The
+target reads its owned candidate list through `combat_query(view="reactions")`
+and calls `combat_choice(action="resolve_defense")` with that choice id and either
+a listed reaction activity id or `decline`. The resolver spends the Reaction only
+when used, re-evaluates the stored roll against the structured AC bonus, then
+rolls/applies damage at most once. Generic `combat_choice(action="resolve")`
+rejects this window. Non-DM reaction reads omit the stored attack plan and raw
+mechanical internals.
+
 `character_rest` applies v2-card short/long-rest recovery with a character
 revision and idempotency key. For a Short Rest, provide each spent hit die and
 its rolled result through `hit_dice_spends`; the runtime applies Constitution

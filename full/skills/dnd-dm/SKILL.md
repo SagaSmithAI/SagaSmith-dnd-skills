@@ -150,6 +150,16 @@ weapon/mode/count sequence still recorded by that option. Do not declare a raw
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
 
+When an attack returns `status: pending_reaction`, no damage has been rolled or
+applied. The target actor reads its owned window with
+`combat_query(view="reactions")`, chooses a listed defense or `decline`, and calls
+`combat_choice(action="resolve_defense")` with the returned choice id and current
+campaign revision. Only that resolution spends the Reaction when used, updates AC
+for the stored attack roll, and then resolves damage if the attack still hits.
+Never roll damage early, manually patch HP, or use generic choice resolution for
+this window. The same sequence applies when an opportunity attack opens a
+post-hit defense.
+
 Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
 disadvantage, once-per-turn token, and critical dice. For Second Wind, first use

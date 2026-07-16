@@ -43,6 +43,11 @@ complete operation mapping.
    Subsequent calls must consume only that option's remaining weapon/mode entries.
    Pass `attack_mode: ranged` when throwing a melee weapon; never model
    Multiattack as an unrestricted `attacks_per_action` count.
+7. If an attack pauses with `status: pending_reaction`, read the target's
+   `combat_query(view="reactions")` result. Resolve the exact window through
+   `combat_choice(action="resolve_defense")` with a listed activity id or
+   `decline`. Do not roll damage until that call returns; a used defense spends
+   the target's Reaction and re-evaluates the already stored attack roll.
 
 ## Rule question
 

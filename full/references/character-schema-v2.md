@@ -175,6 +175,11 @@ rule effect. `point_cost` supports spell-point variants. The authoritative daily
   `{weapon_id, attack_mode, count}` entries. Every weapon id must resolve to an
   inventory attack. Keep alternate melee/ranged compositions as separate options;
   never replace their constraints with a generic extra-attack count.
+- A deterministic AC reaction uses
+  `choices.reaction_defense = {kind: "armor_class_bonus", bonus,
+  attack_modes, requires_visible_attacker, requires_wielded_melee_weapon}` on a
+  Reaction activity. This is a conditional post-hit mechanic, never a permanent
+  AC modifier. Unstructured reaction prose remains a DM ruling.
 - `content.selections` records structural catalog choices that are represented
   elsewhere on the sheet, such as background and subclass. Each entry retains
   `artifact_id`, kind, name, exact pack id/version, rule/mechanic references,

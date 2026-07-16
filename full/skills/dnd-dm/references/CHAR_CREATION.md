@@ -78,6 +78,27 @@ After creation, verify `derived.multiattack_options` against the source and make
 sure every referenced weapon id exists. Preserve the source document and rule
 reference on the activity card just like any other imported mechanic.
 
+An AC-changing defensive reaction must also be structured instead of inferred
+from its description. For example, the 2014 Bandit Captain's Parry activity keeps
+its Reaction activation and records:
+
+```json
+{
+  "reaction_defense": {
+    "kind": "armor_class_bonus",
+    "bonus": 2,
+    "attack_modes": ["melee"],
+    "requires_visible_attacker": true,
+    "requires_wielded_melee_weapon": true
+  }
+}
+```
+
+Put this object under `choices`, and retain the source citation on the activity.
+Do not turn reaction text into an always-on AC bonus. If any source prerequisite
+cannot be represented as a verified field, leave the mechanic unresolved for the
+DM instead of silently weakening it.
+
 For a 2014 class-prepared caster, eligible level 1+ class spells use
 `grant.method: "class_prepared"`, identify the recorded class with
 `grant.source_key`, and may keep `access.known: false`. Put the complete daily
