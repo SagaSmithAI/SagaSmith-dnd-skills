@@ -32,7 +32,10 @@ species grant and required choice, through `character_content_apply`. Treat
 applicable card. When importing a finished character whose printed scores and HP
 already include species bonuses, pass `values_include_species_grants: true` while
 applying the species so the catalog provenance and nonnumeric traits are retained
-without double-counting numeric grants.
+without double-counting numeric grants. When only the printed ability scores or
+only HP already includes the grant, use the narrower
+`ability_scores_include_species_grants` or
+`hit_points_include_species_grants` flag and let the other value settle normally.
 
 Before combat, audit at least: class and subclass features, species/subspecies
 features, proficiencies and expertise, resources and recovery periods, equipped

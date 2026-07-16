@@ -30,9 +30,13 @@ citations before the pack can be installed.
    `method`; a subclass identifies its target class on multiclass cards; a
    background supplies its required language choices. A species supplies every
    listed language, skill, tool, ability, and cantrip choice. If an imported
-   finished sheet already includes its numeric species bonuses, set
+   finished sheet already includes all numeric species bonuses, set
    `values_include_species_grants: true` explicitly so provenance and traits are
-   linked without adding the bonuses twice.
+   linked without adding the bonuses twice. If only part is already included,
+   use `ability_scores_include_species_grants` and
+   `hit_points_include_species_grants` separately; for example, a printed Hill
+   Dwarf card may already include ability increases but still be missing the
+   per-level HP grant.
 5. If the response is `pending_ruling`, obtain the required choices or resolve
    the effect as a DM decision. Do not bypass the result by editing raw sheets.
 
