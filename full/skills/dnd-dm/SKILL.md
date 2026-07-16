@@ -192,6 +192,14 @@ that feature bonus into the base amount yourself. Halfling Lucky is
 resolved automatically for attacks, checks, saves, death saves, and initiative;
 retain its `rerolls` audit instead of rolling a second untracked check.
 
+Preserve the source spell card's canonical casting time during import. Standard
+cards commonly use `1 action`, `1 bonus action`, or `1 reaction, ...`; do not
+strip the leading count or replace these with a free-form timing label. In
+combat, `combat_cast_spell` maps that card timing to the actor's matching action
+budget. A bonus-action spell spends only the bonus action and leaves the main
+action available, subject to the edition's same-turn spell restrictions; a
+reaction spell still requires its owned pending reaction window.
+
 Use `combat_common_action` for the core non-attack actions. It records their
 action payment and tactical state; it deliberately does not fabricate the
 outcome of a Hide, Search, or Help declaration. At encounter start, provide
