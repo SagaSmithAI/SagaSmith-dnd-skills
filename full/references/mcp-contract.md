@@ -373,7 +373,14 @@ a listed reaction activity id or `decline`. The resolver spends the Reaction onl
 when used, re-evaluates the stored roll against the structured AC bonus, then
 rolls/applies damage at most once. Generic `combat_choice(action="resolve")`
 rejects this window. Non-DM reaction reads omit the stored attack plan and raw
-mechanical internals.
+mechanical internals. A source-bound Core `Shield` spell candidate additionally
+returns `cast_levels`; select its spell id with an explicit `cast_level`. That one
+mutation pays the Reaction and canonical casting resource, persists the +5 AC
+effect with `turn_start: 1`, re-evaluates the stored attack, and never rolls
+damage twice. An unavailable/unprepared spell, exhausted slot, incapacitated
+caster, spent Reaction, or edition spell-per-turn conflict removes the candidate.
+The attack-hit window does not represent Shield's separate `Magic Missile`
+targeting trigger; clients must not synthesize one from prose.
 
 `character_rest` applies v2-card short/long-rest recovery with a character
 revision and idempotency key. For a Short Rest, provide each spent hit die and

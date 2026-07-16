@@ -158,7 +158,15 @@ campaign revision. Only that resolution spends the Reaction when used, updates A
 for the stored attack roll, and then resolves damage if the attack still hits.
 Never roll damage early, manually patch HP, or use generic choice resolution for
 this window. The same sequence applies when an opportunity attack opens a
-post-hit defense.
+post-hit defense. A source-bound `Shield` spell appears as a spell candidate only
+when it is prepared/available, has a legal casting resource, and is legal under
+the current turn's 2014/2024 spell limit. Select one of its returned
+`cast_levels` by sending both its spell id and `cast_level`; the same transaction
+spends the Reaction and slot, applies +5 AC to the triggering roll, and records
+the +5 AC effect until the start of that caster's next turn. Do not model Shield
+as an activity or add its AC manually. Being targeted by `Magic Missile` is a
+different Shield trigger; do not forge an attack-hit window for it or claim that
+the attack-defense path settled that immunity.
 
 Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
