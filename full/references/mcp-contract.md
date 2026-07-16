@@ -14,14 +14,14 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Campaign | `campaign_create`, `campaign_get`, `campaign_list`, `campaign_update`, `campaign_member_grant`, `actor_grant` |
 | Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `content_catalog_list`, `character_content_apply`, `character_rule_artifact_add` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
-| Module artifact | `module_write`, `module_inspect`, `module_import` |
-| Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_index`, `module_set_progress` |
+| Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
+| Scene play | `module_query(list/index/scene/current/progress)`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `event_add`, `event_list`, `memory_add`, `memory_list`, `memory_search` |
 | Snapshot | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `snapshot_regenerate_recap`, `branch_compare` |
 | Audit | `state_history`, `state_undo`, `state_redo` |
 
 `module_search` only selects candidates. Call `module_expand` or
-`module_read_scene` before narrating a module fact. Always provide the active
+`module_query(view="scene")` before narrating a module fact. Always provide the active
 `scope_id` to `module_current` and `module_set_progress`.
 
 ## Structured content catalog
@@ -56,6 +56,15 @@ evidence recovered from room headings and stated dimensions. Set
 `current_location_key` with `module_set_progress` only when it names one of
 those recorded locations.
 
+In `lobby`, run `module_import` in strict order: `stage` -> `inspect` ->
+`validate` -> `ingest` -> `activate`. `stage` accepts either generated
+`payload.name` + `payload.content`, or a user document in `payload.source_path`.
+The latter is limited to `SAGASMITH_DND_MCP_MODULE_IMPORT_ROOTS`; the server
+copies PDF/Markdown/text into checksum-addressed MCP storage before Core reads it.
+Inspect exposes the Core PDF-to-Markdown page/bookmark statistics and complete
+scene/spatial preview. Ingest remains inactive, and only activation changes the
+campaign's active revision under optimistic concurrency.
+
 When `combat_start` has a current scene (or receives `scene_id`), the server
 creates and freezes an encounter-local `battle_map`. It may enforce supplied
 grid bounds and DM-confirmed blocked cells, but never invents walls, line of
@@ -64,8 +73,8 @@ only for DM-confirmed world changes; it stores the patch in the encounter audit
 and the scene runtime state. End combat before treating that temporary map as a
 different scene or module revision.
 
-Call `module_inspect` before import; it uses the same D&D parser profile as
-`module_import`. Every import carries a stable campaign-wide `idempotency_key`;
+Call `module_import(action="inspect")` before validation; every later stage uses
+the same D&D parser profile. Every write carries a stable stage-specific `idempotency_key`;
 an exact retry returns the original result. A player may read `party` scope or
 their own authorized `player:<actor_id>` scope only. Keeper scene reads expose
 only the redaction marker, and player combat-map views omit blocked cells,

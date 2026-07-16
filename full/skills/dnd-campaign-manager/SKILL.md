@@ -20,13 +20,18 @@ the host cannot refresh the native MCP tool list.
 2. Persist the returned `campaign_id`.
 3. Resolve the caller's stable `principal_id`; use `campaign_member_grant` and
    `actor_grant` for access instead of treating `player_name` as authorization.
-4. Generate Markdown through `module_write`, inspect it with `module_inspect`, then
-   call `module_import` with a stable campaign-wide `idempotency_key`. This
-   preserves an editable MCP-managed artifact before ingestion and makes an
-   exact retry return the original import result.
-5. Use `module_index` to choose a scene; use `module_set_progress` with an explicit
+4. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
+   `ingest`, then `activate`. For generated content, stage with `payload.name` and
+   `payload.content`. For a user PDF/Markdown/text module, stage with
+   `payload.source_path`; it must be inside the server-configured module import
+   roots. The server copies it into checksum-addressed MCP storage, and Core
+   performs PDF-to-Markdown normalization. Never bypass staging with a direct path.
+5. Review `preview.valid`, parser warnings, scene/spatial evidence, and the revision
+   diff before ingesting. Activation additionally requires the fresh campaign
+   `expected_revision`; keep a stable idempotency key per stage.
+6. Use `module_query(view="index")` to choose a scene; use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
-   `module_expand` or `module_read_scene` has been called.
+   `module_expand` or `module_query(view="scene")` has been called.
 
 ## Characters
 

@@ -40,8 +40,8 @@ switch to `play`. `combat_start` enters `combat` automatically and `combat_end`
 returns to `play`; never simulate a phase transition only in narration.
 
 1. Resolve `scope_id` (`party`, `group:<id>`, or `player:<id>`), then call
-   `module_current`. Player scopes inherit party progress until they have their own.
-2. Read that scene through `module_read_scene`. Use `module_search` only to select a
+   `module_query(view="current")`. Player scopes inherit party progress until they have their own.
+2. Read that scene through `module_query(view="scene")`. Use `module_search` only to select a
    candidate, then call `module_expand` before relying on a chunk.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
@@ -74,8 +74,8 @@ returns to `play`; never simulate a phase transition only in narration.
 |---|---|
 | Campaign | `campaign_create`, `campaign_get`, `campaign_list` |
 | Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `content_catalog_list`, `character_content_apply`, `character_rule_artifact_add` |
-| Module lifecycle | `module_write`, `module_inspect`, `module_import`, `module_list`, `module_index` |
-| Scene play | `module_current`, `module_search`, `module_expand`, `module_read_scene`, `module_set_progress` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index)` |
+| Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
 | Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
