@@ -69,5 +69,7 @@ the engine validates finesse/ranged weapon eligibility, advantage or an active
 enemy adjacent to the target, disadvantage, once-per-turn use, and critical
 dice. For Fighter Second Wind, call `combat_use_activity` first to pay the bonus
 action and use, roll `1d10 + fighter level`, then apply that exact amount through
-`combat_heal`. Halfling Lucky rerolls are automatic and appear in the roll's
-`rerolls` audit field.
+`combat_hp_change(action=heal)`. For spell healing, supply the source actor,
+recorded spell id, and actual slot level separately; the engine adds a recorded
+Disciple of Life modifier and preserves it in the healing receipt. Halfling Lucky
+rerolls are automatic and appear in the roll's `rerolls` audit field.

@@ -320,11 +320,18 @@ Every combat write should provide `expected_revision` and `idempotency_key`.
 `combat_preflight_attack` never mutates; `combat_resolve_attack`,
 `combat_move`, `combat_end_turn`, `combat_check`, `combat_use_activity`,
 `combat_ready_spell`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`,
-`combat_concentration_check`, `combat_apply_damage`, and `combat_heal` commit one
+`combat_concentration_check`, and `combat_hp_change` commit one
 atomic mutation group. Sensitive combat writes require both
 `expected_revision` and `idempotency_key`. Player views are filtered by campaign
 membership; keeper logs, target mechanics, and rulings are not exposed to
 players.
+
+For `combat_hp_change(action=heal)`, `payload.amount` is the rolled or otherwise
+resolved base healing. Spell healing additionally carries `source_actor_id`,
+`spell_id`, and `spell_level`. The server verifies the spell on that source card,
+rejects illegal cast levels, applies source-linked modifiers such as 2014
+Disciple of Life, clamps once to maximum HP, and returns the base, bonus, effective,
+and actually restored amounts separately.
 
 Treat an `idempotency_key` as unique for the whole campaign, not merely one
 tool name. A successful state mutation is recorded in the same transaction as

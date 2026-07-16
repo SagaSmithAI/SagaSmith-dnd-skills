@@ -147,7 +147,11 @@ Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
 disadvantage, once-per-turn token, and critical dice. For Second Wind, first use
 `combat_use_activity` to pay the bonus action and feature use, then roll `1d10 +
-fighter level` and pass that exact total to `combat_heal`. Halfling Lucky is
+fighter level` and pass that exact total to `combat_hp_change(action=heal)`.
+For levelled spell healing, also pass `source_actor_id`, `spell_id`, and the
+actual `spell_level`; this lets the engine validate the actor card and settle
+source-linked features such as 2014 Life Domain's Disciple of Life. Never fold
+that feature bonus into the base amount yourself. Halfling Lucky is
 resolved automatically for attacks, checks, saves, death saves, and initiative;
 retain its `rerolls` audit instead of rolling a second untracked check.
 

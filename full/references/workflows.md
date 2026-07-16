@@ -30,9 +30,13 @@ complete operation mapping.
    `combat_resolve_attack`. Let the engine validate eligibility and persist the
    once-per-turn token.
 3. For Second Wind, call `combat_use_activity` to pay its bonus action and use,
-   roll the source-stated `1d10 + fighter level`, then call `combat_heal` with
-   that result. Do not heal first or manually decrement the card afterward.
-4. Halfling Lucky requires no extra write. Preserve the returned `rerolls`
+   roll the source-stated `1d10 + fighter level`, then call
+   `combat_hp_change(action=heal)` with that result. Do not heal first or
+   manually decrement the card afterward.
+4. For healing from a levelled spell, send its rolled base `amount` plus
+   `source_actor_id`, `spell_id`, and actual `spell_level` in the healing payload.
+   Do not pre-add Disciple of Life; the engine validates and audits that modifier.
+5. Halfling Lucky requires no extra write. Preserve the returned `rerolls`
    evidence in the combat audit and narrate only the final selected d20.
 
 ## Rule question
