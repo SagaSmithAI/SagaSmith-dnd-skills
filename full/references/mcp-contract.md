@@ -53,8 +53,10 @@ Module re-imports are revisions: earlier sources are retained for snapshots and
 scoped scene progress, while normal `module_index` results show only the newest
 active revision. A D&D scene can contain conservative `spatial.locations`
 evidence recovered from room headings and stated dimensions. Set
-`current_location_key` with `module_set_progress` only when it names one of
-those recorded locations.
+`current_location_key` with `module_set_progress` only when it names a location
+in the current scene or exactly one spatial location elsewhere in the same
+module. This lets an encounter scene reference a separately indexed room scene
+without merging their narrative content; ambiguous or cross-module keys fail.
 
 In `lobby`, run `module_import` in strict order: `stage` -> `inspect` ->
 `validate` -> `ingest` -> `activate`. `stage` accepts either generated
@@ -79,7 +81,9 @@ grid bounds and DM-confirmed blocked cells, but never invents walls, line of
 sight, doors, terrain cost, or a global tactical map. Use `combat_map_patch`
 only for DM-confirmed world changes; it stores the patch in the encounter audit
 and the scene runtime state. End combat before treating that temporary map as a
-different scene or module revision.
+different scene or module revision. When progress references a same-module
+spatial scene, map `source.scene_id` identifies that spatial evidence and
+`source.encounter_scene_id` retains the active narrative encounter.
 
 Call `module_import(action="inspect")` before validation; every later stage uses
 the same D&D parser profile. Every write carries a stable stage-specific `idempotency_key`;

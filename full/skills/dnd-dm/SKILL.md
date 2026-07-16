@@ -146,9 +146,11 @@ action payment and tactical state; it deliberately does not fabricate the
 outcome of a Hide, Search, or Help declaration. At encounter start, provide
 DM-authored `participant_config` positions, disposition, reach, initiative, and
 visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
-current module scene produces a frozen temporary battle map. It enforces only
-its explicit bounds and blocked cells; it never turns room prose into inferred
-walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
+current module scene produces a frozen temporary battle map. An encounter scene
+may use `current_location_key` to reference exactly one spatial location in
+another scene of the same module; preserve both encounter and spatial source
+ids. The map enforces only its explicit bounds and blocked cells; it never turns
+room prose into inferred walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
 post-combat world change through `combat_map_patch`, not by rewriting the module.
 Player map views intentionally omit blocked cells, difficult terrain, DM
 overrides, checksums, and world patches; do not disclose those fields from a DM

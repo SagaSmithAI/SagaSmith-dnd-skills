@@ -45,7 +45,10 @@ the host cannot refresh the native MCP tool list.
    confirm chapter/scene counts, stable keys, page ranges, and spatial evidence.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
-   `module_expand` or `module_query(view="scene")` has been called.
+   `module_expand` or `module_query(view="scene")` has been called. If an
+   encounter scene occurs in a room indexed under a different scene, set its
+   same-module, unique spatial key as `current_location_key`; never copy the
+   room geometry into the encounter or guess an ambiguous key.
 
 ## Characters
 
