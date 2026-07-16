@@ -154,6 +154,9 @@ rule effect. `point_cost` supports spell-point variants. The authoritative daily
   wizards use a level 1+ prepared list with the class-table limit.
 - In 2014, clerics, druids, paladins, and wizards use prepared lists; bards,
   rangers, sorcerers, and warlocks use `mode: "known"`.
+- A `class_prepared` spell is an eligible class-list spell, not a known spell. It
+  may keep `access.known: false`; when its id is selected, derived state marks it
+  prepared. Its `grant.source_key` must name a class recorded on the card.
 - Wizards use spellbook membership separately from daily preparation; a prepared
   Wizard spell must be in that character's spellbook.
 - Always-prepared spells are returned as prepared without consuming a selection.

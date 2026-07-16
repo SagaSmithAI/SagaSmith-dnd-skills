@@ -224,9 +224,10 @@ for that principal. Platform users must be resolved to stable principal IDs befo
 calling sensitive tools. Roles and actor grants are checked by MCP, not supplied by
 the model as trusted claims.
 
-`campaign_create` and `character_create` require a fresh `idempotency_key`; their
-entity rows, initial branch/owner membership where applicable, and replay receipt
-commit atomically.
+`campaign_create`, `character_create`, and `character_build` require a fresh
+`idempotency_key`; their entity rows, initial branch/owner membership where
+applicable, and replay receipt commit atomically. A replay of `character_build`
+returns its original library template and campaign instance as one pair.
 
 Use `campaign_member_grant` for campaign roles and `actor_grant` for explicit PC/NPC
 control or private-sheet visibility. A player's `player_name` field is descriptive

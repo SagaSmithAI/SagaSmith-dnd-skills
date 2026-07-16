@@ -61,7 +61,15 @@ the host cannot refresh the native MCP tool list.
 
 All live actors use `sheet v2` and `notes v2`. Read
 `../../references/character-schema-v2.md` before creation or mutation. Do not
-persist an unconfirmed draft.
+persist an unconfirmed draft. `character_build` requires one stable
+`idempotency_key`; an exact retry must return the original template and campaign
+instance rather than creating another pair.
+
+For imported modules, distinguish narrative and mechanical provenance. The module
+may name an NPC, describe its intent, and assign fixed possessions while an
+inspected rule source provides its statblock. If the supplied module has no
+pregenerated PCs, label separately built PCs as player or regression fixtures
+instead of claiming module provenance. Do not pre-resolve random treasure.
 
 For normal play, mutate only the affected structure:
 

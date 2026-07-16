@@ -108,7 +108,8 @@ party_wallet_adjust | party_wallet_transfer
 ```
 
 Use `character_build` for a PC when a library template and its first campaign
-instance must be created atomically. Use `character_library_list` and
+instance must be created atomically. Always supply a stable idempotency key so a
+transport retry replays that same pair. Use `character_library_list` and
 `character_instantiate` for existing templates. `character_memory_*` stays a legacy
 notes field; new subjective information belongs in the actor-knowledge ledger.
 
