@@ -48,7 +48,11 @@ the host cannot refresh the native MCP tool list.
    `module_expand` or `module_query(view="scene")` has been called. If an
    encounter scene occurs in a room indexed under a different scene, set its
    same-module, unique spatial key as `current_location_key`; never copy the
-   room geometry into the encounter or guess an ambiguous key.
+   room geometry into the encounter or guess an ambiguous key. Also persist the
+   exact spatial scene id as `state.location_scene_id`. At combat start, keep
+   the current progress scene, that spatial evidence scene, and any explicit
+   encounter `scene_id` distinct; do not recover a duplicate key by scanning a
+   different scene when `location_scene_id` was recorded.
 
 ## Characters
 

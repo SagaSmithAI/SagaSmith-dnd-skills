@@ -57,6 +57,10 @@ evidence recovered from room headings and stated dimensions. Set
 in the current scene or exactly one spatial location elsewhere in the same
 module. This lets an encounter scene reference a separately indexed room scene
 without merging their narrative content; ambiguous or cross-module keys fail.
+When the location lives in another scene, also persist its exact scene id as
+`state.location_scene_id`. A later combat start resolves that recorded scene
+first and fails if it is cross-module or does not contain the recorded key; it
+must not silently select a different duplicate key elsewhere in the module.
 
 In `lobby`, run `module_import` in strict order: `stage` -> `inspect` ->
 `validate` -> `ingest` -> `activate`. `stage` accepts either generated
@@ -83,7 +87,12 @@ only for DM-confirmed world changes; it stores the patch in the encounter audit
 and the scene runtime state. End combat before treating that temporary map as a
 different scene or module revision. When progress references a same-module
 spatial scene, map `source.scene_id` identifies that spatial evidence and
-`source.encounter_scene_id` retains the active narrative encounter.
+`source.encounter_scene_id` retains the active narrative encounter. The current
+progress scene remains the source of `current_location_key` and
+`state.location_scene_id`, even when the DM supplies a different encounter
+`scene_id`. If neither the spatial evidence nor the combat request provides
+dimensions, the map falls back to a 12-by-12-cell canvas; clients must not
+describe those fallback bounds as module-authored room dimensions.
 
 Call `module_import(action="inspect")` before validation; every later stage uses
 the same D&D parser profile. Every write carries a stable stage-specific `idempotency_key`;

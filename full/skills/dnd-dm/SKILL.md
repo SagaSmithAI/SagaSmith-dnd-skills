@@ -179,14 +179,18 @@ DM-authored `participant_config` positions, disposition, reach, initiative, and
 visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
 current module scene produces a frozen temporary battle map. An encounter scene
 may use `current_location_key` to reference exactly one spatial location in
-another scene of the same module; preserve both encounter and spatial source
-ids. The map enforces only its explicit bounds and blocked cells; it never turns
+another scene of the same module; persist that source scene as
+`state.location_scene_id`, and preserve the current progress, encounter, and
+spatial source ids as separate evidence. If the spatial evidence states no room
+dimensions and the DM supplies no bounds, the temporary map uses a conservative
+12-by-12-cell canvas; this is workspace, not inferred room geometry. The map
+enforces only its explicit bounds and blocked cells; it never turns
 room prose into inferred walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
 post-combat world change through `combat_map_patch`, not by rewriting the module.
 Player map views intentionally omit blocked cells, difficult terrain, DM
 overrides, checksums, and world patches; do not disclose those fields from a DM
 read or an earlier tool result.
-grid move that leaves an eligible
+A grid move that leaves an eligible
 hostile's recorded reach opens an owned opportunity window; read it through
 `combat_reactions`, decline it with `combat_choice_resolve`, or settle it
 atomically with `combat_reaction_attack`. Do not claim map collision, terrain,
