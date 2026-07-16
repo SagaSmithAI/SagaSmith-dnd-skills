@@ -38,6 +38,10 @@ Outside play, select `lobby` with `game_phase(action="set")` for module writing/
 campaign setup, and character creation. Before the first in-character scene,
 switch to `play`. `combat_start` enters `combat` automatically and `combat_end`
 returns to `play`; never simulate a phase transition only in narration.
+Before module import or character building, read the campaign rule profile and
+explain output. The locked `dnd5e.core.2014` or `dnd5e.core.2024` provider must
+match the adventure/table edition; do not let a default edition silently define
+the campaign.
 
 1. Resolve `scope_id` (`party`, `group:<id>`, or `player:<id>`), then call
    `module_query(view="current")`. Player scopes inherit party progress until they have their own.
@@ -55,6 +59,10 @@ returns to `play`; never simulate a phase transition only in narration.
    `campaign_rules_explain` must also show the locked `dnd5e.core.2014` or
    `dnd5e.core.2024` provider; treat a missing or mismatched core fingerprint as
    a hard stop, not permission to bypass the existing engine boundaries.
+   For an imported module PDF, also require every preview scene to carry a valid
+   source page range. A parser profile/version change is a new normalized module
+   revision even if the PDF checksum is unchanged; rerun the full staged import
+   lifecycle and review the resulting index before play.
 6. For character options, call `content_catalog_list` and present only entries
    available to the campaign's locked Core edition and enabled branch packs.
    Apply only a returned id through `character_content_apply`; respect a

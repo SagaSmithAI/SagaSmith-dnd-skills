@@ -17,19 +17,33 @@ the host cannot refresh the native MCP tool list.
 ## Start and Modules
 
 1. Call `campaign_create` with name, edition, locale, and optional description.
+   Choose `2014` or `2024` from the adventure and table contract before importing
+   modules or building actors; never accept the server default without checking it.
 2. Persist the returned `campaign_id`.
-3. Resolve the caller's stable `principal_id`; use `campaign_member_grant` and
+3. Read `campaign_rules(action="get_profile")` and
+   `campaign_rules(action="explain")`. Confirm the locked Core provider matches
+   the selected edition. For an existing campaign, change the profile only in
+   `lobby`, with the fresh campaign revision and an explicit DM decision, before
+   any character option is applied.
+4. Resolve the caller's stable `principal_id`; use `campaign_member_grant` and
    `actor_grant` for access instead of treating `player_name` as authorization.
-4. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
+5. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
    `ingest`, then `activate`. For generated content, stage with `payload.name` and
    `payload.content`. For a user PDF/Markdown/text module, stage with
    `payload.source_path`; it must be inside the server-configured module import
    roots. The server copies it into checksum-addressed MCP storage, and Core
    performs PDF-to-Markdown normalization. Never bypass staging with a direct path.
-5. Review `preview.valid`, parser warnings, scene/spatial evidence, and the revision
-   diff before ingesting. Activation additionally requires the fresh campaign
+6. Review `preview.valid`, parser warnings, scene/spatial evidence, and the revision
+   diff before ingesting. For a PDF, reject the preview if any scene lacks a valid
+   `page_start`/`page_end` within the source page count. Treat document checksum,
+   `parser_profile`, and `parser_version` together as the normalized module
+   revision identity: a parser-version change requires a new inspect, validate,
+   ingest, and activate cycle even when the source checksum and scene diff are
+   unchanged. Activation additionally requires the fresh campaign
    `expected_revision`; keep a stable idempotency key per stage.
-6. Use `module_query(view="index")` to choose a scene; use `module_set_progress` with an explicit
+7. After ingest and again after activation, use `module_query(view="index")` to
+   confirm chapter/scene counts, stable keys, page ranges, and spatial evidence.
+   Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_query(view="scene")` has been called.
 

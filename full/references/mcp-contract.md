@@ -65,6 +65,14 @@ Inspect exposes the Core PDF-to-Markdown page/bookmark statistics and complete
 scene/spatial preview. Ingest remains inactive, and only activation changes the
 campaign's active revision under optimistic concurrency.
 
+For PDFs, `preview.valid` also requires every scene to have an in-bounds
+`page_start`/`page_end`; the preview exposes those fields together with source
+line ranges. The normalized revision identity is the source checksum plus
+`parser_profile` plus `parser_version`. Re-run inspect -> validate -> ingest ->
+activate after a parser upgrade even when the document checksum and semantic
+scene diff are unchanged, then verify the inactive and active indexes before
+starting play.
+
 When `combat_start` has a current scene (or receives `scene_id`), the server
 creates and freezes an encounter-local `battle_map`. It may enforce supplied
 grid bounds and DM-confirmed blocked cells, but never invents walls, line of
