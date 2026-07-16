@@ -16,7 +16,24 @@ complete operation mapping.
 2. `module_write` → `module_inspect` → `module_import` → `module_index`.
 3. `character_build` for each confirmed PC; use `character_create` or
    `character_instantiate` for NPCs and monsters.
-4. Record the opening `event_add` and `snapshot_create`.
+4. Run the character completeness gate from `content-catalog.md`: apply every
+   eligible class/subclass feature and the complete species/subspecies card,
+   then re-read each character and inspect derived values and unresolved rules.
+5. Record the opening `event_add` and `snapshot_create`.
+
+## Combat feature settlement
+
+1. Read the current actor card and `combat_available_actions`; never infer a
+   feature from the class name alone.
+2. For an attack that should use 2014 Sneak Attack, declare
+   `use_sneak_attack: true` in `combat_preflight_attack` and
+   `combat_resolve_attack`. Let the engine validate eligibility and persist the
+   once-per-turn token.
+3. For Second Wind, call `combat_use_activity` to pay its bonus action and use,
+   roll the source-stated `1d10 + fighter level`, then call `combat_heal` with
+   that result. Do not heal first or manually decrement the card afterward.
+4. Halfling Lucky requires no extra write. Preserve the returned `rerolls`
+   evidence in the combat audit and narrate only the final selected d20.
 
 ## Rule question
 

@@ -68,8 +68,10 @@ the campaign.
    Apply only a returned id through `character_content_apply`; respect a
    `pending_ruling` response for unresolved prerequisites or effects. Supply
    the legal spell source class and grant method, the target base class for a
-   multiclass subclass, and every required background choice; never patch the
-   raw sheet to bypass selection validation.
+   multiclass subclass, every required background/species choice, and every
+   class/subclass feature whose minimum level is met. A class or species name
+   without its granted feature cards and traits is an incomplete actor, not a
+   usable shortcut. Never patch the raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
 8. Persist events, scene progress, actor/party state, and durable facts. Use
    `actor_knowledge_*` for what one PC/NPC believes, not `memory_*`.
@@ -140,6 +142,14 @@ create an opportunity-attack window only from recorded positions, reach,
 hostility, visibility, and movement mode.
 Open a choice window for those decisions and resolve it explicitly; never encode
 an unverified ruling as a character-card fact.
+
+Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
+recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
+disadvantage, once-per-turn token, and critical dice. For Second Wind, first use
+`combat_use_activity` to pay the bonus action and feature use, then roll `1d10 +
+fighter level` and pass that exact total to `combat_heal`. Halfling Lucky is
+resolved automatically for attacks, checks, saves, death saves, and initiative;
+retain its `rerolls` audit instead of rolling a second untracked check.
 
 Use `combat_common_action` for the core non-attack actions. It records their
 action payment and tactical state; it deliberately does not fabricate the

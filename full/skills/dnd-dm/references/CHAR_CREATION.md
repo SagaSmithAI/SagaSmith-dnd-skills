@@ -24,6 +24,22 @@ monsters require complete structured cards; NPCs and monsters require
 or advancement, call `character_get` and use its `derived` values for proficiency,
 saves, skills, AC, HP, speed, spell DC, preparation, and encumbrance.
 
+Recording a class, subclass, species, or subspecies name is not sufficient.
+Before the first `play` phase and after every level-up, query `content_catalog_list`
+and reconcile every class/subclass feature whose `minimum_level` is met, plus every
+species grant and required choice, through `character_content_apply`. Treat
+`catalog_only` as a stop condition that needs reviewer/DM completion, never as an
+applicable card. When importing a finished character whose printed scores and HP
+already include species bonuses, pass `values_include_species_grants: true` while
+applying the species so the catalog provenance and nonnumeric traits are retained
+without double-counting numeric grants.
+
+Before combat, audit at least: class and subclass features, species/subspecies
+features, proficiencies and expertise, resources and recovery periods, equipped
+weapons and ammunition, spellbook/known/prepared spells, AC, HP, speed, senses,
+resistances, and every unresolved rule. Missing feature cards are setup defects,
+not permissions for the DM agent to improvise abilities during combat.
+
 For a 2014 class-prepared caster, eligible level 1+ class spells use
 `grant.method: "class_prepared"`, identify the recorded class with
 `grant.source_key`, and may keep `access.known: false`. Put the complete daily
