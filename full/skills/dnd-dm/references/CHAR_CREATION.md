@@ -43,6 +43,41 @@ weapons and ammunition, spellbook/known/prepared spells, AC, HP, speed, senses,
 resistances, and every unresolved rule. Missing feature cards are setup defects,
 not permissions for the DM agent to improvise abilities during combat.
 
+For an NPC or monster statblock with Multiattack, record its exact legal attack
+compositions in one Action activity. Do not flatten it to a generic
+`attacks_per_action` value: that would allow illegal substitutions. Each option
+uses stable inventory weapon ids, an explicit `attack_mode`, and a count:
+
+```json
+{
+  "id": "bandit-captain-multiattack",
+  "name": "Multiattack",
+  "source_key": "Bandit Captain",
+  "activation": {"type": "action"},
+  "choices": {
+    "multiattack_options": [
+      {
+        "id": "melee",
+        "attacks": [
+          {"weapon_id": "scimitar", "attack_mode": "melee", "count": 2},
+          {"weapon_id": "dagger", "attack_mode": "melee", "count": 1}
+        ]
+      },
+      {
+        "id": "ranged",
+        "attacks": [
+          {"weapon_id": "dagger", "attack_mode": "ranged", "count": 2}
+        ]
+      }
+    ]
+  }
+}
+```
+
+After creation, verify `derived.multiattack_options` against the source and make
+sure every referenced weapon id exists. Preserve the source document and rule
+reference on the activity card just like any other imported mechanic.
+
 For a 2014 class-prepared caster, eligible level 1+ class spells use
 `grant.method: "class_prepared"`, identify the recorded class with
 `grant.source_key`, and may keep `access.known: false`. Put the complete daily

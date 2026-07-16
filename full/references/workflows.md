@@ -38,6 +38,11 @@ complete operation mapping.
    Do not pre-add Disciple of Life; the engine validates and audits that modifier.
 5. Halfling Lucky requires no extra write. Preserve the returned `rerolls`
    evidence in the combat audit and narrate only the final selected d20.
+6. For a statblock Multiattack, read `derived.multiattack_options`, select one
+   source-legal option, and send its `multiattack_option_id` on the first attack.
+   Subsequent calls must consume only that option's remaining weapon/mode entries.
+   Pass `attack_mode: ranged` when throwing a melee weapon; never model
+   Multiattack as an unrestricted `attacks_per_action` count.
 
 ## Rule question
 

@@ -143,6 +143,13 @@ hostility, visibility, and movement mode.
 Open a choice window for those decisions and resolve it explicitly; never encode
 an unverified ruling as a character-card fact.
 
+For a structured monster Multiattack, pass `multiattack_option_id` on its first
+`combat_preflight_attack` and `combat_resolve_attack`, then make only the exact
+weapon/mode/count sequence still recorded by that option. Do not declare a raw
+`attacks_per_action` override. A melee weapon with the Thrown property remains a
+melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
+This distinction controls reach, range, disadvantage, and melee-only modifiers.
+
 Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
 disadvantage, once-per-turn token, and critical dice. For Second Wind, first use

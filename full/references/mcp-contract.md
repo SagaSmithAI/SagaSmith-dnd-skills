@@ -347,6 +347,14 @@ pay the card's action/bonus-action/reaction timing in combat. Card prose,
 choices, targeting, and any non-deterministic result are returned for an
 explicit DM ruling rather than automatically materialized.
 
+`combat_preflight_attack` and `combat_resolve_attack` accept
+`multiattack_option_id` for the first attack of a structured Multiattack. The
+engine pays the Action once, stores the remaining source-defined weapon/mode
+entries in turn state, and rejects substitutions or excess attacks. For a melee
+weapon with the Thrown property, `attack_mode` defaults to `melee`; send
+`attack_mode: "ranged"` to use its thrown range. The selected mode also determines
+whether melee-only modifiers apply.
+
 `character_rest` applies v2-card short/long-rest recovery with a character
 revision and idempotency key. For a Short Rest, provide each spent hit die and
 its rolled result through `hit_dice_spends`; the runtime applies Constitution

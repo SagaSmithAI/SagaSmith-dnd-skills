@@ -170,6 +170,11 @@ rule effect. `point_cost` supports spell-point variants. The authoritative daily
   source/description/uses/choices shape plus `resource_key`, `activation`, and
   level `scaling` for limited class, racial, item, and feat capabilities. Record
   Action Surge, Rage, Channel Divinity, and comparable features here, not in prose.
+- A statblock Multiattack is an Action activity whose
+  `choices.multiattack_options` list contains stable option ids and exact
+  `{weapon_id, attack_mode, count}` entries. Every weapon id must resolve to an
+  inventory attack. Keep alternate melee/ranged compositions as separate options;
+  never replace their constraints with a generic extra-attack count.
 - `content.selections` records structural catalog choices that are represented
   elsewhere on the sheet, such as background and subclass. Each entry retains
   `artifact_id`, kind, name, exact pack id/version, rule/mechanic references,
