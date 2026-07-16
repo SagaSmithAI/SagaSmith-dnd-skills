@@ -161,7 +161,10 @@ with a compact core: `exposure_open`, `exposure_status`, `exposure_search`,
 `campaign_query`, `game_phase`, and server diagnostics. Start or resume with
 `exposure_open(campaign_id, principal_id)`, search/inspect a group, then load it.
 Loaded groups are scoped to that MCP session and principal; another connected
-agent must open and load its own exposure.
+agent must open and load its own exposure. A session/principal has exactly one
+active exposure. Calling `exposure_open` again replaces the previous exposure;
+load multiple compatible same-phase groups into the current exposure and discard
+older exposure ids.
 
 | Phase | Intended state | Example groups |
 |---|---|---|
@@ -380,7 +383,18 @@ effect with `turn_start: 1`, re-evaluates the stored attack, and never rolls
 damage twice. An unavailable/unprepared spell, exhausted slot, incapacitated
 caster, spent Reaction, or edition spell-per-turn conflict removes the candidate.
 The attack-hit window does not represent Shield's separate `Magic Missile`
-targeting trigger; clients must not synthesize one from prose.
+targeting trigger; clients must not synthesize one from prose. A source-bound Core
+Magic Missile instead uses `combat_cast_spell(..., target_allocations=[...])`.
+Allocations contain `target_id` and `darts`; their total is three at level 1 plus
+one for each higher slot. Targets must be current combatants visible to the caster
+and within 120 feet on the recorded grid. The cast pays the caster's action and
+resource once, then opens an owned `magic_missile_targeted` reaction window for
+each target with a legal Shield cast. Resolve each through
+`combat_choice(action="resolve_defense")`; no dart is rolled until all such windows
+are settled. Active or newly cast Shield negates every dart allocated to that
+target. Remaining darts are rolled and applied as separate force-damage instances,
+so concentration and 0-HP consequences are per dart. Never merge them into one
+damage packet or manually patch HP.
 
 `character_rest` applies v2-card short/long-rest recovery with a character
 revision and idempotency key. For a Short Rest, provide each spent hit die and
@@ -391,9 +405,10 @@ all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery need
 the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
 the ending actor's turn; any narrative rest consequence remains a DM ruling.
 
+Except for source-bound spell workflows such as Core Magic Missile,
 `character_cast_spell` and `combat_cast_spell` settle only timing, casting
-resources, concentration, and recorded components. They return `pending_ruling`
-for targets and effects. Cantrips and rituals cannot be upcast; a ritual cannot
+resources, concentration, and recorded components. Generic spells return
+`pending_ruling` for targets and effects. Cantrips and rituals cannot be upcast; a ritual cannot
 complete in active combat. Costly or consumed material components require
 `component_ruling.material_confirmed=true` before resources are spent. Pact Magic
 uses the recorded `pact_magic.slot_level` and is counted as a slot expenditure.

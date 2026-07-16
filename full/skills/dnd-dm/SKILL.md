@@ -164,9 +164,21 @@ the current turn's 2014/2024 spell limit. Select one of its returned
 `cast_levels` by sending both its spell id and `cast_level`; the same transaction
 spends the Reaction and slot, applies +5 AC to the triggering roll, and records
 the +5 AC effect until the start of that caster's next turn. Do not model Shield
-as an activity or add its AC manually. Being targeted by `Magic Missile` is a
-different Shield trigger; do not forge an attack-hit window for it or claim that
-the attack-defense path settled that immunity.
+as an activity or add its AC manually.
+
+A source-bound Core `Magic Missile` is the exception to generic spell
+`pending_ruling`. Call `combat_cast_spell` with `target_allocations`, where every
+entry supplies `target_id` and a positive `darts` count; the total must be three
+at level 1 plus one per higher slot. The server validates current map distance and
+recorded visibility. If a target can cast Shield, the cast returns
+`pending_reaction` before any dart is rolled or damage applied. That target reads
+its owned reaction and uses `combat_choice(action="resolve_defense")` with Shield
+and one returned `cast_level`, or `decline`. The server settles all target choices,
+then rolls and applies every unblocked dart as a separate force-damage instance;
+each dart can cause its own concentration save or 0-HP failure. An already-active
+Shield blocks that target's darts without spending another Reaction. Never roll
+darts externally, combine them into `combat_hp_change`, or forge an attack-hit
+window for this targeting trigger.
 
 Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,

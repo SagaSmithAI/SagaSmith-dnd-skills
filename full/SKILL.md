@@ -16,7 +16,10 @@ as `mcp_sagasmith_dnd_`.
    Start every MCP session with `exposure_open`, then use `exposure_search`,
    `exposure_inspect`, and `exposure_load` for the current campaign phase. Before
    a campaign exists, load only `lobby.bootstrap`; reopen the exposure with the
-   returned `campaign_id` before loading campaign-bound groups.
+   returned `campaign_id` before loading campaign-bound groups. There is one active
+   exposure per MCP session/principal: calling `exposure_open` again replaces it.
+   Load every compatible group needed for the current phase into that one exposure;
+   never retain or call an older exposure id.
 2. Use Full Runtime only when the `sagasmith_dnd` MCP tools are available, then load
    the relevant child Skill and `references/mcp-contract.md`.
 3. If MCP is unavailable, use the separate `standalone/` skill. Do not silently

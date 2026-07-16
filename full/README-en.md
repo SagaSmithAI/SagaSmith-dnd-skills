@@ -9,7 +9,7 @@ This directory contains agent orchestration only. It never writes SQLite/ChromaD
 ## Startup
 
 1. Call `server_capabilities` and `storage_status`.
-2. Open a session exposure with `exposure_open`; do not model-supply a principal when the Host injects identity.
+2. Open a session exposure with `exposure_open`; do not model-supply a principal when the Host injects identity. One session/principal has one current exposure, reopening replaces the old id, and same-phase groups belong in that one exposure.
 3. For lobby work, use `exposure_search` → `exposure_inspect` → `exposure_load`.
 4. Read [`references/mcp-contract.md`](references/mcp-contract.md) and the relevant child skill.
 5. On fresh storage, verify core-rule seed state. For an existing campaign, read campaign, branch, and continuity context first.

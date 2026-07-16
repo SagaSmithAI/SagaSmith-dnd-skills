@@ -9,7 +9,7 @@ be conflated:
    pack is enabled on the current branch.
 3. **Executable**: a reviewed rule mechanic covers the requested outcome.
 
-For the bundled 2014 SRD, `dnd5e.content.srd2014@1.3.0` is installed during MCP
+For the bundled 2014 SRD, `dnd5e.content.srd2014@1.4.0` is installed during MCP
 startup when the full D&D skill repository is configured. Its records retain a
 `bundled:srd2014/...` reference to the original Markdown file. Optional books
 must use `rule_pack_draft_from_source`; every artifact supplies imported

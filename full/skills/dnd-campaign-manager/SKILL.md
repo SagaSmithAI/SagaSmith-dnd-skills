@@ -12,7 +12,9 @@ shell `sagasmith-dnd` commands. Read `../../references/mcp-contract.md` and
 Open an MCP session exposure when resuming a campaign. Use `lobby` groups for
 setup, module, import, indexing, and character-building workflows; load `play`
 groups only when live in-character play begins. Use `exposure_call` only when
-the host cannot refresh the native MCP tool list.
+the host cannot refresh the native MCP tool list. One session/principal has one
+active exposure. Load multiple compatible groups into it; a later `exposure_open`
+replaces the earlier exposure, so discard every older exposure id.
 
 ## Start and Modules
 
