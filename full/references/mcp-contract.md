@@ -526,10 +526,13 @@ uses the recorded `pact_magic.slot_level` and is counted as a slot expenditure.
 `module_set_progress` requires the current `expected_state_version` for that
 scene/scope row (`0` for its first write) and a fresh idempotency key.
 
-`campaign_advance_effects` is DM-only and advances matching `minute`, `hour`,
-`day`, `round`, or `encounter` effect durations across campaign actors as one
-atomic group. It must be called with an explicit established period; conversation
-time is never treated as campaign time automatically.
+`campaign_change(action="clock_set")` establishes the branch-local campaign day,
+hour, and minute. `campaign_change(action="clock_advance")` advances an explicit
+`minute`, `hour`, `day`, `round`, or `encounter` count. Narrative-time advances
+update the snapshotted `state.world_time` and settle matching effect durations
+across all campaign actors as one atomic group; round/encounter advances do not
+move the world clock. The clock must be set first, cannot change during active
+combat, and conversation time is never treated as elapsed campaign time.
 
 ## Player-safe module reads
 

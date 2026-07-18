@@ -90,7 +90,7 @@ the campaign.
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
-| Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision`, `campaign_advance_effects` |
+| Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
 | DM choices | `combat_choice(open/resolve/resolve_defense)` |
 
@@ -319,7 +319,12 @@ resolve its targets, attack, save, damage, area, and narrative consequences with
 the appropriate combat tools and DM ruling rather than treating release as the
 spell's complete effect.
 
-Use `campaign_advance_effects` only after the DM establishes an elapsed
-minute/hour/day (or explicit round/encounter boundary). It advances matching
-canonical effect durations across all campaign actors atomically; it does not
-invent passage of time from chat pacing.
+Before a module can branch on opening hours, daylight, watches, or travel time,
+establish its branch-local clock with
+`campaign_change(action="clock_set", payload={day, hour, minute, label})` and cite
+the narrative/source assumption. After the DM establishes elapsed time, use
+`campaign_change(action="clock_advance", payload={period, count})`. Minute, hour,
+and day advances update the snapshotted campaign clock and settle all matching
+canonical effect durations in the same mutation; round and encounter durations
+advance without changing narrative time. Never infer elapsed time from chat
+pacing, and never set or advance the narrative clock during active combat.

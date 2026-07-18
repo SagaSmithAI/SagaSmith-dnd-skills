@@ -42,14 +42,19 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `current_location_key` and `state.location_scene_id` when the spatial room is a
    separate scene. Never merge narrative text merely because two scenes refer to
    the same encounter.
-6. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
+6. If the scene changes by opening hours, daylight, watches, or travel duration,
+   establish `campaign_change(action="clock_set")` before resolving the branch.
+   Advance only source- or DM-established elapsed time with
+   `campaign_change(action="clock_advance")`; it updates the branch-local clock
+   and timed effects atomically.
+7. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
    PCs and `mode="direct"`, `mode="template"`, or `mode="statblock"` for NPCs and
    monsters. Statblock mode must cite an imported exact source; unsupported or
    absent creatures remain unresolved instead of being replaced by a similar one.
-7. Apply every confirmed class/subclass feature and complete species/background
+8. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
-8. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
-9. Record the opening with `campaign_event(action="add")`, persist objective facts
+9. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
+10. Record the opening with `campaign_event(action="add")`, persist objective facts
    with `memory_change`, and call `snapshot_create`.
 
 ## Scene readiness and temporary combat map
