@@ -109,7 +109,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors or reusable library | `character_query(get/list/library)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest)` |
+| Wallet, spell, effects, resources | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/stable_recovery)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -504,6 +504,13 @@ and the edition's minimum. A 2014 Long Rest may require an explicit
 all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery needs
 the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
 the ending actor's turn; any narrative rest consequence remains a DM ruling.
+
+A Stable creature at 0 HP cannot benefit from a rest. When the party can safely
+wait for the automatic recovery, call
+`character_state_change(action="stable_recovery")`. The engine rolls `1d4` hours,
+restores exactly 1 HP, clears Stable and Unconscious, preserves unrelated
+conditions such as Prone, and stores the Core rule receipt atomically. Do not
+manually set HP or choose the recovery duration.
 
 Except for source-bound spell workflows such as Core Magic Missile,
 `character_action(action="cast_spell")` and `combat_cast_spell` settle only timing, casting
