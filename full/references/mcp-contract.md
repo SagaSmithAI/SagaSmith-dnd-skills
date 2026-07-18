@@ -311,6 +311,10 @@ initiative without changing the actor whose turn was already in progress.
 Joining initiative ties require an explicit `tie_breaker`. Create likely scene
 participants and their source-bound cards during lobby import, not during an
 active encounter.
+`combat_end` accepts an optional structured outcome with a bounded public
+`summary` and a status of victory, defeat, withdrawal, truce, or interrupted.
+It persists that outcome on the final encounter audit. It still refuses to end
+while a death-save participant remains dying rather than Dead or Stable.
 Medicine stabilization is not a generic narrative check. Call
 `combat_check(kind="stabilize", ability="wisdom", target_id=...)`; the server
 requires the acting turn, recorded adjacency within 5 feet, and a living target

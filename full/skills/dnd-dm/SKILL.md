@@ -224,6 +224,14 @@ only when the next round starts. Do not patch the combatant list, create a
 mid-combat placeholder card, or queue the NPC after a failed check. Establish
 potential participant cards during lobby/module preparation.
 
+End an encounter with a structured `combat_end.outcome`: `status` is one of
+`victory`, `defeat`, `withdrawal`, `truce`, or `interrupted`, and `summary`
+states the scene-supported reason and immediate public result. Do not close a
+fight merely because the regression has enough samples. The engine rejects an
+end while any death-save actor is still at 0 HP without Dead or Stable; settle
+those actors first. Record longer consequences as post-combat events and memory,
+not by hiding them inside the outcome summary.
+
 Preserve the source spell card's canonical casting time during import. Standard
 cards commonly use `1 action`, `1 bonus action`, or `1 reaction, ...`; do not
 strip the leading count or replace these with a free-form timing label. In
