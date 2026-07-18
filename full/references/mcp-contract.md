@@ -52,7 +52,10 @@ assigns a subclass to the first class on a multiclass card.
 Module re-imports are revisions: earlier sources are retained for snapshots and
 scoped scene progress, while normal `module_query(view="index")` results show only the newest
 active revision. A D&D scene can contain conservative `spatial.locations`
-evidence recovered from room headings and stated dimensions. Set
+evidence recovered from room headings and stated dimensions. Its optional
+`spatial.connections` contains only edges supported by explicit route prose or
+reviewed structured authoring, with confidence and source evidence; neither room
+number order nor generic room references establish adjacency. Set
 `current_location_key` with `module_set_progress` only when it names a location
 in the current scene or exactly one spatial location elsewhere in the same
 module. This lets an encounter scene reference a separately indexed room scene

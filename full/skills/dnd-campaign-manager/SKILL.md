@@ -46,6 +46,10 @@ replaces the earlier exposure, so discard every older exposure id.
    `expected_revision`; keep a stable idempotency key per stage.
 7. After ingest and again after activation, use `module_query(view="index")` to
    confirm chapter/scene counts, stable keys, page ranges, and spatial evidence.
+   Room-heading order is not a map. A `spatial.connections` edge is usable only
+   when it carries explicit source evidence (for example, prose stating that a
+   stair leads from D4 to D5); an empty connection list means topology is still
+   unknown, not that the listed rooms are isolated or sequentially adjacent.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_query(view="scene")` has been called. If an

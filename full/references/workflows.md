@@ -35,7 +35,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Review `module_query(view="index")`. Search only selects candidates; expand the
    chosen scene before using its facts. Verify scene boundaries, keeper/public
    visibility, encounter participants, exact source excerpts, spatial locations,
-   and parser warnings.
+   explicit-evidence spatial connections, and parser warnings. Never treat room
+   heading order as connectivity; an empty `spatial.connections` list means the
+   parser found no source-backed topology.
 5. Set scoped progress with `module_set_progress`, including
    `current_location_key` and `state.location_scene_id` when the spatial room is a
    separate scene. Never merge narrative text merely because two scenes refer to

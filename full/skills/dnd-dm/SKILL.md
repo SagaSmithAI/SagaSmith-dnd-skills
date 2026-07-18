@@ -266,7 +266,12 @@ another scene of the same module; persist that source scene as
 spatial source ids as separate evidence. If the spatial evidence states no room
 dimensions and the DM supplies no bounds, the temporary map uses a conservative
 12-by-12-cell canvas; this is workspace, not inferred room geometry. The map
-enforces only its explicit bounds and blocked cells; it never turns
+may render imported `spatial.connections` only when each edge is backed by
+`confidence="explicit_text"` evidence or reviewed structured authoring. Never
+connect rooms by heading order, room number, or a generic cross-reference such
+as an encounter's reinforcement note. An empty connection list is an explicit
+unknown-topology state. The temporary map enforces only its explicit bounds and
+blocked cells; it never turns
 room prose into inferred walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
 post-combat world change through `combat_map_patch`, not by rewriting the module.
 Player map views intentionally omit blocked cells, difficult terrain, DM
