@@ -112,7 +112,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors or reusable library | `character_query(get/list/library)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -133,6 +133,20 @@ after a Long Rest, while Bard/Ranger/Sorcerer/Warlock use spells known. Always-
 prepared spells and cantrips never occupy selections. Wizard selections must be
 in the spellbook. Multiclass eligibility uses each spell's `grant.source_key`
 and that class's own level. Campaign-bound characters inherit campaign edition.
+
+`character_state_change(action="level_advance")` is DM-authorized and valid only
+in `lobby`, outside active combat. It requires the current actor revision, a fresh
+idempotency key, the exact existing `class_name`, `hp_method` (`fixed` or
+`rolled` plus `hp_roll`), and nonempty `reason` and `source_ref`. It currently
+advances a 2014 single-class actor exactly one level. The atomic mutation raises
+maximum HP without healing current damage, adds the new Hit Die, adds only newly
+gained spell-slot capacity to available slots, recalculates preparation maximum,
+and applies source-bound per-level HP modifiers from installed content. Its
+`advancement.follow_up` lists eligible feature artifacts, subclass options, and
+spell-choice counts. Those are mandatory subsequent catalog operations; after a
+subclass choice, query again for its features. Finish with a complete
+`character_spell_prepare(mode="replace_all", event="level_up")`, actor re-read,
+and snapshot before returning to `play`.
 
 ## Branch-aware continuity
 
@@ -506,7 +520,9 @@ and the edition's minimum. A 2014 Long Rest may require an explicit
 `hit_dice_recovery` allocation across multiclass pools. A 2024 Long Rest restores
 all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery needs
 the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
-the ending actor's turn; any narrative rest consequence remains a DM ruling.
+the ending actor's turn; any narrative rest consequence remains a DM ruling. A
+resource marked `recovers_on: short_rest` also recovers on a Long Rest; the marker
+means the earliest rest that restores it, not that a longer rest fails to do so.
 
 A Stable creature at 0 HP cannot benefit from a rest. When the party can safely
 wait for the automatic recovery, call

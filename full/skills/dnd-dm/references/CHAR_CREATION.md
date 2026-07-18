@@ -111,6 +111,37 @@ choice in `spellcasting.preparation.selected_spell_ids`; the selected spells bec
 derived prepared spells. A Wizard selection must additionally be in the spellbook.
 Cantrips are known but never consume a prepared-list selection.
 
-Advancement changes the live campaign instance. Update only the affected validated
-sheet fields, record a level-up `campaign_event(action="add")`, and call `snapshot_create` after the
-player confirms the new state.
+Advancement changes the live campaign instance and must use the audited lobby
+workflow; never patch `progression.level`, HP, Hit Dice, slots, or preparation
+limits by hand:
+
+1. Inspect the module or campaign award and retain its exact `source_ref`. Record
+   a level-up `campaign_event(action="add")` that says why the level was earned.
+2. End active combat, switch the campaign to `lobby`, read the actor's latest
+   revision, and call
+   `character_state_change(action="level_advance", payload={class_name,
+   hp_method, hp_roll?, reason, source_ref})`. The current implementation advances
+   an existing 2014 single class by exactly one level; multiclass and 2024
+   advancement are stop conditions, not permissions to replace the sheet.
+3. Use `hp_method="fixed"` for the class fixed value, or use `"rolled"` only with
+   the actual Hit Die result. The transaction updates maximum HP, the Hit Die
+   pool, spell-slot capacity, and preparation maximum. It does not heal existing
+   damage. Newly gained slot capacity becomes available, but spent old slots do
+   not refresh. Source-bound per-level modifiers such as Dwarven Toughness are
+   resolved from already applied catalog provenance.
+4. Read `advancement.follow_up`. Apply every eligible base-class and already
+   selected-subclass feature in the listed order through
+   `character_content_apply`. If `subclass_options` is nonempty, obtain the
+   player's choice, apply that subclass, query the content catalog again, and
+   apply its newly eligible feature cards. A feature that names a shared resource
+   must be applied after the feature that grants that resource.
+5. Resolve each reported cantrip, known-spell, or spellbook choice from
+   `rule_pack_query(view="content_catalog")`; apply only eligible artifact ids.
+   A Wizard adds the reported spells with `method="spellbook"`. Then submit the
+   complete legal prepared list with
+   `character_spell_prepare(mode="replace_all", event="level_up")`.
+6. Re-read the actor and audit level, HP maximum/current HP, Hit Dice, spell slots,
+   preparation, feature resources, subclass, spells, and `derived`. Do not return
+   to `play` while any required catalog item or player choice is missing.
+7. After confirmation, create a post-level `snapshot_create`, then return to
+   `play` and reopen the phase-appropriate exposure.

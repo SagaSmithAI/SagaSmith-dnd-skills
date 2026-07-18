@@ -112,6 +112,16 @@ new list as `prepared_spell_ids` on the actor's
 `character_state_change(action="rest")` long-rest
 transaction; do not toggle preparations one by one.
 
+When the campaign awards a level, first record the source-bound milestone event,
+then switch to `lobby` and use
+`character_state_change(action="level_advance")`. Never patch the actor sheet.
+Treat the returned `advancement.follow_up` as a blocking checklist: all eligible
+features, subclass/player choices, spell gains, and the complete `level_up`
+prepared list must be reconciled from the active catalog before returning to
+`play`. Re-read the actor and create a post-advancement snapshot. Current 2014
+single-class support is explicit; unsupported multiclass or 2024 advancement
+stops for review.
+
 After each actor or party mutation call `character_query(view="get")` or
 `campaign_query(view="party")`. Use their
 derived values rather than recalculating weapon attacks, AC, or encumbrance in

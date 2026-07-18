@@ -128,6 +128,16 @@ membership, always-prepared and cantrip exclusions, and multiclass
 `grant.source_key` ownership. An unprepared level 1+ spell on a prepared caster's
 card is not castable merely because its access record says it is known.
 
+Level advancement is a `lobby` transaction, not a sheet replacement. Preserve
+the exact award evidence and call
+`character_state_change(action="level_advance")` with the existing class, fixed
+or actually rolled HP method, `reason`, and `source_ref`. Current HP is not healed.
+Then exhaust `advancement.follow_up`: apply eligible class features, resolve any
+subclass and spell choices from the active content catalog, apply newly eligible
+subclass features, replace the complete prepared list with `event="level_up"`,
+re-read derived state, and snapshot before returning to `play`. Follow the full
+ordering and stop conditions in `references/CHAR_CREATION.md`.
+
 ## Combat boundary
 
 Use `combat_preflight_attack` before every attack commit. The engine automatically

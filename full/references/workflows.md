@@ -107,6 +107,25 @@ own exposure. Loading a group for one Agent must not expose it to another.
    When conscious and above 0 HP, clear the retained Prone condition only with
    `character_state_change(action="stand")`.
 
+## Source-bound level advancement
+
+1. Verify the XP or milestone in the imported module/campaign evidence and add a
+   campaign event with that exact source reference.
+2. End combat, switch to `lobby`, re-read the actor revision, and call
+   `character_state_change(action="level_advance")`. Use the fixed HP value unless
+   the player actually rolls; never supply a fabricated roll.
+3. Inspect `advancement.follow_up`. Apply its base-class and existing-subclass
+   feature ids through `character_content_apply`. Resolve a listed subclass choice
+   with the player, apply it, then query the catalog again for subclass features.
+4. Select only the reported number of legal cantrips/known/spellbook spells from
+   the active catalog. Apply Wizard additions as `method: spellbook`.
+5. Submit the complete prepared list with
+   `character_spell_prepare(mode="replace_all", event="level_up")`, re-read the
+   actor, and verify all resources and derived values.
+6. Create a snapshot, switch back to `play`, and reopen phase exposure. Stop if
+   the runtime reports unsupported edition/multiclass state or any catalog item
+   remains unresolved.
+
 ## Feature settlement examples
 
 - For 2014 Sneak Attack, declare `use_sneak_attack: true` in preflight and resolve;
