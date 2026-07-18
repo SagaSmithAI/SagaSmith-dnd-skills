@@ -15,7 +15,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Rules | `rule_import(stage/inspect/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/explain/receipts)`, `character_content_apply` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets)`, `module_page_render`, `module_search`, `module_expand`, `module_set_progress` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `campaign_event(add/list)`, `memory_change`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout)` |
 | Audit | `state_revision(history/undo/redo)` |
@@ -76,6 +76,14 @@ id. The review lives in scoped scene progress, so snapshots and branch checkout
 restore it without mutating immutable imported metadata. A review-only write may
 omit `status` and `progress`; existing values are preserved. See
 `module-visual-atlas.md` for the full sequence and schema.
+
+When a creature card exists only in the PDF image layer, render and inspect its
+managed page, then call `module_content_review`. The MCP validates the normalized
+2014 statblock before Core stores immutable module/scene/page/asset evidence.
+Re-read it with `module_query(view="content")` and create campaign actors with
+`character_create_from(mode="module_statblock")`. See
+`module-image-content-review.md`; missing text extraction is not evidence that a
+printed card is absent, and visual transcription is not permission to fill gaps.
 
 In `lobby`, run `module_import` in strict order: `stage` -> `inspect` ->
 `validate` -> `ingest` -> `activate`. `stage` accepts either generated
@@ -252,8 +260,10 @@ creature present in an imported rule source, use
 `character_create_from(mode="statblock")` with the imported `source_id` and, when
 needed, reviewed `chunk_ids`. The parser preserves source provenance, exact AC,
 HP, abilities, defenses, senses, weapon attacks, and structured Multiattack.
-Current automatic import supports reviewed English 2014 SRD-style weapon
-statblocks. A spell-only, 2024, ambiguous, or otherwise unsupported block must
+For an image-only module card, use the reviewed visual workflow and
+`mode="module_statblock"` instead. Current automatic import supports reviewed
+English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
+numeric attack facts, 2024, ambiguous, or otherwise unsupported block must
 remain unresolved; do not replace it with a similar SRD creature or invent a card.
 
 Before `combat_start`, call `module_query(view="readiness")` with a manifest:

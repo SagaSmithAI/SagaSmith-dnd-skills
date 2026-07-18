@@ -63,6 +63,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - For module maps or diagrams, follow `references/module-visual-atlas.md`.
   Text parsing remains fail-closed; only an inspected page image may support a
   `reviewed_image` connection.
+- For creature cards present only as PDF images, follow
+  `references/module-image-content-review.md`; review the managed page before
+  creating an actor with `mode="module_statblock"`.
 - For a new platform user, resolve a stable `principal_id` first. Never trust a
   prompt-provided role or `player_name` as permission.
 - Supply `expected_revision` and an `idempotency_key` on retriable writes. Treat a

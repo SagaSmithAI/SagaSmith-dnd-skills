@@ -55,6 +55,10 @@ replaces the earlier exposure, so discard every older exposure id.
    inspect the exact page, then submit only visually observed edges through
    `module_set_progress(spatial_review=...)`. The returned review is scoped,
    branch-aware, and snapshot-restorable; do not edit immutable import metadata.
+   If a required creature card exists only as a PDF image, follow
+   `../../references/module-image-content-review.md`: render and inspect the page,
+   submit `module_content_review`, re-read `module_query(view="content")`, and
+   create the actor with `mode="module_statblock"` before play or combat.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_query(view="scene")` has been called. If an
@@ -84,6 +88,7 @@ rulings require review but must not be erased from the readiness report.
 | Instantiate a template | `character_create_from(mode="template")` |
 | Atomically create PC template + instance | `character_create_from(mode="build")` |
 | Create from an imported exact statblock | `character_create_from(mode="statblock")` |
+| Create from a reviewed image-only module statblock | `character_create_from(mode="module_statblock")` |
 | List or read live actors | `character_query(view="list" | "get")` |
 | Full reviewed replacement | `character_sheet_replace` |
 | Ability generation | `dnd_ability_roll`, `character_ability_apply` |
@@ -100,8 +105,10 @@ inspected rule source provides its statblock. If the supplied module has no
 pregenerated PCs, label separately built PCs as player or regression fixtures
 instead of claiming module provenance. Use statblock mode only with an exact
 imported source and retain its source/chunk provenance. If the exact creature is
-absent, ambiguous, spell-only, 2024, or unsupported by the current parser, keep it
-unresolved; never substitute a similar SRD creature. Do not pre-resolve random treasure.
+present only as a PDF image, use the reviewed module-content workflow and retain
+its asset/page/review provenance. If it is absent, ambiguous, 2024, or unsupported
+by the current parser, keep it unresolved; never substitute a similar SRD creature.
+Do not pre-resolve random treasure.
 
 For normal play, mutate only the affected structure:
 

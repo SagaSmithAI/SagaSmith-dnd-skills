@@ -28,6 +28,8 @@ Read `../../references/mcp-contract.md` before a mutation and
   `references/MODULE_ARC.md`
 - module maps, diagrams, or missing topology:
   `../../references/module-visual-atlas.md`
+- image-only module creature cards:
+  `../../references/module-image-content-review.md`
 - user PDF/Markdown rulebook import: `../../references/rulebook-import.md`
 - catalogued core or extension character options:
   `../../references/content-catalog.md`
@@ -87,7 +89,7 @@ the campaign.
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets)`, `module_page_render` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content)`, `module_page_render`, `module_content_review` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `campaign_event`, `memory_change`, `memory_query` |
@@ -250,7 +252,11 @@ list; reinforcements must not be. Treat missing cards, 0 HP/Dead actors, and
 unresolved executable rules as blockers. Surface manual rulings without silently
 marking them resolved. When an exact imported rule source contains the creature,
 create it in lobby with `character_create_from(mode="statblock")`; never substitute
-a similar creature when the named statblock is unavailable or unsupported.
+a similar creature when the named statblock is unavailable or unsupported. When
+the exact card is visible only on a module PDF page, follow
+`../../references/module-image-content-review.md` and use
+`character_create_from(mode="module_statblock")` only after the reviewed record
+validates. Never create or repair a required actor after combat begins.
 
 End an encounter with a structured `combat_end.outcome`: `status` is one of
 `victory`, `defeat`, `withdrawal`, `truce`, or `interrupted`, and `summary`

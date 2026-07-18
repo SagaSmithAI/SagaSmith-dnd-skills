@@ -42,6 +42,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `module-visual-atlas.md`: `module_query(view="assets")` ->
    `module_page_render` -> visual inspection ->
    `module_set_progress(spatial_review=...)`. Never infer an edge from room order.
+   If an appendix statblock is image-only, use `module-image-content-review.md`:
+   render and inspect the page, submit `module_content_review`, re-read the
+   immutable evidence, then use `character_create_from(mode="module_statblock")`.
 5. Set scoped progress with `module_set_progress`, including
    `current_location_key` and `state.location_scene_id` when the spatial room is a
    separate scene. Never merge narrative text merely because two scenes refer to
@@ -52,9 +55,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `campaign_change(action="clock_advance")`; it updates the branch-local clock
    and timed effects atomically.
 7. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
-   PCs and `mode="direct"`, `mode="template"`, or `mode="statblock"` for NPCs and
-   monsters. Statblock mode must cite an imported exact source; unsupported or
-   absent creatures remain unresolved instead of being replaced by a similar one.
+   PCs and `mode="direct"`, `mode="template"`, `mode="statblock"`, or
+   `mode="module_statblock"` for NPCs and monsters. Either statblock mode must
+   cite exact imported evidence; unsupported or absent creatures remain unresolved
+   instead of being replaced by a similar one.
 8. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
 9. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.

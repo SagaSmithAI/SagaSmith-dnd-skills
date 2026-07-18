@@ -24,5 +24,12 @@ Follow `../../../references/module-visual-atlas.md`: query managed assets, rende
 and inspect the page, then use the validated `spatial_review` path. A review-only
 write may omit `status` and `progress` so their current values remain unchanged.
 
+If the scene text names a creature but its appendix card is missing because the
+PDF stored it as an image, follow
+`../../../references/module-image-content-review.md`. Render and inspect the
+managed page, validate an immutable `module_content_review`, then create exact
+actors from its review id in lobby. Do not substitute another creature or create
+the missing card after combat starts.
+
 When leaving a scene, write it as `completed` with progress `100`, then set the
 next scene to `current`. Record a snapshot before chapter transitions.
