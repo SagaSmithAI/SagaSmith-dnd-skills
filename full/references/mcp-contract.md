@@ -297,6 +297,20 @@ triggers, and narrative consequences remain explicit DM choices through
 Help, Hide, Search, Influence, Study, Utilize/Use an Object, and non-spell Ready
 without inventing their narrative result;
 `combat_reactions` exposes an eligible actor's pending reaction windows.
+For a scene-defined skill use that consumes an action, `combat_check` accepts the
+skill name as `ability` and one matching `action` payment. A 2014 improvised
+action uses `action="improvise"`. The server derives the named skill from the
+actor card and rejects caller-supplied proficiency or bonus values. The check
+and action payment commit together even when the check fails.
+
+`combat_join` queues an existing canonical campaign actor as a reinforcement for
+the next round. The queued actor remains outside `combatants` until the round
+boundary, is omitted from player combat views, and cannot act, be targeted, or
+participate in reaction geometry early. At the boundary it is inserted by
+initiative without changing the actor whose turn was already in progress.
+Joining initiative ties require an explicit `tie_breaker`. Create likely scene
+participants and their source-bound cards during lobby import, not during an
+active encounter.
 Medicine stabilization is not a generic narrative check. Call
 `combat_check(kind="stabilize", ability="wisdom", target_id=...)`; the server
 requires the acting turn, recorded adjacency within 5 feet, and a living target

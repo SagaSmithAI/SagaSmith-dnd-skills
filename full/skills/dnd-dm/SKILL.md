@@ -90,7 +90,7 @@ the campaign.
 | World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
 | Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo`, `campaign_advance_effects` |
-| Combat | `combat_start`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_stand`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_action_trigger`, `combat_readied_action_resolve`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_map_patch`, `combat_end` |
+| Combat | `combat_start`, `combat_join`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_stand`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_action_trigger`, `combat_readied_action_resolve`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_map_patch`, `combat_end` |
 | DM choices | `combat_choice_open`, `combat_choice_resolve` |
 
 ## Actor Cards and Party State
@@ -204,6 +204,25 @@ Prone; on failure it spends the action without changing the target. Do not patch
 conditions or death saves by hand. Use Spare the Dying only when that exact
 source spell is present and castable on the actor card; never grant it merely
 because stabilization is needed.
+
+When an imported scene allows an action-bound social or investigative check,
+pass the skill name as `ability` and the action payment in the same
+`combat_check` transaction. For example, the Elfsong Tavern bribe is
+`combat_check(kind="check", ability="persuasion", action="improvise", dc=15)`
+(or `ability="deception"` when the offered reward is insufficient). The engine
+derives the complete skill modifier from the actor card and spends the main
+action whether the check succeeds or fails; do not pass `proficient` or `bonus`
+for a named skill. Advantage from an offer of at least 10 gp is a verified scene
+fact and may be supplied only when the actual offer meets that threshold.
+
+If that check succeeds and the chosen NPC already has a canonical campaign actor
+card, call `combat_join` with its explicit position, disposition, initiative (or
+let the engine roll), and a `tie_breaker` whenever its initiative ties another
+participant. The actor is stored under `reinforcements`, cannot act, be targeted,
+or trigger reactions during the current round, and is inserted into initiative
+only when the next round starts. Do not patch the combatant list, create a
+mid-combat placeholder card, or queue the NPC after a failed check. Establish
+potential participant cards during lobby/module preparation.
 
 Preserve the source spell card's canonical casting time during import. Standard
 cards commonly use `1 action`, `1 bonus action`, or `1 reaction, ...`; do not
