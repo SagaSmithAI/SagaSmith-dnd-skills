@@ -104,6 +104,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
 8. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
    to wait, call `character_state_change(action="stable_recovery")`; the engine
    rolls the `1d4`-hour delay and restores 1 HP. Do not patch HP or supply the roll.
+   When conscious and above 0 HP, clear the retained Prone condition only with
+   `character_state_change(action="stand")`.
 
 ## Feature settlement examples
 

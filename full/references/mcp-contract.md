@@ -112,7 +112,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors or reusable library | `character_query(get/list/library)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/stable_recovery)` |
+| Wallet, spell, effects, resources | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -513,7 +513,10 @@ wait for the automatic recovery, call
 `character_state_change(action="stable_recovery")`. The engine rolls `1d4` hours,
 restores exactly 1 HP, clears Stable and Unconscious, preserves unrelated
 conditions such as Prone, and stores the Core rule receipt atomically. Do not
-manually set HP or choose the recovery duration.
+manually set HP or choose the recovery duration. A recovered, conscious actor
+above 0 HP may then use `character_state_change(action="stand")`; this narrowly
+clears Prone under the Core movement boundary and does not permit arbitrary
+condition edits.
 
 Except for source-bound spell workflows such as Core Magic Missile,
 `character_action(action="cast_spell")` and `combat_cast_spell` settle only timing, casting

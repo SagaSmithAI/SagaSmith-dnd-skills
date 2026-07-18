@@ -226,7 +226,9 @@ A Stable creature at 0 HP cannot take a short or long rest. If the established
 scene permits waiting, call `character_state_change(action="stable_recovery")`.
 The engine rolls the source-required `1d4` hours, restores exactly 1 HP, clears
 Stable and Unconscious, and keeps unrelated conditions such as Prone. Never patch
-HP or choose the duration yourself.
+HP or choose the duration yourself. Once that actor is conscious and above 0 HP,
+use the restricted `character_state_change(action="stand")` to clear Prone; do
+not replace the whole sheet or expose arbitrary condition deletion.
 
 Before combat, call `module_query(view="readiness")` with source-grounded groups
 for required combatants, reinforcements, and optional actors. Each group includes
