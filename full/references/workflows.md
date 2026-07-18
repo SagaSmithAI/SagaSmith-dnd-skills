@@ -38,6 +38,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    explicit-evidence spatial connections, and parser warnings. Never treat room
    heading order as connectivity; an empty `spatial.connections` list means the
    parser found no source-backed topology.
+   If a PDF map contains required topology, use
+   `module-visual-atlas.md`: `module_query(view="assets")` ->
+   `module_page_render` -> visual inspection ->
+   `module_set_progress(spatial_review=...)`. Never infer an edge from room order.
 5. Set scoped progress with `module_set_progress`, including
    `current_location_key` and `state.location_scene_id` when the spatial room is a
    separate scene. Never merge narrative text merely because two scenes refer to

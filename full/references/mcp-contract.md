@@ -15,7 +15,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Rules | `rule_import(stage/inspect/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/explain/receipts)`, `character_content_apply` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress)`, `module_search`, `module_expand`, `module_set_progress` |
+| Scene play | `module_query(list/index/scene/current/progress/assets)`, `module_page_render`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `campaign_event(add/list)`, `memory_change`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout)` |
 | Audit | `state_revision(history/undo/redo)` |
@@ -64,6 +64,18 @@ When the location lives in another scene, also persist its exact scene id as
 `state.location_scene_id`. A later combat start resolves that recorded scene
 first and fails if it is cross-module or does not contain the recorded key; it
 must not silently select a different duplicate key elsewhere in the module.
+
+For visual evidence, an owner/DM calls `module_query(view="assets")`, then
+`module_page_render` for one page of the imported PDF. The tool returns an MCP
+image and registers a content-addressed derived asset. After inspecting that
+image, submit only observed edges through `module_set_progress.spatial_review`.
+Core validates same-module unique endpoints, the PDF/rendered asset and page,
+connection kind, reviewer, and active branch. Returned edges carry
+`confidence="reviewed_image"` plus the asset checksum, page, reviewer, and branch
+id. The review lives in scoped scene progress, so snapshots and branch checkout
+restore it without mutating immutable imported metadata. A review-only write may
+omit `status` and `progress`; existing values are preserved. See
+`module-visual-atlas.md` for the full sequence and schema.
 
 In `lobby`, run `module_import` in strict order: `stage` -> `inspect` ->
 `validate` -> `ingest` -> `activate`. `stage` accepts either generated

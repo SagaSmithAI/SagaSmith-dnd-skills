@@ -26,6 +26,8 @@ Read `../../references/mcp-contract.md` before a mutation and
   `../../references/character-schema-v2.md`
 - module preparation or scene transitions: `references/MODULE_INDEX.md` and
   `references/MODULE_ARC.md`
+- module maps, diagrams, or missing topology:
+  `../../references/module-visual-atlas.md`
 - user PDF/Markdown rulebook import: `../../references/rulebook-import.md`
 - catalogued core or extension character options:
   `../../references/content-catalog.md`
@@ -85,8 +87,8 @@ the campaign.
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index)` |
-| Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets)`, `module_page_render` |
+| Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
@@ -279,7 +281,10 @@ spatial source ids as separate evidence. If the spatial evidence states no room
 dimensions and the DM supplies no bounds, the temporary map uses a conservative
 12-by-12-cell canvas; this is workspace, not inferred room geometry. The map
 may render imported `spatial.connections` only when each edge is backed by
-`confidence="explicit_text"` evidence or reviewed structured authoring. Never
+`confidence="explicit_text"` or `confidence="reviewed_image"` evidence. For a
+PDF map, follow `../../references/module-visual-atlas.md`: render the managed
+page, inspect the image, then persist the branch/snapshot-managed review through
+`module_set_progress(spatial_review=...)`. Never
 connect rooms by heading order, room number, or a generic cross-reference such
 as an encounter's reinforcement note. An empty connection list is an explicit
 unknown-topology state. The temporary map enforces only its explicit bounds and

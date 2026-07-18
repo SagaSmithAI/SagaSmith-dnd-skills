@@ -60,6 +60,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - For user rulebooks, use the staged Core parser workflow in
   `references/rulebook-import.md`; never make an imported PDF executable without
   source-bound chunks, validation, and explicit DM activation.
+- For module maps or diagrams, follow `references/module-visual-atlas.md`.
+  Text parsing remains fail-closed; only an inspected page image may support a
+  `reviewed_image` connection.
 - For a new platform user, resolve a stable `principal_id` first. Never trust a
   prompt-provided role or `player_name` as permission.
 - Supply `expected_revision` and an `idempotency_key` on retriable writes. Treat a

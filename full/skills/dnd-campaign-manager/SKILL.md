@@ -50,6 +50,11 @@ replaces the earlier exposure, so discard every older exposure id.
    when it carries explicit source evidence (for example, prose stating that a
    stair leads from D4 to D5); an empty connection list means topology is still
    unknown, not that the listed rooms are isolated or sequentially adjacent.
+   When a PDF map carries the missing topology, follow
+   `../../references/module-visual-atlas.md`: list managed assets, render and
+   inspect the exact page, then submit only visually observed edges through
+   `module_set_progress(spatial_review=...)`. The returned review is scoped,
+   branch-aware, and snapshot-restorable; do not edit immutable import metadata.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_query(view="scene")` has been called. If an

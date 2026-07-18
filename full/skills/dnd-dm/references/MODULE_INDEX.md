@@ -19,5 +19,10 @@ party current scene until its own `module_set_progress` call establishes a separ
 progress record. Update progress with the complete merged `state`, `current_room`,
 status, and percent; do not reveal rooms or facts outside that scope.
 
+If topology exists only in a PDF map or diagram, do not manufacture edges here.
+Follow `../../../references/module-visual-atlas.md`: query managed assets, render
+and inspect the page, then use the validated `spatial_review` path. A review-only
+write may omit `status` and `progress` so their current values remain unchanged.
+
 When leaving a scene, write it as `completed` with progress `100`, then set the
 next scene to `current`. Record a snapshot before chapter transitions.
