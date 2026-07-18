@@ -15,10 +15,10 @@ Chroma、artifact 文件或本地 D&D CLI。
 ## 身份与权限
 
 - 每次平台用户映射到稳定 `principal_id`。
-- `campaign_member_grant` 管理 owner、DM、player、observer。
-- `actor_grant` 管理某个 PC/NPC 的 control 和 private view 权限。
+- `access_grant(scope="campaign")` 管理 owner、DM、player、observer。
+- `access_grant(scope="actor")` 管理某个 PC/NPC 的 control 和 private view 权限。
 - `player_name` 只是角色卡字段，不是授权依据。
-- 玩家读取使用 `continuity_context`、`module_read_scene` 等带 principal 的过滤接口。
+- 玩家读取使用 `continuity_context`、`module_query(view="scene")` 等带 principal 的过滤接口。
 
 ## 写入合同
 
@@ -32,7 +32,7 @@ Chroma、artifact 文件或本地 D&D CLI。
 
 - fresh MCP storage 使用 `rule_seed_status` / `rule_seed_bundled` 初始化 bundled SRD。
 - 规则查询严格使用 `rule_search` → `rule_expand`。
-- 模组生成严格使用 `module_write` → `module_inspect` → `module_import`。
+- 模组导入严格使用 `module_import(stage → inspect → validate → ingest → activate)`。
 - `module_search` 只用于候选选择；叙事前必须通过 scene/chunk 读取。
 - scene visibility 使用 `public`、`party`、`keeper`，keeper 内容由服务端过滤。
 

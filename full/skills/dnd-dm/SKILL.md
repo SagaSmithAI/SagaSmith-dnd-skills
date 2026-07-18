@@ -50,20 +50,21 @@ the campaign.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
-5. Imported rulebook text is evidence, not executable mechanics. In `lobby`,
-   use `rule_document_stage` -> `rule_document_inspect` ->
-   `rule_document_import`, then search/expand the exact source. Draft imported
-   mechanics with `rule_pack_draft_from_source`, install it inactive, show the DM its report,
-   and enable an exact version only with explicit DM approval. Never change the
+5. Imported rulebook text is evidence, not executable mechanics. In `lobby`, use
+   `rule_import` in order: `stage` -> `inspect` -> `ingest` ->
+   `extract_candidates` -> `review` -> `compile` -> `install` -> `activate`, then
+   search/expand the exact source. Compile a separate source-bound mechanic with
+   `rule_pack_compile(action="from_source")` only after review, install it inactive,
+   show the DM its report, and enable an exact version only with explicit DM approval. Never change the
    lock during combat or silently substitute a missing version.
-   `campaign_rules_explain` must also show the locked `dnd5e.core.2014` or
+   `campaign_rules(action="explain")` must also show the locked `dnd5e.core.2014` or
    `dnd5e.core.2024` provider; treat a missing or mismatched core fingerprint as
    a hard stop, not permission to bypass the existing engine boundaries.
    For an imported module PDF, also require every preview scene to carry a valid
    source page range. A parser profile/version change is a new normalized module
    revision even if the PDF checksum is unchanged; rerun the full staged import
    lifecycle and review the resulting index before play.
-6. For character options, call `content_catalog_list` and present only entries
+6. For character options, call `rule_pack_query(view="content_catalog")` and present only entries
    available to the campaign's locked Core edition and enabled branch packs.
    Apply only a returned id through `character_content_apply`; respect a
    `pending_ruling` response for unresolved prerequisites or effects. Supply
@@ -74,56 +75,53 @@ the campaign.
    usable shortcut. Never patch the raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
 8. Persist events, scene progress, actor/party state, and durable facts. Use
-   `actor_knowledge_*` for what one PC/NPC believes, not `memory_*`.
+   `actor_knowledge_change/query` for what one PC/NPC believes, not world memory.
 9. Call `snapshot_create` at decision points, chapter transitions, and before a
-   dangerous restore. Use `snapshot_verify` and `snapshot_lineage` before restore.
+    dangerous restore. Use `snapshot_query(view="verify" | "lineage")` before restore.
 
 ## MCP Tool Reference
 
 | Workflow | MCP tools |
 |---|---|
-| Campaign | `campaign_create`, `campaign_get`, `campaign_list` |
-| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `content_catalog_list`, `character_content_apply`, `character_rule_artifact_add` |
+| Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
+| Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
 | Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index)` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
-| World continuity | `event_add`, `event_list`, `memory_add`, `memory_search` |
-| Actor continuity | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search`, `continuity_context` |
-| Saves and audit | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `state_history`, `state_undo`, `state_redo`, `campaign_advance_effects` |
-| Combat | `combat_start`, `combat_join`, `combat_status`, `combat_available_actions`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_move`, `combat_stand`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready_spell`, `combat_readied_action_trigger`, `combat_readied_action_resolve`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`, `combat_reactions`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_apply_damage`, `combat_heal`, `combat_map_patch`, `combat_end` |
-| DM choices | `combat_choice_open`, `combat_choice_resolve` |
+| World continuity | `campaign_event`, `memory_change`, `memory_query` |
+| Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
+| Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision`, `campaign_advance_effects` |
+| Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
+| DM choices | `combat_choice(open/resolve/resolve_defense)` |
 
 ## Actor Cards and Party State
 
 Every live PC, NPC, and monster is an authoritative v2 actor card. Use
-`character_get` after every write. Use granular tools instead of replacing a whole
+`character_query(view="get")` after every write. Use granular facade tools instead of replacing a whole
 sheet for a small change:
 
 ```text
-character_inventory_add | character_inventory_update | character_inventory_remove
-character_inventory_transfer | character_inventory_equip | character_ammunition_consume
-character_wallet_adjust | character_spell_prepare | character_spell_prepare_list | character_effect_add
-character_effect_remove | character_resource_set | character_memory_add
-character_memory_resolve | character_ability_apply | character_rest | character_cast_spell | character_use_activity
-party_show | party_inventory_add | party_inventory_remove | party_inventory_transfer
-party_wallet_adjust | party_wallet_transfer
+inventory_change | inventory_transfer | wallet_change
+character_spell_prepare | character_state_change | character_action
+character_metadata_update | character_content_apply | character_ability_apply
+campaign_query(view="party")
 ```
 
-Use `character_build` for a PC when a library template and its first campaign
+Use `character_create_from(mode="build")` for a PC when a library template and its first campaign
 instance must be created atomically. Always supply a stable idempotency key so a
-transport retry replays that same pair. Use `character_library_list` and
-`character_instantiate` for existing templates. `character_memory_*` stays a legacy
-notes field; new subjective information belongs in the actor-knowledge ledger.
+transport retry replays that same pair. Use `character_query(view="library")` and
+`character_create_from(mode="template")` for existing templates. New subjective
+information belongs in the actor-knowledge ledger.
 
-After item writes, treat `character_get(...).derived.inventory.weapon_attacks` and
-`character_get(...).derived.inventory.encumbrance` as authoritative. Represent one
+After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
+`character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one
 active concentration spell as one active effect with `concentration: true` and its
 `source_spell_id`.
 
 During lobby setup or level advancement, submit the complete level 1+ prepared list
-through `character_spell_prepare_list`; use the singular prepare tool only for a
+through `character_spell_prepare(mode="replace_all")`; use `mode="set"` only for a
 setup edit. During live play, a prepared-list change must be part of
-`character_rest(..., rest_type="long_rest", prepared_spell_ids=[...])`. Do not
+`character_state_change(action="rest", rest_type="long_rest", prepared_spell_ids=[...])`. Do not
 simulate a long rest by repeated toggles. The runtime enforces 2014/2024 class
 timing and replacement count, class-level spell eligibility, Wizard spellbook
 membership, always-prepared and cantrip exclusions, and multiclass
@@ -224,6 +222,16 @@ only when the next round starts. Do not patch the combatant list, create a
 mid-combat placeholder card, or queue the NPC after a failed check. Establish
 potential participant cards during lobby/module preparation.
 
+Before combat, call `module_query(view="readiness")` with source-grounded groups
+for required combatants, reinforcements, and optional actors. Each group includes
+canonical campaign actor ids, a same-module `source_scene_id`, and an exact
+normalized `source_excerpt`. Required combatants must be in the initial participant
+list; reinforcements must not be. Treat missing cards, 0 HP/Dead actors, and
+unresolved executable rules as blockers. Surface manual rulings without silently
+marking them resolved. When an exact imported rule source contains the creature,
+create it in lobby with `character_create_from(mode="statblock")`; never substitute
+a similar creature when the named statblock is unavailable or unsupported.
+
 End an encounter with a structured `combat_end.outcome`: `status` is one of
 `victory`, `defeat`, `withdrawal`, `truce`, or `interrupted`, and `summary`
 states the scene-supported reason and immediate public result. Do not close a
@@ -260,15 +268,16 @@ overrides, checksums, and world patches; do not disclose those fields from a DM
 read or an earlier tool result.
 A grid move that leaves an eligible
 hostile's recorded reach opens an owned opportunity window; read it through
-`combat_reactions`, decline it with `combat_choice_resolve`, or settle it
+`combat_query(view="reactions")`, decline it with
+`combat_choice(action="resolve")`, or settle it
 atomically with `combat_reaction_attack`. Do not claim map collision, terrain,
 forced movement, line of sight, or a trigger not represented in encounter state.
-Use `combat_move.path` for bent grid routes. Set `movement_mode` to `forced` or
+Use `combat_movement(action="move")` with `payload.path` for bent grid routes. Set `movement_mode` to `forced` or
 `teleport` when the scene establishes that the move does not provoke a normal
 opportunity attack; do not encode terrain cost or collision unless it is part of
 the supplied scene facts.
-If Prone, either use `combat_stand` (half speed, no action) or use
-`combat_move(..., crawl=true)`; crawling costs double movement.
+If Prone, either use `combat_movement(action="stand")` (half speed, no action) or
+use `combat_movement(action="move", payload.crawl=true)`; crawling costs double movement.
 
 Every campaign, character, party, combat, rest, continuity, branch, snapshot,
 scene-progress, and actor-knowledge mutation must carry the current optimistic
@@ -279,7 +288,7 @@ Re-read the relevant state after a conflict; never retry a changed payload under
 the same key. Shared wallet and
 inventory adjustments are campaign writes and follow the same contract.
 
-Use `combat_use_activity` or `character_use_activity` for cards in
+Use `combat_use_activity` or `character_action(action="use_activity")` for cards in
 `content.activities`, `features`, or `feats`. These tools pay a recorded use or
 resource and the activation timing, then return `pending_ruling` when the card
 has choices; they never infer a result from prose.
@@ -287,11 +296,11 @@ has choices; they never infer a result from prose.
 Reaction spells and activities require an owned pending reaction window. Do not
 call them solely because it is another actor's turn. Do not hide a spell inside
 the generic Ready payload. For a spell with an Action casting time, call
-`combat_ready_spell`: it pays the action and spell slot or other casting resource
+`combat_ready(action="ready_spell")`: it pays the action and spell slot or other casting resource
 immediately, replaces any existing concentration, and arms one perceivable
 trigger until the start of the caster's next turn. The DM confirms that the
-trigger occurred with `combat_readied_spell_trigger`. The caster then uses
-`combat_readied_spell_resolve` to release the spell with its reaction or decline
+trigger occurred with `combat_ready(action="trigger_spell")`. The caster then uses
+`combat_ready(action="resolve_spell")` to release the spell with its reaction or decline
 that occurrence without spending the reaction; declining leaves the spell armed.
 Losing concentration, reaching the caster's next turn, or ending combat makes the
 held spell dissipate without effect. A released spell returns `pending_ruling`:

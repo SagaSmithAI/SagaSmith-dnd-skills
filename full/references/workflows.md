@@ -1,89 +1,147 @@
 # Runtime Workflows
 
 Full Runtime uses the `sagasmith_dnd` MCP server. See `mcp-contract.md` for the
-complete operation mapping.
+complete public facade and mutation contract. Never call an internal/retired tool
+name copied from an old prompt.
 
-## Session start
+## Exposure and session start
 
-1. `storage_status`, then `campaign_list` and `campaign_get`.
-2. Call `module_current` for the acting scope and `module_read_scene` if one exists.
-3. Read recent `event_list`, use `continuity_context` for the acting actor, then
-   refresh `party_show` and relevant `character_get` cards.
+1. Call `storage_status`, then `campaign_query(view="list")` and select a campaign.
+2. Call `exposure_open(campaign_id, principal_id)`. Its phase is authoritative.
+3. Call `exposure_search` and `exposure_inspect`, then load only the groups needed
+   for this step with `exposure_load`.
+4. A native dynamic client refreshes `tools/list`. A client that cannot refresh
+   calls the loaded domain tool with `exposure_call`; consume its structured result
+   exactly like a native call.
+5. In `play`, read `module_query(view="current")`, expand the exact scene with
+   `module_query(view="scene")`, read recent `campaign_event(action="list")`, and
+   call `continuity_context` separately for each acting PC or NPC.
+6. Refresh `campaign_query(view="party")` and relevant
+   `character_query(view="get")` cards. Never carry a card or revision across a
+   write, phase transition, branch checkout, or restore.
 
-## New campaign
+An exposure belongs to one MCP session and principal. Every other Agent opens its
+own exposure. Loading a group for one Agent must not expose it to another.
 
-1. `campaign_create`.
-2. `module_write` → `module_inspect` → `module_import` → `module_index`.
-3. `character_build` for each confirmed PC; use `character_create` or
-   `character_instantiate` for NPCs and monsters.
-4. Run the character completeness gate from `content-catalog.md`: apply every
-   eligible class/subclass feature and the complete species/subspecies card,
-   then re-read each character and inspect derived values and unresolved rules.
-5. Record the opening `event_add` and `snapshot_create`.
+## New campaign and module PDF
 
-## Combat feature settlement
+1. Without a campaign, open an exposure and load `lobby.bootstrap`; call
+   `campaign_create`, then reopen the exposure with the new campaign id.
+2. Lock the correct Core edition with `campaign_rules`. Do not silently use a
+   different edition or optional publication.
+3. Load `lobby.modules`. For a user PDF call `module_import` in this exact order:
+   `stage` -> `inspect` -> `validate` -> `ingest` -> `activate`. Keep the same
+   `job_id`; use a stable, stage-specific idempotency key for each write.
+4. Review `module_query(view="index")`. Search only selects candidates; expand the
+   chosen scene before using its facts. Verify scene boundaries, keeper/public
+   visibility, encounter participants, exact source excerpts, spatial locations,
+   and parser warnings.
+5. Set scoped progress with `module_set_progress`, including
+   `current_location_key` and `state.location_scene_id` when the spatial room is a
+   separate scene. Never merge narrative text merely because two scenes refer to
+   the same encounter.
+6. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
+   PCs and `mode="direct"`, `mode="template"`, or `mode="statblock"` for NPCs and
+   monsters. Statblock mode must cite an imported exact source; unsupported or
+   absent creatures remain unresolved instead of being replaced by a similar one.
+7. Apply every confirmed class/subclass feature and complete species/background
+   card, then re-read each actor's `derived` values and unresolved rules.
+8. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
+9. Record the opening with `campaign_event(action="add")`, persist objective facts
+   with `memory_change`, and call `snapshot_create`.
 
-1. Read the current actor card and `combat_available_actions`; never infer a
-   feature from the class name alone.
-2. For an attack that should use 2014 Sneak Attack, declare
-   `use_sneak_attack: true` in `combat_preflight_attack` and
-   `combat_resolve_attack`. Let the engine validate eligibility and persist the
-   once-per-turn token.
-3. For Second Wind, call `combat_use_activity` to pay its bonus action and use,
-   roll the source-stated `1d10 + fighter level`, then call
-   `combat_hp_change(action=heal)` with that result. Do not heal first or
-   manually decrement the card afterward.
-4. For healing from a levelled spell, send its rolled base `amount` plus
-   `source_actor_id`, `spell_id`, and actual `spell_level` in the healing payload.
-   Do not pre-add Disciple of Life; the engine validates and audits that modifier.
-5. Halfling Lucky requires no extra write. Preserve the returned `rerolls`
-   evidence in the combat audit and narrate only the final selected d20.
-6. For a statblock Multiattack, read `derived.multiattack_options`, select one
-   source-legal option, and send its `multiattack_option_id` on the first attack.
-   Subsequent calls must consume only that option's remaining weapon/mode entries.
-   Pass `attack_mode: ranged` when throwing a melee weapon; never model
-   Multiattack as an unrestricted `attacks_per_action` count.
-7. If an attack pauses with `status: pending_reaction`, read the target's
-   `combat_query(view="reactions")` result. Resolve the exact window through
-   `combat_choice(action="resolve_defense")` with a listed activity id or
-   `decline`. Do not roll damage until that call returns; a used defense spends
-   the target's Reaction and re-evaluates the already stored attack roll.
+## Scene readiness and temporary combat map
 
-## Rule question
+1. Build a source-grounded participant manifest from the expanded encounter scene.
+   Each group has a stable key, role (`combatant`, `reinforcement`, or `optional`),
+   required count, canonical campaign actor ids, same-module `source_scene_id`, and
+   an exact normalized `source_excerpt`.
+2. Call `module_query(view="readiness")`. Do not start while a required actor is
+   missing, Dead/at 0 HP, lacks an executable card, or carries unresolved required
+   rules. Review surfaced manual rulings rather than hiding them.
+3. Required `combatant` actors go into initial `participant_ids`.
+   `reinforcement` actors must stay out and join later through `combat_join`.
+4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
+   combat map from the recorded spatial scene and location. If it falls back to a
+   12-by-12 canvas, do not narrate those dimensions as module-authored facts.
+5. After `combat_start`, reopen exposure. The server phase is now `combat`; load
+   only `combat.observe`, `combat.turn`, `combat.actions`, `combat.save`, or
+   `combat.map` as needed.
 
-1. `rule_search` with edition and locale.
-2. Select a result, then `rule_expand`.
-3. Answer with source metadata rather than unverified recollection.
+## Combat turn loop
 
-## User rulebook to executable optional pack
+1. Read `combat_query(view="status")` and
+   `combat_query(view="available_actions", actor_id=...)`. Use the returned current
+   actor, revision, budgets, conditions, positions, and derived attacks.
+2. For every attack, use `combat_preflight_attack` immediately before
+   `combat_resolve_attack`. Never supply replacement attack bonuses or damage
+   formulas. For a source statblock Multiattack, select one
+   `derived.multiattack_options` id on the first attack and consume only its
+   remaining source-defined entries.
+3. When an attack returns `pending_reaction`, read the target's
+   `combat_query(view="reactions")`, then use
+   `combat_choice(action="resolve_defense")`. Do not roll or apply damage twice.
+4. Resolve movement with `combat_movement`, checks with `combat_check`, common
+   actions with `combat_common_action`, spells with `combat_cast_spell`, activities
+   with `combat_use_activity`, and damage/healing with `combat_hp_change`.
+5. A source offer such as “10 gp grants advantage on DC 15 Persuasion” requires
+   the stated payment/offer fact and
+   `combat_check(action="improvise", ability="persuasion", dc=15)`. Only on success
+   call `combat_join`; the canonical reinforcement appears at the next round
+   boundary with a full turn.
+6. End each completed turn with `combat_end_turn`, using the latest revision and a
+   fresh idempotency key. Refresh status after every write.
+7. Call `combat_end` with a structured outcome only when the encounter is actually
+   over. Do not end while a death-save participant is still Dying. The server
+   returns the campaign to `play`; reopen exposure before further play writes.
 
-1. Read `rulebook-import.md`, then stage and inspect with
-   `rule_document_stage` and `rule_document_inspect`.
-2. Import through `rule_document_import`; use `rule_search` and `rule_expand` to
-   select evidence from its exact `source_id`.
-3. Translate the reviewed boundary into safe IR and call
-   `rule_pack_draft_from_source` with imported chunk ids.
-4. Test, inspect, install inactive, and obtain explicit DM approval before
-   `campaign_rule_pack_set`.
-5. Settle a non-combat check with `character_check` or a combat check with
-   `combat_check`, then audit `campaign_rule_receipts`.
+## Feature settlement examples
 
-## Restore
+- For 2014 Sneak Attack, declare `use_sneak_attack: true` in preflight and resolve;
+  let the engine validate eligibility and its once-per-turn token.
+- For Second Wind, call `combat_use_activity` to pay its bonus action and use, roll
+  the source formula, then call `combat_hp_change(action="heal")` with that result.
+- For healing from a levelled spell, send rolled base `amount`, `source_actor_id`,
+  `spell_id`, and actual `spell_level`; do not pre-add source-linked modifiers.
+- Halfling Lucky needs no extra write. Preserve returned reroll evidence and
+  narrate only the selected final d20.
 
-1. `snapshot_verify`, then `snapshot_lineage`.
-2. Explain that `snapshot_restore` forks history.
-3. Refresh actors, `party_show`, `module_current`, `event_list`, and
-   `continuity_context`; discard pre-restore assumptions.
+## Rulebook to executable optional pack
 
-## Session close
+1. Load `lobby.rules`; run `rule_import` in order:
+   `stage` -> `inspect` -> `ingest` -> `extract_candidates` -> `review` ->
+   `compile` -> `install` -> `activate`.
+2. Review exact imported chunks and provenance. Candidate extraction is not
+   approval; unsupported content remains pending.
+3. Compile only safe declarative IR through `rule_pack_compile` when a separate
+   reviewed mechanic is needed. Arbitrary code is never executable rule content.
+4. Use `rule_pack_query(view="test")` and inspect the installed inactive pack.
+   Activation requires explicit DM approval and a fresh campaign revision.
+5. Settle checks with `character_check` in play or `combat_check` in combat, then
+   audit `campaign_rules(action="receipts")`.
 
-1. Reconcile actor and party state with granular MCP tools.
-2. Append `event_add`, `memory_add`, and actor knowledge as appropriate.
-3. `snapshot_create`; use `snapshot_regenerate_recap` when needed.
+## Post-scene continuity and save
 
-## Audit recovery
+1. Persist the structured `combat_end` outcome as a `campaign_event`.
+2. Use `audience_scope="actor"`, `known_by_actor_ids`, and
+   `knowledge_disclosure_scope="owner"` for a witnessed subset. Use `party` only
+   when every party actor may know the event.
+3. Persist objective world facts with `memory_change`. Persist each PC/NPC's
+   subjective belief, secret, inference, or misinformation separately with
+   `actor_knowledge_change`.
+4. Call `snapshot_create` with the current campaign revision, branch id, and head
+   snapshot id. The restorable payload is full; the recap is the delta.
+5. Verify with `snapshot_query(view="verify")` and inspect
+   `snapshot_query(view="lineage")`.
 
-- `state_history` inspects audited mutations.
-- `state_undo` and `state_redo` change audited state without deleting snapshots.
-- `memory_list` and `branch_list` show current-branch continuity; use explicit
-  `branch_id` to inspect another timeline.
+## Restore, branches, and audit recovery
+
+1. Before restore call `snapshot_query(view="verify")` and inspect lineage.
+2. Explain that `snapshot_restore` forks history; perform it with current guards.
+3. Verify the new head, then refresh campaign, characters, party, module progress,
+   events, and each actor's continuity context. Discard pre-restore assumptions.
+4. Use `branch_query(view="compare")` before discussing alternate timelines.
+   There is no implicit merge of world facts or actor knowledge.
+5. `state_revision(action="history")` inspects audited mutation groups.
+   `state_revision(action="undo" | "redo")` uses the latest history sequence and
+   does not delete snapshots.

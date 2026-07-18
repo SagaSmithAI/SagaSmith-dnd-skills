@@ -11,6 +11,13 @@ resources, and memories only through the granular MCP tools. Resolve the caller'
 `principal_id` and use `expected_revision` plus `idempotency_key` for retriable
 writes. `player_name` is not an authorization source.
 
+The MCP owns progressive tool exposure. Start with `exposure_open`, then
+`exposure_search` / `exposure_inspect` / `exposure_load`. Use `lobby` for imports,
+campaign setup, and character building; `play` for live non-combat scenes; and the
+server-managed `combat` transition for encounters. If the Host cannot refresh
+native tools, use `exposure_call` and consume its structured result. Never expose
+all phase tools permanently or call retired internal tool names.
+
 ## First Run
 
 If `BOOTSTRAP.md` exists, that's your birth certificate. Follow it, figure out who you are, then delete it. You won't need it again.
@@ -36,7 +43,8 @@ Do not manually reread startup files unless:
 每次收到玩家消息时，如果是新的对话对话（非同一对话的连续消息），必须先执行 `SOUL.md` 中的 **会话启动协议**：
 
 1. 自我展示
-2. 使用 `dnd-campaign-manager` Skill 从数据库列出活动战役和完整 Snapshot；不要扫描工作区 `saves/`
+2. 使用 `dnd-campaign-manager` Skill，通过 `campaign_query(view="list")` 和
+   `snapshot_query(view="list")` 列出活动战役和完整 Snapshot；不要扫描工作区 `saves/`
 3. 询问玩家：载入存档 / 新开一局 / 查看列表
 4. 根据选择执行
 5. 执行规则自查后开始游戏

@@ -1,7 +1,8 @@
 ---
 name: sagasmith-dnd-suite
 description: "MCP-first D&D 5e 2014/2024 game-master and campaign workflow."
-version: 2.0.0
+metadata:
+  version: 2.0.0
 ---
 
 # SagaSmith D&D Suite
@@ -64,12 +65,12 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - Supply `expected_revision` and an `idempotency_key` on retriable writes. Treat a
   revision conflict as a fresh read/review cycle, not as permission to overwrite.
 - For rule-profile and rule-pack writes, obtain `campaign_revision` from
-  `campaign_rule_profile_get` and carry the returned revision forward one write at
+  `campaign_rules(action="get_profile")` and carry the returned revision forward one write at
   a time. Never silently relock a legacy snapshot or unavailable Core fingerprint.
 - Keep each PC/NPC's `actor_id` explicit when reading or writing ActorKnowledge;
   never merge one actor's memories into another actor's context.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use
-  `branch_compare` before explaining divergent timelines.
+  `branch_query(view="compare")` before explaining divergent timelines.
 
 See `references/mcp-contract.md` and `references/workflows.md`. The CLI contract is
 legacy compatibility documentation only.

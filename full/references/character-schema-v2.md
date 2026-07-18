@@ -1,9 +1,10 @@
 # D&D Character Schema v2
 
 Full Runtime uses MCP tools, not the CLI snippets that appear in the historical
-examples below. Use `character_create`, `character_build`, `character_get`,
-`character_sheet_replace`, and the granular inventory/wallet/effect/resource
-tools. Include `principal_id`, `expected_revision`, and `idempotency_key` on
+examples below. Use `character_create_from`, `character_query`,
+`character_sheet_replace`, and the granular `inventory_change`,
+`inventory_transfer`, `wallet_change`, `character_state_change`, and
+`character_action` facades. Include `principal_id`, `expected_revision`, and `idempotency_key` on
 retriable writes; `player_name` is descriptive and does not grant access.
 
 Runtime mode stores every PC, NPC, and monster as a `Character` record with the
@@ -15,7 +16,7 @@ not change the required sheet shape.
 - `sheet` is the authoritative mechanical state.
 - `notes` is authoritative narrative state: description, important memories,
   relationships, and goals.
-- `derived` is returned by `character show`; it is calculated from the sheet and
+- `derived` is returned by `character_query(view="get")`; it is calculated from the sheet and
   must never be edited directly.
 - `campaign.state.party.inventory` is the authoritative shared wallet and stash.
 - Every new sheet and notes document has `schema_version: 2`.
@@ -38,9 +39,9 @@ the executable mechanic definition remains in the MCP-owned immutable pack.
 
 The public character library may hold reusable PC, NPC, and monster templates.
 Any type may instead be created directly as a campaign instance. For player
-character creation, prefer `character build`: it atomically creates the public
+character creation, prefer `character_create_from(mode="build")`: it atomically creates the public
 template and an independent instance in the selected campaign. All live actors in
-the same encounter must be read with `character show` and must use the campaign's
+the same encounter must be read with `character_query(view="get")` and must use the campaign's
 edition and rules profile.
 Defaults are only placeholders while information is unknown. Once a rule source or
 published stat block supplies a value, write the structured value rather than
@@ -292,6 +293,6 @@ sagasmith-dnd party wallet deposit --campaign <id> --id <character-id> --denomin
 sagasmith-dnd party wallet withdraw --campaign <id> --id <character-id> --denomination gp --amount 5 --json
 ```
 
-Use `character update --sheet/--notes` only for a reviewed complete draft or a
+Use `character_sheet_replace` only for a reviewed complete draft or a
 deliberate full-sheet change. Never hand-edit one inventory entry, wallet balance,
 prepared spell, effect, or memory through a raw sheet replacement during play.

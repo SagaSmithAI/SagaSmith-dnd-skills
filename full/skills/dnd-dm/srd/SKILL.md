@@ -1,3 +1,8 @@
+---
+name: dnd-rule-sources
+description: "Use the bundled D&D 5e 2014/2024 SRD corpora through the reviewed SagaSmith MCP rule-import and retrieval workflow."
+---
+
 # D&D Rule Sources
 
 This Skill carries three optional corpora:
@@ -6,10 +11,9 @@ This Skill carries three optional corpora:
 - `references-2014-en/`: SRD 5.1 / 2014 English.
 - `references-2014-zh/`: SRD 5.1 / 2014 Chinese convenience translation.
 
-Runtime ingestion is a reviewed lobby workflow. Do not call the retired direct
-`rule_ingest` tool:
+Runtime ingestion is a reviewed lobby workflow. Do not call a retired direct
+ingestion surface:
 
-```powershell
 Call `rule_import(action="stage")` with a source path inside the configured rule
 import roots and set `source_key`, `title`, `edition`, `locale`, and
 `publication_id` (`srd-5.2.1`, `srd-5.1`, or `srd-5.1-zh`). Then call
@@ -17,7 +21,6 @@ import roots and set `source_key`, `title`, `edition`, `locale`, and
 job. Use `rule_search` and `rule_expand` during play. Candidate extraction,
 compilation, installation, and activation are only for a reviewed executable
 extension pack; ordinary SRD evidence stops after ingest.
-```
 
 The MCP's default rule-import allowlist includes this Skill's `srd/` directory
 when the Skill repository is configured. An external Host must configure the

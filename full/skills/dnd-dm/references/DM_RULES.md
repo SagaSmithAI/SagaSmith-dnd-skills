@@ -29,8 +29,8 @@
    模板可 `character instantiate` 成实例。PC 车卡使用 `character build` 创建模板和实例。
 
 准备法术列表必须按版本和职业处理。车卡或升级阶段用
-`character_spell_prepare_list` 一次提交完整列表；游戏中只能把完整
-`prepared_spell_ids` 随 `character_rest` 的长休一起原子提交，禁止连续切换单个法术来
+`character_spell_prepare(mode="replace_all")` 一次提交完整列表；游戏中只能把完整
+`prepared_spell_ids` 随 `character_state_change(action="rest")` 的长休一起原子提交，禁止连续切换单个法术来
 绕过替换数量。2024 牧师/德鲁伊/法师长休可替换任意项，圣武士/游侠只可替换一项，
 吟游诗人/术士/邪术师只在获得本职业等级时替换一项；2014 吟游诗人/游侠/术士/
 邪术师使用已知法术，不建立准备列表。始终准备的法术不占名额，戏法不进入 1 环以上
@@ -116,16 +116,16 @@ or `player_name` as permission.
 | 2014/2024 突袭差异、反应支付、每回合法术限制 | 先攻同值时玩家/DM 的最终顺序选择 |
 
 引擎只自动提交可以由规则版本、角色卡和已记录场景事实唯一确定的结果。
-其余情况先用 `combat_choice_open` 建立可审计窗口，再用
-`combat_choice_resolve` 记录 DM 决定；不得把猜测伪装成数值修正或角色卡事实。
+其余情况先用 `combat_choice(action="open")` 建立可审计窗口，再用
+`combat_choice(action="resolve")` 记录 DM 决定；不得把猜测伪装成数值修正或角色卡事实。
 Reaction spell/activity 必须消费属于该 actor 的 pending reaction window。
 通用 Ready 不接受法术 payload。准备施法必须使用以下专用流程：
 
-1. 只有施法时间为 Action 的法术可调用 `combat_ready_spell`。此时立刻支付动作与法术位/
+1. 只有施法时间为 Action 的法术可调用 `combat_ready(action="ready_spell")`。此时立刻支付动作与法术位/
    施法资源，声明角色可感知的触发条件，并立刻开始专注；该专注会结束原有专注。
 2. 触发事件是否真实发生、是否满足声明条件，由 DM 根据已知场景事实裁定，再调用
-   `combat_readied_spell_trigger` 打开该施法者独占的反应窗口。
-3. 施法者调用 `combat_readied_spell_resolve`：`release` 消耗反应并释放；`decline`
+   `combat_ready(action="trigger_spell")` 打开该施法者独占的反应窗口。
+3. 施法者调用 `combat_ready(action="resolve_spell")`：`release` 消耗反应并释放；`decline`
    不消耗反应，法术继续保持，仍可等待下次符合条件的事件。
 4. 专注中断、施法者下回合开始或战斗结束时，尚未释放的法术无效果消散。原本需要专注
    的法术在释放后恢复其正常专注时长；原本不需专注的法术结束临时保持专注。

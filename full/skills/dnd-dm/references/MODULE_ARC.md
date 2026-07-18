@@ -1,7 +1,7 @@
 # Module Arc
 
 Static module text remains external to saves. At a chapter transition, call
-`event_add` with `event_type: "chapter"`, persist scoped scene progress with
+`campaign_event(action="add")` with `event_type: "chapter"`, persist scoped scene progress with
 `module_set_progress`, then call `snapshot_create`.
 
 Restoring a snapshot forks a new branch; it never rewrites the static module source

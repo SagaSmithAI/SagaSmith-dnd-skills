@@ -11,24 +11,24 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Intent | MCP tool |
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
-| Campaign | `campaign_create`, `campaign_get`, `campaign_list`, `campaign_update`, `campaign_member_grant`, `actor_grant` |
-| Rules | `rule_document_stage`, `rule_document_inspect`, `rule_document_import`, `rule_ingest`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_draft`, `rule_pack_draft_from_source`, `rule_pack_install`, `rule_pack_list`, `rule_pack_inspect`, `rule_pack_test`, `rule_pack_remove`, `campaign_rule_profile_get`, `campaign_rule_profile_set`, `campaign_rule_pack_set`, `campaign_rule_pack_remove`, `campaign_rules_explain`, `campaign_rule_receipts`, `content_catalog_list`, `character_content_apply`, `character_rule_artifact_add` |
+| Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
+| Rules | `rule_import(stage/inspect/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/explain/receipts)`, `character_content_apply` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress)`, `module_search`, `module_expand`, `module_set_progress` |
-| Chronology | `event_add`, `event_list`, `memory_add`, `memory_list`, `memory_search` |
-| Snapshot | `snapshot_create`, `snapshot_list`, `snapshot_verify`, `snapshot_lineage`, `snapshot_restore`, `snapshot_regenerate_recap`, `branch_compare` |
-| Audit | `state_history`, `state_undo`, `state_redo` |
+| Chronology | `campaign_event(add/list)`, `memory_change`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
+| Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout)` |
+| Audit | `state_revision(history/undo/redo)` |
 
 `module_search` only selects candidates. Call `module_expand` or
 `module_query(view="scene")` before narrating a module fact. Always provide the active
-`scope_id` to `module_current` and `module_set_progress`.
+`scope_id` to `module_query(view="current")` and `module_set_progress`.
 
 ## Structured content catalog
 
 For a campaign locked to 2014, the installed `dnd5e.content.srd2014` catalog
 provides source-linked class, subclass, species, background, feat, spell, and
-item records. Use `content_catalog_list` to discover only the core edition and
+item records. Use `rule_pack_query(view="content_catalog")` to discover only the core edition and
 extension packs enabled on the current branch. Do not search an inactive pack
 and then apply its option by id. The list response includes compact
 `selection_requirements` and source citations without copying an entire rule
@@ -50,7 +50,7 @@ assigns a subclass to the first class on a multiclass card.
 ## Modules, space evidence, and temporary combat maps
 
 Module re-imports are revisions: earlier sources are retained for snapshots and
-scoped scene progress, while normal `module_index` results show only the newest
+scoped scene progress, while normal `module_query(view="index")` results show only the newest
 active revision. A D&D scene can contain conservative `spatial.locations`
 evidence recovered from room headings and stated dimensions. Set
 `current_location_key` with `module_set_progress` only when it names a location
@@ -105,24 +105,24 @@ difficult terrain, world patches, checksums, and DM overrides.
 
 | Intent | MCP tool |
 |---|---|
-| Template/library | `character_create` without `campaign_id`, `character_library_list`, `character_instantiate` |
-| Atomic PC build | `character_build` |
-| Read/replace card | `character_get`, `character_list`, `character_sheet_replace` |
-| Inventory | `character_inventory_add`, `character_inventory_update`, `character_inventory_remove`, `character_inventory_transfer`, `character_inventory_equip`, `character_ammunition_consume` |
-| Wallet, spell, effects, resources | `character_wallet_adjust`, `character_spell_prepare`, `character_spell_prepare_list`, `character_effect_add`, `character_effect_remove`, `character_resource_set` |
+| Create from direct/build/template/statblock input | `character_create_from(mode=...)` |
+| Read campaign actors or reusable library | `character_query(get/list/library)` |
+| Replace a complete reviewed card | `character_sheet_replace` |
+| Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
+| Wallet, spell, effects, resources | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
-| Legacy notes memory | `character_memory_add`, `character_memory_resolve` |
-| Shared stash/wallet | `party_show`, `party_inventory_add`, `party_inventory_remove`, `party_inventory_transfer`, `party_wallet_adjust`, `party_wallet_transfer` |
+| Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
+| Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
 
 The campaign instance is authoritative. After any actor or party mutation, read
-`character_get` or `party_show` and use returned `derived` values. Do not use
+`character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use
 `character_sheet_replace` for a one-field mutation.
 
 Prepared-spell selection is edition- and class-aware. In `lobby`, use
-`character_spell_prepare_list` with the complete selected list and `event: setup`
-or `event: level_up`; the singular `character_spell_prepare` is only a setup
-edit. In live `play`, supply the complete `prepared_spell_ids` list to
-`character_rest` so recovery and a legal long-rest replacement commit atomically.
+`character_spell_prepare(mode="replace_all")` with the complete selected list and
+`event: setup` or `event: level_up`; `mode="set"` is only a setup edit. In live
+`play`, use `character_state_change(action="rest")` and supply the complete
+`prepared_spell_ids` list so recovery and a legal long-rest replacement commit atomically.
 In 2024, Cleric/Druid/Wizard may replace any number after a Long Rest,
 Paladin/Ranger may replace one, and Bard/Sorcerer/Warlock replace one only when
 gaining a class level. In 2014, Cleric/Druid/Paladin/Wizard may change their list
@@ -137,15 +137,34 @@ World facts, chronology, and subjective actor knowledge are different ledgers.
 
 | Ledger | MCP tool |
 |---|---|
-| Branches | `branch_list`, `branch_create`, `branch_checkout` |
-| World facts | `memory_add`, `memory_list`, `memory_search` |
-| Events | `event_add`, `event_list` |
-| One actor's belief/knowledge | `actor_knowledge_add`, `actor_knowledge_revise`, `actor_knowledge_list`, `actor_knowledge_search` |
+| Branches | `branch_query(list/compare)`, `branch_change(create/checkout)` |
+| World facts | `memory_change`, `memory_query(list/search)` |
+| Events | `campaign_event(add/list)` |
+| One actor's belief/knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Safe retrieved context | `continuity_context` |
 
 Pass `branch_id` for an explicit historical branch. For player-safe narration,
 use `continuity_context` with the acting `actor_id`, `scope_id`, and audience;
-never substitute a broad `memory_search` result for that context.
+never substitute a broad `memory_query(view="search")` result for that context.
+
+Use the three ledgers deliberately:
+
+- `campaign_event` records what happened. For a witnessed subset, set
+  `audience_scope="actor"`, list `known_by_actor_ids`, and set
+  `knowledge_disclosure_scope="owner"`; use `party` only when every party member
+  may know it.
+- `memory_change` records objective world facts and campaign state worth
+  retrieving later.
+- `actor_knowledge_change` records one PC or NPC's belief, inference, secret, or
+  misinformation. Revising one actor must never revise another actor's ledger.
+
+After a meaningful scene or combat outcome, append the event, persist any world
+fact and actor-scoped knowledge, then create the snapshot. A snapshot contains a
+full restorable payload; its recap is the branch delta. `MemoryInfo.snapshot_id`
+is only an optional creation anchor. Snapshot membership is held by the internal
+fact binding, so a null memory field does not mean the fact was omitted. Before a
+restore call `snapshot_query(view="verify")`; after restore verify the new head and
+refresh campaign, characters, module progress, events, and continuity context.
 
 ## Deliberate boundaries
 
@@ -175,8 +194,10 @@ older exposure ids.
 For native clients supporting MCP `tools/list_changed`, loading or unloading a
 group changes the actual tool list. If a host cannot refresh its native schemas,
 it keeps the core and calls the same loaded domain tool through
-`exposure_call(exposure_id, tool_id, arguments)`. This is a transport fallback,
-not a permission bypass: it performs the identical session and phase check.
+`exposure_call(exposure_id, tool_id, arguments)`. It returns the same structured
+facade result as a native domain-tool call, not an internal content/result tuple.
+This is a transport fallback, not a permission bypass: it performs the identical
+session and phase check.
 
 An exposure without `campaign_id` may load only `lobby.bootstrap` (system list
 and campaign creation), plus the `system:local`-only storage administration
@@ -195,32 +216,82 @@ resources, rests, non-combat casts, and activities) are rejected while an
 encounter is active. Do not use a profile mismatch to bypass combat action
 economy.
 
-Rule text retrieval and executable rules are separate. For user documents,
-`rule_document_stage` accepts only configured import roots, and inspect/import
-read only the MCP-managed artifact. Core performs the shared PDF/Markdown
-normalization and records the original checksum, parser warnings, and per-chunk
-page ranges. `rule_ingest` remains the direct Markdown compatibility path.
-Only the safe declarative IR accepted by
-`rule_pack_draft` can settle mechanics; arbitrary Python, expression evaluation,
+## Source-bound actors and scene readiness
+
+Create likely combatants and reinforcements in `lobby`, before combat. For a
+creature present in an imported rule source, use
+`character_create_from(mode="statblock")` with the imported `source_id` and, when
+needed, reviewed `chunk_ids`. The parser preserves source provenance, exact AC,
+HP, abilities, defenses, senses, weapon attacks, and structured Multiattack.
+Current automatic import supports reviewed English 2014 SRD-style weapon
+statblocks. A spell-only, 2024, ambiguous, or otherwise unsupported block must
+remain unresolved; do not replace it with a similar SRD creature or invent a card.
+
+Before `combat_start`, call `module_query(view="readiness")` with a manifest:
+
+```json
+{
+  "schema_version": 1,
+  "groups": [
+    {
+      "key": "dead_three",
+      "label": "Dead Three attackers",
+      "role": "combatant",
+      "required_count": 8,
+      "actor_ids": ["canonical campaign actor ids"],
+      "source_scene_id": "same-module scene id",
+      "source_excerpt": "exact normalized module excerpt, 8 to 500 characters"
+    },
+    {
+      "key": "tavern_reserves",
+      "label": "Bribable tavern patrons",
+      "role": "reinforcement",
+      "required_count": 5,
+      "actor_ids": ["canonical campaign actor ids"],
+      "source_scene_id": "same-module scene id",
+      "source_excerpt": "exact normalized module excerpt, 8 to 500 characters"
+    }
+  ]
+}
+```
+
+Required combatants must be present in the initial `participant_ids`.
+Reinforcements must not be initial participants. Readiness is false when a
+required actor is missing, at 0 HP/Dead, or has unresolved executable card rules;
+manual rulings are surfaced but do not falsely disappear. A scene offer such as
+“pay at least 10 gp, then DC 15 Charisma (Persuasion)” is resolved with an
+action-bound `combat_check(action="improvise", ability="persuasion", dc=15)` and
+advantage only when the stated offer condition is satisfied. On success call
+`combat_join`; the canonical actor enters at the next round boundary with a full
+turn. On failure no actor joins.
+
+Rule text retrieval and executable rules are separate. For user documents, use
+`rule_import(action="stage")`; it accepts only configured import roots, and every
+later action reads only the checksum-addressed MCP-managed artifact. Core performs
+the shared PDF/Markdown normalization and records the original checksum, parser
+warnings, and per-chunk page ranges. Direct ingestion helpers are internal and are
+not part of the public contract. Only the safe declarative IR accepted by
+`rule_pack_compile(action="draft" | "from_source")` can settle mechanics;
+arbitrary Python, expression evaluation,
 network access, and database paths are forbidden. Installation does not enable
 a pack. A DM explicitly pins a validated version per branch, and snapshots keep
 the exact version/checksum lock. Missing locked versions never fall back to a
-newer version. Use `campaign_rules_explain` to audit applied mechanic ids,
-citations, and the deterministic fingerprint.
-Use `campaign_rule_receipts` for the fingerprint and citations stored atomically
-with historical settlements.
-For a user-imported executable rule, use `rule_pack_draft_from_source`: citations
+newer version. Use `campaign_rules(action="explain")` to audit applied mechanic
+ids, citations, and the deterministic fingerprint. Use
+`campaign_rules(action="receipts")` for the fingerprint and citations stored
+atomically with historical settlements.
+For a user-imported executable rule, use
+`rule_pack_compile(action="from_source")`: citations
 must be imported chunk ids and are resolved server-side to the exact source id,
 document checksum, heading path, and page range. Use `character_check` outside
 combat and `combat_check` during combat when an enabled `check.before` rule needs
 DM-established `rule_facts`.
 
 Treat rule-profile and branch rule-pack changes as campaign writes. First read
-`campaign_rule_profile_get`, then pass its latest `campaign_revision` as
-`expected_revision` together with a stable `idempotency_key` to
-`campaign_rule_profile_set`, `campaign_rule_pack_set`, or
-`campaign_rule_pack_remove`. Reuse the same key only for an exact retry; a stale
-revision requires a fresh read and review.
+`campaign_rules(action="get_profile")`, then pass its latest `campaign_revision`
+as `expected_revision` together with a stable `idempotency_key` to
+`campaign_rules(action="set_profile" | "set_pack" | "remove_pack")`. Reuse the
+same key only for an exact retry; a stale revision requires a fresh read and review.
 
 The base engine is not an implicit fallback. Every new campaign locks either
 `dnd5e.core.2014` or `dnd5e.core.2024`, including a fingerprinted coverage list
@@ -240,13 +311,14 @@ for that principal. Platform users must be resolved to stable principal IDs befo
 calling sensitive tools. Roles and actor grants are checked by MCP, not supplied by
 the model as trusted claims.
 
-`campaign_create`, `character_create`, and `character_build` require a fresh
+`campaign_create` and every `character_create_from` mode require a fresh
 `idempotency_key`; their entity rows, initial branch/owner membership where
-applicable, and replay receipt commit atomically. A replay of `character_build`
+applicable, and replay receipt commit atomically. A replay of build mode
 returns its original library template and campaign instance as one pair.
 
-Use `campaign_member_grant` for campaign roles and `actor_grant` for explicit PC/NPC
-control or private-sheet visibility. A player's `player_name` field is descriptive
+Use `access_grant(scope="campaign")` for campaign roles and
+`access_grant(scope="actor")` for explicit PC/NPC control or private-sheet
+visibility. A player's `player_name` field is descriptive
 only and is never an authorization mechanism.
 
 All campaign-bound granular character writes require the character's current
@@ -254,24 +326,26 @@ All campaign-bound granular character writes require the character's current
 requires `expected_campaign_revision`, `expected_source_revision`, and
 `expected_target_revision`.
 
-Append-only `event_add`, `memory_add`, and `actor_knowledge_add` require a fresh
-`idempotency_key`. `actor_knowledge_revise` also requires the current
+Append-only `campaign_event(action="add")`, `memory_change`, and
+`actor_knowledge_change(action="add")` require a fresh `idempotency_key`.
+`actor_knowledge_change(action="revise")` also requires the current
 `expected_revision_id`; this is the knowledge ledger's revision token, not the
 character-card revision.
 
 Branch creation/checkout and snapshot restore require the current campaign
 revision, active `expected_branch_id`, and a fresh key. Snapshot creation requires
 the current campaign revision, current `expected_head_snapshot_id` (use `""` when
-the branch has no head), and a fresh key. `state_undo` / `state_redo` require the
-current `expected_history_sequence` from `state_history` plus a fresh key.
+the branch has no head), and a fresh key. `state_revision(action="undo" | "redo")`
+requires the current `expected_history_sequence` from
+`state_revision(action="history")` plus a fresh key.
 
-`branch_create(checkout=true)` returns both the new branch and the materialized
+`branch_change(action="create", payload.checkout=true)` returns both the new branch and the materialized
 snapshot; pointer changes and state restoration are one transaction.
-The transfer is one mutation group, so one `state_undo` restores every affected
+The transfer is one mutation group, so one `state_revision(action="undo")` restores every affected
 wallet, item stack, and character revision together. Retrying the same key replays
 the original result; reusing it with different arguments is an error.
 
-Use `branch_compare` before discussing alternate timelines. There is no implicit
+Use `branch_query(view="compare")` before discussing alternate timelines. There is no implicit
 branch merge: world facts and each actor's subjective knowledge require explicit
 conflict decisions.
 
@@ -286,17 +360,17 @@ is interpreted by the selected 2014/2024 ruleset. The DM may provide a
 `hidden`, explicit `visible_to_actor_ids`, surprise, and initiative. Omit
 `visible_to_actor_ids` for an ordinarily visible creature; provide it when known
 special senses let only named participants see a hidden or Invisible creature.
-With valid grid positions, `combat_move`
+With valid grid positions, `combat_movement(action="move")`
 verifies the declared five-foot grid distance and creates an owned
 `opportunity_attack` reaction window only when a mover leaves an eligible
 hostile's reach; `combat_reaction_attack` settles that window and its attack in
 one mutation. Collision, terrain, forced movement, line of sight, unrecorded
 triggers, and narrative consequences remain explicit DM choices through
-`combat_choice_open` / `combat_choice_resolve`.
+`combat_choice(action="open" | "resolve" | "resolve_defense")`.
 `combat_common_action` settles the action payment for Dash, Disengage, Dodge,
 Help, Hide, Search, Influence, Study, Utilize/Use an Object, and non-spell Ready
 without inventing their narrative result;
-`combat_reactions` exposes an eligible actor's pending reaction windows.
+`combat_query(view="reactions")` exposes an eligible actor's pending reaction windows.
 For a scene-defined skill use that consumes an action, `combat_check` accepts the
 skill name as `ability` and one matching `action` payment. A 2014 improvised
 action uses `action="improvise"`. The server derives the named skill from the
@@ -326,19 +400,19 @@ bonus, or manual condition patch.
 The generic Ready action rejects spell payloads. Use the dedicated spell-ready
 transaction instead:
 
-1. `combat_ready_spell` accepts only a spell with an Action casting time. It pays
+1. `combat_ready(action="ready_spell")` accepts only a spell with an Action casting time. It pays
    the action and the spell slot or other casting resource immediately, replaces
    any prior concentration, and records an explicit perceivable trigger.
-2. `combat_readied_spell_trigger` is a DM/owner confirmation that the trigger has
+2. `combat_ready(action="trigger_spell")` is a DM/owner confirmation that the trigger has
    occurred and opens an owned reaction window. It does not infer trigger truth
    from prose.
-3. `combat_readied_spell_resolve` either releases the spell and consumes the
+3. `combat_ready(action="resolve_spell")` either releases the spell and consumes the
    caster's reaction, or declines that occurrence without spending the reaction.
    Declining rearms the same held spell for a later occurrence before expiry.
 
 For a generic non-spell Ready action, use `combat_common_action(action="ready")`,
-then let the DM confirm the trigger with `combat_readied_action_trigger` and let
-the actor release or decline with `combat_readied_action_resolve`. Releasing pays
+then let the DM confirm the trigger with `combat_ready(action="trigger_action")`
+and let the actor release or decline with `combat_ready(action="resolve_action")`. Releasing pays
 the reaction and returns `pending_ruling`; it never fabricates the declared
 effect.
 
@@ -356,8 +430,8 @@ they must come from `derived.inventory.weapon_attacks` or an explicit DM ruling.
 
 Every combat write should provide `expected_revision` and `idempotency_key`.
 `combat_preflight_attack` never mutates; `combat_resolve_attack`,
-`combat_move`, `combat_end_turn`, `combat_check`, `combat_use_activity`,
-`combat_ready_spell`, `combat_readied_spell_trigger`, `combat_readied_spell_resolve`,
+`combat_movement`, `combat_end_turn`, `combat_check`, `combat_use_activity`,
+`combat_ready`,
 `combat_concentration_check`, and `combat_hp_change` commit one
 atomic mutation group. Sensitive combat writes require both
 `expected_revision` and `idempotency_key`. Player views are filtered by campaign
@@ -378,7 +452,7 @@ stored, retry returns the safe opaque replay `{status: committed,
 response_recovery: read_current_state}` rather than applying the mutation
 again; then read the relevant campaign, character, or combat state.
 
-`character_use_activity` and `combat_use_activity` work with the normalized
+`character_action(action="use_activity")` and `combat_use_activity` work with the normalized
 `content.activities`, `content.features`, and `content.feats` cards. They spend
 one `resource_key` resource when present, otherwise one limited card use, and
 pay the card's action/bonus-action/reaction timing in combat. Card prose,
@@ -422,7 +496,7 @@ target. Remaining darts are rolled and applied as separate force-damage instance
 so concentration and 0-HP consequences are per dart. Never merge them into one
 damage packet or manually patch HP.
 
-`character_rest` applies v2-card short/long-rest recovery with a character
+`character_state_change(action="rest")` applies v2-card short/long-rest recovery with a character
 revision and idempotency key. For a Short Rest, provide each spent hit die and
 its rolled result through `hit_dice_spends`; the runtime applies Constitution
 and the edition's minimum. A 2014 Long Rest may require an explicit
@@ -432,7 +506,7 @@ the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
 the ending actor's turn; any narrative rest consequence remains a DM ruling.
 
 Except for source-bound spell workflows such as Core Magic Missile,
-`character_cast_spell` and `combat_cast_spell` settle only timing, casting
+`character_action(action="cast_spell")` and `combat_cast_spell` settle only timing, casting
 resources, concentration, and recorded components. Generic spells return
 `pending_ruling` for targets and effects. Cantrips and rituals cannot be upcast; a ritual cannot
 complete in active combat. Costly or consumed material components require
@@ -449,7 +523,7 @@ time is never treated as campaign time automatically.
 
 ## Player-safe module reads
 
-`module_read_scene`, `module_index`, and `module_search` accept `principal_id`.
+`module_query(view="scene" | "index")` and `module_search` accept `principal_id`.
 DM/owner reads may include keeper content; player reads are filtered to `public` or
 `party` visibility and keeper content is replaced with a redaction marker. A
 player cannot select another player or group scope merely by knowing its ID.

@@ -4,10 +4,11 @@ Use `dnd_ability_roll` for visible rolls. Apply a confirmed standard array,
 point-buy, or rolled assignment with `character_ability_apply`; never manually
 write derived ability values.
 
-For a new PC, call `character_build` with complete validated `sheet v2` and
+For a new PC, call `character_create_from(mode="build")` with complete validated `sheet v2` and
 `notes v2`. It creates the public template and independent campaign instance in one
-transaction. Use `character_create` for a direct NPC/monster instance, and
-`character_instantiate` to copy an existing library template.
+transaction. Use `character_create_from(mode="direct")` for a direct NPC/monster
+instance, `mode="template"` to copy an existing library template, and
+`mode="statblock"` to create an NPC/monster from an exact imported rule source.
 
 When preparing an imported module, first verify whether the supplied artifact
 actually contains pregenerated PCs. If it does not, do not attribute invented
@@ -17,15 +18,19 @@ named module NPC or monster, the module supplies identity, role, disposition, an
 scene-specific possessions while an inspected rule source supplies the mechanical
 statblock. Record both sources. Fixed treasure may be placed on the card during
 lobby setup; dice-denominated treasure stays unresolved until the real roll occurs.
+Statblock import currently accepts reviewed English 2014 SRD-style weapon
+statblocks. If the exact creature is absent, spell-only, 2024, ambiguous, or
+unsupported, keep it unresolved instead of substituting a similar creature.
 
 Before creating any actor, read `character-schema-v2.md`. All PCs, NPCs, and
 monsters require complete structured cards; NPCs and monsters require
 `notes.profile.summary`. Do not persist an unconfirmed draft. After every creation
-or advancement, call `character_get` and use its `derived` values for proficiency,
+or advancement, call `character_query(view="get")` and use its `derived` values for proficiency,
 saves, skills, AC, HP, speed, spell DC, preparation, and encumbrance.
 
 Recording a class, subclass, species, or subspecies name is not sufficient.
-Before the first `play` phase and after every level-up, query `content_catalog_list`
+Before the first `play` phase and after every level-up, query
+`rule_pack_query(view="content_catalog")`
 and reconcile every class/subclass feature whose `minimum_level` is met, plus every
 species grant and required choice, through `character_content_apply`. Treat
 `catalog_only` as a stop condition that needs reviewer/DM completion, never as an
@@ -107,5 +112,5 @@ derived prepared spells. A Wizard selection must additionally be in the spellboo
 Cantrips are known but never consume a prepared-list selection.
 
 Advancement changes the live campaign instance. Update only the affected validated
-sheet fields, record a level-up `event_add`, and call `snapshot_create` after the
+sheet fields, record a level-up `campaign_event(action="add")`, and call `snapshot_create` after the
 player confirms the new state.

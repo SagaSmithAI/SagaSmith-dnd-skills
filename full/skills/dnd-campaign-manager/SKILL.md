@@ -27,8 +27,9 @@ replaces the earlier exposure, so discard every older exposure id.
    the selected edition. For an existing campaign, change the profile only in
    `lobby`, with the fresh campaign revision and an explicit DM decision, before
    any character option is applied.
-4. Resolve the caller's stable `principal_id`; use `campaign_member_grant` and
-   `actor_grant` for access instead of treating `player_name` as authorization.
+4. Resolve the caller's stable `principal_id`; use
+   `access_grant(scope="campaign" | "actor")` for access instead of treating
+   `player_name` as authorization.
 5. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
    `ingest`, then `activate`. For generated content, stage with `payload.name` and
    `payload.content`. For a user PDF/Markdown/text module, stage with
@@ -54,23 +55,33 @@ replaces the earlier exposure, so discard every older exposure id.
    exact spatial scene id as `state.location_scene_id`. At combat start, keep
    the current progress scene, that spatial evidence scene, and any explicit
    encounter `scene_id` distinct; do not recover a duplicate key by scanning a
-   different scene when `location_scene_id` was recorded.
+    different scene when `location_scene_id` was recorded.
+
+Before combat, create a participant manifest from the expanded source scene and
+call `module_query(view="readiness")`. Every group records its role, required
+count, canonical actor ids, same-module `source_scene_id`, and exact normalized
+`source_excerpt`. Initial participants must satisfy every required `combatant`
+group. Actors in a `reinforcement` group stay out of the initial list and may enter
+only through `combat_join` after the source condition succeeds. Missing, Dead/0 HP,
+or mechanically unresolved required actors block combat start; surfaced manual
+rulings require review but must not be erased from the readiness report.
 
 ## Characters
 
 | Need | MCP tool |
 |---|---|
-| Create a public template or direct instance | `character_create` |
-| List templates | `character_library_list` |
-| Instantiate a template | `character_instantiate` |
-| Atomically create PC template + instance | `character_build` |
-| List or read live actors | `character_list`, `character_get` |
+| Create a direct actor | `character_create_from(mode="direct")` |
+| List templates | `character_query(view="library")` |
+| Instantiate a template | `character_create_from(mode="template")` |
+| Atomically create PC template + instance | `character_create_from(mode="build")` |
+| Create from an imported exact statblock | `character_create_from(mode="statblock")` |
+| List or read live actors | `character_query(view="list" | "get")` |
 | Full reviewed replacement | `character_sheet_replace` |
 | Ability generation | `dnd_ability_roll`, `character_ability_apply` |
 
 All live actors use `sheet v2` and `notes v2`. Read
 `../../references/character-schema-v2.md` before creation or mutation. Do not
-persist an unconfirmed draft. `character_build` requires one stable
+persist an unconfirmed draft. Build mode requires one stable
 `idempotency_key`; an exact retry must return the original template and campaign
 instance rather than creating another pair.
 
@@ -78,26 +89,27 @@ For imported modules, distinguish narrative and mechanical provenance. The modul
 may name an NPC, describe its intent, and assign fixed possessions while an
 inspected rule source provides its statblock. If the supplied module has no
 pregenerated PCs, label separately built PCs as player or regression fixtures
-instead of claiming module provenance. Do not pre-resolve random treasure.
+instead of claiming module provenance. Use statblock mode only with an exact
+imported source and retain its source/chunk provenance. If the exact creature is
+absent, ambiguous, spell-only, 2024, or unsupported by the current parser, keep it
+unresolved; never substitute a similar SRD creature. Do not pre-resolve random treasure.
 
 For normal play, mutate only the affected structure:
 
 ```text
-character_inventory_add | character_inventory_update | character_inventory_remove
-character_inventory_transfer | character_inventory_equip | character_ammunition_consume
-character_wallet_adjust | character_rest | character_effect_add
-character_effect_remove | character_resource_set | character_memory_add
-character_memory_resolve
-party_show | party_inventory_add | party_inventory_remove | party_inventory_transfer
-party_wallet_adjust | party_wallet_transfer
+inventory_change | inventory_transfer | wallet_change
+character_state_change | character_action | character_metadata_update
+campaign_query(view="party")
 ```
 
-Use `character_spell_prepare` only in `lobby` for setup and level advancement.
+Use `character_spell_prepare(mode="replace_all")` only in `lobby` for setup and level advancement.
 During live play, pass the complete
-new list as `prepared_spell_ids` on the actor's `character_rest` long-rest
+new list as `prepared_spell_ids` on the actor's
+`character_state_change(action="rest")` long-rest
 transaction; do not toggle preparations one by one.
 
-After each actor or party mutation call `character_get` or `party_show`. Use their
+After each actor or party mutation call `character_query(view="get")` or
+`campaign_query(view="party")`. Use their
 derived values rather than recalculating weapon attacks, AC, or encumbrance in
 prose.
 
@@ -111,12 +123,12 @@ fields are listed in `../../references/mcp-contract.md`.
 
 | Need | MCP tool |
 |---|---|
-| Create/list a save | `snapshot_create`, `snapshot_list` |
-| Validate / inspect lineage | `snapshot_verify`, `snapshot_lineage` |
+| Create/list a save | `snapshot_create`, `snapshot_query(view="list")` |
+| Validate / inspect lineage | `snapshot_query(view="verify" | "lineage")` |
 | Restore without deleting future history | `snapshot_restore` |
-| Regenerate recap | `snapshot_regenerate_recap` |
-| List/create/switch timeline | `branch_list`, `branch_create`, `branch_checkout` |
-| Audit / undo / redo | `state_history`, `state_undo`, `state_redo` |
+| Regenerate recap | `snapshot_query(view="recap")` |
+| List/create/switch timeline | `branch_query`, `branch_change` |
+| Audit / undo / redo | `state_revision(history/undo/redo)` |
 
 Restore is a branch fork, never destructive overwrite. Verify the target first,
 then refresh campaign actors, party state, scene progress, events, and continuity
@@ -124,11 +136,11 @@ context after restoring.
 
 ## Continuity
 
-Use `memory_*` for branch-scoped durable world facts and `event_*` for immutable
-chronology. Use `actor_knowledge_*` only for one PC/NPC/monster's subjective
-knowledge. The separate `character_memory_*` tools keep legacy notes memories and
-are not imported into the actor-knowledge ledger.
+Use `memory_change/query` for branch-scoped durable world facts and
+`campaign_event(add/list)` for immutable chronology. Use
+`actor_knowledge_change/query` only for one PC/NPC/monster's subjective knowledge.
 
 For player-safe retrieval, call `continuity_context` with `actor_id`, `scope_id`,
-audience, and optionally `branch_id`. Do not substitute broad `memory_search` for
+audience, and optionally `branch_id`. Do not substitute broad
+`memory_query(view="search")` for
 that context; it can expose DM facts or sibling-branch history.

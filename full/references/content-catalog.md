@@ -12,14 +12,14 @@ be conflated:
 For the bundled 2014 SRD, `dnd5e.content.srd2014@1.4.0` is installed during MCP
 startup when the full D&D skill repository is configured. Its records retain a
 `bundled:srd2014/...` reference to the original Markdown file. Optional books
-must use `rule_pack_draft_from_source`; every artifact supplies imported
+must use source-bound `rule_import` or `rule_pack_compile(action="from_source")`; every artifact supplies imported
 `source_chunk_ids`, which the MCP resolves to the exact document chunk/page
 citations before the pack can be installed.
 
 ## Agent procedure
 
-1. Read `campaign_rule_profile_get` and the current branch state.
-2. Call `content_catalog_list(campaign_id, kind, query)`.
+1. Read `campaign_rules(action="get_profile")` and the current branch state.
+2. Call `rule_pack_query(view="content_catalog")` with campaign, kind, and query.
 3. Present only returned options and their source references to the player. Read
    `selection_requirements` for spell eligibility, subclass class/level,
    species grants, class/subclass feature level, background choices, and feat
