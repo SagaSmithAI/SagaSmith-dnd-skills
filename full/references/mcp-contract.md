@@ -297,6 +297,14 @@ triggers, and narrative consequences remain explicit DM choices through
 Help, Hide, Search, Influence, Study, Utilize/Use an Object, and non-spell Ready
 without inventing their narrative result;
 `combat_reactions` exposes an eligible actor's pending reaction windows.
+Medicine stabilization is not a generic narrative check. Call
+`combat_check(kind="stabilize", ability="wisdom", target_id=...)`; the server
+requires the acting turn, recorded adjacency within 5 feet, and a living target
+at 0 HP, then derives DC 10 and the actor card's Medicine modifier. It consumes
+the main action whether the check succeeds or fails. Success atomically clears
+death-save successes/failures and records Stable without healing; failure leaves
+the target unchanged. A client must not supply a replacement DC, proficiency,
+bonus, or manual condition patch.
 The generic Ready action rejects spell payloads. Use the dedicated spell-ready
 transaction instead:
 

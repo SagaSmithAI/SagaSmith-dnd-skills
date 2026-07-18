@@ -192,6 +192,19 @@ that feature bonus into the base amount yourself. Halfling Lucky is
 resolved automatically for attacks, checks, saves, death saves, and initiative;
 retain its `rerolls` audit instead of rolling a second untracked check.
 
+To stabilize a dying creature with Medicine, call
+`combat_check(kind="stabilize", ability="wisdom", target_id=...)`. The MCP
+requires the current actor's turn, both creatures in the encounter, recorded map
+positions within 5 feet, and a living target at exactly 0 HP. It derives the
+fixed DC 10 and the actor card's complete Medicine modifier; do not pass a client
+`bonus`, `proficient`, or alternate DC. The same atomic transaction spends the
+main action. On success it resets the target's death-save tally and records
+Stable while preserving 0 HP, Unconscious, and existing conditions such as
+Prone; on failure it spends the action without changing the target. Do not patch
+conditions or death saves by hand. Use Spare the Dying only when that exact
+source spell is present and castable on the actor card; never grant it merely
+because stabilization is needed.
+
 Preserve the source spell card's canonical casting time during import. Standard
 cards commonly use `1 action`, `1 bonus action`, or `1 reaction, ...`; do not
 strip the leading count or replace these with a free-form timing label. In
