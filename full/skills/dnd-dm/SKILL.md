@@ -229,6 +229,21 @@ source-linked features such as 2014 Life Domain's Disciple of Life. Never fold
 that feature bonus into the base amount yourself. Halfling Lucky is
 resolved automatically for attacks, checks, saves, death saves, and initiative;
 retain its `rerolls` audit instead of rolling a second untracked check.
+The canonical 2014 Fighter Action Surge card is engine-owned: call
+`combat_use_activity` with its exact feature id on the Fighter's turn. The same
+transaction consumes one use and grants one `extra_action`; it returns
+`committed`, not `pending_ruling`. Use the returned action normally. An unused
+extra action expires at the next turn and Action Surge cannot be activated twice
+on the same turn. Do not patch `turn_budget` or invent another Attack.
+
+At the start of a current combatant's turn, treat `HP == 0`, that combatant's
+`death_saves: true`, and the absence of Dead/Stable as the complete death-save
+gate. Do not wait for or create a synthetic `Dying` condition. Confirm
+`combat_query(view="available_actions", actor_id=...)` returns `death_save`, then
+call `combat_check(kind="death_save")` with no `ability`, bonus, proficiency, DC,
+or target. Resolve it before any other action or `combat_end_turn`. Refresh the
+actor card and combat state immediately; a natural 20 can restore 1 HP and leave
+the action available, three successes add Stable, and three failures add Dead.
 
 To stabilize a dying creature with Medicine, call
 `combat_check(kind="stabilize", ability="wisdom", target_id=...)`. The MCP
@@ -242,6 +257,11 @@ Prone; on failure it spends the action without changing the target. Do not patch
 conditions or death saves by hand. Use Spare the Dying only when that exact
 source spell is present and castable on the actor card; never grant it merely
 because stabilization is needed.
+If reaching the target requires movement, commit `combat_movement` first and
+inspect all returned reaction windows. Resolve or explicitly decline every owned
+opportunity attack before calling stabilization; a blocking reaction window must
+never be skipped. Re-read both actors afterward because the rescuer can be
+damaged or incapacitated before administering aid.
 
 When an imported scene allows an action-bound social or investigative check,
 pass the skill name as `ability` and the action payment in the same

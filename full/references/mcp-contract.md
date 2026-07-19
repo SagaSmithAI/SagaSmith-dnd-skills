@@ -365,7 +365,17 @@ The base engine is not an implicit fallback. Every new campaign locks either
 for the existing combat, movement, reaction, damage, rest, spell, character,
 and MCP mutation boundaries. Optional packs layer on top of that core provider.
 If a runtime upgrade changes the locked core fingerprint, settlement fails until
-the DM explicitly reviews and relocks the campaign profile.
+the DM explicitly reviews and relocks the campaign profile. During active combat,
+first finish the current atomic write, call `snapshot_create`, and require
+`snapshot_query(view="verify")` to report that checkpoint valid and current. Then
+call `campaign_core_relock` with the exact old Core fingerprint from
+`campaign_rules(action="get_profile")`, current branch id, campaign revision,
+checkpoint head id, a bounded reason, and a fresh idempotency key. Re-read the
+effective profile, add a DM-visible maintenance event, and create/verify a second
+snapshot before resuming settlement. This tool changes only the built-in Core
+lock; edition, locale, publications, user options, and optional pack activations
+remain unchanged. Never use `campaign_rules(action="set_profile")` to bypass this
+checkpointed combat path.
 Snapshot restore and branch checkout check the saved Core lock before changing
 live state. A legacy save without that lock, or a save requiring an unavailable
 Core fingerprint, needs an explicit conversion path and is never silently
@@ -478,6 +488,15 @@ the main action whether the check succeeds or fails. Success atomically clears
 death-save successes/failures and records Stable without healing; failure leaves
 the target unchanged. A client must not supply a replacement DC, proficiency,
 bonus, or manual condition patch.
+Death saves are discovered separately from ordinary actions. At the start of the
+current combatant's turn, `combat_query(view="available_actions", actor_id=...)`
+returns only `death_save` when the canonical card is at 0 HP, the encounter grants
+death saves, and the actor is neither Dead nor Stable. Call
+`combat_check(kind="death_save")`; `ability`, target, client bonus, proficiency,
+DC, and `rule_facts` are absent. A successful write marks the turn's save used and
+returns the natural roll, tally, and outcome. Do not infer eligibility from a
+nonexistent Dying condition. If a rescuer must move into range, resolve every
+opportunity-reaction window from that movement before attempting stabilization.
 The generic Ready action rejects spell payloads. Use the dedicated spell-ready
 transaction instead:
 
@@ -543,6 +562,11 @@ one `resource_key` resource when present, otherwise one limited card use, and
 pay the card's action/bonus-action/reaction timing in combat. Card prose,
 choices, targeting, and any non-deterministic result are returned for an
 explicit DM ruling rather than automatically materialized.
+The canonical 2014 Fighter Action Surge id is a narrow Core exception:
+`combat_use_activity` consumes its use and atomically grants one current-turn
+`extra_action`. It rejects off-turn or twice-on-one-turn activation, and any
+unused extra action is cleared when the actor's next turn begins. Its Core receipt
+is `dnd5e.core.activity.action_surge`; clients must not edit the turn budget.
 
 `combat_preflight_attack` and `combat_resolve_attack` accept
 `multiattack_option_id` for the first attack of a structured Multiattack. The

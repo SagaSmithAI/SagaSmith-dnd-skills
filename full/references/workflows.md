@@ -120,18 +120,27 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.
+   After movement, settle every returned opportunity-reaction window before the
+   next action. A rescue move can damage or incapacitate the rescuer before a
+   Medicine attempt, so re-read both actor cards after the reaction.
 5. A source offer such as “10 gp grants advantage on DC 15 Persuasion” requires
    the stated payment/offer fact and
    `combat_check(action="improvise", ability="persuasion", dc=15)`. Only on success
    call `combat_join` through `combat.control`; the canonical reinforcement
    appears at the next round boundary with a full turn.
-6. End each completed turn with `combat_end_turn`, using the latest revision and a
+6. At the start of a death-save combatant's turn, if its card is at 0 HP and has
+   neither Dead nor Stable, require
+   `combat_query(view="available_actions", actor_id=...) == ["death_save"]`, then
+   call `combat_check(kind="death_save")` without an `ability` or target. Do not
+   require or write a synthetic Dying condition. Refresh state before continuing;
+   a revived actor may still act, while a pending result may only end its turn.
+7. End each completed turn with `combat_end_turn`, using the latest revision and a
    fresh idempotency key. Refresh status after every write.
-7. Call `combat_end` through owner/DM `combat.control` with a structured outcome
+8. Call `combat_end` through owner/DM `combat.control` with a structured outcome
    only when the encounter is actually over. Do not end while a death-save
-   participant is still Dying. The server returns the campaign to `play`; reopen
-   exposure before further play writes.
-8. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
+   participant is at 0 HP without Dead or Stable. The server returns the campaign
+   to `play`; reopen exposure before further play writes.
+9. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
    to wait, call `character_state_change(action="stable_recovery")`; the engine
    rolls the `1d4`-hour delay and restores 1 HP. Do not patch HP or supply the roll.
    When conscious and above 0 HP, clear the retained Prone condition only with
@@ -160,6 +169,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
 
 - For 2014 Sneak Attack, declare `use_sneak_attack: true` in preflight and resolve;
   let the engine validate eligibility and its once-per-turn token.
+- For the canonical 2014 Action Surge feature id, call `combat_use_activity` on
+  the Fighter's turn. The committed result consumes its card use and grants one
+  current-turn `extra_action`; never patch the turn budget, and never carry an
+  unused extra action into a later turn.
 - For Second Wind, call `combat_use_activity` to pay its bonus action and use, roll
   the source formula, then call `combat_hp_change(action="heal")` with that result.
 - For healing from a levelled spell, send rolled base `amount`, `source_actor_id`,

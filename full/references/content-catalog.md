@@ -73,3 +73,7 @@ action and use, roll `1d10 + fighter level`, then apply that exact amount throug
 recorded spell id, and actual slot level separately; the engine adds a recorded
 Disciple of Life modifier and preserves it in the healing receipt. Halfling Lucky
 rerolls are automatic and appear in the roll's `rerolls` audit field.
+The canonical 2014 Fighter Action Surge feature is directly executable through
+`combat_use_activity`: it consumes the card use and grants one current-turn
+`extra_action`, with a Core receipt. An imported or similarly named non-Core card
+does not inherit that behavior merely from its prose or display name.
