@@ -302,6 +302,12 @@ action payment and tactical state; it deliberately does not fabricate the
 outcome of a Hide, Search, or Help declaration. At encounter start, provide
 DM-authored `participant_config` positions, disposition, reach, initiative, and
 visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
+2014 surprise decision must compare every hiding creature's canonical Stealth
+result against each opponent's passive Perception. Do not substitute the general
+half-success group-check rule, and do not treat satisfying an adventure's
+"careful/no light" prerequisite as guaranteed surprise unless the source says so.
+An opponent that notices any threat is not surprised; record the comparison and
+set `surprised` per participant. Hidden and surprised are separate facts. A
 current module scene produces a frozen temporary battle map. An encounter scene
 may use `current_location_key` to reference exactly one spatial location in
 another scene of the same module; persist that source scene as

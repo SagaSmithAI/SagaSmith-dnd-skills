@@ -87,7 +87,17 @@ own exposure. Loading a group for one Agent must not expose it to another.
    combat map from the recorded spatial scene and location. Load the owner/DM
    `play.combat_control` group for this transition. If it falls back to a
    12-by-12 canvas, do not narrate those dimensions as module-authored facts.
-5. After `combat_start`, reopen exposure. The server phase is now `combat`; load
+5. Resolve surprise before `combat_start`, but do not turn an adventure's approach
+   prerequisite into automatic surprise. A requirement such as "approach carefully
+   and without light" only avoids the adventure's automatic alert unless its text
+   explicitly promises more. Under 2014 rules, roll each hiding creature's Stealth
+   with its canonical card, including armor disadvantage, and compare those results
+   against each opposing creature's passive Perception. An opponent that notices
+   any approaching threat is not surprised. Determine `surprised` separately for
+   every participant; never replace these comparisons with the general "at least
+   half succeed" group-check rule unless the imported source explicitly calls for
+   a group check. Record the comparisons and source condition in a campaign event.
+6. After `combat_start`, reopen exposure. The server phase is now `combat`; load
    `combat.observe`, `combat.turn`, or `combat.actions` for an acting player.
    Load `combat.control`, `combat.save`, or `combat.map` only for an owner/DM.
 

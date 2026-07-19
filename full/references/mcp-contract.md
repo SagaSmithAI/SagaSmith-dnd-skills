@@ -427,6 +427,14 @@ is interpreted by the selected 2014/2024 ruleset. The DM may provide a
 `hidden`, explicit `visible_to_actor_ids`, surprise, and initiative. Omit
 `visible_to_actor_ids` for an ordinarily visible creature; provide it when known
 special senses let only named participants see a hidden or Invisible creature.
+For 2014 surprise, first satisfy any imported scene prerequisites that merely
+avoid automatic detection, then resolve each hiding actor's canonical Stealth
+check and compare the individual results with each opposing creature's passive
+Perception. An opponent that notices any threat is not surprised. Surprise is
+therefore a per-participant scene fact, not the result of applying the ordinary
+half-success group-check rule to the party. `hidden` and `surprised` are distinct
+facts. Store the source prerequisite and comparison matrix in an auditable
+campaign event before supplying `participant_config.surprised`.
 With valid grid positions, `combat_movement(action="move")`
 verifies the declared five-foot grid distance and creates an owned
 `opportunity_attack` reaction window only when a mover leaves an eligible
