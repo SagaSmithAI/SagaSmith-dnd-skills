@@ -122,6 +122,24 @@ After item writes, treat `character_query(view="get").derived.inventory.weapon_a
 active concentration spell as one active effect with `concentration: true` and its
 `source_spell_id`.
 
+When a module yields a found spellbook, add one `kind="spellbook"` inventory item
+for each physically distinct book. Preserve its edition, exact source scene/key,
+copyability, owner mark, resolved catalog `spell_ids`, and
+`unresolved_spell_names`. A name absent from the active content catalog stays
+unresolved and non-executable; never drop it, substitute a similar spell, or
+fabricate an artifact id. Record discovery with one `campaign_event` and only
+the actual witnesses in `known_by_actor_ids`.
+
+Discovery does not add spells to a Wizard's personal spellbook. During `play`,
+copy exactly one returned spell id with `character_content_apply` using
+`method="spellbook_copy"`, the source owner/item id, payment owner, and an exact
+coin payment. The runtime validates Wizard/class-level eligibility, performs the
+2014 decipher-and-copy process, advances time and all timed actor/world effects,
+and applies source-bound discounts such as Evocation Savant. It does not invent
+currency exchange or change. A missing source, unresolved spell name,
+insufficient exact payment, unavailable Core lock, or failed validation must
+leave character, wallet, clock, inventory, and effects unchanged.
+
 During lobby setup or level advancement, submit the complete level 1+ prepared list
 through `character_spell_prepare(mode="replace_all")`; use `mode="set"` only for a
 setup edit. During live play, a prepared-list change must be part of
@@ -348,6 +366,15 @@ establish its branch-local clock with
 the narrative/source assumption. After the DM establishes elapsed time, use
 `campaign_change(action="clock_advance", payload={period, count})`. Minute, hour,
 and day advances update the snapshotted campaign clock and settle all matching
-canonical effect durations in the same mutation; round and encounter durations
+canonical actor and campaign-space effect durations in the same mutation; round and encounter durations
 advance without changing narrative time. Never infer elapsed time from chat
-pacing, and never set or advance the narrative clock during active combat.
+pacing, and never set or advance the narrative clock during active combat. Once
+set, do not jump the clock with another `clock_set`; use `clock_advance` so no
+duration is skipped.
+
+An effect on a room, object, scene, or the campaign belongs in structured
+`campaign_change(action="effect_add")`, not an arbitrary `module_set_progress.state`
+blob. Give it a stable id, target, duration, source, and `visibility` of
+`public`, `party`, or `dm`; dismiss it with `effect_remove`. Player campaign
+reads are audience projections, but never reuse a DM `campaign_query` result in
+player narration or assume an exposure layer repairs already-read private data.

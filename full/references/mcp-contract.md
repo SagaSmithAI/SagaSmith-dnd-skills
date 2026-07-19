@@ -47,6 +47,16 @@ subclass choice, and all required background choices. The runtime rejects a
 spell outside the selected class list or class-level limit and never silently
 assigns a subclass to the first class on a multiclass card.
 
+A discovered physical spellbook is a party or character inventory item, not a
+free content grant. Store its resolved `spell_ids` and preserve catalog misses in
+`unresolved_spell_names`; unresolved names remain non-executable. During `play`,
+use `character_content_apply` with `method="spellbook_copy"`, exact
+`source_owner`/`source_item_id`, and explicit exact coin payment. The transaction
+includes the 2014 deciphering process, eligibility, payment, elapsed time,
+matching actor/world duration expiry, and applicable rule modifiers such as
+Evocation Savant. Ordinary `method="spellbook"` grants belong to lobby setup or
+level advancement. A failure commits none of those state changes.
+
 ## Modules, space evidence, and temporary combat maps
 
 Module re-imports are revisions: earlier sources are retained for snapshots and
@@ -476,6 +486,10 @@ atomic mutation group. Sensitive combat writes require both
 `expected_revision` and `idempotency_key`. Player views are filtered by campaign
 membership; keeper logs, target mechanics, and rulings are not exposed to
 players.
+`campaign_query(view="get" | "list")` is also audience-filtered: a non-DM sees
+only the whitelisted party/game-phase/clock state, audience-visible world
+effects, and the already-redacted combat projection. It cannot be used as a raw
+state back door around domain-specific visibility checks.
 
 For `combat_hp_change(action=heal)`, `payload.amount` is the rolled or otherwise
 resolved base healing. Spell healing additionally carries `source_actor_id`,
@@ -571,9 +585,18 @@ scene/scope row (`0` for its first write) and a fresh idempotency key.
 hour, and minute. `campaign_change(action="clock_advance")` advances an explicit
 `minute`, `hour`, `day`, `round`, or `encounter` count. Narrative-time advances
 update the snapshotted `state.world_time` and settle matching effect durations
-across all campaign actors as one atomic group; round/encounter advances do not
+across all campaign actors and `state.world_effects` as one atomic group;
+round/encounter advances do not
 move the world clock. The clock must be set first, cannot change during active
-combat, and conversation time is never treated as elapsed campaign time.
+combat, and conversation time is never treated as elapsed campaign time. Once
+set, a different `clock_set` value is rejected; use `clock_advance`.
+
+Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
+effect on a campaign, scene, location, or object. Each effect has a stable id,
+source, target, active flag, duration period/remaining count, and visibility
+`public|party|dm`. Timed effects require an established campaign clock. Do not
+store a timed Light, hazard, ward, weather effect, or similar object state only
+inside arbitrary scene-progress JSON, because that bypasses the duration engine.
 
 ## Player-safe module reads
 

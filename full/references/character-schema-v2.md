@@ -196,6 +196,13 @@ Each item has a stable `id`, `name`, `kind`, `quantity`, `weight_oz`, `price_cp`
 short `description`, `source_key`, container/equipment state, identification,
 attunement, condition, uses, charges, and type-specific `mechanics`.
 
+A found `kind: "spellbook"` item records `mechanics.edition`, resolved
+`spell_ids`, preserved `unresolved_spell_names`, `owner_mark`,
+`source_scene_id`, and `copyable`. `deciphered` is informational: 2014 copying
+from another Wizard's notation performs deciphering inside the paid/timed copy
+process. The item is the source artifact; finding it does not mutate any
+character's `spellcasting.spellbook.spell_ids`.
+
 For every item that exists in play, this skill requires a nonempty `name` and
 short `description`; use `source_key` whenever it comes from a rule source. A
 plain key, gem, trade bar, quest object, or monster drop is still an item with
@@ -232,6 +239,12 @@ and supported active effects. `derived.armor_class_breakdown` explains every
 applied source. A supported effect change uses
 `{ "path": "derived.armor_class", "mode": "add|override", "value": <integer> }`.
 Other effect changes remain in `derived.unresolved_rules` for DM adjudication.
+
+Actor effects remain in `sheet.effects`. Effects attached to a room, object,
+scene, or the campaign instead live in `campaign.state.world_effects` and are
+written through `campaign_change(effect_add/effect_remove)`. Their visibility is
+`public`, `party`, or `dm`; their minute/hour/day/round/encounter duration is
+advanced by the same atomic campaign clock paths as actor effects.
 
 Containers are ordinary `kind: "container"` items. Items reference their parent
 with `container_id`; containers cannot form cycles. Container mechanics record
