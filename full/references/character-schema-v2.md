@@ -222,7 +222,8 @@ Armor and shields have strict mechanics:
     "base_ac": 14,
     "dexterity_mode": "max",
     "dexterity_max": 2,
-    "magic_bonus": 0
+    "magic_bonus": 0,
+    "stealth_disadvantage": true
   },
   "shield": { "ac_bonus": 2, "magic_bonus": 0 },
   "magic_item": { "ac_bonus": 1 }
@@ -230,8 +231,11 @@ Armor and shields have strict mechanics:
 ```
 
 Armor uses `dexterity_mode: "none"`, `"full"`, or `"max"`; `dexterity_max` is
-required only for `"max"`. Armor may only occupy `armor`, shields only `shield`,
-and rings must be `magic_item` records in a ring slot.
+required only for `"max"`. Set `stealth_disadvantage` from the exact armor table;
+when such armor is equipped the runtime automatically rolls Dexterity (Stealth)
+checks with disadvantage in play and combat. Do not also pass a client-authored
+disadvantage for the same armor source. Armor may only occupy `armor`, shields
+only `shield`, and rings must be `magic_item` records in a ring slot.
 
 `derived.armor_class` is calculated in this order: explicit `combat.ac.override`;
 otherwise armor or `combat.ac.base`; then shield, equipped magic-item AC bonuses,
