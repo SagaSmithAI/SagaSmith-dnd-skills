@@ -117,6 +117,11 @@ transport retry replays that same pair. Use `character_query(view="library")` an
 `character_create_from(mode="template")` for existing templates. New subjective
 information belongs in the actor-knowledge ledger.
 
+For a module NPC or monster, use the exact imported standard statblock or an
+immutable reviewed image card. If the module explicitly changes only HP, AC,
+languages, or an action, pass a source-cited `variant` to the statblock creation
+call. Never rebuild or raw-patch the full sheet for a small module instance change.
+
 After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
 `character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one
 active concentration spell as one active effect with `concentration: true` and its

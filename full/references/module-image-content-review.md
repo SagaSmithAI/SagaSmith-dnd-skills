@@ -31,6 +31,39 @@ and never create or repair a required actor after combat has begun.
    actor and verify AC, HP, attacks, source refs, and unresolved rules before
    adding its canonical id to the scene-readiness manifest.
 
+If a room names a standard rule statblock and then states a small instance change,
+import the exact standard source and use `character_create_from(mode="statblock")`
+with `payload.variant`. Do not transcribe a second whole card or patch the resulting
+sheet. Every variant requires a module `source_ref`; the runtime accepts only
+explicit current/maximum HP, AC, languages, action removal, and narrow weapon-action
+overrides. For example, a wounded unarmored Noble can set `current_hit_points`,
+`armor_class`, `languages`, and `remove_actions`, while an animated gauntlet based
+on Flying Sword can rename its weapon and change only the cited damage type.
+
+```json
+{
+  "mode": "statblock",
+  "payload": {
+    "campaign_id": "campaign-id",
+    "source_id": "exact-noble-rule-source-id",
+    "name": "Klim Jhasso",
+    "character_type": "npc",
+    "variant": {
+      "source_ref": "module-chunk:d12-banes-altar",
+      "current_hit_points": 1,
+      "armor_class": 10,
+      "languages": ["Common", "Elvish"],
+      "remove_actions": ["rapier"]
+    }
+  },
+  "idempotency_key": "create-klim-jhasso-d12-v1"
+}
+```
+
+Reject a variant if the cited source does not explicitly establish every change,
+if an action id is ambiguous, or if the desired change is outside the whitelist.
+The base source and variant source must both remain visible in actor provenance.
+
 ```json
 {
   "campaign_id": "campaign-id",

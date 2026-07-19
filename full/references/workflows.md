@@ -61,6 +61,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `mode="module_statblock"` for NPCs and monsters. Either statblock mode must
    cite exact imported evidence; unsupported or absent creatures remain unresolved
    instead of being replaced by a similar one.
+   When the module modifies a named standard creature, import that exact rule source
+   and use its source-bound `variant` whitelist; never replace the whole actor sheet.
+   Read `module-image-content-review.md` for the distinction between an image-only
+   full card and a standard card with module instance changes.
 8. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
 9. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
