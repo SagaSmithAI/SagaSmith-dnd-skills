@@ -10,6 +10,8 @@ name copied from an old prompt.
 2. Call `exposure_open(campaign_id, principal_id)`. Its phase is authoritative.
 3. Call `exposure_search` and `exposure_inspect`, then load only the groups needed
    for this step with `exposure_load`.
+   Use player-safe read/action groups for player Agents. Load `*_control`,
+   `combat.save`, or `combat.map` only in an owner/DM exposure.
 4. A native dynamic client refreshes `tools/list`. A client that cannot refresh
    calls the loaded domain tool with `exposure_call`; consume its structured result
    exactly like a native call.
@@ -63,7 +65,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
    card, then re-read each actor's `derived` values and unresolved rules.
 9. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
 10. Record the opening with `campaign_event(action="add")`, persist objective facts
-   with `memory_change`, and call `snapshot_create`.
+   with `memory_change`, and call `snapshot_create`. These writes require the
+   owner/DM `lobby.memory_control` and `lobby.campaign` groups.
 
 ## Scene readiness and temporary combat map
 
@@ -77,11 +80,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
 3. Required `combatant` actors go into initial `participant_ids`.
    `reinforcement` actors must stay out and join later through `combat_join`.
 4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
-   combat map from the recorded spatial scene and location. If it falls back to a
+   combat map from the recorded spatial scene and location. Load the owner/DM
+   `play.combat_control` group for this transition. If it falls back to a
    12-by-12 canvas, do not narrate those dimensions as module-authored facts.
 5. After `combat_start`, reopen exposure. The server phase is now `combat`; load
-   only `combat.observe`, `combat.turn`, `combat.actions`, `combat.save`, or
-   `combat.map` as needed.
+   `combat.observe`, `combat.turn`, or `combat.actions` for an acting player.
+   Load `combat.control`, `combat.save`, or `combat.map` only for an owner/DM.
 
 ## Combat turn loop
 
@@ -102,13 +106,14 @@ own exposure. Loading a group for one Agent must not expose it to another.
 5. A source offer such as “10 gp grants advantage on DC 15 Persuasion” requires
    the stated payment/offer fact and
    `combat_check(action="improvise", ability="persuasion", dc=15)`. Only on success
-   call `combat_join`; the canonical reinforcement appears at the next round
-   boundary with a full turn.
+   call `combat_join` through `combat.control`; the canonical reinforcement
+   appears at the next round boundary with a full turn.
 6. End each completed turn with `combat_end_turn`, using the latest revision and a
    fresh idempotency key. Refresh status after every write.
-7. Call `combat_end` with a structured outcome only when the encounter is actually
-   over. Do not end while a death-save participant is still Dying. The server
-   returns the campaign to `play`; reopen exposure before further play writes.
+7. Call `combat_end` through owner/DM `combat.control` with a structured outcome
+   only when the encounter is actually over. Do not end while a death-save
+   participant is still Dying. The server returns the campaign to `play`; reopen
+   exposure before further play writes.
 8. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
    to wait, call `character_state_change(action="stable_recovery")`; the engine
    rolls the `1d4`-hour delay and restores 1 HP. Do not patch HP or supply the roll.
@@ -160,6 +165,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    audit `campaign_rules(action="receipts")`.
 
 ## Post-scene continuity and save
+
+Load owner/DM `play.scene_control` before the following chronology and save
+writes. A player Agent uses `play.scene` and receives only audience-safe events,
+continuity, and its authorized actor knowledge.
 
 1. Persist the structured `combat_end` outcome as a `campaign_event`.
 2. Use `audience_scope="actor"`, `known_by_actor_ids`, and

@@ -3,7 +3,9 @@
 Use this workflow when imported module text identifies locations but a map,
 diagram, or handout carries topology that the text parser cannot safely infer.
 Run it in `lobby` while preparing a module, or in `play` before relying on a
-missing edge. Load `lobby.modules` or `play.scene` first.
+missing edge. Load owner/DM `lobby.modules` or `play.scene_control` first; the
+player-safe `play.scene` group intentionally cannot render keeper pages or write
+reviewed topology.
 
 ## Review sequence
 

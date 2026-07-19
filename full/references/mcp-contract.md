@@ -234,9 +234,9 @@ older exposure ids.
 
 | Phase | Intended state | Example groups |
 |---|---|---|
-| `lobby` | Game-outside setup, imports, campaign administration, character building | `lobby.bootstrap`, `lobby.campaign`, `lobby.characters`, `lobby.rules`, `lobby.modules` |
-| `play` | Live non-combat exploration and downtime | `play.scene`, `play.characters`, `play.resolution` |
-| `combat` | Active structured encounter | `combat.observe`, `combat.turn`, `combat.actions`, `combat.save`, `combat.map` |
+| `lobby` | Game-outside setup, imports, campaign administration, character building | player-safe `lobby.characters`, `lobby.memory`; owner/DM `lobby.campaign`, `lobby.rules`, `lobby.modules`, `lobby.memory_control` |
+| `play` | Live non-combat exploration and downtime | player-safe `play.scene`, `play.characters`, `play.resolution`; owner/DM `play.scene_control`, `play.combat_control` |
+| `combat` | Active structured encounter | player-safe `combat.observe`, `combat.turn`, `combat.actions`; owner/DM `combat.control`, `combat.save`, `combat.map` |
 
 For native clients supporting MCP `tools/list_changed`, loading or unloading a
 group changes the actual tool list. If a host cannot refresh its native schemas,
@@ -252,6 +252,17 @@ group. After campaign creation or selection, call `exposure_open` again with the
 campaign id. Campaign administration, rules and module-import groups additionally
 require owner/DM membership. A campaign-bound exposure rejects arguments that
 target a different campaign, including character ids resolved to that campaign.
+Objective memory, actor-knowledge writes, snapshot history, state history, rule
+receipts, scene progression, combat start/end/join, and map patches are likewise
+kept in owner/DM control groups. Do not load a control group merely to make its
+tools visible to a player Agent; use the player-safe read group and let actor
+authorization govern that Agent's own card and subjective knowledge.
+
+The runtime enforces the same boundary even when a caller bypasses progressive
+discovery and invokes a facade directly. In particular, players cannot inspect
+snapshot labels or lineage, reversible state history, or settlement receipts.
+Non-local reusable-character library reads retain the reusable sheet but omit
+private template notes.
 
 Use `game_phase(action="set", tool_profile="lobby" | "play")` only for the
 non-combat transition. `combat_start` moves the campaign to `combat` and
