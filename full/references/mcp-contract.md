@@ -435,6 +435,12 @@ therefore a per-participant scene fact, not the result of applying the ordinary
 half-success group-check rule to the party. `hidden` and `surprised` are distinct
 facts. Store the source prerequisite and comparison matrix in an auditable
 campaign event before supplying `participant_config.surprised`.
+Multiattack is an explicit action choice. `derived.attacks_per_action` represents
+the actor's ordinary Attack action (including a real Extra Attack feature); it is
+not inflated from a monster's Multiattack card. Pass a canonical
+`multiattack_option_id` only when selecting that structured Multiattack and omit
+it for one ordinary weapon attack. A descriptive Multiattack without executable
+options requires a DM ruling only if selected and must not disable ordinary attacks.
 With valid grid positions, `combat_movement(action="move")`
 verifies the declared five-foot grid distance and creates an owned
 `opportunity_attack` reaction window only when a mover leaves an eligible

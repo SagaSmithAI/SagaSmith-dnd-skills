@@ -108,9 +108,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    actor, revision, budgets, conditions, positions, and derived attacks.
 2. For every attack, use `combat_preflight_attack` immediately before
    `combat_resolve_attack`. Never supply replacement attack bonuses or damage
-   formulas. For a source statblock Multiattack, select one
+   formulas. Multiattack is a distinct action choice, not a passive increase to
+   `derived.attacks_per_action`. To choose a source statblock Multiattack, pass one
    `derived.multiattack_options` id on the first attack and consume only its
-   remaining source-defined entries.
+   remaining source-defined entries. Omit the id to choose one ordinary Attack.
+   An unstructured/descriptive Multiattack remains a DM boundary but never blocks
+   that ordinary single weapon attack.
 3. When an attack returns `pending_reaction`, read the target's
    `combat_query(view="reactions")`, then use
    `combat_choice(action="resolve_defense")`. Do not roll or apply damage twice.
