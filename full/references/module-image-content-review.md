@@ -60,9 +60,12 @@ on Flying Sword can rename its weapon and change only the cited damage type.
 }
 ```
 
-Reject a variant if the cited source does not explicitly establish every change,
-if an action id is ambiguous, or if the desired change is outside the whitelist.
-The base source and variant source must both remain visible in actor provenance.
+Use only a managed `module-chunk:<id>`, `module-review:<id>`, or matching-edition
+`rule-chunk:<id>` as `source_ref`; the MCP resolves it and returns structured
+`variant_evidence`. Reject a variant if the cited source does not explicitly
+establish every change, if an action id is ambiguous, or if the desired change is
+outside the whitelist. The base source and variant source must both remain visible
+in actor provenance.
 
 ```json
 {
