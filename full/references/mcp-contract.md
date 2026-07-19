@@ -151,6 +151,13 @@ The campaign instance is authoritative. After any actor or party mutation, read
 `character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use
 `character_sheet_replace` for a one-field mutation.
 
+`inventory_transfer(mode="character_to_character")` mutates two private actor
+documents and therefore requires the caller to control both actors (an owner/DM
+satisfies both checks), plus current campaign/source/target revisions. A failed
+authorization or stale revision moves nothing. Party transfers instead use
+`party_to_character` or `character_to_party`; the facade maps those directions
+to one atomic shared-stash/actor mutation.
+
 Prepared-spell selection is edition- and class-aware. In `lobby`, use
 `character_spell_prepare(mode="replace_all")` with the complete selected list and
 `event: setup` or `event: level_up`; `mode="set"` is only a setup edit. In live
