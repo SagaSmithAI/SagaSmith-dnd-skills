@@ -1,8 +1,21 @@
 # Character Creation and Advancement
 
-Use `dnd_ability_roll` for visible rolls. Apply a confirmed standard array,
-point-buy, or rolled assignment with `character_ability_apply`; never manually
-write derived ability values.
+Apply ability scores only through `character_ability_apply`; never write the six
+ability fields or their derived modifiers directly. The supported creation paths
+have distinct provenance:
+
+- `method="manual"` plus all six `assignments` records explicit user-entered
+  scores from 1 through 30. This supports physical dice, existing characters,
+  and intentional overrides, but its empty `rolls` list must never be described
+  as an engine roll.
+- `method="standard_array"` and `method="point_buy"` require all six assignments
+  and are validated against the selected edition.
+- `method="roll_4d6_drop_lowest"` is two phase. First omit `assignments`; the MCP
+  rolls and persists one immutable six-score set and returns `pending_choice`.
+  Show those rolls to the player. Then re-read the character revision and call
+  the same method with an assignment of every returned score exactly once. Never
+  submit a `rolls` argument, reroll a pending set, or generate scores through
+  `dnd_ability_roll` (which is an ordinary d20 check, not score generation).
 
 For a new PC, call `character_create_from(mode="build")` with complete validated `sheet v2` and
 `notes v2`. It creates the public template and independent campaign instance in one

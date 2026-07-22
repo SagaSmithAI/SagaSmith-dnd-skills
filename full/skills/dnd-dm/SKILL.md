@@ -117,6 +117,13 @@ transport retry replays that same pair. Use `character_query(view="library")` an
 `character_create_from(mode="template")` for existing templates. New subjective
 information belongs in the actor-knowledge ledger.
 
+For ability generation, `manual` preserves explicitly entered scores without
+claiming a dice audit, while `standard_array` and `point_buy` enforce their rule
+budgets. Rolled generation is two-phase through `character_ability_apply`: omit
+assignments to let the engine persist the six 4d6-drop-lowest results, then assign
+those exact results under the returned character revision. Never send `rolls` or
+reroll a pending set. See `references/CHAR_CREATION.md` for the complete contract.
+
 For a module NPC or monster, use the exact imported standard statblock or an
 immutable reviewed image card. If the module explicitly changes only HP, AC,
 languages, or an action, pass a source-cited `variant` to the statblock creation
