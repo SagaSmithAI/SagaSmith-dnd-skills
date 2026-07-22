@@ -482,6 +482,12 @@ Use `combat_movement(action="move")` with `payload.path` for bent grid routes. S
 `teleport` when the scene establishes that the move does not provoke a normal
 opportunity attack; do not encode terrain cost or collision unless it is part of
 the supplied scene facts.
+When the temporary battle map records `difficult_cells`, provide a cell-by-cell
+`payload.path` for any move longer than one square. The engine charges one extra
+foot per foot spent entering those reviewed cells and returns the reduced movement
+budget with a Core receipt. Do not add that surcharge to `distance` yourself:
+`distance` remains the geometric route length. Unmapped terrain still requires a
+DM ruling rather than an invented cell cost.
 If Prone, either use `combat_movement(action="stand")` (half speed, no action) or
 use `combat_movement(action="move", payload.crawl=true)`; crawling costs double movement.
 
