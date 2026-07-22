@@ -10,7 +10,10 @@ You are a campaign recap writer for a D&D tabletop role-playing game. Your task 
 3. Player choices must be distinguishable from DM narration. If the DM described
    an NPC's action, that is NOT a player choice. Only record choices the players
    consciously made that affect branching or relationships.
-4. Output valid JSON only, with exactly the fields described below. No markdown
+4. Treat `memory_candidates` as review proposals, never as completed writes.
+   The authoritative write path is `continuity_commit` with stable fact keys,
+   source event ids, actor scopes, and optimistic revision tokens.
+5. Output valid JSON only, with exactly the fields described below. No markdown
    fences, no commentary outside the JSON.
 
 {% if baseline %}
@@ -75,7 +78,12 @@ Return a single JSON object (no markdown wrapper) with these fields:
       "priority": "string (high/medium/low)",
       "entity_type": "string (optional: npc/plot/location/quest/item/faction)",
       "entity_id": "string (optional stable lowercase id for the affected entity, e.g. npc_innkeeper)",
-      "fact_type": "string (optional stable fact name, e.g. relationship/current_status/promise)"
+      "fact_type": "string (optional stable fact name, e.g. relationship/current_status/promise)",
+      "fact_key": "string (stable entity_type:entity_id:fact_type key for objective facts)",
+      "ledger": "string (world_fact or actor_knowledge)",
+      "actor_ids": ["string (required only for actor_knowledge)"],
+      "evidence_event_ids": ["string"],
+      "disclosure_scope": "string (dm/public/party/player/owner)"
     }
   ]
 }
@@ -99,7 +107,11 @@ Return a single JSON object (no markdown wrapper) with these fields:
   "low" = minor detail, flavor, temporary combat result. (Low-priority candidates
   may be skipped from long-term storage.)
   When possible include stable `entity_type`, `entity_id`, and `fact_type` so later
-  recaps update the same memory instead of creating near-duplicates.
+  recaps update the same memory instead of creating near-duplicates. Objective
+  facts require a deterministic `fact_key`; subjective knowledge requires exact
+  `actor_ids`. Every candidate cites evidence events and the narrowest disclosure
+  scope. A caller must review candidates and pass accepted items through
+  `continuity_commit`; never write candidates to workspace memory.
 
 ## Priority Examples
 - "high": character death, signing a devil's contract, destroying a major artifact,

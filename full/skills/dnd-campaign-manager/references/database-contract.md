@@ -5,7 +5,8 @@ Chroma、artifact 文件或本地 D&D CLI。
 
 ## 权威状态
 
-- `Character.sheet`：机械状态；`Character.notes`：叙事和角色资料。
+- `Character.sheet`：机械状态；`Character.notes`：角色资料。旧
+  `notes.memories` 仅供迁移，不再接收新的长期记忆。
 - `derived`：只读计算结果，不能写回。
 - `campaign.state.party.inventory`：队伍共享物品和钱包。
 - `memory`：当前分支的世界事实；`event`：时间顺序证据。
@@ -27,6 +28,9 @@ Chroma、artifact 文件或本地 D&D CLI。
 - 金币、物品、弹药和跨角色变化必须使用对应 granular MCP tool。
 - 跨实体操作属于一个 mutation group，一次 undo/redo 必须整体恢复。
 - revision conflict 时重新读取和审查，禁止覆盖新状态。
+- 场景结算使用一次 `continuity_commit` 原子写入 event、稳定键 world facts、
+  逐 actor knowledge 和可选 snapshot；更新已有事实或知识时携带各自的
+  `expected_revision_id`。
 
 ## 规则与模组
 
