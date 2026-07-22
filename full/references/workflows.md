@@ -176,8 +176,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
   the Fighter's turn. The committed result consumes its card use and grants one
   current-turn `extra_action`; never patch the turn budget, and never carry an
   unused extra action into a later turn.
-- For Second Wind, call `combat_use_activity` to pay its bonus action and use, roll
-  the source formula, then call `combat_hp_change(action="heal")` with that result.
+- For Second Wind, call `combat_use_activity` with its exact feature id. The same
+  transaction pays its bonus action and use, rolls the source formula, and applies
+  clamped healing. Never roll it externally or follow it with `combat_hp_change`.
 - For healing from a levelled spell, send rolled base `amount`, `source_actor_id`,
   `spell_id`, and actual `spell_level`; do not pre-add source-linked modifiers.
 - Halfling Lucky needs no extra write. Preserve returned reroll evidence and
