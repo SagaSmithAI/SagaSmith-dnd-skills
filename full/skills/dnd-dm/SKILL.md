@@ -419,7 +419,14 @@ half-success group-check rule, and do not treat satisfying an adventure's
 "careful/no light" prerequisite as guaranteed surprise unless the source says so.
 An opponent that notices any threat is not surprised; record the comparison and
 set `surprised` per participant. Hidden and surprised are separate facts. A
-current module scene produces a frozen temporary battle map. An encounter scene
+contextual observer feature such as Keen Smell changes passive Perception by
+`+5` only when the DM confirms that the particular attempt can be perceived by
+that sense; preserve that sensory ruling per observer instead of raising every
+observer's passive score globally. For every d20 result, retain `roll_mode`,
+`advantage_applied`, and `disadvantage_applied` with the raw `rolls` and rule
+receipts. The effective roll-mode fields are authoritative: two raw d20 values
+alone do not distinguish an applied mode from rerolls or other audited effects.
+A current module scene produces a frozen temporary battle map. An encounter scene
 may use `current_location_key` to reference exactly one spatial location in
 another scene of the same module; persist that source scene as
 `state.location_scene_id`, and preserve the current progress, encounter, and
