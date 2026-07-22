@@ -123,11 +123,15 @@ budgets. Rolled generation is two-phase through `character_ability_apply`: omit
 assignments to let the engine persist the six 4d6-drop-lowest results, then assign
 those exact results under the returned character revision. Never send `rolls` or
 reroll a pending set. See `references/CHAR_CREATION.md` for the complete contract.
+When presenting character creation choices, keep all four paths visible; never
+remove `manual` merely because a rules-validated alternative is available.
 
 For a module NPC or monster, use the exact imported standard statblock or an
 immutable reviewed image card. If the module explicitly changes only HP, AC,
-languages, or an action, pass a source-cited `variant` to the statblock creation
-call. Never rebuild or raw-patch the full sheet for a small module instance change.
+creature type, languages, or an action, pass a source-cited `variant` to the
+statblock creation call. Never rebuild or raw-patch the full sheet for a small
+module instance change. A type replacement such as beast to undead must use
+`creature_type` and cite the exact managed module chunk or review that says so.
 
 After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
 `character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one
