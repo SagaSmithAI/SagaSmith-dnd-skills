@@ -638,6 +638,11 @@ resources, concentration, and recorded components. Generic spells return
 complete in active combat. Costly or consumed material components require
 `component_ruling.material_confirmed=true` before resources are spent. Pact Magic
 uses the recorded `pact_magic.slot_level` and is counted as a slot expenditure.
+A custom source-bound statblock spell whose component details were not present in
+the reviewed card requires `component_ruling.source_components_confirmed=true`
+before it pays an action, slot, or concentration. Confirm this only from an
+explicit DM ruling or an active exact spell rule; the later `pending_ruling`
+still covers targets and effects.
 
 `module_set_progress` requires the current `expected_state_version` for that
 scene/scope row (`0` for its first write) and a fresh idempotency key.

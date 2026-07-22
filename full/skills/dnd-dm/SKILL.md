@@ -375,6 +375,11 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+For a source-bound statblock spell marked with components not repeated in its
+reviewed card, obtain an explicit source or DM confirmation and pass
+`component_ruling.source_components_confirmed=true` before casting. The engine
+checks this before paying the action, slot, or concentration. Never spend first
+and ask for the component ruling afterward.
 
 For a room such as `D13` nested inside a larger indexed location scene, call
 `module_search("D13")` and verify that the first hit's last `heading_path` entry
