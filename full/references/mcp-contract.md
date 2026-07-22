@@ -437,6 +437,11 @@ is interpreted by the selected 2014/2024 ruleset. The DM may provide a
 `hidden`, explicit `visible_to_actor_ids`, surprise, and initiative. Omit
 `visible_to_actor_ids` for an ordinarily visible creature; provide it when known
 special senses let only named participants see a hidden or Invisible creature.
+When a source-bound weapon records additional typed damage, one successful hit
+rolls all parts and applies per-type defenses as one simultaneous damage instance.
+The result's `damage.roll_parts` preserves every roll. A nonempty
+`on_hit_ruling` means damage is committed while the quoted secondary condition or
+choice still requires explicit DM settlement; it is not permission to repeat the hit.
 For 2014 surprise, first satisfy any imported scene prerequisites that merely
 avoid automatic detection, then resolve each hiding actor's canonical Stealth
 check and compare the individual results with each opposing creature's passive

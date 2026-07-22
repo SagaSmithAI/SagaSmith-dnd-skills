@@ -222,6 +222,13 @@ while holding a weapon whose ammunition is exhausted. The Core attack is
 proficient, uses Strength, has 5-foot reach, and deals `1 + Strength modifier`
 bludgeoning damage. Do not require the actor to delete or unequip a weapon first.
 
+A source-bound weapon can carry multiple simultaneous typed damage parts. Let the
+engine roll every recorded part and apply resistance, immunity, and vulnerability
+per type as one hit; never collapse them into one type or manually add the second
+part. If the same hit also returns `on_hit_ruling.required`, the damage is already
+committed but the quoted secondary effect is still a DM boundary. Resolve that
+effect explicitly and do not silently omit it or apply the damage again.
+
 Multiattack is a distinct action choice. For a structured monster Multiattack,
 pass `multiattack_option_id` on its first `combat_preflight_attack` and
 `combat_resolve_attack`, then make only the exact weapon/mode/count sequence still
