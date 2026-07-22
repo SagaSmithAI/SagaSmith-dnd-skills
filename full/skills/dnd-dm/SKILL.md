@@ -173,6 +173,13 @@ rolls every spent die, adds the card's Constitution modifier, and returns
 reject long-rest hit-die recovery allocations and `food_and_drink`. A creature
 at 0 HP or Dead receives no rest benefit.
 
+If a Wizard chooses Arcane Recovery at the end of that short rest, include
+`arcane_recovery={"<slot level>": <count>}` in the same rest call. The engine
+requires the recorded feature, limits the combined recovered slot levels to half
+the Wizard level rounded up, forbids level 6+ slots, records its once-per-long-rest
+use, and restores only actually missing slots. Do not apply the rest first and
+patch spell slots afterward.
+
 Level advancement is a `lobby` transaction, not a sheet replacement. Preserve
 the exact award evidence and call
 `character_state_change(action="level_advance")` with the existing class, fixed
@@ -418,6 +425,14 @@ Use `combat_use_activity` or `character_action(action="use_activity")` for cards
 `content.activities`, `features`, or `feats`. These tools pay a recorded use or
 resource and the activation timing, then return `pending_ruling` when the card
 has choices; they never infer a result from prose.
+
+Core Preserve Life is an exception with a complete deterministic contract. In
+noncombat play, its `declaration.allocations` must contain every target's id,
+current character revision, positive healing amount, and DM-confirmed
+`within_30_ft: true`. Submit the whole allocation once. The MCP enforces the
+five-times-Cleric-level pool, the half-maximum-HP ceiling, and the Undead/Construct
+exclusion, then atomically spends Channel Divinity and updates all target cards.
+Never pay the activity first and heal targets through separate calls.
 
 Reaction spells and activities require an owned pending reaction window. Do not
 call them solely because it is another actor's turn. Do not hide a spell inside
