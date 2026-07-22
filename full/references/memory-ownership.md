@@ -51,3 +51,6 @@ whole unit; never finish only the remaining calls from a partially imagined save
 - Never replace actor-scoped context with broad fact search.
 - After branch checkout or snapshot restore, discard cached cards and context,
   then reread campaign, actors, module progress, events, and each actor's context.
+- Use `continuity_diagnostics` for counts, orphan provenance, unsnapshotted events,
+  recap evidence, checkpoint size, and Skill drift; it must not return narrative
+  secrets or become a second write path.
