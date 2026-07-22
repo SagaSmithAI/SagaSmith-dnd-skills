@@ -128,8 +128,9 @@ Advancement changes the live campaign instance and must use the audited lobby
 workflow; never patch `progression.level`, HP, Hit Dice, slots, or preparation
 limits by hand:
 
-1. Inspect the module or campaign award and retain its exact `source_ref`. Record
-   a level-up `campaign_event(action="add")` that says why the level was earned.
+1. Inspect the module or campaign award and retain its exact `source_ref`. Prepare
+   a level-up event for the final `continuity_commit` that says why the level was
+   earned.
 2. End active combat, switch the campaign to `lobby`, read the actor's latest
    revision, and call
    `character_state_change(action="level_advance", payload={class_name,
@@ -156,5 +157,6 @@ limits by hand:
 6. Re-read the actor and audit level, HP maximum/current HP, Hit Dice, spell slots,
    preparation, feature resources, subclass, spells, and `derived`. Do not return
    to `play` while any required catalog item or player choice is missing.
-7. After confirmation, create a post-level `snapshot_create`, then return to
-   `play` and reopen the phase-appropriate exposure.
+7. After confirmation, use `continuity_commit` for the level-up event and
+   post-level snapshot, then return to `play` and reopen the phase-appropriate
+   exposure.

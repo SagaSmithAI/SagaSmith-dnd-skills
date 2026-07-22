@@ -71,9 +71,11 @@ own exposure. Loading a group for one Agent must not expose it to another.
 8. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
 9. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
-10. Record the opening with `campaign_event(action="add")`, persist objective facts
-   with `memory_change`, and call `snapshot_create`. These writes require the
-   owner/DM `lobby.memory_control` and `lobby.campaign` groups.
+10. Record the opening with one `continuity_commit`: include the opening event,
+    deterministic-key objective facts, per-actor knowledge only for actual
+    witnesses, and the initial snapshot. Supply a fresh `idempotency_key` and the
+    current campaign revision. This requires the owner/DM `lobby.memory_control`
+    and `lobby.campaign` groups.
 
 ## Scene readiness and temporary combat map
 
@@ -214,15 +216,18 @@ Load owner/DM `play.scene_control` before the following chronology and save
 writes. A player Agent uses `play.scene` and receives only audience-safe events,
 continuity, and its authorized actor knowledge.
 
-1. Persist the structured `combat_end` outcome as a `campaign_event`.
-2. Use `audience_scope="actor"`, `known_by_actor_ids`, and
-   `knowledge_disclosure_scope="owner"` for a witnessed subset. Use `party` only
-   when every party actor may know the event.
-3. Persist objective world facts with `memory_change`. Persist each PC/NPC's
-   subjective belief, secret, inference, or misinformation separately with
-   `actor_knowledge_change`.
-4. Call `snapshot_create` with the current campaign revision, branch id, and head
-   snapshot id. The restorable payload is full; the recap is the delta.
+1. Build one `continuity_commit` payload from the structured `combat_end` or scene
+   outcome. Include exactly one event, accepted objective fact changes, each
+   affected actor's knowledge changes, and the snapshot request.
+2. Use `audience_scope="actor"` and owner-scoped ActorKnowledge for a witnessed
+   subset. Use `party` only when every party actor may know the event. Never infer
+   actor knowledge from a world fact.
+3. Give objective facts deterministic keys such as
+   `location:cellar:door-state`. Existing keys and knowledge revisions require
+   their current `expected_revision_id`; the commit itself requires a fresh
+   `idempotency_key` and the current campaign revision.
+4. Submit once. If any write fails, refresh all affected revisions and rebuild the
+   entire unit; do not retry only the missing tail or claim a partial save.
 5. Verify with `snapshot_query(view="verify")` and inspect
    `snapshot_query(view="lineage")`.
 

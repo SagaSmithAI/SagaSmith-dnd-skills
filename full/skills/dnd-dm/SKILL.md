@@ -78,10 +78,12 @@ the campaign.
    without its granted feature cards and traits is an incomplete actor, not a
    usable shortcut. Never patch the raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
-8. Persist events, scene progress, actor/party state, and durable facts. Use
-   `actor_knowledge_change/query` for what one PC/NPC believes, not world memory.
-9. Call `snapshot_create` at decision points, chapter transitions, and before a
-    dangerous restore. Use `snapshot_query(view="verify" | "lineage")` before restore.
+8. Persist resolved scene continuity with one `continuity_commit`: one event,
+   stable-key objective fact changes, exact per-actor knowledge changes, and an
+   optional snapshot. Never infer who knows a fact from the fact itself.
+9. Use an administrative `snapshot_create` only when no scene continuity unit is
+   being written, such as immediately before a dangerous restore. Use
+   `snapshot_query(view="verify" | "lineage")` before restore.
 
 ## MCP Tool Reference
 
@@ -92,7 +94,7 @@ the campaign.
 | Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content)`, `module_page_render`, `module_content_review` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
-| World continuity | `campaign_event`, `memory_change`, `memory_query` |
+| World continuity | `continuity_commit`, `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
@@ -143,8 +145,8 @@ for each physically distinct book. Preserve its edition, exact source scene/key,
 copyability, owner mark, resolved catalog `spell_ids`, and
 `unresolved_spell_names`. A name absent from the active content catalog stays
 unresolved and non-executable; never drop it, substitute a similar spell, or
-fabricate an artifact id. Record discovery with one `campaign_event` and only
-the actual witnesses in `known_by_actor_ids`.
+fabricate an artifact id. Record discovery through `continuity_commit`, with the
+objective item fact and separate ActorKnowledge entries only for actual witnesses.
 
 Discovery does not add spells to a Wizard's personal spellbook. During `play`,
 copy exactly one returned spell id with `character_content_apply` using

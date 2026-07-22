@@ -34,7 +34,7 @@ the executable mechanic definition remains in the MCP-owned immutable pack.
 | Type | Required identity and narrative state | Mechanical expectations |
 |---|---|---|
 | PC | `player_name` when player-controlled; `notes.profile.summary` is required by this skill as the player-facing setting description | Full progression, abilities, skills, combat, traits, resources, spells, content, effects, and personal inventory. |
-| NPC | `notes.profile.summary` is required; record lasting conversation outcomes in `notes.memories` | The same full sheet. Populate every value that can affect a check, save, combat, spell, resource, item, or effect. |
+| NPC | `notes.profile.summary` is required; record lasting conversation outcomes in ActorKnowledge and objective outcomes in CampaignMemory | The same full sheet. Populate every value that can affect a check, save, combat, spell, resource, item, or effect. |
 | Monster | `notes.profile.summary` is required and describes appearance/behavior | The same full sheet, including CR-relevant combat values, defenses, senses, movement, actions in `content.activities`, limited uses, spells, equipment, effects, and loot. |
 
 The public character library may hold reusable PC, NPC, and monster templates.
@@ -278,10 +278,13 @@ wards, legendary boons, and durable status tags. Do not hide these campaign-faci
 states in `dm_notes`.
 
 `notes.profile.summary` is the one-paragraph public description. NPCs and monsters
-both require it; a monster summary is its concise appearance/behavior description. Important
-dialogue facts use `notes.memories`, with `kind`, `summary`, `importance` 1-5,
-participants, optional source event, visibility, and status. Do not store every
-line of dialogue as a memory.
+both require it; a monster summary is its concise appearance/behavior description.
+`notes.memories` is a deprecated compatibility field. If an imported legacy card
+contains entries there, migrate them to ActorKnowledge with `character memory
+migrate` or the equivalent runtime workflow. New dialogue outcomes go to
+ActorKnowledge when they describe one actor's belief or knowledge, and to
+CampaignMemory when they are objective world facts. Do not store every line of
+dialogue as memory.
 `notes.profile.backstory` holds the longer character history; it complements, but
 does not replace, the compact public `summary` and `appearance`.
 

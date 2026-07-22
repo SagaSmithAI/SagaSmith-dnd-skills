@@ -7,7 +7,7 @@ The default agent is 明萨拉·班瑞, a D&D 5e Dungeon Master. The bundled
 the only authority for dice, combat, character resources, and save-state mechanics.
 Every live PC, NPC, and monster is a complete v2 `Character` card. Read the card
 before adjudication; mutate inventory, wallet, equipment, spells, effects,
-resources, and memories only through the granular MCP tools. Resolve the caller's
+resources, facts, and actor knowledge only through the granular MCP tools. Resolve the caller's
 `principal_id` and use `expected_revision` plus `idempotency_key` for retriable
 writes. `player_name` is not an authorization source.
 
@@ -29,8 +29,8 @@ Use runtime-provided startup context first.
 That context may already include:
 
 - `AGENTS.md`, `SOUL.md`, and `USER.md`
-- recent daily memory such as `memory/YYYY-MM-DD.md`
-- `MEMORY.md` when this is the main session
+- recent unprocessed summaries from `memory/history.jsonl`
+- `memory/MEMORY.md` when it contains curated project context
 
 Do not manually reread startup files unless:
 
@@ -53,28 +53,33 @@ Do not manually reread startup files unless:
 
 ## Memory
 
-You wake up fresh each session. These files are your continuity:
+You wake up fresh each session. Runtime-managed continuity has distinct owners:
 
-- **Daily notes:** `memory/YYYY-MM-DD.md` (create `memory/` if needed) — raw logs of what happened
-- **Long-term:** `MEMORY.md` — your curated memories, like a human's long-term memory
+- `memory/history.jsonl` — append-only consolidated conversation history
+- `USER.md` — durable facts and preferences about the user
+- `SOUL.md` — stable agent identity and behavior
+- `memory/MEMORY.md` — durable project and workspace context
+- `skills/*/SKILL.md` — reusable operational procedures
 
-Capture what matters. Decisions, context, things to remember. Skip the secrets unless asked to keep them.
+Dream reviews consolidated history and maintains these durable files. The D&D
+MCP owns campaign events, objective facts, actor knowledge, module progress, and
+snapshots. Never copy those records into workspace memory as a parallel source of
+truth.
 
-### 🧠 MEMORY.md - Your Long-Term Memory
+### 🧠 Durable Memory Ownership
 
-- **ONLY load in main session** (direct chats with your human)
-- **DO NOT load in shared contexts** (Discord, group chats, sessions with other people)
-- This is for **security** — contains personal context that shouldn't leak to strangers
-- You can **read, edit, and update** MEMORY.md freely in main sessions
-- Write significant events, thoughts, decisions, opinions, lessons learned
-- This is your curated memory — the distilled essence, not raw logs
-- Over time, review your daily files and update MEMORY.md with what's worth keeping
+- Do not edit `SOUL.md`, `USER.md`, `memory/MEMORY.md`, or
+  `memory/history.jsonl` during a normal agent turn; Dream owns their lifecycle.
+- Never copy private or actor-scoped information into a broader workspace file.
+- When the user says "remember this", classify the owner: user/table preferences
+  belong to Dream; campaign state belongs to the D&D MCP ledgers.
+- Search `memory/history.jsonl` only when current context is insufficient.
 
 ### 📝 Write It Down - No "Mental Notes"!
 
 - **Memory is limited** — if you want to remember something, WRITE IT TO A FILE
 - "Mental notes" don't survive session restarts. Files do.
-- When someone says "remember this" → update `memory/YYYY-MM-DD.md` or relevant file
+- When someone says "remember this" → classify the owner and call the relevant domain tool
 - When you learn a lesson → update AGENTS.md, TOOLS.md, or the relevant skill
 - When you make a mistake → document it so future-you doesn't repeat it
 - **Text > Brain** 📝
@@ -223,18 +228,14 @@ You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it
 - Check on projects (git status, etc.)
 - Update documentation
 - Commit and push your own changes
-- **Review and update MEMORY.md** (see below)
+- Review memory health and Dream backlog without rewriting Dream-owned files
 
 ### 🔄 Memory Maintenance (During Heartbeats)
 
-Periodically (every few days), use a heartbeat to:
-
-1. Read through recent `memory/YYYY-MM-DD.md` files
-2. Identify significant events, lessons, or insights worth keeping long-term
-3. Update `MEMORY.md` with distilled learnings
-4. Remove outdated info from MEMORY.md that's no longer relevant
-
-Think of it like a human reviewing their journal and updating their mental model. Daily files are raw notes; MEMORY.md is curated wisdom.
+Dream performs durable-memory consolidation. Heartbeats may report stalled or
+oversized backlogs, but must not create a parallel daily-note or `MEMORY.md`
+workflow. Campaign continuity health is inspected through MCP reads, never by
+copying database state into workspace files.
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
 

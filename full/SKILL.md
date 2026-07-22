@@ -1,8 +1,6 @@
 ---
 name: sagasmith-dnd-suite
-description: "MCP-first D&D 5e 2014/2024 game-master and campaign workflow."
-metadata:
-  version: 2.0.0
+description: "Run or maintain D&D 5e 2014/2024 campaigns through SagaSmith's MCP-first game-master, actor, module, continuity-memory, and snapshot workflows. Use for live play, campaign setup, character management, module import, rules adjudication, durable facts, actor knowledge, branches, saves, and restores."
 ---
 
 # SagaSmith D&D Suite
@@ -35,7 +33,8 @@ as `mcp_sagasmith_dnd_`.
 
 Runtime continuity is branch-aware: use world facts for durable truth, actor knowledge
 for one PC/NPC/monster's subjective information, and scoped scene state for private
-discoveries. Do not use workspace `MEMORY.md` as campaign state.
+discoveries. Read `references/memory-ownership.md` before routing a "remember this"
+request or persisting a scene. Do not use workspace memory as campaign state.
 
 Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 
@@ -52,7 +51,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   `references/character-schema-v2.md` before creating or mutating a PC, NPC, or
   monster. All three are full `Character` records, not abbreviated stat blocks.
 - Use granular character / party MCP tools for inventory, wallet, equipment,
-  prepared spells, effects, resources, and NPC memories. `character update` is
+  prepared spells, effects, resources, and actor adventure state. Legacy
+  `notes.memories` is import-only; new subjective information belongs to
+  ActorKnowledge. `character update` is
   reserved for a reviewed replacement of the complete `sheet` or `notes` document.
 - `character build` is the preferred player-character creation workflow: it creates
   a public template and a separate initial campaign instance atomically.
