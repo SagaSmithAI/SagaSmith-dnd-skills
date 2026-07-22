@@ -293,6 +293,11 @@ For an image-only module card, use the reviewed visual workflow and
 English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
 numeric attack facts, 2024, ambiguous, or otherwise unsupported block must
 remain unresolved; do not replace it with a similar SRD creature or invent a card.
+When a complete statblock action repeats a known spell, the action is authoritative
+for that creature. Hydration preserves the Core card's components and provenance
+but overlays the displayed effect/range and structured attack resolution together.
+Clients must reject a newly prepared actor if those views disagree; do not show a
+base-spell range while the engine enforces the statblock override.
 
 Before `combat_start`, call `module_query(view="readiness")` with a manifest:
 

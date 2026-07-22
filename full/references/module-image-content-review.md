@@ -29,7 +29,12 @@ and never create or repair a required actor after combat has begun.
    `character_create_from(mode="module_statblock", payload={"campaign_id": ...,
    "review_id": ..., "name": ..., "character_type": "monster"})`. Re-read the
    actor and verify AC, HP, attacks, source refs, and unresolved rules before
-   adding its canonical id to the scene-readiness manifest.
+   adding its canonical id to the scene-readiness manifest. If the printed
+   statblock repeats a known spell as a numeric action, that action is an explicit
+   creature-specific override: the hydrated spell card's displayed effect/range
+   and structured resolution must agree with the printed action, even when the
+   base Core spell has a different range. Treat any display/settlement mismatch as
+   a lobby blocker; never narrate the base spell value while settling the override.
 
 If a room names a standard rule statblock and then states a small instance change,
 import the exact standard source and use `character_create_from(mode="statblock")`
@@ -93,3 +98,10 @@ it is not branch-scoped narrative state. Actors created from it retain the revie
 id, module/scene ids, page, and asset checksum in their notes. A corrected visual
 transcription creates a new review record and new actor preparation; do not mutate
 the old evidence or silently rewrite an active combatant.
+
+For a regression import, checkpoint in `lobby`, create and checkout a disposable
+branch, build the actor from the immutable review, and verify every spell card's
+displayed range against its structured range override. Snapshot that branch and
+checkout the source branch again. The newly created actor must not appear in the
+source branch; this verifies new-import behavior without migrating or rewriting
+old campaign actors.

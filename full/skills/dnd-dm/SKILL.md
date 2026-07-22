@@ -405,6 +405,11 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+When the statblock prints a complete numeric action for a known spell, its
+creature-specific range, damage, and effect override the base spell for that actor.
+After creation, verify that the spell card's displayed definition and structured
+resolution agree; a mismatch is a lobby blocker because Agent narration and engine
+settlement would otherwise contradict each other.
 The excerpt is evidence, not a search hint: copy an exact normalized substring
 from the expanded same-module scene or a verified `module_search` hit. Never
 paraphrase, translate, or copy text from a different occurrence of the room key.
