@@ -121,6 +121,7 @@ new 2014 car creation must use one of these code-validated methods:
 
 | Method | Runtime enforcement |
 |---|---|
+| `manual` | Preserves all six explicitly entered scores (1-30) without claiming that the engine rolled them. This option must remain available to players. |
 | `standard_array` | Uses exactly `15, 14, 13, 12, 10, 8` once each. |
 | `point_buy` | Uses scores 8-15 and spends exactly 27 points using the 2014 cost table. |
 | `roll_4d6_drop_lowest` | Requires six recorded 4d6 pools, each with its lowest die dropped, and assigns every resulting score once. |
@@ -130,6 +131,7 @@ new 2014 car creation must use one of these code-validated methods:
 sagasmith-dnd character ability roll --edition 2014 --json
 
 # Apply a method to an existing template or campaign instance.
+sagasmith-dnd character ability apply --id <id> --method manual --assignments '<six-ability-json>' --json
 sagasmith-dnd character ability apply --id <id> --method standard_array --assignments '<six-ability-json>' --json
 sagasmith-dnd character ability apply --id <id> --method point_buy --assignments '<six-ability-json>' --json
 sagasmith-dnd character ability apply --id <id> --method roll_4d6_drop_lowest --rolls '<roll-output-array>' --assignments '<six-ability-json>' --json
