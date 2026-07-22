@@ -84,6 +84,13 @@ or thrown ranges before switching to combat. The universal `unarmed-strike`
 fallback does not make an incomplete imported weapon or spell automatically
 settled.
 
+When one indexed scene contains many numbered rooms, advance by the imported room
+chunk rather than assuming every room is a top-level scene. Search the exact room
+identifier with `module_search` (for example `D13`), require the first result's
+final `heading_path` element to name that room, and retain its chunk id and page
+range as the source for events, statblocks, and spatial review. A same-looking
+identifier inside ordinary prose or a different scene is not the room source.
+
 ## Characters
 
 | Need | MCP tool |

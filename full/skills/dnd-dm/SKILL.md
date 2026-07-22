@@ -365,6 +365,12 @@ the exact card is visible only on a module PDF page, follow
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
 
+For a room such as `D13` nested inside a larger indexed location scene, call
+`module_search("D13")` and verify that the first hit's last `heading_path` entry
+is the exact room heading before using its content. Preserve that hit's chunk id,
+scene id, and page range. Do not select another occurrence where `D13` merely
+means a DC value or appears in unrelated prose.
+
 End an encounter with a structured `combat_end.outcome`: `status` is one of
 `victory`, `defeat`, `withdrawal`, `truce`, or `interrupted`, and `summary`
 states the scene-supported reason and immediate public result. Do not close a
