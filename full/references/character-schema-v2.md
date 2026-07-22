@@ -307,8 +307,7 @@ sagasmith-dnd character spell unprepare --id <id> --spell <spell-id> --json
 sagasmith-dnd character effect add --id <id> --payload '<effect-json>' --json
 sagasmith-dnd character effect remove --id <id> --effect <effect-id> --json
 sagasmith-dnd character resource set --id <id> --resource <resource-key> --amount <n> --json
-sagasmith-dnd character memory add --id <id> --payload '<memory-json>' --json
-sagasmith-dnd character memory resolve --id <id> --memory-id <memory-id> --json
+sagasmith-dnd character memory migrate --id <id> --json
 sagasmith-dnd party inventory deposit --campaign <id> --id <character-id> --item <item-id> --json
 sagasmith-dnd party inventory withdraw --campaign <id> --id <character-id> --item <item-id> --json
 sagasmith-dnd party wallet deposit --campaign <id> --id <character-id> --denomination gp --amount 5 --json
@@ -318,3 +317,7 @@ sagasmith-dnd party wallet withdraw --campaign <id> --id <character-id> --denomi
 Use `character_sheet_replace` only for a reviewed complete draft or a
 deliberate full-sheet change. Never hand-edit one inventory entry, wallet balance,
 prepared spell, effect, or memory through a raw sheet replacement during play.
+`character memory migrate` is read-only: review its candidates, then persist
+accepted subjective entries with `actor_knowledge_change` or the
+`actor_knowledge` member of `continuity_commit`. Do not call the deprecated
+character memory add/resolve compatibility commands for new runtime state.
