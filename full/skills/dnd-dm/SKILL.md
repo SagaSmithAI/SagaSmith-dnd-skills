@@ -176,9 +176,11 @@ at 0 HP or Dead receives no rest benefit.
 If a Wizard chooses Arcane Recovery at the end of that short rest, include
 `arcane_recovery={"<slot level>": <count>}` in the same rest call. The engine
 requires the recorded feature, limits the combined recovered slot levels to half
-the Wizard level rounded up, forbids level 6+ slots, records its once-per-long-rest
-use, and restores only actually missing slots. Do not apply the rest first and
-patch spell slots afterward.
+the Wizard level rounded up, forbids level 6+ slots, records the use, and restores
+only actually missing slots. For 2014, this is once per
+campaign day, not once per long rest: the MCP requires the branch-local clock,
+records the last-used day on the feature, and a long rest does not reset it. Do
+not apply the rest first and patch spell slots afterward.
 
 Level advancement is a `lobby` transaction, not a sheet replacement. Preserve
 the exact award evidence and call
