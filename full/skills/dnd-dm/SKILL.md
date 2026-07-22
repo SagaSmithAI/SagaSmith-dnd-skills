@@ -155,10 +155,24 @@ membership, always-prepared and cantrip exclusions, and multiclass
 `grant.source_key` ownership. An unprepared level 1+ spell on a prepared caster's
 card is not castable merely because its access record says it is known.
 
+A rest benefit and elapsed narrative time are separate writes. First establish
+that the uninterrupted rest actually occurred and advance the branch-local clock
+by its source-required duration; only then call
+`character_state_change(action="rest")` for each eligible actor. For a short
+rest, submit `hit_dice_spends=[{"key": <recorded hit-die key>, "count": <positive
+integer>}]`. Never submit a die result: the engine validates the available pool,
+rolls every spent die, adds the card's Constitution modifier, and returns
+`hit_dice_rolls` for audit. Long rests reject `hit_dice_spends`; short rests
+reject long-rest hit-die recovery allocations and `food_and_drink`. A creature
+at 0 HP or Dead receives no rest benefit.
+
 Level advancement is a `lobby` transaction, not a sheet replacement. Preserve
 the exact award evidence and call
 `character_state_change(action="level_advance")` with the existing class, fixed
-or actually rolled HP method, `reason`, and `source_ref`. Current HP is not healed.
+or rolled HP method, `reason`, and `source_ref`. Never provide `hp_roll`: for the
+rolled method the engine rolls the class Hit Die after idempotency, revision,
+content, and rules checks and returns the roll in `advancement.hit_points.roll`.
+Current HP is not healed.
 Then exhaust `advancement.follow_up`: apply eligible class features, resolve any
 subclass and spell choices from the active content catalog, apply newly eligible
 subclass features, replace the complete prepared list with `event="level_up"`,
