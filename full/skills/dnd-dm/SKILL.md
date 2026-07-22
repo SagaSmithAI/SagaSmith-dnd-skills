@@ -304,6 +304,24 @@ decide whether the circumstances permit hiding and resolve the Stealth/observer
 boundary. Never spend a second main action for the same declaration, and never
 mark the actor Hidden merely because the bonus action was paid.
 
+The canonical 2014 Cleric Channel Divinity card's `Turn Undead` option is
+engine-owned. Call `combat_use_activity` with activity id
+`dnd5e.content.srd2014.feature.cleric-channel-divinity` and declaration
+`{option: "turn_undead", perception: [...]}`. The DM must include exactly one
+perception entry for every living Undead whose recorded battle-map position is
+within 30 feet: `{target_id, can_see_or_hear, reason?}`. Use `reason` whenever an
+Undead is excluded because it can neither see nor hear the cleric. Do not omit a
+hidden, blinded, deafened, silenced, or obscured target instead of making that
+explicit sensory ruling. The server derives the cleric spell save DC, rolls each
+included target's Wisdom save, spends the main action and Channel Divinity, and
+atomically updates every failed target. A turned creature cannot react, must try
+to move away, and may use its action only to Dash, escape an effect preventing
+movement, or Dodge when the DM confirms it has nowhere to move. Damage ends the
+effect immediately; otherwise the combat duration clock ends it after one minute
+(ten rounds). Use the returned target saves, effects, combat state, and Core
+receipt. Never roll the saves separately, patch `turned`, edit target reactions,
+or spend Channel Divinity before this call.
+
 At the start of a current combatant's turn, treat `HP == 0`, that combatant's
 `death_saves: true`, and the absence of Dead/Stable as the complete death-save
 gate. Do not wait for or create a synthetic `Dying` condition. Confirm
@@ -478,8 +496,10 @@ inventory adjustments are campaign writes and follow the same contract.
 
 Use `combat_use_activity` or `character_action(action="use_activity")` for cards in
 `content.activities`, `features`, or `feats`. These tools pay a recorded use or
-resource and the activation timing, then return `pending_ruling` when the card
-has choices; they never infer a result from prose.
+resource and the activation timing. They settle explicitly supported Core
+mechanics such as Action Surge, Second Wind, Cunning Action, and Turn Undead;
+other choices or prose outcomes return `pending_ruling`. Never treat a generic
+`committed` payment as proof that unstructured prose was resolved.
 
 Core Preserve Life is an exception with a complete deterministic contract. In
 noncombat play, its `declaration.allocations` must contain every target's id,
