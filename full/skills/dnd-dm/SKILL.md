@@ -91,7 +91,7 @@ the campaign.
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content)`, `module_page_render`, `module_content_review` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | World continuity | `continuity_commit`, `campaign_event`, `memory_change`, `memory_query` |

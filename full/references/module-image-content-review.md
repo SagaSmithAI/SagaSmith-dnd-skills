@@ -1,14 +1,27 @@
 # Image-only Module Content Review
 
-Use this workflow when an imported PDF visibly contains a creature statblock but
-the PDF text layer and imported scene omit the card. This is a source-recovery
-path, not permission to invent mechanics. Perform actor preparation in `lobby`
-and never create or repair a required actor after combat has begun.
+Use this workflow when an imported module exposes a review-only statblock
+candidate or a PDF visibly contains a creature statblock that its text layer
+cannot recover. This is a source-recovery path, not permission to invent
+mechanics. Perform actor preparation in `lobby` and never create or repair a
+required actor after combat has begun.
+
+First call `module_query(view="candidates")` for the exact module. Route by the
+returned `execution_state`:
+
+- For `review_ready`, inspect `normalized_content`, validation, scene, and every
+  source chunk. Submit that exact normalized text to `module_content_review` with
+  the returned `scene_id` and `source_chunk_ids`; do not replace text evidence
+  with a page-memory reconstruction.
+- For `blocked`, do not submit the candidate as text evidence. Use the managed
+  asset/page workflow below and transcribe only what is actually visible. If the
+  cited page cannot establish a complete card, leave the actor unresolved.
 
 ## Ordered workflow
 
 1. Use `module_query(view="index" | "scene")` to locate the appendix scene and
-   confirm that the normalized text does not contain an executable statblock.
+   confirm that the normalized text does not contain an executable statblock, or
+   that the candidate was explicitly blocked by the evidence gate.
 2. Use `module_query(view="assets")`, select the managed PDF, and call
    `module_page_render` for the cited page. Inspect the returned image itself.
 3. Transcribe only visible card facts into canonical English 2014 statblock

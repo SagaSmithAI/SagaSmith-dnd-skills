@@ -31,10 +31,19 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `campaign_create`, then reopen the exposure with the new campaign id.
 2. Lock the correct Core edition with `campaign_rules`. Do not silently use a
    different edition or optional publication.
-3. Load `lobby.modules`. For a user PDF call `module_import` in this exact order:
+3. Inventory every allowlisted file before importing. Call
+   `character_query(view="document")` for character sheets, pregenerated-PC
+   packets, and ability-score option files. Its classification and checksum are
+   authoritative; these documents never enter `module_import`. Keep explicit
+   `manual` score entry available even when the document supplies arrays.
+   For a campaign directory, group every document below the same top-level
+   campaign folder into one campaign while retaining one immutable module
+   revision per physical document. A root-level adventure remains its own
+   campaign. Do not create one campaign per appendix, map packet, or supplement.
+4. Load `lobby.modules`. For each module PDF call `module_import` in this exact order:
    `stage` -> `inspect` -> `validate` -> `ingest` -> `activate`. Keep the same
    `job_id`; use a stable, stage-specific idempotency key for each write.
-4. Review `module_query(view="index")`. Search only selects candidates; expand the
+5. Review `module_query(view="index")`. Search only selects candidates; expand the
    chosen scene before using its facts. Verify scene boundaries, keeper/public
    visibility, encounter participants, exact source excerpts, spatial locations,
    explicit-evidence spatial connections, and parser warnings. Never treat room
@@ -47,11 +56,18 @@ own exposure. Loading a group for one Agent must not expose it to another.
    If an appendix statblock is image-only, use `module-image-content-review.md`:
    render and inspect the page, submit `module_content_review`, re-read the
    immutable evidence, then use `character_create_from(mode="module_statblock")`.
-5. Set scoped progress with `module_set_progress`, including
+   Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
+   be submitted to `module_content_review` only with its exact
+   `source_chunk_ids`. A `blocked` candidate is a stop condition: render its cited
+   managed PDF page and visually transcribe only observed fields, or leave it
+   unresolved. Never repair OCR from rules memory or silently relabel blocked
+   evidence as reviewed text.
+6. Set scoped progress with `module_set_progress`, including
    `current_location_key` and `state.location_scene_id` when the spatial room is a
-   separate scene. Never merge narrative text merely because two scenes refer to
-   the same encounter.
-6. If the scene changes by opening hours, daylight, watches, or travel duration,
+   separate scene. The location key must be copied from the expanded scene's
+   `spatial.locations`; a slug, display label, or guessed room id is not valid.
+   Never merge narrative text merely because two scenes refer to the same encounter.
+7. If the scene changes by opening hours, daylight, watches, or travel duration,
    establish `campaign_change(action="clock_set")` before resolving the branch.
    Advance only source- or DM-established elapsed time with
    `campaign_change(action="clock_advance")`; it updates the branch-local clock
@@ -59,7 +75,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    For a completed long rest, use `campaign_change(action="party_rest")` instead:
    it advances the clock once and settles all named members atomically. Never
    loop an eight-hour clock advance per character or call individual long rests.
-7. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
+8. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
    PCs and `mode="direct"`, `mode="template"`, `mode="statblock"`, or
    `mode="module_statblock"` for NPCs and monsters. Either statblock mode must
    cite exact imported evidence; unsupported or absent creatures remain unresolved
@@ -68,10 +84,15 @@ own exposure. Loading a group for one Agent must not expose it to another.
    and use its source-bound `variant` whitelist; never replace the whole actor sheet.
    Read `module-image-content-review.md` for the distinction between an image-only
    full card and a standard card with module instance changes.
-8. Apply every confirmed class/subclass feature and complete species/background
+9. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
-9. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
-10. Record the opening with one `continuity_commit`: include the opening event,
+10. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
+    When setup or advancement should finish with a completed long rest, establish
+    the campaign clock and use one atomic `campaign_change(action="party_rest")`
+    for all named members; do not call individual long rests.
+11. Only after every campaign resource has activated and all actors have passed
+    their completeness checks, record the opening with one `continuity_commit`:
+    include the opening event,
     deterministic-key objective facts, per-actor knowledge only for actual
     witnesses, and the initial snapshot. Supply a fresh `idempotency_key` and the
     current campaign revision. This requires the owner/DM `lobby.memory_control`
@@ -246,7 +267,9 @@ continuity, and its authorized actor knowledge.
 For destructive or stateful regression, enter `lobby`, create and verify a source
 checkpoint, then create-and-checkout a disposable branch. Return to `play`, reopen
 exposure, run the scene/combat workflow, record actor-scoped knowledge and a full
-snapshot, then return through `lobby` and checkout the source branch. Reopen
+snapshot, then return through `lobby`. The phase change dirties the disposable
+branch, so create and verify a second lobby checkpoint before checkout; otherwise
+the clean-branch guard must reject the switch. Checkout the source branch. Reopen
 exposure after every phase or branch change. Verify source HP/resources and query
 each actor's knowledge on both branches; a branch comparison must show the test
 memory and subjective knowledge only on the disposable branch. There is no merge.

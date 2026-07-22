@@ -15,7 +15,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Rules | `rule_import(discover/stage/inspect/ingest/extract_candidates/review/compile/install/activate)`, `rule_document_page_render`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/explain/receipts)`, `character_content_apply` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets/content)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `continuity_commit`, `campaign_event(add/list)`, `memory_change(add/upsert/revise/supersede)`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout)` |
 | Audit | `state_revision(history/undo/redo)` |
@@ -139,7 +139,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Intent | MCP tool |
 |---|---|
 | Create from direct/build/template/statblock input | `character_create_from(mode=...)` |
-| Read campaign actors or reusable library | `character_query(get/list/library)` |
+| Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
 | Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
@@ -150,6 +150,13 @@ difficult terrain, world patches, checksums, and DM overrides.
 The campaign instance is authoritative. After any actor or party mutation, read
 `character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use
 `character_sheet_replace` for a one-field mutation.
+
+Before passing an allowlisted PDF/text file to module import, use
+`character_query(view="document")` when it may be a character sheet,
+pregenerated-PC packet, or ability-score option document. The result stages and
+normalizes the artifact, reports its checksum and `document_kind`, preserves
+manual-input choices, and explicitly sets `module_import_allowed=false` for
+character documents. Never force such a document through the module parser.
 
 `inventory_transfer(mode="character_to_character")` mutates two private actor
 documents and therefore requires the caller to control both actors (an owner/DM

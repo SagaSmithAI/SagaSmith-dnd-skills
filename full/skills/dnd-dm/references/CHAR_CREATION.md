@@ -23,6 +23,14 @@ transaction. Use `character_create_from(mode="direct")` for a direct NPC/monster
 instance, `mode="template"` to copy an existing library template, and
 `mode="statblock"` to create an NPC/monster from an exact imported rule source.
 
+When the user supplies a character sheet, pregenerated-PC packet, or ability
+option document, first call `character_query(view="document")` with the campaign
+id and allowlisted source path. Use its classified fields and checksum as review
+input; do not send it through `module_import`. The inspection is not permission to
+invent missing sheet fields: complete and confirm them before build. Its
+`manual_input` contract preserves manual six-score entry alongside any extracted
+arrays.
+
 When preparing an imported module, first verify whether the supplied artifact
 actually contains pregenerated PCs. If it does not, do not attribute invented
 characters to the module: create player-confirmed or explicitly labeled regression

@@ -30,13 +30,20 @@ replaces the earlier exposure, so discard every older exposure id.
 4. Resolve the caller's stable `principal_id`; use
    `access_grant(scope="campaign" | "actor")` for access instead of treating
    `player_name` as authorization.
-5. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
+5. Classify character support documents before module staging with
+   `character_query(view="document", payload={campaign_id, source_path,
+   expected_checksum?})`. Route character sheets, pregenerated-PC packets, and
+   ability-score option files to character creation; they are not modules. Keep
+   the returned `manual_input` option available to the player. If a directory
+   contains one adventure plus appendices or map/resource PDFs, keep them in one
+   campaign and import each physical module document as its own immutable revision.
+6. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
    `ingest`, then `activate`. For generated content, stage with `payload.name` and
    `payload.content`. For a user PDF/Markdown/text module, stage with
    `payload.source_path`; it must be inside the server-configured module import
    roots. The server copies it into checksum-addressed MCP storage, and Core
    performs PDF-to-Markdown normalization. Never bypass staging with a direct path.
-6. Review `preview.valid`, parser warnings, scene/spatial evidence, and the revision
+7. Review `preview.valid`, parser warnings, scene/spatial evidence, and the revision
    diff before ingesting. For a PDF, reject the preview if any scene lacks a valid
    `page_start`/`page_end` within the source page count. Treat document checksum,
    `parser_profile`, and `parser_version` together as the normalized module
@@ -44,7 +51,7 @@ replaces the earlier exposure, so discard every older exposure id.
    ingest, and activate cycle even when the source checksum and scene diff are
    unchanged. Activation additionally requires the fresh campaign
    `expected_revision`; keep a stable idempotency key per stage.
-7. After ingest and again after activation, use `module_query(view="index")` to
+8. After ingest and again after activation, use `module_query(view="index")` to
    confirm chapter/scene counts, stable keys, page ranges, and spatial evidence.
    Room-heading order is not a map. A `spatial.connections` edge is usable only
    when it carries explicit source evidence (for example, prose stating that a
@@ -59,6 +66,10 @@ replaces the earlier exposure, so discard every older exposure id.
    `../../references/module-image-content-review.md`: render and inspect the page,
    submit `module_content_review`, re-read `module_query(view="content")`, and
    create the actor with `mode="module_statblock"` before play or combat.
+   Inspect `module_query(view="candidates")` as a separate evidence gate.
+   `review_ready` text candidates must retain their exact `source_chunk_ids` in
+   `module_content_review`; `blocked` candidates require a rendered managed page
+   and literal visual transcription. Never fill OCR gaps from memory.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_query(view="scene")` has been called. If an
@@ -68,7 +79,11 @@ replaces the earlier exposure, so discard every older exposure id.
    exact spatial scene id as `state.location_scene_id`. At combat start, keep
    the current progress scene, that spatial evidence scene, and any explicit
    encounter `scene_id` distinct; do not recover a duplicate key by scanning a
-    different scene when `location_scene_id` was recorded.
+   different scene when `location_scene_id` was recorded.
+9. After every resource document has activated, verify the combined module list,
+   scene counts, page ranges, atlas location counts, and snapshot the campaign
+   baseline once. Do not checkpoint a partial folder import as the playable
+   baseline.
 
 Before combat, create a participant manifest from the expanded source scene and
 call `module_query(view="readiness")`. Every group records its role, required
@@ -102,6 +117,7 @@ identifier inside ordinary prose or a different scene is not the room source.
 | Create from an imported exact statblock | `character_create_from(mode="statblock")` |
 | Create from a reviewed image-only module statblock | `character_create_from(mode="module_statblock")` |
 | List or read live actors | `character_query(view="list" | "get")` |
+| Inspect a character/ability document | `character_query(view="document")` |
 | Full reviewed replacement | `character_sheet_replace` |
 | Ability generation | `dnd_ability_roll`, `character_ability_apply` |
 
@@ -110,6 +126,10 @@ All live actors use `sheet v2` and `notes v2`. Read
 persist an unconfirmed draft. Build mode requires one stable
 `idempotency_key`; an exact retry must return the original template and campaign
 instance rather than creating another pair.
+
+Ability scores always pass through `character_ability_apply`. `manual` with all
+six assignments is a first-class path for physical rolls and user-entered values;
+do not remove it because standard array or point buy is available.
 
 For imported modules, distinguish narrative and mechanical provenance. The module
 may name an NPC, describe its intent, and assign fixed possessions while an
