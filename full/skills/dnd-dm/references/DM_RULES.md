@@ -115,6 +115,13 @@ or `player_name` as permission.
 | 已记录网格、敌对、触及、可见性与移动模式产生的借机攻击窗口 | 未记录触发器、强迫移动/传送的语义、剧情后果 |
 | 2014/2024 突袭差异、反应支付、每回合法术限制 | 先攻同值时玩家/DM 的最终顺序选择 |
 
+战斗 readiness 的 `ready` 只表示角色可进入遭遇，不表示整张卡都可自动结算。逐项检查
+`settlement`、`manual_rulings`、`automatic_spell_ids`、`ruling_spell_ids` 和
+`unavailable_attack_ids`。地图上缺失通常射程的远程攻击必须暂停并裁决；有来源数值时应先在
+lobby 修复卡片。无论装备状态或弹药是否耗尽，角色都可显式使用
+`weapon_id: "unarmed-strike"`。战斗结束后的 `combat_query(status)` 是最终历史快照，当前
+HP、状态和资源以 `character_query` 为准。
+
 引擎只自动提交可以由规则版本、角色卡和已记录场景事实唯一确定的结果。
 其余情况先用 `combat_choice(action="open")` 建立可审计窗口，再用
 `combat_choice(action="resolve")` 记录 DM 决定；不得把猜测伪装成数值修正或角色卡事实。

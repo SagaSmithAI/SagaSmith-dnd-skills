@@ -77,7 +77,12 @@ count, canonical actor ids, same-module `source_scene_id`, and exact normalized
 group. Actors in a `reinforcement` group stay out of the initial list and may enter
 only through `combat_join` after the source condition succeeds. Missing, Dead/0 HP,
 or mechanically unresolved required actors block combat start; surfaced manual
-rulings require review but must not be erased from the readiness report.
+rulings require review but must not be erased from the readiness report. A
+`ready: true` manifest can still have `settlement: mixed`: inspect per-card
+`manual_rulings`, `ruling_spell_ids`, `unavailable_attack_ids`, and missing ranged
+or thrown ranges before switching to combat. The universal `unarmed-strike`
+fallback does not make an incomplete imported weapon or spell automatically
+settled.
 
 ## Characters
 

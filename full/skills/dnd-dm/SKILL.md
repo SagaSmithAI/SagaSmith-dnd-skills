@@ -213,6 +213,10 @@ at least one unit in that exact linked ammunition stack. The commit consumes one
 only after the declaration is otherwise valid; the final shot leaves the
 auditable stack at quantity 0 so the weapon link remains valid. Do not substitute
 another stack, delete the empty linked item, or roll before successful preflight.
+An actor can always explicitly select `weapon_id: "unarmed-strike"`, including
+while holding a weapon whose ammunition is exhausted. The Core attack is
+proficient, uses Strength, has 5-foot reach, and deals `1 + Strength modifier`
+bludgeoning damage. Do not require the actor to delete or unequip a weapon first.
 
 Multiattack is a distinct action choice. For a structured monster Multiattack,
 pass `multiattack_option_id` on its first `combat_preflight_attack` and
@@ -223,6 +227,10 @@ block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
 override. A melee weapon with the Thrown property remains a
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
+On a positioned combat map, a ranged attack without a recorded normal range is a
+DM-ruling boundary, never permission to skip distance enforcement. Repair the
+source-grounded card in lobby when the source states the range; otherwise choose
+a legal recorded mode such as melee or preserve the ruling explicitly.
 
 When an attack returns `status: pending_reaction`, no damage has been rolled or
 applied. The target actor reads its owned window with
@@ -345,7 +353,11 @@ canonical campaign actor ids, a same-module `source_scene_id`, and an exact
 normalized `source_excerpt`. Required combatants must be in the initial participant
 list; reinforcements must not be. Treat missing cards, 0 HP/Dead actors, and
 unresolved executable rules as blockers. Surface manual rulings without silently
-marking them resolved. When an exact imported rule source contains the creature,
+marking them resolved. Read the returned `settlement`, `manual_rulings`,
+`automatic_spell_ids`, `ruling_spell_ids`, and `unavailable_attack_ids`; `ready`
+means the actor may enter the encounter, not that every action on the card is
+automatically executable. `unarmed_attack_id` remains available even when every
+recorded weapon is unavailable. When an exact imported rule source contains the creature,
 create it in lobby with `character_create_from(mode="statblock")`; never substitute
 a similar creature when the named statblock is unavailable or unsupported. When
 the exact card is visible only on a module PDF page, follow
@@ -360,6 +372,11 @@ fight merely because the regression has enough samples. The engine rejects an
 end while any death-save actor is still at 0 HP without Dead or Stable; settle
 those actors first. Record longer consequences as post-combat events and memory,
 not by hiding them inside the outcome summary.
+After `combat_end`, `combat_query(view="status")` is a historical final encounter
+record. Require `snapshot_role: "historical_final_encounter"` and
+`combatant_state_is_current: false`, and read current HP, conditions, resources,
+and recovery from `character_query`; never overwrite a recovered actor from the
+historical combatant projection.
 
 Preserve the source spell card's canonical casting time during import. Standard
 cards commonly use `1 action`, `1 bonus action`, or `1 reaction, ...`; do not
