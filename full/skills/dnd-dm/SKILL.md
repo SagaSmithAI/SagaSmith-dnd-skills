@@ -199,6 +199,12 @@ hostility, visibility, and movement mode.
 Open a choice window for those decisions and resolve it explicitly; never encode
 an unverified ruling as a character-card fact.
 
+For a weapon with a recorded `ammunition_item_id`, attack preflight also requires
+at least one unit in that exact linked ammunition stack. The commit consumes one
+only after the declaration is otherwise valid; the final shot leaves the
+auditable stack at quantity 0 so the weapon link remains valid. Do not substitute
+another stack, delete the empty linked item, or roll before successful preflight.
+
 Multiattack is a distinct action choice. For a structured monster Multiattack,
 pass `multiattack_option_id` on its first `combat_preflight_attack` and
 `combat_resolve_attack`, then make only the exact weapon/mode/count sequence still
