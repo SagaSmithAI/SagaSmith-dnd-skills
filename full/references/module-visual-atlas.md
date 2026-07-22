@@ -17,6 +17,9 @@ reviewed topology.
    call `module_page_render(campaign_id, module_id, page_number,
    source_asset_id)`. Inspect the returned image itself. Text extraction, room
    numbering, heading order, and a generic cross-reference are not visual proof.
+   When using `exposure_call`, read provenance from its JSON envelope and inspect
+   the separately forwarded MCP image content block; the fallback deliberately
+   does not inline base64 data into the envelope.
 4. Re-read `module_query(view="current" | "progress")` and use the current
    scene/scope `state_version` (`0` only when no row exists).
 5. Call `module_set_progress` with a fresh idempotency key and

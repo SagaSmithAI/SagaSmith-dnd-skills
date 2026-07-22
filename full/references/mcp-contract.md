@@ -251,7 +251,10 @@ it keeps the core and calls the same loaded domain tool through
 `exposure_call(exposure_id, tool_id, arguments)`. It returns the same structured
 facade result as a native domain-tool call, not an internal content/result tuple.
 This is a transport fallback, not a permission bypass: it performs the identical
-session and phase check.
+session and phase check. For image-producing tools, the fallback keeps the JSON
+envelope in the first text/structured-content block and forwards each MCP image
+block separately. Read the envelope for provenance and inspect the image block;
+never expect base64 image data inside `result` or discard non-text content.
 
 An exposure without `campaign_id` may load only `lobby.bootstrap` (system list
 and campaign creation), plus the `system:local`-only storage administration
