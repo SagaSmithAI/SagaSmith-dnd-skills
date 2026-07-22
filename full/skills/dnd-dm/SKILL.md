@@ -273,6 +273,18 @@ Shield blocks that target's darts without spending another Reaction. Never roll
 darts externally, combine them into `combat_hp_change`, or forge an attack-hit
 window for this targeting trigger.
 
+For a source-bound structured spell attack such as `Scorching Ray`, call
+`combat_cast_spell` exactly once. That transaction pays the casting action and
+spell resource once and returns `status="pending_resolution"`, a
+`resolution_id`, and the authoritative attack count. Select each target only when
+calling `combat_resolve_attack`; pass
+`action.spell_resolution_id=<resolution_id>` and a freshly read campaign revision
+once for every remaining attack. Never call `combat_cast_spell` per ray, substitute
+a weapon id, roll damage externally, or patch HP. A hit can still open an owned
+Shield reaction; resolve it normally before attempting the next attack. The
+pending spell resolution blocks the caster's turn end and encounter end until its
+remaining count reaches zero.
+
 Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
 disadvantage, once-per-turn token, and critical dice. The canonical 2014 Fighter
@@ -393,6 +405,9 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+The excerpt is evidence, not a search hint: copy an exact normalized substring
+from the expanded same-module scene or a verified `module_search` hit. Never
+paraphrase, translate, or copy text from a different occurrence of the room key.
 For a source-bound statblock spell marked with components not repeated in its
 reviewed card, obtain an explicit source or DM confirmation and pass
 `component_ruling.source_components_confirmed=true` before casting. The engine

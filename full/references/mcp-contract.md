@@ -325,7 +325,13 @@ Before `combat_start`, call `module_query(view="readiness")` with a manifest:
 Required combatants must be present in the initial `participant_ids`.
 Reinforcements must not be initial participants. Readiness is false when a
 required actor is missing, at 0 HP/Dead, or has unresolved executable card rules;
-manual rulings are surfaced but do not falsely disappear. A scene offer such as
+manual rulings are surfaced but do not falsely disappear. The excerpt must be an
+exact normalized substring of that same module scene; it is not a fuzzy query and
+a paraphrase or another occurrence of the room label is rejected. `ready=true`
+means that the actor may enter combat, not that every card entry is automatic.
+`automatic_spell_ids` describes structured effect settlement, while component,
+targeting, passive, and on-hit uncertainty can still appear in `manual_rulings` or
+`ruling_spell_ids`. A scene offer such as
 “pay at least 10 gp, then DC 15 Charisma (Persuasion)” is resolved with an
 action-bound `combat_check(action="improvise", ability="persuasion", dc=15)` and
 advantage only when the stated offer condition is satisfied. On success call
@@ -609,6 +615,20 @@ are settled. Active or newly cast Shield negates every dart allocated to that
 target. Remaining darts are rolled and applied as separate force-damage instances,
 so concentration and 0-HP consequences are per dart. Never merge them into one
 damage packet or manually patch HP.
+
+A source-bound structured spell attack uses a two-stage contract. Call
+`combat_cast_spell` once without a target declaration. A successful cast pays its
+action and casting resource once and returns `status="pending_resolution"`, an
+opaque `resolution_id`, `attack_count`, and `remaining_attacks`. For each attack,
+call `combat_resolve_attack` with the chosen `target_id` and
+`action={"spell_resolution_id": resolution_id}` using the latest campaign
+revision. The engine derives the spell attack bonus, range, damage, and critical
+dice from the source-bound card; the per-attack calls do not pay another action or
+slot. A pending Shield defense is resolved through its actor-owned reaction window
+before the next attack. Pending spell attacks block `combat_end_turn` and
+`combat_end`; both become legal only after `remaining_attacks` reaches zero. Never
+model the attacks as weapon actions, repeat the cast, combine damage packets, or
+patch HP.
 
 `character_state_change(action="rest")` applies v2-card short/long-rest recovery with a character
 revision and idempotency key. For a Short Rest, provide each spent hit die and

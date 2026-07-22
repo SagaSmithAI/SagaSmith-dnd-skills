@@ -83,7 +83,11 @@ own exposure. Loading a group for one Agent must not expose it to another.
    an exact normalized `source_excerpt`.
 2. Call `module_query(view="readiness")`. Do not start while a required actor is
    missing, Dead/at 0 HP, lacks an executable card, or carries unresolved required
-   rules. Review surfaced manual rulings rather than hiding them.
+   rules. `source_excerpt` is an evidence assertion and must be an exact normalized
+   substring of the expanded same-module scene; use a verified `module_search` hit
+   when needed, never a paraphrase. Review surfaced manual rulings rather than
+   hiding them. `ready=true` authorizes entry only: automatic effect settlement
+   and component, targeting, passive, or on-hit rulings remain separate.
 3. Required `combatant` actors go into initial `participant_ids`.
    `reinforcement` actors must stay out and join later through `combat_join`.
 4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
@@ -126,6 +130,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    After movement, settle every returned opportunity-reaction window before the
    next action. A rescue move can damage or incapacitate the rescuer before a
    Medicine attempt, so re-read both actor cards after the reaction.
+   For a structured multi-attack spell, cast once and keep its returned
+   `resolution_id`. Resolve each attack separately with `combat_resolve_attack` and
+   `action.spell_resolution_id`, refreshing `expected_revision` after every write.
+   The cast spends its action and slot once; the individual attacks spend neither.
+   Resolve any owned Shield window before the next attack. Do not end the caster's
+   turn or the encounter until `remaining_attacks` is zero.
 5. A source offer such as “10 gp grants advantage on DC 15 Persuasion” requires
    the stated payment/offer fact and
    `combat_check(action="improvise", ability="persuasion", dc=15)`. Only on success
@@ -227,3 +237,11 @@ continuity, and its authorized actor knowledge.
 5. `state_revision(action="history")` inspects audited mutation groups.
    `state_revision(action="undo" | "redo")` uses the latest history sequence and
    does not delete snapshots.
+
+For destructive or stateful regression, enter `lobby`, create and verify a source
+checkpoint, then create-and-checkout a disposable branch. Return to `play`, reopen
+exposure, run the scene/combat workflow, record actor-scoped knowledge and a full
+snapshot, then return through `lobby` and checkout the source branch. Reopen
+exposure after every phase or branch change. Verify source HP/resources and query
+each actor's knowledge on both branches; a branch comparison must show the test
+memory and subjective knowledge only on the disposable branch. There is no merge.
