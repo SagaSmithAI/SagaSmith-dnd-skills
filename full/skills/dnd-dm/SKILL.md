@@ -220,10 +220,13 @@ window for this targeting trigger.
 
 Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
 recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
-disadvantage, once-per-turn token, and critical dice. For Second Wind, first use
-`combat_use_activity` to pay the bonus action and feature use, then roll `1d10 +
-fighter level` and pass that exact total to `combat_hp_change(action=heal)`.
-For levelled spell healing, also pass `source_actor_id`, `spell_id`, and the
+disadvantage, once-per-turn token, and critical dice. The canonical 2014 Fighter
+Second Wind card is engine-owned: call `combat_use_activity` with its exact
+feature id. One atomic transaction consumes the card use and bonus action, rolls
+`1d10 + fighter level`, applies the clamped healing, and returns the roll,
+before/after HP, applied amount, and Core receipt. Never roll it externally or
+follow it with `combat_hp_change`; that would double-settle the feature. For
+levelled spell healing, pass `source_actor_id`, `spell_id`, and the
 actual `spell_level`; this lets the engine validate the actor card and settle
 source-linked features such as 2014 Life Domain's Disciple of Life. Never fold
 that feature bonus into the base amount yourself. Halfling Lucky is
@@ -235,6 +238,16 @@ transaction consumes one use and grants one `extra_action`; it returns
 `committed`, not `pending_ruling`. Use the returned action normally. An unused
 extra action expires at the next turn and Action Surge cannot be activated twice
 on the same turn. Do not patch `turn_budget` or invent another Attack.
+
+The canonical 2014 Rogue Cunning Action card is also engine-owned. Call
+`combat_use_activity` with its exact feature id and a declaration whose `action`
+is `dash`, `disengage`, or `hide`. Dash spends the bonus action and adds the
+actor's recorded Speed to remaining movement; Disengage spends it and records
+the no-opportunity-attack turn flag. Hide spends the bonus action and records a
+source-linked Hide declaration, but remains `pending_ruling`: the DM must still
+decide whether the circumstances permit hiding and resolve the Stealth/observer
+boundary. Never spend a second main action for the same declaration, and never
+mark the actor Hidden merely because the bonus action was paid.
 
 At the start of a current combatant's turn, treat `HP == 0`, that combatant's
 `death_saves: true`, and the absence of Dead/Stable as the complete death-save

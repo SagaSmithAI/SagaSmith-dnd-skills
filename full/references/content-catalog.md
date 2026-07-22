@@ -67,9 +67,9 @@ The engine recognizes source-linked feature cards, not prose guesses. For 2014
 Rogue Sneak Attack, pass `use_sneak_attack: true` to the attack declaration;
 the engine validates finesse/ranged weapon eligibility, advantage or an active
 enemy adjacent to the target, disadvantage, once-per-turn use, and critical
-dice. For Fighter Second Wind, call `combat_use_activity` first to pay the bonus
-action and use, roll `1d10 + fighter level`, then apply that exact amount through
-`combat_hp_change(action=heal)`. For spell healing, supply the source actor,
+dice. Fighter Second Wind is a single engine-owned `combat_use_activity` call:
+it pays the bonus action and use, rolls `1d10 + fighter level`, applies healing,
+and returns one Core-audited result. Do not roll or heal again. For spell healing, supply the source actor,
 recorded spell id, and actual slot level separately; the engine adds a recorded
 Disciple of Life modifier and preserves it in the healing receipt. Halfling Lucky
 rerolls are automatic and appear in the roll's `rerolls` audit field.
@@ -77,3 +77,8 @@ The canonical 2014 Fighter Action Surge feature is directly executable through
 `combat_use_activity`: it consumes the card use and grants one current-turn
 `extra_action`, with a Core receipt. An imported or similarly named non-Core card
 does not inherit that behavior merely from its prose or display name.
+The canonical 2014 Rogue Cunning Action feature uses the same tool with
+`declaration.action` set to Dash, Disengage, or Hide. Dash and Disengage settle
+their deterministic tactical effect. Hide pays and records the bonus-action
+declaration but still requires a DM ruling for eligibility and observation; do
+not pay a second action or infer Hidden from the card text alone.
