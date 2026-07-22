@@ -52,6 +52,7 @@ Return a single JSON object (no markdown wrapper) with these fields:
 ```json
 {
   "summary": "string (150-400 Chinese characters, natural language, player-facing. For baseline, describe the campaign origin. For delta, describe what changed since the last save.)",
+  "evidence_event_ids": ["string (player-safe event id supporting this presentation)"],
   "plot_progress": ["string (completed plot node or milestone)"],
   "new_characters": [
     {
@@ -92,6 +93,8 @@ Return a single JSON object (no markdown wrapper) with these fields:
 ### Field rules:
 - `summary`: Required. 150-400 Chinese characters. Narrative, engaging, chronological.
   End with a forward-looking hook if future_impact is non-empty.
+- `evidence_event_ids`: Required. Cite only events in the deterministic player-safe
+  delta. The snapshot service rejects unknown or DM-only evidence ids.
 - `plot_progress`: Plot nodes actually completed or substantially advanced. Empty list if none.
 - `new_characters`: NPCs, monsters, allies that appeared for the first time or became
   important for the first time. Empty list if none.

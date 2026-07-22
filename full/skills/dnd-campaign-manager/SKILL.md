@@ -168,6 +168,7 @@ fields are listed in `../../references/mcp-contract.md`.
 | Regenerate recap | `snapshot_query(view="recap")` |
 | List/create/switch timeline | `branch_query`, `branch_change` |
 | Audit / undo / redo | `state_revision(history/undo/redo)` |
+| Inspect continuity health | `continuity_diagnostics` |
 
 Restore is a branch fork, never destructive overwrite. Verify the target first,
 then refresh campaign actors, party state, scene progress, events, and continuity

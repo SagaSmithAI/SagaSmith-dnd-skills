@@ -195,8 +195,9 @@ World facts, chronology, and subjective actor knowledge are different ledgers.
 | World facts | `memory_change`, `memory_query(list/search)` |
 | Events | `campaign_event(add/list)` |
 | One actor's belief/knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
-| Safe retrieved context | `continuity_context` |
+| Safe retrieved context | `continuity_context` with one shared `budget_chars` limit |
 | Atomic post-scene write | `continuity_commit` |
+| Continuity health | `continuity_diagnostics` (owner/DM only) |
 
 Pass `branch_id` for an explicit historical branch. For player-safe narration,
 use `continuity_context` with the acting `actor_id`, `scope_id`, and audience;
@@ -230,6 +231,12 @@ successful scene save. A snapshot contains a full restorable payload; its recap 
 the branch delta. Before a restore call `snapshot_query(view="verify")`; after
 restore verify the new head and refresh campaign, characters, module progress,
 events, and continuity context.
+
+Use `continuity_diagnostics` to inspect active/inactive ledger counts, orphan
+source-event references, unsnapshotted events, latest checkpoint size, recap
+provenance, and Skill-manifest drift. It returns health metadata rather than
+narrative content. A non-null drift or growing unsnapshotted count is an
+operational signal, not permission to rewrite history automatically.
 
 ## Deliberate boundaries
 
