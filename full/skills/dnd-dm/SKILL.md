@@ -509,6 +509,16 @@ pacing, and never set or advance the narrative clock during active combat. Once
 set, do not jump the clock with another `clock_set`; use `clock_advance` so no
 duration is skipped.
 
+Resolve every completed long rest through
+`campaign_change(action="party_rest", payload={members, duration_minutes})`, even
+for a one-character party. Each member supplies its current character revision
+and any prepared-spell or 2014 hit-die recovery choices. This one write advances
+the campaign clock once, advances timed effects for every campaign actor and
+world object, applies benefits to only the named members, records completion on
+each card, and enforces the one-benefit-per-24-hours rule. A creature must have at
+least 1 HP at the start. Do not call individual `character_rest` for a long rest
+or advance eight hours separately before/after the party rest.
+
 An effect on a room, object, scene, or the campaign belongs in structured
 `campaign_change(action="effect_add")`, not an arbitrary `module_set_progress.state`
 blob. Give it a stable id, target, duration, source, and `visibility` of

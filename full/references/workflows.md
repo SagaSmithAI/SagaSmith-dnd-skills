@@ -56,6 +56,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
    Advance only source- or DM-established elapsed time with
    `campaign_change(action="clock_advance")`; it updates the branch-local clock
    and timed effects atomically.
+   For a completed long rest, use `campaign_change(action="party_rest")` instead:
+   it advances the clock once and settles all named members atomically. Never
+   loop an eight-hour clock advance per character or call individual long rests.
 7. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
    PCs and `mode="direct"`, `mode="template"`, `mode="statblock"`, or
    `mode="module_statblock"` for NPCs and monsters. Either statblock mode must

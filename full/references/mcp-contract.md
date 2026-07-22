@@ -657,6 +657,15 @@ move the world clock. The clock must be set first, cannot change during active
 combat, and conversation time is never treated as elapsed campaign time. Once
 set, a different `clock_set` value is rejected; use `clock_advance`.
 
+`campaign_change(action="party_rest")` is the only long-rest write. Its
+`members` array contains `character_id`, that actor's `expected_revision`, and
+optional `prepared_spell_ids`, `hit_dice_recovery`, and `food_and_drink` choices.
+`duration_minutes` defaults to 480 and cannot be lower. The MCP advances time and
+all timed actor/world effects once, then settles the named actors and records
+their completion minute in the same mutation. It rejects 0-HP/dead starters and
+a second benefit less than 1,440 minutes after the previous one. Individual
+`character_rest` remains the short-rest surface and rejects `long_rest`.
+
 Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
 effect on a campaign, scene, location, or object. Each effect has a stable id,
 source, target, active flag, duration period/remaining count, and visibility
