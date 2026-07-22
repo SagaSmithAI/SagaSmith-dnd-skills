@@ -398,6 +398,18 @@ reviewed card, obtain an explicit source or DM confirmation and pass
 `component_ruling.source_components_confirmed=true` before casting. The engine
 checks this before paying the action, slot, or concentration. Never spend first
 and ask for the component ruling afterward.
+If a hidden caster uses a spell with verbal, somatic, or source-unknown
+components, include `component_ruling.casting_perception` before casting. It must
+contain exactly one `{observer_id, perceived, reason?}` entry for every living
+combatant that does not already know the caster's position; a negative ruling
+requires `reason`. Only the DM owns this observer matrix. The MCP rejects an
+incomplete matrix before spending the action or spell resource and then updates
+per-observer visibility atomically with the cast. Do not leave `hidden=true`
+unchanged after audible or visible casting. If an already-recorded legacy or
+interrupted workflow needs correction, use `combat_map_patch` with a
+`combatant_visibility` patch containing `actor_id`, `hidden` and/or
+`visible_to_actor_ids`, and an explicit DM `reason`; never edit encounter state
+outside MCP.
 
 For a room such as `D13` nested inside a larger indexed location scene, call
 `module_search("D13")` and verify that the first hit's last `heading_path` entry
