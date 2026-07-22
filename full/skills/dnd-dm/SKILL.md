@@ -424,11 +424,18 @@ post-combat world change through `combat_map_patch`, not by rewriting the module
 Player map views intentionally omit blocked cells, difficult terrain, DM
 overrides, checksums, and world patches; do not disclose those fields from a DM
 read or an earlier tool result.
-A grid move that leaves an eligible
+A voluntary grid move cannot end in another living combatant's recorded space.
+Set `participant_config.can_share_space=true` only when a source-bound trait
+(for example, a swarm trait) or an explicit DM ruling permits it; preserve that
+decision when the creature joins later. Passing through occupied spaces,
+different creature sizes, and effect-specific forced/teleport overlap are not
+inferred from endpoints. A forced or teleport destination that is already
+occupied requires an explicit effect-specific ruling unless one participant has
+the recorded sharing exception. A grid move that leaves an eligible
 hostile's recorded reach opens an owned opportunity window; read it through
 `combat_query(view="reactions")`, decline it with
 `combat_choice(action="resolve")`, or settle it
-atomically with `combat_reaction_attack`. Do not claim map collision, terrain,
+atomically with `combat_reaction_attack`. Do not claim other map collision, terrain,
 forced movement, line of sight, or a trigger not represented in encounter state.
 Use `combat_movement(action="move")` with `payload.path` for bent grid routes. Set `movement_mode` to `forced` or
 `teleport` when the scene establishes that the move does not provoke a normal
