@@ -200,6 +200,13 @@ knowledge are unchanged and no combat remains active. Interrupted disposable
 branches must be closed and returned through the same public MCP sequence before
 retrying; do not delete them or repair the database.
 
+When replaying an objective outcome on a sibling branch, reuse its deterministic
+`fact_key`. The commit must create or revise a branch-local head for the shared
+stable fact identity while leaving the sibling head unchanged. A visibility
+error is a branch-isolation defect to fix; inventing a branch-suffixed key is not
+a valid workaround. Verify both branches through `memory_query` or
+`branch_query(view="compare")` after the replay checkpoint.
+
 ## Corpus completion report
 
 For every campaign, retain machine-readable reports for import/index, all-scene

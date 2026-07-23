@@ -318,7 +318,11 @@ Use the three ledgers deliberately:
 - `memory_change` records objective world facts worth retrieving later. Prefer
   `action="upsert"` with a deterministic `fact_key`; revising an existing key
   requires its current `expected_revision_id`. Use `supersede` or a revised status
-  instead of deleting history. Omitted revision fields remain unchanged.
+  instead of deleting history. Omitted revision fields remain unchanged. Keep the
+  same deterministic key when the same fact is independently established on a
+  sibling branch: Core reuses the stable fact identity but creates or advances
+  only that branch's fact head. Do not append a branch suffix to evade
+  visibility checks.
 - `actor_knowledge_change` records one PC or NPC's belief, inference, secret, or
   misinformation. Revising one actor must never revise another actor's ledger.
 
