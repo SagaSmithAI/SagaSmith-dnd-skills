@@ -41,9 +41,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `derived.multiattack_options`. If a deterministic printed composition is
    missing, stop at the quality gate and repair/reimport it; do not silently run
    one ordinary attack in place of the source-defined action. A generic
-   “N melee/ranged weapon attacks” composition is deterministic only when the
-   actor card has exactly one compatible weapon for that mode. Multiple
-   compatible weapons remain an explicit DM-review boundary.
+   “N melee/ranged [weapon] attacks” composition (where “weapon” may be omitted
+   in the source) is deterministic only when the actor card has exactly one
+   compatible weapon for that mode. Multiple compatible weapons remain an
+   explicit DM-review boundary.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with
