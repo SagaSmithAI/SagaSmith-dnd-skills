@@ -62,7 +62,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    location provenance agree. Exercise at least one structured automatic path
    and any relevant owned reaction/choice window. End with a structured outcome;
    never stop while a spell resolution, reaction, death save, or concentration
-   obligation is pending.
+   obligation is pending. When a hostile selects a structured Multiattack, pass
+   its option id only on the first attack, resolve every remaining source-defined
+   attack separately, and do not end that actor's turn while its Multiattack
+   attack budget/remaining sequence is nonempty.
    Resolve Surprise from the source positioning and the authoritative actor cards:
    when multiple hostiles hide, call public `character_check` for each hostile's
    Dexterity (Stealth), preserving its derived skill modifier and automatic armor
