@@ -16,7 +16,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
-| Chronology | `campaign_event(add/list)`, `memory_change`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
+| Chronology | `continuity_commit`, `campaign_event(add/list)`, `memory_change(add/upsert/revise/supersede)`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout)` |
 | Audit | `state_revision(history/undo/redo)` |
 
@@ -195,7 +195,9 @@ World facts, chronology, and subjective actor knowledge are different ledgers.
 | World facts | `memory_change`, `memory_query(list/search)` |
 | Events | `campaign_event(add/list)` |
 | One actor's belief/knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
-| Safe retrieved context | `continuity_context` |
+| Safe retrieved context | `continuity_context` with one shared `budget_chars` limit |
+| Atomic post-scene write | `continuity_commit` |
+| Continuity health | `continuity_diagnostics` (owner/DM only) |
 
 Pass `branch_id` for an explicit historical branch. For player-safe narration,
 use `continuity_context` with the acting `actor_id`, `scope_id`, and audience;
@@ -207,18 +209,34 @@ Use the three ledgers deliberately:
   `audience_scope="actor"`, list `known_by_actor_ids`, and set
   `knowledge_disclosure_scope="owner"`; use `party` only when every party member
   may know it.
-- `memory_change` records objective world facts and campaign state worth
-  retrieving later.
+- `memory_change` records objective world facts worth retrieving later. Prefer
+  `action="upsert"` with a deterministic `fact_key`; revising an existing key
+  requires its current `expected_revision_id`. Use `supersede` or a revised status
+  instead of deleting history. Omitted revision fields remain unchanged.
 - `actor_knowledge_change` records one PC or NPC's belief, inference, secret, or
   misinformation. Revising one actor must never revise another actor's ledger.
 
-After a meaningful scene or combat outcome, append the event, persist any world
-fact and actor-scoped knowledge, then create the snapshot. A snapshot contains a
-full restorable payload; its recap is the branch delta. `MemoryInfo.snapshot_id`
-is only an optional creation anchor. Snapshot membership is held by the internal
-fact binding, so a null memory field does not mean the fact was omitted. Before a
-restore call `snapshot_query(view="verify")`; after restore verify the new head and
-refresh campaign, characters, module progress, events, and continuity context.
+After a meaningful scene or combat outcome, call one `continuity_commit` with the
+event, accepted fact changes, per-actor knowledge changes, and an optional
+snapshot. The transaction rolls back as a unit if any actor, revision token, or
+fact is invalid. Require a fresh `idempotency_key`; existing fact or knowledge
+revisions require their current `expected_revision_id`. The MCP adds the installed
+D&D and module-generation Skill SHA-256 manifest to the event payload, and the
+snapshot captures that provenance.
+
+Use the individual event, memory, knowledge, and snapshot tools only for isolated
+administrative work or when the server does not advertise
+`atomic_continuity_commit`; never present a partially completed fallback as a
+successful scene save. A snapshot contains a full restorable payload; its recap is
+the branch delta. Before a restore call `snapshot_query(view="verify")`; after
+restore verify the new head and refresh campaign, characters, module progress,
+events, and continuity context.
+
+Use `continuity_diagnostics` to inspect active/inactive ledger counts, orphan
+source-event references, unsnapshotted events, latest checkpoint size, recap
+provenance, and Skill-manifest drift. It returns health metadata rather than
+narrative content. A non-null drift or growing unsnapshotted count is an
+operational signal, not permission to rewrite history automatically.
 
 ## Deliberate boundaries
 
@@ -417,11 +435,12 @@ All campaign-bound granular character writes require the character's current
 requires `expected_campaign_revision`, `expected_source_revision`, and
 `expected_target_revision`.
 
-Append-only `campaign_event(action="add")`, `memory_change`, and
-`actor_knowledge_change(action="add")` require a fresh `idempotency_key`.
-`actor_knowledge_change(action="revise")` also requires the current
-`expected_revision_id`; this is the knowledge ledger's revision token, not the
-character-card revision.
+`continuity_commit`, append-only `campaign_event(action="add")`, every
+`memory_change`, and `actor_knowledge_change(action="add")` require a fresh
+`idempotency_key`. Existing `memory_change(action="upsert" | "revise" |
+"supersede")` targets require the current fact `expected_revision_id`.
+`actor_knowledge_change(action="revise")` also requires the current knowledge
+`expected_revision_id`; neither token is the character-card revision.
 
 Branch creation/checkout and snapshot restore require the current campaign
 revision, active `expected_branch_id`, and a fresh key. Snapshot creation requires

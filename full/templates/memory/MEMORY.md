@@ -1,23 +1,23 @@
 # Long-term Memory
 
-This file stores important information that should persist across sessions.
+This Dream-managed file stores durable project and workspace context. It is not
+an authoritative D&D campaign ledger.
 
-## Players and DM
+## User and Table Preferences
 
-(Important facts about the user)
+(Stable preferences about tone, accessibility, scheduling, and play style)
 
-## Preferences
+## Workspace Context
 
-(User preferences learned over time)
-
-## Campaign Context
-
-(Information about ongoing projects)
+(Durable non-campaign project context)
 
 ## Important Notes
 
-(Things to remember)
+(Cross-session notes that do not belong to an application or MCP database)
+
+Do not store campaign events, characters, world facts, actor knowledge, module
+progress, secrets, or snapshot contents here. Route them to the SagaSmith D&D MCP.
 
 ---
 
-*This file is automatically updated by dnd-dm-agent when important information should be remembered.*
+*This file is automatically maintained by SagaSmith Agent Dream. Normal turns do not edit it.*

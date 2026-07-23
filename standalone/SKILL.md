@@ -91,9 +91,17 @@ python portable.py roll attack --ac 17 --score 18 --proficient --level 5
 
 ```powershell
 python portable.py event add --campaign <id> --type discovery --summary "Event" --payload '{}'
-python portable.py memory add --campaign <id> --type fact --subject "Key" --content "Value"
+python portable.py memory upsert --campaign <id> --fact-key location:key:state --type fact --subject "Key" --content "Value" --evidence-event <event-id> --expected-revision 0
 python portable.py memory search --campaign <id> --query "key"
+python portable.py memory history --campaign <id> --fact-key location:key:state
 ```
+
+Standalone memory is an append-only revision log. Reuse the same stable
+`--fact-key` when truth changes and pass the revision returned by the prior write
+as `--expected-revision`; a mismatch is a conflict that requires a fresh read.
+`memory list` and `memory search` project only each fact's current revision, while
+`memory history` exposes its provenance. This local ledger is not synchronized
+with Full Runtime CampaignMemory.
 
 ### Save / Restore
 

@@ -21,9 +21,12 @@ Usage:
     python tools/portable.py roll attack --dc 17 --score 18 [--proficient] [--level 5]
     python tools/portable.py event add --campaign <id> --type combat --summary "Fought orcs" [--payload '{}']
     python tools/portable.py event list --campaign <id>
-    python tools/portable.py memory add --campaign <id> --type fact --subject "Key" --content "The key is under the mat"
+    python tools/portable.py memory upsert --campaign <id> \
+        --fact-key location:mat:key --type fact --subject "Key" \
+        --content "The key is under the mat" --expected-revision 0
     python tools/portable.py memory list --campaign <id>
     python tools/portable.py memory search --campaign <id> --query "<text>"
+    python tools/portable.py memory history --campaign <id> --fact-key location:mat:key
     python tools/portable.py save create --campaign <id> --label "Before boss"
     python tools/portable.py save list --campaign <id>
     python tools/portable.py save restore --campaign <id> --slot <slot>
@@ -544,35 +547,133 @@ def cmd_event_list(args: argparse.Namespace) -> dict[str, Any]:
     return {"events": events}
 
 
-def cmd_memory_add(args: argparse.Namespace) -> dict[str, Any]:
+def _memory_fact_key(memory_type: str, subject: str) -> str:
+    """Derive a repeatable fallback key while preferring an explicit domain key."""
+    kind = _slug(memory_type) or "fact"
+    subject_key = _slug(subject)
+    if not subject_key:
+        subject_key = hashlib.sha256(subject.encode("utf-8")).hexdigest()[:16]
+    return f"{kind}:{subject_key}"
+
+
+def _current_memories(memories: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Project the append-only revision log into current active facts."""
+    legacy: list[dict[str, Any]] = []
+    latest: dict[str, dict[str, Any]] = {}
+    for memory in memories:
+        fact_key = memory.get("fact_key")
+        if not fact_key:
+            legacy.append(memory)
+            continue
+        latest[str(fact_key)] = memory
+    return legacy + [
+        memory
+        for memory in latest.values()
+        if memory.get("status", "active") == "active"
+    ]
+
+
+def cmd_memory_upsert(args: argparse.Namespace) -> dict[str, Any]:
     mem_file = _data_dir(args.campaign) / "memories.jsonl"
+    memories = _json_lines(mem_file)
+    fact_key = args.fact_key or _memory_fact_key(
+        args.type or "fact", args.subject or ""
+    )
+    previous = next(
+        (memory for memory in reversed(memories) if memory.get("fact_key") == fact_key),
+        None,
+    )
+    actual_revision = int(previous.get("revision", 0)) if previous else 0
+    if args.expected_revision is not None and args.expected_revision != actual_revision:
+        return {
+            "error": "memory revision conflict",
+            "fact_key": fact_key,
+            "expected_revision": args.expected_revision,
+            "actual_revision": actual_revision,
+        }
+    content = (
+        args.content
+        if args.content is not None
+        else (previous or {}).get("content", "")
+    )
+    if not content:
+        return {"error": "memory content is required", "fact_key": fact_key}
+    source_event_ids = (
+        list(args.evidence_event)
+        if args.evidence_event
+        else list((previous or {}).get("source_event_ids", []))
+    )
     memory = {
         "id": str(uuid.uuid4()),
         "campaign_id": args.campaign,
-        "type": args.type or "fact",
-        "subject": args.subject or "",
-        "content": args.content or "",
-        "revision": 1,
+        "fact_key": fact_key,
+        "type": args.type or (previous or {}).get("type", "fact"),
+        "subject": (
+            args.subject
+            if args.subject is not None
+            else (previous or {}).get("subject", "")
+        ),
+        "subject_ref": (
+            args.subject_ref
+            if args.subject_ref is not None
+            else (previous or {}).get("subject_ref")
+        ),
+        "predicate": (
+            args.predicate
+            if args.predicate is not None
+            else (previous or {}).get("predicate")
+        ),
+        "content": content,
+        "revision": actual_revision + 1,
+        "status": "active",
+        "supersedes_revision_id": (previous or {}).get("id"),
+        "source_event_ids": source_event_ids,
+        "importance": (
+            args.importance
+            if args.importance is not None
+            else (previous or {}).get("importance", 3)
+        ),
+        "disclosure_scope": (
+            args.disclosure
+            if args.disclosure is not None
+            else (previous or {}).get("disclosure_scope", "party")
+        ),
     }
     _append_line(mem_file, memory)
     return memory
 
 
 def cmd_memory_list(args: argparse.Namespace) -> dict[str, Any]:
-    memories = _json_lines(_data_dir(args.campaign) / "memories.jsonl")
+    memories = _current_memories(
+        _json_lines(_data_dir(args.campaign) / "memories.jsonl")
+    )
     return {"memories": memories}
 
 
 def cmd_memory_search(args: argparse.Namespace) -> dict[str, Any]:
-    memories = _json_lines(_data_dir(args.campaign) / "memories.jsonl")
+    memories = _current_memories(
+        _json_lines(_data_dir(args.campaign) / "memories.jsonl")
+    )
     query = _enrich_query(args.query)
     scored = []
     for m in memories:
-        score = _lexical_score(query, title=m.get("subject", ""), content=m.get("content", ""))
+        score = _lexical_score(
+            query, title=m.get("subject", ""), content=m.get("content", "")
+        )
         if score > 0:
             scored.append((score, m))
     scored.sort(key=lambda x: -x[0])
     return {"memories": [m for _, m in scored]}
+
+
+def cmd_memory_history(args: argparse.Namespace) -> dict[str, Any]:
+    memories = _json_lines(_data_dir(args.campaign) / "memories.jsonl")
+    return {
+        "fact_key": args.fact_key,
+        "revisions": [
+            memory for memory in memories if memory.get("fact_key") == args.fact_key
+        ],
+    }
 
 
 def cmd_save_create(args: argparse.Namespace) -> dict[str, Any]:
@@ -727,16 +828,29 @@ def _parser() -> argparse.ArgumentParser:
     # memory
     memp = sub.add_parser("memory")
     memsub = memp.add_subparsers(dest="action", required=True)
-    ma = memsub.add_parser("add")
-    ma.add_argument("--campaign", required=True)
-    ma.add_argument("--type", default="fact")
-    ma.add_argument("--subject")
-    ma.add_argument("--content")
+    memory_writers = [memsub.add_parser("add"), memsub.add_parser("upsert")]
+    for memory_writer in memory_writers:
+        memory_writer.add_argument("--campaign", required=True)
+        memory_writer.add_argument("--fact-key")
+        memory_writer.add_argument("--type")
+        memory_writer.add_argument("--subject")
+        memory_writer.add_argument("--subject-ref")
+        memory_writer.add_argument("--predicate")
+        memory_writer.add_argument("--content")
+        memory_writer.add_argument("--expected-revision", type=int)
+        memory_writer.add_argument("--evidence-event", action="append", default=[])
+        memory_writer.add_argument("--importance", type=int, choices=range(1, 6))
+        memory_writer.add_argument(
+            "--disclosure", choices=("keeper", "party", "public")
+        )
     ml = memsub.add_parser("list")
     ml.add_argument("--campaign", required=True)
     mms = memsub.add_parser("search")
     mms.add_argument("--campaign", required=True)
     mms.add_argument("--query", required=True)
+    mh = memsub.add_parser("history")
+    mh.add_argument("--campaign", required=True)
+    mh.add_argument("--fact-key", required=True)
     # save
     svp = sub.add_parser("save")
     svsub = svp.add_subparsers(dest="action", required=True)
@@ -749,7 +863,11 @@ def _parser() -> argparse.ArgumentParser:
     svr.add_argument("--campaign", required=True)
     svr.add_argument("--slot", type=int, required=True)
 
-    for subp in [mcur, mrs, msr, msp, mindex, mi, ch_create, ch_list, ch_get, cp_get, ea, el, ma, ml, mms, svc, svl, svr, rp, rs, cp_start]:
+    json_subcommands = [
+        mcur, mrs, msr, msp, mindex, mi, ch_create, ch_list, ch_get, cp_get,
+        ea, el, *memory_writers, ml, mms, mh, svc, svl, svr, rp, rs, cp_start,
+    ]
+    for subp in json_subcommands:
         subp.add_argument("--json", action="store_true", default=True)
 
     return p
@@ -775,9 +893,11 @@ CMD_MAP: dict[str, dict[str, Any]] = {
     ("roll", "attack"): cmd_roll_attack,
     ("event", "add"): cmd_event_add,
     ("event", "list"): cmd_event_list,
-    ("memory", "add"): cmd_memory_add,
+    ("memory", "add"): cmd_memory_upsert,
+    ("memory", "upsert"): cmd_memory_upsert,
     ("memory", "list"): cmd_memory_list,
     ("memory", "search"): cmd_memory_search,
+    ("memory", "history"): cmd_memory_history,
     ("save", "create"): cmd_save_create,
     ("save", "list"): cmd_save_list,
     ("save", "restore"): cmd_save_restore,

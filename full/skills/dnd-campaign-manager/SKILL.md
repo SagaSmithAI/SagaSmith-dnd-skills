@@ -161,12 +161,14 @@ fields are listed in `../../references/mcp-contract.md`.
 
 | Need | MCP tool |
 |---|---|
-| Create/list a save | `snapshot_create`, `snapshot_query(view="list")` |
+| Commit a scene and optional save | `continuity_commit` |
+| Create/list an administrative save | `snapshot_create`, `snapshot_query(view="list")` |
 | Validate / inspect lineage | `snapshot_query(view="verify" | "lineage")` |
 | Restore without deleting future history | `snapshot_restore` |
 | Regenerate recap | `snapshot_query(view="recap")` |
 | List/create/switch timeline | `branch_query`, `branch_change` |
 | Audit / undo / redo | `state_revision(history/undo/redo)` |
+| Inspect continuity health | `continuity_diagnostics` |
 
 Restore is a branch fork, never destructive overwrite. Verify the target first,
 then refresh campaign actors, party state, scene progress, events, and continuity
@@ -175,8 +177,16 @@ context after restoring.
 ## Continuity
 
 Use `memory_change/query` for branch-scoped durable world facts and
-`campaign_event(add/list)` for immutable chronology. Use
+`campaign_event(add/list)` for immutable chronology. Prefer stable fact keys and
+revision-safe upserts; supersede obsolete facts instead of deleting them. Use
 `actor_knowledge_change/query` only for one PC/NPC/monster's subjective knowledge.
+
+After a resolved scene, use one `continuity_commit` for the event, objective fact
+revisions, actor-specific knowledge, and optional snapshot. Require a fresh
+idempotency key, plus current fact/knowledge revision ids for updates. A failed
+member rolls back the whole continuity unit. The individual ledgers remain valid
+for isolated administration, but never emulate an atomic scene save with a
+partially completed sequence.
 
 For player-safe retrieval, call `continuity_context` with `actor_id`, `scope_id`,
 audience, and optionally `branch_id`. Do not substitute broad
