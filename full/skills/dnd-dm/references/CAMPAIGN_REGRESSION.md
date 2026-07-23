@@ -82,6 +82,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     stable award and manifest-sync identities must include the sorted recipient
     actor ids as well as scene and amount, so a deliberately split award cannot
     collide with another actor's transaction.
+14. Advance each eligible survivor through the public regression driver's
+    `advance-level` path one target level at a time. Supply the exact source
+    reference that established the XP or milestone, an explicit fixed/rolled HP
+    method, the intended return phase, and every caller-owned choice. The driver
+    must enter `lobby`, replay the stable level transaction when resuming,
+    exhaust all returned and newly applicable class/subclass feature artifacts,
+    validate any subclass and known/spellbook choices against the active catalog,
+    replace the complete prepared-spell list when the follow-up requires it,
+    re-read and verify the actor, restore `play`, sync the manifest, and verify a
+    checkpoint. Never edit the raw sheet, silently choose a subclass or feature,
+    advance an ineligible/dead actor, or treat the level integer alone as a
+    complete advancement.
 
 ## Exact scene evidence
 

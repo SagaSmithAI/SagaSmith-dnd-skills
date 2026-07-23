@@ -32,13 +32,16 @@ invent missing sheet fields: complete and confirm them before build. Its
 arrays.
 
 When preparing an imported module, first verify whether the supplied artifact
-actually contains pregenerated PCs. If it does not, do not attribute invented
-characters to the module: create player-confirmed or explicitly labeled regression
-PCs from the active content catalog, and retain that provenance in `notes`. For a
-named module NPC or monster, the module supplies identity, role, disposition, and
-scene-specific possessions while an inspected rule source supplies the mechanical
-statblock. Record both sources. Fixed treasure may be placed on the card during
-lobby setup; dice-denominated treasure stays unresolved until the real roll occurs.
+actually contains pregenerated PCs. When it does, import and use every applicable,
+complete pregenerated PC before generating any replacement; generate only the
+shortfall needed for the source-declared party size, and retain each actor's
+provenance. If it does not, do not attribute invented characters to the module:
+create player-confirmed or explicitly labeled regression PCs from the active
+content catalog, and retain that provenance in `notes`. For a named module NPC or
+monster, the module supplies identity, role, disposition, and scene-specific
+possessions while an inspected rule source supplies the mechanical statblock.
+Record both sources. Fixed treasure may be placed on the card during lobby setup;
+dice-denominated treasure stays unresolved until the real roll occurs.
 Statblock import currently accepts reviewed English 2014 SRD-style weapon
 statblocks. If the exact creature is absent, spell-only, 2024, ambiguous, or
 unsupported, keep it unresolved instead of substituting a similar creature.
