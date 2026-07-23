@@ -110,6 +110,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
     duration without an explicit audited ruling.
+16. When a manifest PC is dead or departed, build one replacement through the
+    public party driver. Prefer an applicable unused module pregen; otherwise
+    select one legal audited profile, give it a new identity, enter `lobby`
+    through `game_phase`, and restore the entry phase even when construction
+    fails. Then use `register-replacement` in `play` at the current source-cited
+    Scene Atlas location. The new actor must start with empty ActorKnowledge; the
+    joining event may add only its witnessed join and explicit `told_by` handoff
+    facts. Keep the predecessor actor and its independent knowledge unchanged,
+    replace only its active manifest party slot, append the predecessor,
+    replacement, and handoff-event ids to replacement history, and verify a
+    checkpoint after the manifest update.
 
 ## Exact scene evidence
 

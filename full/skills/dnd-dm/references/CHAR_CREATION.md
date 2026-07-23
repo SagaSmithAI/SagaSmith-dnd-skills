@@ -46,6 +46,16 @@ Statblock import currently accepts reviewed English 2014 SRD-style weapon
 statblocks. If the exact creature is absent, spell-only, 2024, ambiguous, or
 unsupported, keep it unresolved instead of substituting a similar creature.
 
+When an active PC dies, disappears, or leaves, create any replacement through the
+same public, source-audited character workflow. Reuse an applicable unused
+pregenerated PC first; otherwise build a new legal actor from the active catalog.
+The replacement needs a distinct actor id and must begin with empty independent
+ActorKnowledge. Never clone the predecessor's card, identity, inventory, or
+knowledge ledger. Keep the predecessor actor and its knowledge intact. After the
+new card passes its full audit, return to `play` and use a source-cited joining
+event at the current Scene Atlas location to grant only facts the living
+participants explicitly tell the replacement.
+
 Before creating any actor, read `character-schema-v2.md`. All PCs, NPCs, and
 monsters require complete structured cards; NPCs and monsters require
 `notes.profile.summary`. Do not persist an unconfirmed draft. After every creation
