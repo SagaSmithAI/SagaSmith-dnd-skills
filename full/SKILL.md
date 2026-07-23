@@ -58,7 +58,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - When one source-defined treasure parcel contains both currency and items, use
   `campaign_change(action="loot_acquire")` with one stable acquisition id and the
   exact expanded module chunk reference. Do not split that parcel into independent
-  wallet and inventory writes.
+  wallet and inventory writes. If a promised reward is paid later, keep the exact
+  promise chunk as the source while separately recording and validating the scene
+  and Scene Atlas location where payment actually occurs; never relabel the old
+  source location as the payout location.
 - Use `campaign_change(action="consumable_use")` for a shared standard healing
   potion outside combat so item consumption, server-side `2d4+2`, healing, the
   random-stream position, and their rule receipt commit together.

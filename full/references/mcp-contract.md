@@ -201,6 +201,10 @@ items, and the branch-local acquisition record commit atomically; an exact
 idempotent retry returns the original parcel, while a second key cannot reuse the
 same acquisition id. Use separate `wallet_change` or `inventory_change` calls
 only for genuinely separate in-world transactions, not to decompose one chest.
+Regression orchestration may distinguish the occurrence scene/location from the
+source scene for a delayed promised reward. The transaction's exact `source_ref`
+still identifies the original promise chunk, while continuity records the later
+scene and a location that exists in that scene's atlas.
 
 Outside combat, use `campaign_change(action="consumable_use")` to drink one
 standard identified `Potion of Healing` from the shared stash. Supply a stable

@@ -54,7 +54,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    content hash. Currency, items, and the branch-local audit record must commit
    in one public transaction. Record the discovery only for living or otherwise
    present witnesses, sync the playthrough manifest, and verify the resulting
-   checkpoint before consuming or transferring any acquired item.
+   checkpoint before consuming or transferring any acquired item. For a reward
+   promised in an earlier scene and paid at a later destination, cite the original
+   promise chunk but validate the event against the current scene and its actual
+   Scene Atlas location. Treat missing named businesses, inns, farms, or other
+   authored locations as an import/atlas defect to repair and refresh, not as
+   permission to reuse an unrelated fallback location.
 10. Exercise a source-acquired standard healing potion when a living PC is
     wounded: call `campaign_change(action="consumable_use")` once, then verify the
     stack decrement, service-owned `2d4+2` random receipt, HP clamp, Core rule
