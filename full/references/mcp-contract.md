@@ -163,6 +163,11 @@ tagged `narrative_only` and `source_bound`. Those sentinel mechanics must not be
 used for checks or combat. The full-playthrough driver must switch from `play` to
 `lobby`, replay creation under a stable identity, restore `play` on success or
 failure, upsert the actor into `manifest.npcs`, and verify a checkpoint.
+The service canonicalizes the returned `source_ref` to its verified module,
+scene, chunk, page, heading, and content-hash fields. A regression verifier must
+compare that canonical field set, while retaining optional asset-path, asset
+hash, and purpose fields in its continuity evidence; it must not treat removal
+of those unexecuted audit annotations as a failed actor creation.
 
 Before passing an allowlisted PDF/text file to module import, use
 `character_query(view="document")` when it may be a character sheet,
