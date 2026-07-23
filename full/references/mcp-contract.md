@@ -502,6 +502,13 @@ document checksum, heading path, and page range. Use `character_check` outside
 combat and `combat_check` during combat when an enabled `check.before` rule needs
 DM-established `rule_facts`.
 
+For source-cited playthrough checks, an idempotent retry means the exact same run,
+scene, Scene Atlas location, actor, kind, ability/skill, DC, proficiency,
+advantage/disadvantage, and checksum-addressed source chunk. Include that complete
+identity in progress, `character_check`, `continuity_commit`, ActorKnowledge, and
+manifest-sync keys. A later check elsewhere in the same indexed scene is a new
+roll even when its actor, ability, and DC happen to match.
+
 Treat rule-profile and branch rule-pack changes as campaign writes. First read
 `campaign_rules(action="get_profile")`, then pass its latest `campaign_revision`
 as `expected_revision` together with a stable `idempotency_key` to

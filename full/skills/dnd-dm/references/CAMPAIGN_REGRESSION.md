@@ -50,6 +50,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with
    one `continuity_commit`. A skill label belongs in the cited evidence; use
    `kind="check"` unless the tool contract explicitly defines another kind.
+   Derive each check's retry identity from the run, scene, Scene Atlas location,
+   check kind, ability/skill, actor, DC, proficiency, advantage/disadvantage, and
+   exact source chunk. Checks that share a scene, actor, ability, and DC but occur
+   at different locations or cite different chunks are separate rolls and must
+   not reuse progress, dice, continuity, knowledge, or manifest-sync keys.
 6. Before combat, read the exact encounter scene and its location. Call
    `module_query(view="readiness")` with every source/DM-established group.
    `required_count` is the complete group count, not `len(actor_ids)`: derive it
