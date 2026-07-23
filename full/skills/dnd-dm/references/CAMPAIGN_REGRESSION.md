@@ -55,6 +55,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    and any relevant owned reaction/choice window. End with a structured outcome;
    never stop while a spell resolution, reaction, death save, or concentration
    obligation is pending.
+   Resolve Surprise from the source positioning and the authoritative actor cards:
+   when multiple hostiles hide, call public `character_check` for each hostile's
+   Dexterity (Stealth), preserving its derived skill modifier and automatic armor
+   disadvantage, then compare every result with each opponent's passive
+   Perception. An opponent is surprised only when it detects none of the hiding
+   threats; a tied passive score detects that threat. Never hardcode a generic
+   Stealth modifier or substitute one creature's profile for another. Use one
+   shared hostile roll only when the exact encounter text explicitly says to roll
+   once for the group, and require identical Stealth profiles before doing so.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
    historical final combat projection as current state.
