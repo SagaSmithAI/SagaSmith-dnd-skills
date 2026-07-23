@@ -80,17 +80,24 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     insufficient funds or commit the full payment and branch-local spend audit.
     Commit witness ActorKnowledge, sync the manifest, and verify the checkpoint;
     never decompose one bill into negative `wallet_change` calls.
-11. Exercise a source-acquired standard healing potion when a living PC is
+11. If a source-cited bargain, tribute, gift, handoff, or destruction removes a
+    non-consumable shared item, use the public regression driver's `spend-item`
+    path. Supply one stable spend id, exact item id and positive quantity, actual
+    Scene Atlas location, exact source excerpt and chunk reference, and every
+    witness actor id. Verify the atomic stash decrement, branch-local
+    `item_spends` audit, ActorKnowledge, manifest sync, and checkpoint. Never
+    represent the disposition only in prose while the item remains in inventory.
+12. Exercise a source-acquired standard healing potion when a living PC is
     wounded: call `campaign_change(action="consumable_use")` once, then verify the
     stack decrement, service-owned `2d4+2` random receipt, HP clamp, Core rule
     receipt, ActorKnowledge recipients, manifest sync, and checkpoint. A dead PC
     is not a valid recipient and must not gain knowledge from the use.
-12. Give every source-cited scene event a stable identity derived from the run,
+13. Give every source-cited scene event a stable identity derived from the run,
     scene, event type, and resolved summary. Before writing progress, merge the
     new entry into the existing `full_playthrough_events` map; never replace the
     map or reuse a run-only key. Re-read progress after the checkpoint and verify
     that earlier events from the same run and scene remain present.
-13. When a resolved event changes an NPC, quest, clue, or machine-verifiable
+14. When a resolved event changes an NPC, quest, clue, or machine-verifiable
     world condition, use the public regression driver's `record-outcome` path.
     Give it a stable outcome id and exact source reference. It must atomically
     commit the event, stable world facts, and witness-scoped ActorKnowledge,
@@ -101,13 +108,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     stable outcome id and identical outcome/fact payload: matching saved progress
     is a resume boundary, not a reason to rewrite it with a changed state version.
     Narrative event text alone is not a restorable NPC or quest state.
-14. Award one source-defined XP parcel to every exact eligible recipient in one
+15. Award one source-defined XP parcel to every exact eligible recipient in one
     public `award-xp` call when possible. Never include a dead, departed, or
     otherwise ineligible actor merely to match the original party count. The
     stable award and manifest-sync identities must include the sorted recipient
     actor ids as well as scene and amount, so a deliberately split award cannot
     collide with another actor's transaction.
-15. Advance each eligible survivor through the public regression driver's
+16. Advance each eligible survivor through the public regression driver's
     `advance-level` path one target level at a time. Supply the exact source
     reference that established the XP or milestone, an explicit fixed/rolled HP
     method, the intended return phase, and every caller-owned choice. The driver
@@ -119,7 +126,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     checkpoint. Never edit the raw sheet, silently choose a subclass or feature,
     advance an ineligible/dead actor, or treat the level integer alone as a
     complete advancement.
-16. Advance campaign time through the public regression driver's
+17. Advance campaign time through the public regression driver's
     `advance-time` path whenever travel, waiting, or a source-triggered interval
     matters. Cite the exact scene chunk and excerpt, supply a positive
     minute/hour/day count, and state any DM ruling used to turn narrative timing
@@ -127,7 +134,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
     duration without an explicit audited ruling.
-17. When a manifest PC is dead or departed, build one replacement through the
+18. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`
     through `game_phase`, and restore the entry phase even when construction

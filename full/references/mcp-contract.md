@@ -144,7 +144,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire/currency_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -244,6 +244,19 @@ Insufficient funds in any denomination leave every balance unchanged. Use the
 regression `spend-coins` path to bind the occurrence Scene Atlas location,
 witness ActorKnowledge, manifest sync, and verified checkpoint. Do not emulate
 one payment with multiple negative `wallet_change` calls.
+
+`campaign_change(action="item_spend")` is the play-phase transaction for a
+source-cited bargain, tribute, gift, handoff, or destruction that permanently
+removes a non-consumable item from the shared stash. Supply a stable
+branch-local `spend_id`, exact existing `item_id`, positive `quantity`, reason,
+and exact module chunk `source_ref`. The Runtime validates the chunk ownership
+and hash, removes the item stack amount, and stores the removed item plus the
+branch-local `item_spends` audit in one commit. An exact retry returns the first
+result; missing items, excessive quantities, stale revisions, or duplicate ids
+leave the stash unchanged. Use the regression `spend-item` path so the actual
+Scene Atlas location, witness ActorKnowledge, manifest sync, and checkpoint are
+committed. Do not record the narrative outcome while leaving the item in the
+canonical inventory.
 
 Outside combat, use `campaign_change(action="consumable_use")` to drink one
 standard identified `Potion of Healing` from the shared stash. Supply a stable

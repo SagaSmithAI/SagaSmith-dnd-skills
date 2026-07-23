@@ -65,6 +65,11 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - Use `campaign_change(action="consumable_use")` for a shared standard healing
   potion outside combat so item consumption, server-side `2d4+2`, healing, the
   random-stream position, and their rule receipt commit together.
+- When a source-cited bargain, handoff, tribute, or destruction permanently
+  removes a non-consumable shared item, use
+  `campaign_change(action="item_spend")` with a stable spend id, exact item id
+  and quantity, and the expanded source chunk reference. Do not leave the item
+  in inventory while recording only a narrative outcome.
 - `character build` is the preferred player-character creation workflow: it creates
   a public template and a separate initial campaign instance atomically.
 - Do not load entire rulebooks or modules into context.

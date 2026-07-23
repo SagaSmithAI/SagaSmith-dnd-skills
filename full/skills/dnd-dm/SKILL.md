@@ -175,6 +175,14 @@ the reduced stack, healing, random-stream receipt, and rule receipt atomically.
 Never call `inventory_change(remove)`, `dnd_dice_roll`, and
 `character_state_change(heal)` as three substitutes for drinking one potion.
 
+For a source-cited bargain, tribute, gift, handoff, or destruction that removes
+a non-consumable shared item, call `campaign_change(action="item_spend")`.
+Provide a stable spend id, exact item id and positive quantity, reason, and
+expanded module chunk reference. Use the full-playthrough `spend-item` path so
+the inventory removal, branch audit, witnessed ActorKnowledge, manifest sync,
+and checkpoint remain linked. Never record only the narrative disposition while
+the canonical stash still contains the item.
+
 When a module yields a found spellbook, add one `kind="spellbook"` inventory item
 for each physically distinct book. Preserve its edition, exact source scene/key,
 copyability, owner mark, resolved catalog `spell_ids`, and
