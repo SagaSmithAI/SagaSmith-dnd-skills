@@ -65,6 +65,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - For module maps or diagrams, follow `references/module-visual-atlas.md`.
   Text parsing remains fail-closed; only an inspected page image may support a
   `reviewed_image` connection.
+- For a real campaign rehearsal or corpus regression, follow
+  `skills/dnd-dm/references/CAMPAIGN_REGRESSION.md`; each campaign must exercise
+  source-bound lobby preparation, play settlement, combat, continuity, and
+  branch/Snapshot isolation instead of treating successful PDF import as play coverage.
 - For creature cards present only as PDF images, follow
   `references/module-image-content-review.md`; review the managed page before
   creating an actor with `mode="module_statblock"`.

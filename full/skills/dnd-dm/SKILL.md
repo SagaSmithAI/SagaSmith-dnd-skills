@@ -26,6 +26,8 @@ Read `../../references/mcp-contract.md` before a mutation and
   `../../references/character-schema-v2.md`
 - module preparation or scene transitions: `references/MODULE_INDEX.md` and
   `references/MODULE_ARC.md`
+- real campaign rehearsal or corpus regression:
+  `references/CAMPAIGN_REGRESSION.md`
 - module maps, diagrams, or missing topology:
   `../../references/module-visual-atlas.md`
 - image-only module creature cards:
@@ -50,7 +52,9 @@ the campaign.
 1. Resolve `scope_id` (`party`, `group:<id>`, or `player:<id>`), then call
    `module_query(view="current")`. Player scopes inherit party progress until they have their own.
 2. Read that scene through `module_query(view="scene")`. Use `module_search` only to select a
-   candidate, then call `module_expand` before relying on a chunk.
+   candidate, then call `module_expand` before relying on a chunk. A search/expanded chunk can
+   lack a scene id or straddle scene boundaries; never reuse its heading or page match as combat
+   evidence until the exact indexed scene has been read.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
@@ -407,6 +411,13 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+`required_count` is the complete group count established by the cited scene, a
+recorded random-encounter roll, or an explicit branch-local DM composition fact.
+It is never shorthand for `len(actor_ids)`. Prepare every required card in lobby
+and keep readiness false while any required actor is missing. If the source names
+other hostile groups, include them as combatant, reinforcement, or optional
+groups, or first record the scene-supported reason they are not participants;
+do not shorten the excerpt to conceal a printed count.
 When the statblock prints a complete numeric action for a known spell, its
 creature-specific range, damage, and effect override the base spell for that actor.
 After creation, verify that the spell card's displayed definition and structured

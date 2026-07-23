@@ -47,6 +47,9 @@
 - 战斗结束后统一结算条件、死亡、掉落、消耗、经验/里程碑和世界后果并保存。
 - 对每个仍相关的 NPC/怪物保留完整 HP、临时 HP、资源、条件、效果、装备、物品和
   `notes.profile.summary`；击败、离场或死亡也是卡上的状态/叙事变化，而不是只写一行 event。
+- readiness 的 `required_count` 必须是原文、已记录的随机遭遇掷骰或当前分支 DM 事实确定的
+  完整分组数量，不能直接填写现有 `actor_ids` 的长度。缺一张必要角色卡就保持未就绪；原文还
+  列出其他敌对、增援或可选组时应一并 manifest，不能截短引文来隐藏人数。
 
 ## 一致性、审计与并发
 
@@ -127,6 +130,10 @@ HP、状态和资源以 `character_query` 为准。
 `source_excerpt` 必须是同一模组场景中精确的规范化子串，不是模糊搜索提示；不得改写、翻译或
 拿另一个同名房间的文字代替。`automatic_spell_ids` 只说明法术效果已有结构化结算，不会消除
 法术成分、目标合法性、被动效果或命中附带效果中的 DM 裁决。
+`module_search`/`module_expand` 返回的文档 chunk 可能没有 `scene_id` 或跨越相邻标题；用于 DC、
+战斗参与者或地图之前，必须先从 index 选择 scene，再读取 `module_query(view="scene")` 并从该
+scene 内容复制证据。PDF 控制字符、软连字符和弯引号的规范化只修复抽取差异，不会让跨 scene
+或改写后的文字变成有效证据。
 
 Scorching Ray 一类结构化多次法术攻击只调用一次 `combat_cast_spell`，动作与法术位也只支付
 一次。保存返回的 `resolution_id`，再为每次攻击调用一次 `combat_resolve_attack`，把它放入

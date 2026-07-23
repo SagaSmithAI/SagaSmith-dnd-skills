@@ -362,6 +362,12 @@ manual rulings are surfaced but do not falsely disappear. The excerpt must be an
 exact normalized substring of that same module scene; it is not a fuzzy query and
 a paraphrase or another occurrence of the room label is rejected. `ready=true`
 means that the actor may enter combat, not that every card entry is automatic.
+`required_count` is the complete branch-local group count established by the
+source, a recorded source-table roll, or an explicit DM composition fact. It is
+not derived from the current length of `actor_ids`; missing cards must keep the
+group unready. If an excerpt names a larger count or additional hostile groups,
+manifest the complete composition or record the source-supported branch change
+that removed them. Never select a shorter substring merely to evade that count.
 `automatic_spell_ids` describes structured effect settlement, while component,
 targeting, passive, and on-hit uncertainty can still appear in `manual_rulings` or
 `ruling_spell_ids`. A scene offer such as
