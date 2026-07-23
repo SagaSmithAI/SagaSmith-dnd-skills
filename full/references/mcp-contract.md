@@ -140,7 +140,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 
 | Intent | MCP tool |
 |---|---|
-| Create from direct/build/template/statblock input | `character_create_from(mode=...)` |
+| Create from direct/build/template/statblock or exact narrative identity evidence | `character_create_from(mode=...)` |
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
@@ -152,6 +152,17 @@ difficult terrain, world patches, checksums, and DM overrides.
 The campaign instance is authoritative. After any actor or party mutation, read
 `character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use
 `character_sheet_replace` for a one-field mutation.
+
+`character_create_from(mode="narrative_npc")` is the only creation path for an
+important named module NPC whose cited chunk provides identity/role but no
+combat statblock. It requires an active module id, exact scene/chunk/page range
+and content hash, an excerpt containing the exact actor name, a role, and a
+summary. The result stores source evidence in notes and reports
+`combat_statblock="not_imported"` and `combat_eligible=false`; its actor card is
+tagged `narrative_only` and `source_bound`. Those sentinel mechanics must not be
+used for checks or combat. The full-playthrough driver must switch from `play` to
+`lobby`, replay creation under a stable identity, restore `play` on success or
+failure, upsert the actor into `manifest.npcs`, and verify a checkpoint.
 
 Before passing an allowlisted PDF/text file to module import, use
 `character_query(view="document")` when it may be a character sheet,

@@ -77,9 +77,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    loop an eight-hour clock advance per character or call individual long rests.
 8. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
    PCs and `mode="direct"`, `mode="template"`, `mode="statblock"`, or
-   `mode="module_statblock"` for NPCs and monsters. Either statblock mode must
-   cite exact imported evidence; unsupported or absent creatures remain unresolved
-   instead of being replaced by a similar one.
+   `mode="module_statblock"` for mechanically authoritative NPCs and monsters.
+   Either statblock mode must cite exact imported evidence; unsupported or absent
+   creatures remain unresolved instead of being replaced by a similar one. For
+   an important named NPC whose exact module chunk supplies identity but no
+   statblock, use `mode="narrative_npc"` with the active source reference and a
+   name-bearing excerpt. Its `narrative_only` default mechanics are sentinels and
+   cannot be used for a check or combat.
    When the module modifies a named standard creature, import that exact rule source
    and use its source-bound `variant` whitelist; never replace the whole actor sheet.
    Read `module-image-content-review.md` for the distinction between an image-only

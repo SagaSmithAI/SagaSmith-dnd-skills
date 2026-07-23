@@ -138,6 +138,13 @@ creature type, languages, or an action, pass a source-cited `variant` to the
 statblock creation call. Never rebuild or raw-patch the full sheet for a small
 module instance change. A type replacement such as beast to undead must use
 `creature_type` and cite the exact managed module chunk or review that says so.
+When a named NPC has authored identity and role but no combat statblock, create a
+source-bound noncombat identity card with
+`character_create_from(mode="narrative_npc")`; require the exact active
+module/scene/chunk/page/hash and an excerpt containing the name. Treat its
+`narrative_only` default mechanics as sentinels, never as authored AC/HP/ability
+scores, and never include that actor in a check or encounter until an exact
+statblock is imported.
 
 After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
 `character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one

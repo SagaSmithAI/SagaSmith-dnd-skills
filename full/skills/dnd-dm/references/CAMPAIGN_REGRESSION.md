@@ -24,11 +24,19 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    ids. Use a level appropriate to the adventure segment. Exhaust advancement
    follow-ups, prepared spells, features, derived-state re-reads, and a verified
    snapshot before returning to `play`.
-4. Prepare every NPC/monster required by the selected encounter in `lobby`. Use
-   exact rule statblocks or reviewed module image cards and retain all warnings.
-   A descriptive passive or action is a DM boundary only when it becomes relevant;
-   it does not authorize replacing the creature or blocking unrelated automatic
-   attacks.
+4. Prepare every important named NPC and every NPC/monster required by the
+   selected encounter. When the module provides only a narrative identity and no
+   combat statblock, use the public driver's `prepare-narrative-npc` path: cite
+   the active module/scene/chunk/page/hash and an excerpt containing the exact
+   name, enter `lobby`, create `character_create_from(mode="narrative_npc")`,
+   verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
+   restore `play`, register the actor in the manifest, and verify its checkpoint.
+   Such a card supports identity, notes, relationships, and ActorKnowledge; its
+   default mechanical shell is not an authored statblock and must never enter
+   combat. For encounter participants, use exact rule statblocks or reviewed
+   module image cards and retain all warnings. A descriptive passive or action is
+   a DM boundary only when it becomes relevant; it does not authorize replacing
+   the creature or blocking unrelated automatic attacks.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with

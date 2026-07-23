@@ -120,6 +120,7 @@ identifier inside ordinary prose or a different scene is not the room source.
 | Atomically create PC template + instance | `character_create_from(mode="build")` |
 | Create from an imported exact statblock | `character_create_from(mode="statblock")` |
 | Create from a reviewed image-only module statblock | `character_create_from(mode="module_statblock")` |
+| Create an exact named noncombat identity with no statblock | `character_create_from(mode="narrative_npc")` |
 | List or read live actors | `character_query(view="list" | "get")` |
 | Inspect a character/ability document | `character_query(view="document")` |
 | Full reviewed replacement | `character_sheet_replace` |
@@ -145,6 +146,13 @@ present only as a PDF image, use the reviewed module-content workflow and retain
 its asset/page/review provenance. If it is absent, ambiguous, 2024, or unsupported
 by the current parser, keep it unresolved; never substitute a similar SRD creature.
 Do not pre-resolve random treasure.
+
+If an important named NPC has an authored identity but no combat statblock, bind
+its exact active module/scene/chunk/page/hash and name-bearing excerpt through
+`mode="narrative_npc"`. The resulting `narrative_only` card may participate in
+relationships, notes, goals, and ActorKnowledge, but its default mechanics are
+sentinels and it cannot make a check or enter combat until an exact statblock is
+later imported.
 
 For normal play, mutate only the affected structure:
 

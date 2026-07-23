@@ -34,7 +34,7 @@ the executable mechanic definition remains in the MCP-owned immutable pack.
 | Type | Required identity and narrative state | Mechanical expectations |
 |---|---|---|
 | PC | `player_name` when player-controlled; `notes.profile.summary` is required by this skill as the player-facing setting description | Full progression, abilities, skills, combat, traits, resources, spells, content, effects, and personal inventory. |
-| NPC | `notes.profile.summary` is required; record lasting conversation outcomes in ActorKnowledge and objective outcomes in CampaignMemory | The same full sheet. Populate every value that can affect a check, save, combat, spell, resource, item, or effect. |
+| NPC | `notes.profile.summary` is required; record lasting conversation outcomes in ActorKnowledge and objective outcomes in CampaignMemory | Populate every value that can affect a check, save, combat, spell, resource, item, or effect when an exact statblock exists. A source-bound `narrative_only` identity card may retain schema defaults, but those sentinels are never mechanically authoritative and the actor is ineligible for checks or combat. |
 | Monster | `notes.profile.summary` is required and describes appearance/behavior | The same full sheet, including CR-relevant combat values, defenses, senses, movement, actions in `content.activities`, limited uses, spells, equipment, effects, and loot. |
 
 The public character library may hold reusable PC, NPC, and monster templates.
@@ -46,6 +46,13 @@ edition and rules profile.
 Defaults are only placeholders while information is unknown. Once a rule source or
 published stat block supplies a value, write the structured value rather than
 leaving an inferred default.
+
+For an important named module NPC with no published statblock, use
+`character_create_from(mode="narrative_npc")`. Its exact source evidence lives in
+notes and the card carries `narrative_only`/`source_bound` tags plus an explicit
+`combat_eligible=false` response. It may own relationships, goals, and
+ActorKnowledge, but no caller may treat its placeholder AC, HP, abilities, speed,
+or other derived mechanics as authored.
 
 ```powershell
 # Public library templates and direct campaign instances both support pc/npc/monster.

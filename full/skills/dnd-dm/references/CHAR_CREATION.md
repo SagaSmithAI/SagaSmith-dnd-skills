@@ -46,6 +46,19 @@ Statblock import currently accepts reviewed English 2014 SRD-style weapon
 statblocks. If the exact creature is absent, spell-only, 2024, ambiguous, or
 unsupported, keep it unresolved instead of substituting a similar creature.
 
+An important named NPC may have an authored identity but no combat statblock at
+all. Create that identity only with
+`character_create_from(mode="narrative_npc")`. Supply the active
+module/scene/chunk/page/hash reference, an excerpt containing the exact actor
+name, an authored role, and a concise summary. The service stores immutable
+source evidence in notes and marks the card `narrative_only`, `source_bound`,
+`combat_statblock=not_imported`, and `combat_eligible=false`. Re-read the card,
+restore the prior `play` exposure, add the actor to the playthrough manifest, and
+checkpoint. The default sheet values on this identity card are schema sentinels,
+not inferred module mechanics: never use the card in a check or combat, never
+claim its AC/HP/abilities as authored, and never upgrade it into a combatant
+without later importing an exact statblock.
+
 When an active PC dies, disappears, or leaves, create any replacement through the
 same public, source-audited character workflow. Reuse an applicable unused
 pregenerated PC first; otherwise build a new legal actor from the active catalog.
@@ -59,8 +72,9 @@ participants explicitly tell the replacement.
 Before creating any actor, read `character-schema-v2.md`. All PCs, NPCs, and
 monsters require complete structured cards; NPCs and monsters require
 `notes.profile.summary`. Do not persist an unconfirmed draft. After every creation
-or advancement, call `character_query(view="get")` and use its `derived` values for proficiency,
-saves, skills, AC, HP, speed, spell DC, preparation, and encumbrance.
+or advancement, call `character_query(view="get")`. Use returned `derived`
+mechanics only for PCs and source-statblocked actors; a `narrative_only` actor is
+not mechanically authoritative.
 
 Recording a class, subclass, species, or subspecies name is not sufficient.
 Before the first `play` phase and after every level-up, query
