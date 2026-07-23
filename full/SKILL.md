@@ -59,6 +59,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   `campaign_change(action="loot_acquire")` with one stable acquisition id and the
   exact expanded module chunk reference. Do not split that parcel into independent
   wallet and inventory writes.
+- Use `campaign_change(action="consumable_use")` for a shared standard healing
+  potion outside combat so item consumption, server-side `2d4+2`, healing, the
+  random-stream position, and their rule receipt commit together.
 - `character build` is the preferred player-character creation workflow: it creates
   a public template and a separate initial campaign instance atomically.
 - Do not load entire rulebooks or modules into context.

@@ -55,6 +55,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    in one public transaction. Record the discovery only for living or otherwise
    present witnesses, sync the playthrough manifest, and verify the resulting
    checkpoint before consuming or transferring any acquired item.
+10. Exercise a source-acquired standard healing potion when a living PC is
+    wounded: call `campaign_change(action="consumable_use")` once, then verify the
+    stack decrement, service-owned `2d4+2` random receipt, HP clamp, Core rule
+    receipt, ActorKnowledge recipients, manifest sync, and checkpoint. A dead PC
+    is not a valid recipient and must not gain knowledge from the use.
 
 ## Exact scene evidence
 

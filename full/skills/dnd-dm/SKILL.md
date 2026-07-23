@@ -151,6 +151,13 @@ ids, pass the exact chunk `source_ref`, and then record ActorKnowledge only for
 the witnesses. Do not credit the shared wallet and add the items in separate
 writes: a transport failure must not leave half of a chest acquired.
 
+For an identified standard healing potion in the shared stash outside combat,
+call `campaign_change(action="consumable_use")`. Keep its use id stable and pass
+the target's current revision. The Runtime owns the Core `2d4+2` roll and commits
+the reduced stack, healing, random-stream receipt, and rule receipt atomically.
+Never call `inventory_change(remove)`, `dnd_dice_roll`, and
+`character_state_change(heal)` as three substitutes for drinking one potion.
+
 When a module yields a found spellbook, add one `kind="spellbook"` inventory item
 for each physically distinct book. Preserve its edition, exact source scene/key,
 copyability, owner mark, resolved catalog `spell_ids`, and
