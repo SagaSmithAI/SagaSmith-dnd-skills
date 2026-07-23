@@ -94,6 +94,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     checkpoint. Never edit the raw sheet, silently choose a subclass or feature,
     advance an ineligible/dead actor, or treat the level integer alone as a
     complete advancement.
+15. Advance campaign time through the public regression driver's
+    `advance-time` path whenever travel, waiting, or a source-triggered interval
+    matters. Cite the exact scene chunk and excerpt, supply a positive
+    minute/hour/day count, and state any DM ruling used to turn narrative timing
+    such as "late in the day" into a duration. The service-owned campaign clock,
+    continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
+    must all agree. Never update only the manifest's projected clock or invent a
+    duration without an explicit audited ruling.
 
 ## Exact scene evidence
 
