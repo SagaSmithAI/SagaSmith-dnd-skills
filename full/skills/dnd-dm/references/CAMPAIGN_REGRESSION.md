@@ -76,6 +76,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     stable outcome id and identical outcome/fact payload: matching saved progress
     is a resume boundary, not a reason to rewrite it with a changed state version.
     Narrative event text alone is not a restorable NPC or quest state.
+13. Award one source-defined XP parcel to every exact eligible recipient in one
+    public `award-xp` call when possible. Never include a dead, departed, or
+    otherwise ineligible actor merely to match the original party count. The
+    stable award and manifest-sync identities must include the sorted recipient
+    actor ids as well as scene and amount, so a deliberately split award cannot
+    collide with another actor's transaction.
 
 ## Exact scene evidence
 
