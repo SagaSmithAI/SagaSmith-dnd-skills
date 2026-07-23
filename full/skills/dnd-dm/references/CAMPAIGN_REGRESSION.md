@@ -75,6 +75,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Stealth modifier or substitute one creature's profile for another. Use one
    shared hostile roll only when the exact encounter text explicitly says to roll
    once for the group, and require identical Stealth profiles before doing so.
+   Preserve detection separately for every hostile-observer pair: a hidden
+   combatant's `visible_to_actor_ids` includes each opponent whose passive score
+   detected that combatant. Detecting one hider neither reveals the others nor
+   makes the detected hider untargetable.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
    historical final combat projection as current state.
