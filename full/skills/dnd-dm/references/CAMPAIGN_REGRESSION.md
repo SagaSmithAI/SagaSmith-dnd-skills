@@ -71,6 +71,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     commit the event, stable world facts, and witness-scoped ActorKnowledge,
     upsert (not replace) the manifest NPC/quest/clue projections, merge world
     state, then sync and verify a checkpoint containing the resulting manifest.
+    The driver must validate the complete prospective manifest before the first
+    mutation. If transport fails after scene progress commits, retry the same
+    stable outcome id and identical outcome/fact payload: matching saved progress
+    is a resume boundary, not a reason to rewrite it with a changed state version.
     Narrative event text alone is not a restorable NPC or quest state.
 
 ## Exact scene evidence
