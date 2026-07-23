@@ -144,6 +144,13 @@ After item writes, treat `character_query(view="get").derived.inventory.weapon_a
 active concentration spell as one active effect with `concentration: true` and its
 `source_spell_id`.
 
+When a searched and expanded module chunk grants one parcel containing currency
+and/or multiple objects, read the exact scene and use
+`campaign_change(action="loot_acquire")`. Give the parcel and every item stable
+ids, pass the exact chunk `source_ref`, and then record ActorKnowledge only for
+the witnesses. Do not credit the shared wallet and add the items in separate
+writes: a transport failure must not leave half of a chest acquired.
+
 When a module yields a found spellbook, add one `kind="spellbook"` inventory item
 for each physically distinct book. Preserve its edition, exact source scene/key,
 copyability, owner mark, resolved catalog `spell_ids`, and

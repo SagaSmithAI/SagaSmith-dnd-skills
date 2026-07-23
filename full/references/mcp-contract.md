@@ -142,7 +142,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -190,6 +190,17 @@ and that PC's `expected_revision`; the call also requires the current campaign
 revision and branch. All PC totals and a branch-local award record commit
 atomically. It returns cumulative thresholds and `eligible`, but never changes a
 level. Milestone mode rejects this action.
+
+`campaign_change(action="loot_acquire")` is the play-phase transaction for one
+source-defined treasure parcel. Supply a stable branch-local `acquisition_id`,
+positive denomination amounts in `coins`, normalized shared-stash `items` with
+stable ids, a nonempty reason, and the exact JSON `source_ref` from the selected
+module chunk. The Runtime verifies that the chunk belongs to the campaign,
+module, and scene and that `content_sha256` matches its expanded text. Currency,
+items, and the branch-local acquisition record commit atomically; an exact
+idempotent retry returns the original parcel, while a second key cannot reuse the
+same acquisition id. Use separate `wallet_change` or `inventory_change` calls
+only for genuinely separate in-world transactions, not to decompose one chest.
 
 `character_state_change(action="level_advance")` is DM-authorized and valid only
 in `lobby`, outside active combat. It requires the current actor revision, a fresh

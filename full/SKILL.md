@@ -55,6 +55,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   `notes.memories` is import-only; new subjective information belongs to
   ActorKnowledge. `character update` is
   reserved for a reviewed replacement of the complete `sheet` or `notes` document.
+- When one source-defined treasure parcel contains both currency and items, use
+  `campaign_change(action="loot_acquire")` with one stable acquisition id and the
+  exact expanded module chunk reference. Do not split that parcel into independent
+  wallet and inventory writes.
 - `character build` is the preferred player-character creation workflow: it creates
   a public template and a separate initial campaign instance atomically.
 - Do not load entire rulebooks or modules into context.

@@ -47,6 +47,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
    historical final combat projection as current state.
+9. When the resolved scene yields treasure, select and expand the exact treasure
+   chunk and acquire the complete parcel through
+   `campaign_change(action="loot_acquire")`. Use one stable acquisition id,
+   stable item ids, the printed denominations and quantities, and the exact
+   content hash. Currency, items, and the branch-local audit record must commit
+   in one public transaction. Record the discovery only for living or otherwise
+   present witnesses, sync the playthrough manifest, and verify the resulting
+   checkpoint before consuming or transferring any acquired item.
 
 ## Exact scene evidence
 
