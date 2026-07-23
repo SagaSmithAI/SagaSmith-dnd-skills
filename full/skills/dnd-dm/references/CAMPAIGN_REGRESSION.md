@@ -65,6 +65,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     new entry into the existing `full_playthrough_events` map; never replace the
     map or reuse a run-only key. Re-read progress after the checkpoint and verify
     that earlier events from the same run and scene remain present.
+12. When a resolved event changes an NPC, quest, clue, or machine-verifiable
+    world condition, use the public regression driver's `record-outcome` path.
+    Give it a stable outcome id and exact source reference. It must atomically
+    commit the event, stable world facts, and witness-scoped ActorKnowledge,
+    upsert (not replace) the manifest NPC/quest/clue projections, merge world
+    state, then sync and verify a checkpoint containing the resulting manifest.
+    Narrative event text alone is not a restorable NPC or quest state.
 
 ## Exact scene evidence
 
