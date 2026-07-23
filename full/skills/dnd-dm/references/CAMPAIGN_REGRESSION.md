@@ -11,7 +11,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
 
 1. In `lobby`, verify storage, server capabilities, the campaign edition, the
    locked Core fingerprint, and the active module revision. Complete the staged
-   module import and explicitly resolve any warning gate before activation.
+   module import and explicitly resolve any warning gate before activation. Give
+   every parser behavior change a new parser version before refreshing. A refresh
+   may enter `lobby`, but on any stage/inspect/validate/ingest/activate failure it
+   must restore the phase that was exposed on entry.
 2. Read `module_query(view="index")`. Visit every non-reference/non-overview
    scene through `module_query(view="scene")`; require readable content, valid PDF
    page ranges, and stable scene ids. Exercise every available atlas location by

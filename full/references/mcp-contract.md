@@ -61,7 +61,9 @@ level advancement. A failure commits none of those state changes.
 
 Module re-imports are revisions: earlier sources are retained for snapshots and
 scoped scene progress, while normal `module_query(view="index")` results show only the newest
-active revision. A D&D scene can contain conservative `spatial.locations`
+active revision. Re-import orchestration must version parser behavior and restore
+the entry tool phase if any staged refresh step fails; a rejected import must not
+strand a live campaign in `lobby`. A D&D scene can contain conservative `spatial.locations`
 evidence recovered from room headings and stated dimensions. Its optional
 `spatial.connections` contains only edges supported by explicit route prose or
 reviewed structured authoring, with confidence and source evidence; neither room
