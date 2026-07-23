@@ -60,6 +60,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     stack decrement, service-owned `2d4+2` random receipt, HP clamp, Core rule
     receipt, ActorKnowledge recipients, manifest sync, and checkpoint. A dead PC
     is not a valid recipient and must not gain knowledge from the use.
+11. Give every source-cited scene event a stable identity derived from the run,
+    scene, event type, and resolved summary. Before writing progress, merge the
+    new entry into the existing `full_playthrough_events` map; never replace the
+    map or reuse a run-only key. Re-read progress after the checkpoint and verify
+    that earlier events from the same run and scene remain present.
 
 ## Exact scene evidence
 
