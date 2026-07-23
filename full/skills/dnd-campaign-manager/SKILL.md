@@ -18,9 +18,13 @@ replaces the earlier exposure, so discard every older exposure id.
 
 ## Start and Modules
 
-1. Call `campaign_create` with name, edition, locale, and optional description.
+1. Call `campaign_create` with name, edition, locale, `advancement_mode`
+   (`milestone` or `xp`), and optional description.
    Choose `2014` or `2024` from the adventure and table contract before importing
-   modules or building actors; never accept the server default without checking it.
+   modules or building actors; never accept either server default without checking
+   it. For an existing campaign whose mode is absent or must change, switch to
+   `lobby` and use `campaign_change(action="advancement_configure",
+   payload={mode})`.
 2. Persist the returned `campaign_id`.
 3. Read `campaign_rules(action="get_profile")` and
    `campaign_rules(action="explain")`. Confirm the locked Core provider matches
@@ -156,9 +160,16 @@ new list as `prepared_spell_ids` on the actor's
 `character_state_change(action="rest")` long-rest
 transaction; do not toggle preparations one by one.
 
-When the campaign awards a level, first record the source-bound milestone event,
-then switch to `lobby` and use
-`character_state_change(action="level_advance")`. Never patch the actor sheet.
+For milestone advancement, record and settle the source-bound award immediately
+when its trigger occurs, before entering a later sourced scene. For XP advancement,
+use one atomic `campaign_change(action="experience_award")` with the exact
+source/reason and each PC's amount and current revision. Never synthesize encounter
+XP for a milestone module, award XP to NPCs, or change `progression.xp` by sheet
+replacement. Re-read the returned eligibility; XP award never auto-levels.
+
+Once a milestone is earned or XP reports `eligible=true`, end combat, switch to
+`lobby`, and use `character_state_change(action="level_advance")`. XP mode rejects
+the call below the next cumulative threshold. Never patch the actor sheet.
 Treat the returned `advancement.follow_up` as a blocking checklist: all eligible
 features, subclass/player choices, spell gains, and the complete `level_up`
 prepared list must be reconciled from the active catalog before returning to

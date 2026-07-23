@@ -192,13 +192,17 @@ campaign day, not once per long rest: the MCP requires the branch-local clock,
 records the last-used day on the feature, and a long rest does not reset it. Do
 not apply the rest first and patch spell slots afterward.
 
-Level advancement is a `lobby` transaction, not a sheet replacement. Preserve
-the exact award evidence and call
+Level advancement is a `lobby` transaction, not a sheet replacement. Confirm the
+campaign's explicit `milestone` or `xp` mode. In XP mode, first use the atomic
+`campaign_change(action="experience_award")`; it records source-bound awards and
+returns eligibility without auto-leveling. In milestone mode, never invent
+encounter XP. Settle either kind of trigger before entering a later sourced scene.
+Preserve the exact award evidence and call
 `character_state_change(action="level_advance")` with the existing class, fixed
 or rolled HP method, `reason`, and `source_ref`. Never provide `hp_roll`: for the
 rolled method the engine rolls the class Hit Die after idempotency, revision,
-content, and rules checks and returns the roll in `advancement.hit_points.roll`.
-Current HP is not healed.
+content, rules, and XP-threshold checks and returns the roll in
+`advancement.hit_points.roll`. Current HP is not healed.
 Then exhaust `advancement.follow_up`: apply eligible class features, resolve any
 subclass and spell choices from the active content catalog, apply newly eligible
 subclass features, replace the complete prepared list with `event="level_up"`,

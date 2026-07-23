@@ -136,21 +136,34 @@ Advancement changes the live campaign instance and must use the audited lobby
 workflow; never patch `progression.level`, HP, Hit Dice, slots, or preparation
 limits by hand:
 
-1. Inspect the module or campaign award and retain its exact `source_ref`. Prepare
-   a level-up event for the final `continuity_commit` that says why the level was
-   earned.
+1. Read `campaign.settings.advancement.mode`. Campaign creation must explicitly
+   select `milestone` or `xp`; configure a missing/changed mode only in `lobby`
+   through `campaign_change(action="advancement_configure", payload={mode})`.
+   In milestone mode, inspect the module trigger and retain its exact `source_ref`;
+   do not also synthesize encounter XP. In XP mode, award the reviewed amount as
+   soon as the encounter/objective is resolved with
+   `campaign_change(action="experience_award", payload={awards:
+   [{character_id, amount, expected_revision}], reason, source_ref})`, using the
+   current campaign revision. The award atomically updates all named PCs, records
+   branch-local evidence, and returns threshold status; it never auto-levels.
+   Prepare a level-up event for the final `continuity_commit` that says why the
+   level was earned.
 2. End active combat, switch the campaign to `lobby`, read the actor's latest
-   revision, and call
+   revision, verify that the milestone is earned or XP returns `eligible=true`,
+   and call
    `character_state_change(action="level_advance", payload={class_name,
-   hp_method, hp_roll?, reason, source_ref})`. The current implementation advances
+   hp_method, reason, source_ref})`. The current implementation advances
    an existing 2014 single class by exactly one level; multiclass and 2024
    advancement are stop conditions, not permissions to replace the sheet.
 3. Use `hp_method="fixed"` for the class fixed value, or use `"rolled"` only with
-   the actual Hit Die result. The transaction updates maximum HP, the Hit Die
+   an explicit player/DM choice to roll; the engine performs and returns the Hit
+   Die roll after all guards pass. Never provide a roll value. The transaction
+   updates maximum HP, the Hit Die
    pool, spell-slot capacity, and preparation maximum. It does not heal existing
    damage. Newly gained slot capacity becomes available, but spent old slots do
    not refresh. Source-bound per-level modifiers such as Dwarven Toughness are
-   resolved from already applied catalog provenance.
+   resolved from already applied catalog provenance and included in the matching
+   `hp_progression` entry.
 4. Read `advancement.follow_up`. Apply every eligible base-class and already
    selected-subclass feature in the listed order through
    `character_content_apply`. If `subclass_options` is nonempty, obtain the
@@ -168,3 +181,9 @@ limits by hand:
 7. After confirmation, use `continuity_commit` for the level-up event and
    post-level snapshot, then return to `play` and reopen the phase-appropriate
    exposure.
+
+The trigger timing is part of correctness. If a module says the party reaches
+level 2 after a tavern encounter, settle level 2 before entering the next
+bathhouse/dungeon scene. If an audit discovers a late award, record it explicitly
+as a retrospective correction; do not claim that the earlier scene used the
+correct level or silently rewrite its rolls.

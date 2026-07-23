@@ -142,7 +142,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -178,14 +178,30 @@ prepared spells and cantrips never occupy selections. Wizard selections must be
 in the spellbook. Multiclass eligibility uses each spell's `grant.source_key`
 and that class's own level. Campaign-bound characters inherit campaign edition.
 
+`campaign_create` records `advancement_mode="milestone" | "xp"` in campaign
+settings. Use `campaign_change(action="advancement_configure", payload={mode})`
+only in `lobby`, outside active combat, with the current campaign revision. A
+campaign missing this setting cannot award XP or advance until it is configured.
+
+`campaign_change(action="experience_award")` is DM-authorized and valid only for
+PCs in XP mode, outside active combat. Its payload contains nonempty `reason` and
+`source_ref`, plus unique `awards` entries with `character_id`, positive `amount`,
+and that PC's `expected_revision`; the call also requires the current campaign
+revision and branch. All PC totals and a branch-local award record commit
+atomically. It returns cumulative thresholds and `eligible`, but never changes a
+level. Milestone mode rejects this action.
+
 `character_state_change(action="level_advance")` is DM-authorized and valid only
 in `lobby`, outside active combat. It requires the current actor revision, a fresh
 idempotency key, the exact existing `class_name`, `hp_method` (`fixed` or
-`rolled` plus `hp_roll`), and nonempty `reason` and `source_ref`. It currently
+`rolled`; never provide `hp_roll`), and nonempty `reason` and `source_ref`. In XP
+mode it requires the actor's current cumulative XP to meet the next-level
+threshold; milestone mode relies on the cited trigger. It currently
 advances a 2014 single-class actor exactly one level. The atomic mutation raises
 maximum HP without healing current damage, adds the new Hit Die, adds only newly
 gained spell-slot capacity to available slots, recalculates preparation maximum,
-and applies source-bound per-level HP modifiers from installed content. Its
+and applies source-bound per-level HP modifiers from installed content to both
+maximum HP and the matching HP-growth ledger entry. Its
 `advancement.follow_up` lists eligible feature artifacts, subclass options, and
 spell-choice counts. Those are mandatory subsequent catalog operations; after a
 subclass choice, query again for its features. Finish with a complete

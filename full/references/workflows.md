@@ -184,11 +184,17 @@ own exposure. Loading a group for one Agent must not expose it to another.
 
 ## Source-bound level advancement
 
-1. Verify the XP or milestone in the imported module/campaign evidence and add a
-   campaign event with that exact source reference.
-2. End combat, switch to `lobby`, re-read the actor revision, and call
+1. Read the campaign's explicit advancement mode. For a milestone module, verify
+   the exact trigger and do not synthesize encounter XP. For XP mode, atomically
+   apply the reviewed source-bound PC awards with
+   `campaign_change(action="experience_award")`, fresh campaign/actor revisions,
+   and a fresh idempotency key. It does not auto-level; use its returned
+   `eligible` status. Add a campaign event with the same exact source reference.
+2. Settle the trigger before entering a later sourced scene. End combat, switch
+   to `lobby`, re-read the actor revision, and call
    `character_state_change(action="level_advance")`. Use the fixed HP value unless
-   the player actually rolls; never supply a fabricated roll.
+   the table selected rolled HP; the engine owns that roll, so never supply a roll
+   value. XP mode rejects advancement below its cumulative threshold.
 3. Inspect `advancement.follow_up`. Apply its base-class and existing-subclass
    feature ids through `character_content_apply`. Resolve a listed subclass choice
    with the player, apply it, then query the catalog again for subclass features.
