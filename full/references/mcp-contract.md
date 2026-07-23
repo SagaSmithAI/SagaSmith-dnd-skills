@@ -144,7 +144,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire/currency_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -220,6 +220,19 @@ Regression orchestration may distinguish the occurrence scene/location from the
 source scene for a delayed promised reward. The transaction's exact `source_ref`
 still identifies the original promise chunk, while continuity records the later
 scene and a location that exists in that scene's atlas.
+
+`campaign_change(action="currency_spend")` is the play-phase transaction for one
+shared-wallet bill. Supply a stable branch-local `spend_id`, a nonempty `coins`
+object whose denomination amounts are positive integers, a reason, the exact
+module chunk `source_ref` that establishes the offered expense, and a nonempty
+Core/Skill `rule_ref` or reviewed price basis. The Runtime validates the module,
+scene, chunk hash, denominations, and available exact balances before committing
+the new wallet and branch-local `currency_spends` audit together. An exact
+idempotent retry returns the first result; another key cannot reuse the spend id.
+Insufficient funds in any denomination leave every balance unchanged. Use the
+regression `spend-coins` path to bind the occurrence Scene Atlas location,
+witness ActorKnowledge, manifest sync, and verified checkpoint. Do not emulate
+one payment with multiple negative `wallet_change` calls.
 
 Outside combat, use `campaign_change(action="consumable_use")` to drink one
 standard identified `Potion of Healing` from the shared stash. Supply a stable

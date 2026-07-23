@@ -151,6 +151,16 @@ ids, pass the exact chunk `source_ref`, and then record ActorKnowledge only for
 the witnesses. Do not credit the shared wallet and add the items in separate
 writes: a transport failure must not leave half of a chest acquired.
 
+For lodging, supplies, services, and other shared-wallet expenses in `play`, use
+`campaign_change(action="currency_spend")`. Pass one stable branch-local spend
+id, the exact positive coin denominations paid, the scene chunk `source_ref`
+that establishes the offered expense, and the active Core/Skill `rule_ref` or
+reviewed price basis. The transaction must reject insufficient funds without
+partially deducting any denomination and must persist the payment audit with the
+new wallet in one commit. Then record only the participants who witnessed the
+purchase, sync the playthrough manifest, and verify a checkpoint. Do not use a
+sequence of negative `wallet_change` adjustments for one bill.
+
 For an identified standard healing potion in the shared stash outside combat,
 call `campaign_change(action="consumable_use")`. Keep its use id stable and pass
 the target's current revision. The Runtime owns the Core `2d4+2` roll and commits
