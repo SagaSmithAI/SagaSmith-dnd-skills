@@ -36,7 +36,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    combat. For encounter participants, use exact rule statblocks or reviewed
    module image cards and retain all warnings. A descriptive passive or action is
    a DM boundary only when it becomes relevant; it does not authorize replacing
-   the creature or blocking unrelated automatic attacks.
+   the creature or blocking unrelated automatic attacks. Before any prepared
+   monster enters combat, compare every printed Multiattack with
+   `derived.multiattack_options`. If a deterministic printed composition is
+   missing, stop at the quality gate and repair/reimport it; do not silently run
+   one ordinary attack in place of the source-defined action. A generic
+   “N melee/ranged weapon attacks” composition is deterministic only when the
+   actor card has exactly one compatible weapon for that mode. Multiple
+   compatible weapons remain an explicit DM-review boundary.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with
