@@ -43,9 +43,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Such a card supports identity, notes, relationships, and ActorKnowledge; its
    default mechanical shell is not an authored statblock and must never enter
    combat. For encounter participants, use exact rule statblocks or reviewed
-   module image cards and retain all warnings. A descriptive passive or action is
-   a DM boundary only when it becomes relevant; it does not authorize replacing
-   the creature or blocking unrelated automatic attacks. Before any prepared
+   module image cards and retain all warnings. When one reviewed statblock must
+   create several source-identical actors, create every actor separately with an
+   idempotency identity scoped by the run, review, actor name, actor type, and
+   source variant. Retrying one actor must recover that actor, while the next
+   actor must not collide with the previous creation. A descriptive passive or
+   action is a DM boundary only when it becomes relevant; it does not authorize
+   replacing the creature or blocking unrelated automatic attacks. Before any prepared
    spellcaster enters combat, a printed `Spellcasting` entry must have parsed as
    structured spellcasting rather than a descriptive passive. Compare its
    source-printed ability, slot maxima, and exact spell-name set with the created
