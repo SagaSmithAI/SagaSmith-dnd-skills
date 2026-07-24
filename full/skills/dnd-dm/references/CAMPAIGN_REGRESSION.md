@@ -287,6 +287,15 @@ quotes, dash variants, case, and whitespace. This only compensates for extractio
 artifacts. It never makes a paraphrase, translation, truncated count, or text from
 another scene acceptable.
 
+When a source rule calls for a random encounter check or table roll, use the
+public driver's `roll-source` action with a stable occurrence-specific roll id,
+the exact dice expression, Scene Atlas location, expanded chunk reference, and
+verbatim rule excerpt. The action advances the server-owned random stream,
+records the receipt and result in scene progress and continuity, and syncs the
+manifest. Use a DM audience for hidden encounter checks. If the result triggers
+a second table roll, give that roll a different id and perform it through the
+same action; never generate either result client-side.
+
 ## Snapshot and branch-isolation audit
 
 Run destructive rehearsal steps on a disposable branch created from a verified
@@ -297,7 +306,7 @@ Use scene-level checkpoint batching on a campaign's main timeline. Pass
 `--defer-checkpoint` only to repeated `prepare-statblock` calls on the main
 timeline and to these public playthrough-driver actions:
 `prepare-narrative-npc`, `resolve-check`, `record-event`, an intermediate
-`record-outcome`, `advance-time`, `stand-up`, `provision-source-item`,
+`record-outcome`, `advance-time`, `roll-source`, `stand-up`, `provision-source-item`,
 `transfer-source-item`, `acquire-loot`, `spend-coins`, `spend-item`, and
 `use-consumable`. Each action must still commit its authoritative state, exact
 source reference where applicable, event/facts, ActorKnowledge, and manifest
