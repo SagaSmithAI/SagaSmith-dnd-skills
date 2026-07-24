@@ -935,11 +935,14 @@ If an atomic party rest succeeds but the following continuity checkpoint fails,
 retry the exact request. When changed actor revisions make that retry conflict,
 an owner or DM may read the stored campaign mutation through
 `state_revision(action="receipt", payload={"idempotency_key": ...})`. Treat this
-as recovery evidence only when its member ids, duration, campaign revision, and
-world clock exactly match current public state, each member's `rest_history`
-matches the implied start/completion minutes, and requested prepared spells match
-the authoritative cards. Then add only the missing occurrence-scoped continuity
-and checkpoint writes; do not repeat the rest or patch storage.
+as recovery evidence only when its branch and before/after entity-revision
+evidence match the current campaign and actors, and its request hash matches the
+exact pre-rest request reconstructed from those before revisions and all member
+choices. Its member ids, duration, campaign revision, and world clock must also
+exactly match current public state, each member's `rest_history` must match the
+implied start/completion minutes, and its prepared-spell receipt must match the
+authoritative cards. Then add only the missing occurrence-scoped continuity and
+checkpoint writes; do not repeat the rest or patch storage.
 
 Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
 effect on a campaign, scene, location, or object. Each effect has a stable id,

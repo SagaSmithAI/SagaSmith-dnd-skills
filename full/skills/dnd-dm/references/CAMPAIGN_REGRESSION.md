@@ -241,11 +241,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     member choices, duration, and reason. If that rest commits but its following
     continuity checkpoint fails, retry the exact request first. A stale-revision
     idempotency conflict means the rest may already exist: read its owner/DM-only
-    receipt with `state_revision(action="receipt")`, then require the receipt's
-    members, duration, campaign revision, and world clock to equal current public
-    state. Also require every member's `rest_history` completion/start minutes
-    and any requested prepared-spell selection to match. Only after all checks
-    pass may the driver commit the missing continuity event and checkpoint.
+    receipt with `state_revision(action="receipt")`. Require its branch and
+    before/after entity-revision evidence to match the current campaign and
+    actors, reconstruct the exact pre-rest request from those before revisions
+    and all member choices, and require its hash to match the receipt. Then
+    require the receipt's members, duration, campaign revision, and world clock
+    to equal current public state. Also require every member's `rest_history`
+    completion/start minutes and any prepared-spell receipt to match the
+    authoritative card. Only after all checks pass may the driver commit the
+    missing continuity event and checkpoint.
     Never run the rest twice, edit the database, or accept a receipt from an
     intervening campaign mutation.
 20. When a manifest PC is dead or departed, build one replacement through the
