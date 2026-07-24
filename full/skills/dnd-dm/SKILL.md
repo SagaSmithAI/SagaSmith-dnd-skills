@@ -281,8 +281,12 @@ content, rules, and XP-threshold checks and returns the roll in
 `advancement.hit_points.roll`. Current HP is not healed.
 Then exhaust `advancement.follow_up`: apply eligible class features, resolve any
 subclass and spell choices from the active content catalog, apply newly eligible
-subclass features, replace the complete prepared list with `event="level_up"`,
-and re-read derived state. Snapshot before entering another sourced scene. When
+subclass features, verify that the level transaction materialized newly unlocked
+always-prepared subclass spells, add newly selected prepared-class spell cards
+with `method="class_prepared"`, replace the complete prepared list with
+`event="level_up"`, and re-read derived state. Always-prepared spells stay outside
+the caller-selected list and do not consume its maximum. Snapshot before entering
+another sourced scene. When
 several eligible party members advance together at the same downtime boundary,
 the public regression driver may defer their individual snapshots and create one
 verified aggregate party-advancement checkpoint after every actor passes this

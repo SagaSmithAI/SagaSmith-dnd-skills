@@ -190,7 +190,9 @@ limits by hand:
    damage. Newly gained slot capacity becomes available, but spent old slots do
    not refresh. Source-bound per-level modifiers such as Dwarven Toughness are
    resolved from already applied catalog provenance and included in the matching
-   `hp_progression` entry.
+   `hp_progression` entry. The same transaction materializes always-prepared
+   subclass spells whose recorded minimum level has just become eligible; audit
+   `advancement.subclass_spell_grants` and their exact subclass provenance.
 4. Read `advancement.follow_up`. Apply every eligible base-class and already
    selected-subclass feature in the listed order through
    `character_content_apply`. If `subclass_options` is nonempty, obtain the
@@ -199,8 +201,13 @@ limits by hand:
    must be applied after the feature that grants that resource.
 5. Resolve each reported cantrip, known-spell, or spellbook choice from
    `rule_pack_query(view="content_catalog")`; apply only eligible artifact ids.
-   A Wizard adds the reported spells with `method="spellbook"`. Then submit the
-   complete legal prepared list with
+   A Wizard adds the reported spells with `method="spellbook"`. For a prepared
+   caster, also apply each newly chosen class spell not yet present on the card
+   with `method="class_prepared"` and include it in the complete prepared list;
+   these card-hydration selections do not consume a reported known/spellbook
+   choice. Do not include automatically always-prepared subclass spells in that
+   caller-selected list or count them against its maximum. Then submit the complete
+   legal prepared list with
    `character_spell_prepare(mode="replace_all", event="level_up")`.
 6. Re-read the actor and audit level, HP maximum/current HP, Hit Dice, spell slots,
    preparation, feature resources, subclass, spells, and `derived`. Do not return

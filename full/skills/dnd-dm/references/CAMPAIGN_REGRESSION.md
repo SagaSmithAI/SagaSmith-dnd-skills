@@ -220,7 +220,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     must enter `lobby`, replay the stable level transaction when resuming,
     exhaust all returned and newly applicable class/subclass feature artifacts,
     validate any subclass and known/spellbook choices against the active catalog,
-    replace the complete prepared-spell list when the follow-up requires it,
+    verify that newly level-eligible always-prepared subclass spells were
+    materialized, add any newly chosen prepared-class spell cards with
+    `method="class_prepared"`, replace the complete prepared-spell list when the
+    follow-up requires it,
     re-read and verify the actor, and restore `play`. For a single advancement,
     sync the manifest and verify its checkpoint. For a contiguous group of
     eligible party members advancing from the same source-cited scene or
