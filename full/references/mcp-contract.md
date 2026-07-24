@@ -237,6 +237,14 @@ source scene for a delayed promised reward. The transaction's exact `source_ref`
 still identifies the original promise chunk, while continuity records the later
 scene and a location that exists in that scene's atlas.
 
+The same split applies to public full-playthrough `record-event` and
+`record-outcome` orchestration. `scene_id` and `location_key` identify where the
+event actually occurs and where scene progress is written; optional
+`source_scene_id` identifies the scene whose expanded chunk must contain the
+exact excerpt and match `source_ref`. Continuity retains both ids. This supports
+delayed rescue returns, deliveries, promises, and quest completion without
+rewriting progress in the original scene or fabricating a return there.
+
 `campaign_change(action="currency_spend")` is the play-phase transaction for one
 shared-wallet bill. Supply a stable branch-local `spend_id`, a nonempty `coins`
 object whose denomination amounts are positive integers, a reason, the exact

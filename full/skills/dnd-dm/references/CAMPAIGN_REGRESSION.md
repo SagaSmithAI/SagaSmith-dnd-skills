@@ -132,6 +132,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     commit the event, stable world facts, and witness-scoped ActorKnowledge,
     upsert (not replace) the manifest NPC/quest/clue projections, merge world
     state, then sync and verify a checkpoint containing the resulting manifest.
+    For an outcome fulfilled in a later scene, pass the actual occurrence scene
+    and Scene Atlas location separately from `source_scene_id`: validate the
+    excerpt and exact reference against the original source scene, but write
+    progress and location only to the occurrence scene. Preserve both scene ids
+    in the continuity event; never move the party back to the source scene merely
+    to make a delayed rescue, delivery, promise, or return condition validate.
     The driver must validate the complete prospective manifest before the first
     mutation. If transport fails after scene progress commits, retry the same
     stable outcome id and identical outcome/fact payload: matching saved progress
