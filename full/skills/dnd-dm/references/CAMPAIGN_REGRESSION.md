@@ -19,7 +19,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    scene through `module_query(view="scene")`; require readable content, valid PDF
    page ranges, and stable scene ids. Exercise every available atlas location by
    writing scoped progress on a disposable branch. Do not invent topology for a
-   scene without reviewed or explicit connections.
+   scene without reviewed or explicit connections. A campaign may revisit the
+   same scene after world, quest, party, or objective state changes. Derive each
+   `advance-scene` replace identity from the complete normalized target manifest:
+   an exact transport retry must reproduce the same key and payload, while a
+   later stateful revisit must receive a different key. A target-scene-only key
+   is invalid because hubs, towns, and headquarters are intentionally revisited.
 3. Prepare at least one complete source-bound PC using only active content catalog
    ids. Use a level appropriate to the adventure segment. Exhaust advancement
    follow-ups, prepared spells, features, derived-state re-reads, and a verified

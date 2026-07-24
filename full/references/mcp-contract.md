@@ -169,6 +169,13 @@ compare that canonical field set, while retaining optional asset-path, asset
 hash, and purpose fields in its continuity evidence; it must not treat removal
 of those unexecuted audit annotations as a failed actor creation.
 
+Full-playthrough scene transitions replace the snapshot-managed manifest through
+`playthrough_manifest(action="replace")`. The driver derives the transition
+idempotency identity from the complete normalized target manifest, not only the
+target scene id. Replaying the same transition therefore submits the same key and
+payload, while revisiting a town, hub, or headquarters after party/world/quest
+state changes submits a distinct key and cannot collide with the earlier visit.
+
 Before passing an allowlisted PDF/text file to module import, use
 `character_query(view="document")` when it may be a character sheet,
 pregenerated-PC packet, or ability-score option document. The result stages and
