@@ -98,6 +98,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - For rule-profile and rule-pack writes, obtain `campaign_revision` from
   `campaign_rules(action="get_profile")` and carry the returned revision forward one write at
   a time. Never silently relock a legacy snapshot or unavailable Core fingerprint.
+  If a verified snapshot needs an older unavailable Core, inspect it with
+  `snapshot_query(view="core")` and use the explicit
+  `branch_change(action="create_core_upgrade")` conversion only after recording a
+  reviewed reason and both old/new fingerprints.
 - Keep each PC/NPC's `actor_id` explicit when reading or writing ActorKnowledge;
   never merge one actor's memories into another actor's context.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use

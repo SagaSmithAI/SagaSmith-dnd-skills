@@ -242,6 +242,14 @@ source checkpoint. Carry fresh campaign/actor/scene revisions and idempotency ke
 through every mutation. Create and verify branch checkpoints during long scene
 walks and after continuity/combat. Then:
 
+If the parent snapshot's built-in Core fingerprint is unavailable in the current
+runtime, do not relock the live branch and retry a normal restore. Inspect the
+target with `snapshot_query(view="core")`, review the old/new fingerprints, and
+rerun `branch-from-snapshot` with an explicit Core-conversion reason. The public
+driver must use `branch_change(action="create_core_upgrade")`, preserve the old
+snapshot checksum, and verify the converted child checkpoint before play resumes.
+A snapshot with no recorded Core lock remains blocked for an edition migration.
+
 1. end combat and switch the disposable branch to `lobby`;
 2. create and verify its closing snapshot;
 3. checkout the original source branch through `branch_change`;

@@ -17,7 +17,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `continuity_commit`, `campaign_event(add/list)`, `memory_change(add/upsert/revise/supersede)`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
-| Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout)` |
+| Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/undo/redo)` |
 
 `module_search` only selects candidates. Call `module_expand` or
@@ -577,7 +577,16 @@ checkpointed combat path.
 Snapshot restore and branch checkout check the saved Core lock before changing
 live state. A legacy save without that lock, or a save requiring an unavailable
 Core fingerprint, needs an explicit conversion path and is never silently
-upgraded.
+upgraded. For an unavailable fingerprint, first verify the snapshot and call
+`snapshot_query(view="core")`. After reviewing the runtime change, call
+`branch_change(action="create_core_upgrade")` with the target slot, new branch
+name, exact saved/runtime Core fingerprints, current campaign/branch guards, a
+bounded reason, and a fresh key. The transaction preserves the current branch,
+leaves the source snapshot payload/checksum immutable, materializes the target
+only on a new branch, replaces only its Core lock while retaining
+edition/locale/publications/user options/optional activations, and immediately
+captures a converted child snapshot. A missing legacy Core lock still requires a
+separate edition migration; do not guess it.
 
 ## Integrity and identity contract
 
@@ -617,6 +626,8 @@ requires the current `expected_history_sequence` from
 
 `branch_change(action="create", payload.checkout=true)` returns both the new branch and the materialized
 snapshot; pointer changes and state restoration are one transaction.
+`branch_change(action="create_core_upgrade")` likewise returns the converted
+branch and child snapshot plus both Core locks and the reviewed reason.
 The transfer is one mutation group, so one `state_revision(action="undo")` restores every affected
 wallet, item stack, and character revision together. Retrying the same key replays
 the original result; reusing it with different arguments is an error.
