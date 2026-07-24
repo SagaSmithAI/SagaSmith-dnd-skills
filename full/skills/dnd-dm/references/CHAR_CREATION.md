@@ -198,7 +198,12 @@ limits by hand:
    `character_content_apply`. If `subclass_options` is nonempty, obtain the
    player's choice, apply that subclass, query the content catalog again, and
    apply its newly eligible feature cards. A feature that names a shared resource
-   must be applied after the feature that grants that resource.
+   must be applied after the feature that grants that resource. Satisfy every
+   structured `selection_requirements.field` with the exact requested count:
+   Bard Expertise chooses two existing skill proficiencies, while College of
+   Lore Bonus Proficiencies chooses three currently untrained skills. Verify the
+   resulting expertise/proficiency values; an empty feature choice is not a
+   complete level-up.
 5. Resolve each reported cantrip, known-spell, or spellbook choice from
    `rule_pack_query(view="content_catalog")`; apply only eligible artifact ids.
    A Wizard adds the reported spells with `method="spellbook"`. For a prepared

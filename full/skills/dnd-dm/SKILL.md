@@ -281,7 +281,8 @@ content, rules, and XP-threshold checks and returns the roll in
 `advancement.hit_points.roll`. Current HP is not healed.
 Then exhaust `advancement.follow_up`: apply eligible class features, resolve any
 subclass and spell choices from the active content catalog, apply newly eligible
-subclass features, verify that the level transaction materialized newly unlocked
+subclass features with every structured choice field and exact choice count
+satisfied, verify that the level transaction materialized newly unlocked
 always-prepared subclass spells, add newly selected prepared-class spell cards
 with `method="class_prepared"`, replace the complete prepared list with
 `event="level_up"`, and re-read derived state. Always-prepared spells stay outside
