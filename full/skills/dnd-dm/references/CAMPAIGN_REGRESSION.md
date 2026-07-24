@@ -42,6 +42,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    module image cards and retain all warnings. A descriptive passive or action is
    a DM boundary only when it becomes relevant; it does not authorize replacing
    the creature or blocking unrelated automatic attacks. Before any prepared
+   spellcaster enters combat, a printed `Spellcasting` entry must have parsed as
+   structured spellcasting rather than a descriptive passive. Compare its
+   source-printed ability, slot maxima, and exact spell-name set with the created
+   card, and require the prepared spell ids to cover that executable set. OCR
+   tokens such as a broken ordinal are an importer regression to fix and refresh,
+   not permission to accept an empty spell list or patch the actor manually.
+   Before any prepared
    monster enters combat, compare every printed Multiattack with
    `derived.multiattack_options`. If a deterministic printed composition is
    missing, stop at the quality gate and repair/reimport it; do not silently run
@@ -258,7 +265,10 @@ final read-only audit. A corpus is complete only when all campaigns satisfy:
 - the final branch is the expected source branch in `play`, with no active combat
   and a valid head snapshot.
 
-Keep parser warnings and review-only candidates in the report. They are evidence
-of fail-closed behavior, not permission to fabricate missing content. A successful
+Keep parser warnings and review-only candidates in the report. A warning that
+demotes source-printed Spellcasting to a descriptive passive blocks that
+spellcaster from combat until the importer is repaired and the actor is recreated
+from a clean parent snapshot. Warnings are evidence of fail-closed behavior, not
+permission to fabricate missing content. A successful
 corpus result means the exercised public workflows passed; it does not claim that
 every optional rule or every possible encounter path was executed.

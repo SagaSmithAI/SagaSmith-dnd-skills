@@ -444,6 +444,15 @@ for that creature. Hydration preserves the Core card's components and provenance
 but overlays the displayed effect/range and structured attack resolution together.
 Clients must reject a newly prepared actor if those views disagree; do not show a
 base-spell range while the engine enforces the statblock override.
+When the source card prints `Spellcasting`, `module_query(view="candidates")`
+must validate it as structured spellcasting before review/creation. A
+`Spellcasting: descriptive passive is not automatically settled` warning blocks
+that actor from combat. After `mode="module_statblock"` creation, compare the
+source casting ability, slot maxima, and exact spell-name set with
+`sheet.spellcasting`, `sheet.content.spells`, and
+`derived.spellcasting.prepared_spell_ids`. Empty or incomplete hydration is not a
+DM ruling boundary; repair/refresh the parser and recreate the actor from a clean
+snapshot rather than patching its sheet.
 
 Before `combat_start`, call `module_query(view="readiness")` with a manifest:
 

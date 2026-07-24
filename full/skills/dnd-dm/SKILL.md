@@ -454,6 +454,14 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+If the printed card contains `Spellcasting`, a candidate warning that treats that
+entry as a descriptive passive is a lobby blocker, not an optional DM boundary.
+Review the cited page/chunks and repair or refresh the importer before continuing;
+never recreate the spells by raw sheet edits. After actor creation, compare the
+printed casting ability, every slot maximum, and the exact spell-name set with
+the source, then verify that `derived.spellcasting.prepared_spell_ids` and the
+source-bound spell cards contain the same executable list. A missing or extra
+spell, empty slot map, or unresolved active-content binding blocks combat.
 `required_count` is the complete group count established by the cited scene, a
 recorded random-encounter roll, or an explicit branch-local DM composition fact.
 It is never shorthand for `len(actor_ids)`. Prepare every required card in lobby
