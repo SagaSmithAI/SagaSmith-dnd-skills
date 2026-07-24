@@ -49,6 +49,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    name, enter `lobby`, create `character_create_from(mode="narrative_npc")`,
    verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
    restore `play`, register the actor in the manifest, and verify its checkpoint.
+   A `prepare-statblock` failure at candidate lookup, visual review, validation,
+   creation, or verification must restore both the entry branch and entry phase
+   before surfacing the error. Re-read the public phase after a failed review;
+   never leave the campaign in `lobby` and repair it out of band.
    Such a card supports identity, notes, relationships, and ActorKnowledge; its
    default mechanical shell is not an authored statblock and must never enter
    combat. For encounter participants, use exact rule statblocks or reviewed
