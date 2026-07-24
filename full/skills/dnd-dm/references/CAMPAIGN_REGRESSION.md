@@ -181,7 +181,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     actor card; never derive a class-prefixed key from an older fixture or another
     actor. The server rolls spent Hit Dice, applies Constitution, checks remaining
     dice and the once-per-day Arcane Recovery allowance, and records the random
-    receipt. A failed preflight must leave both clock and actors unchanged.
+    receipt. A failed preflight must leave both clock and actors unchanged. Give
+    each Short Rest a stable identity derived from the complete normalized member
+    choices, duration, and reason. Reuse that identity across its clock, actor,
+    knowledge, continuity, and manifest-sync mutations, but never reuse those
+    keys for a later rest with different choices or narrative occurrence.
 19. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`

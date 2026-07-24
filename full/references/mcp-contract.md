@@ -803,7 +803,14 @@ read-only authoritative preflight: it validates remaining dice, the actor's
 current card, campaign day, Arcane Recovery allowance/usage, and rule readiness.
 Only after every member reports `ready=true` may orchestration advance time and
 commit actor rests. The runtime—not the caller—rolls each requested Hit Die,
-applies Constitution and the edition's minimum, and returns the roll audit. A
+applies Constitution and the edition's minimum, and returns the roll audit.
+A full-playthrough driver derives one stable Short Rest identity from the
+complete normalized member choices, duration, and reason, and uses it for that
+rest's clock, actor, knowledge, continuity, and manifest-sync idempotency keys.
+A later rest must derive a distinct identity whenever its choices or narrative
+occurrence differ; a run-wide constant or actor-only key would incorrectly
+replay an earlier rest.
+
 2014 Long Rest may require an explicit
 `hit_dice_recovery` allocation across multiclass pools. A 2024 Long Rest restores
 all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery needs
