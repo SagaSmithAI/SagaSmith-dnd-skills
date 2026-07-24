@@ -203,7 +203,9 @@ limits by hand:
    Bard Expertise chooses two existing skill proficiencies, while College of
    Lore Bonus Proficiencies chooses three currently untrained skills. Verify the
    resulting expertise/proficiency values; an empty feature choice is not a
-   complete level-up.
+   complete level-up. Cross-check every returned feature's `minimum_level`
+   against its cited class or subclass text before applying it; an implausible
+   early unlock is an import/compiler defect and a stop condition, not a bonus.
 5. Resolve each reported cantrip, known-spell, or spellbook choice from
    `rule_pack_query(view="content_catalog")`; apply only eligible artifact ids.
    A Wizard adds the reported spells with `method="spellbook"`. For a prepared
