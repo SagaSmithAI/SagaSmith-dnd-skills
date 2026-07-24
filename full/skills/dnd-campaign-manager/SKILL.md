@@ -154,6 +154,18 @@ relationships, notes, goals, and ActorKnowledge, but its default mechanics are
 sentinels and it cannot make a check or enter combat until an exact statblock is
 later imported.
 
+When an imported adventure introduces a combat-capable actor already at 0 HP,
+Unconscious, and Stable, first create the source-bound actor with
+`current_hit_points: 0`, then call
+`character_state_change(action="source_state",
+payload={state: "stable_unconscious", source_ref: "module-chunk:<id>", reason:
+"<source-grounded reason>"})`. This is a narrow DM initialization path: the actor
+must already be at 0 HP, the citation must resolve to managed campaign content,
+and the state cannot be used for arbitrary conditions or a Dead actor. Record the
+source event as DM-only unless a PC has actually witnessed or learned it. Never
+fabricate a heal followed by nonlethal damage merely to obtain the same sheet
+conditions.
+
 For normal play, mutate only the affected structure:
 
 ```text
