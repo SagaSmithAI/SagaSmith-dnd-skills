@@ -795,10 +795,16 @@ before the next attack. Pending spell attacks block `combat_end_turn` and
 model the attacks as weapon actions, repeat the cast, combine damage packets, or
 patch HP.
 
-`character_state_change(action="rest")` applies v2-card short/long-rest recovery with a character
-revision and idempotency key. For a Short Rest, provide each spent hit die and
-its rolled result through `hit_dice_spends`; the runtime applies Constitution
-and the edition's minimum. A 2014 Long Rest may require an explicit
+`character_state_change(action="rest")` applies v2-card short-rest recovery with
+a character revision and idempotency key. Before any Short Rest clock write,
+call `character_query(view="rest")` for every member with the exact
+`hit_dice_spends` keys/counts and optional `arcane_recovery` allocation. This is a
+read-only authoritative preflight: it validates remaining dice, the actor's
+current card, campaign day, Arcane Recovery allowance/usage, and rule readiness.
+Only after every member reports `ready=true` may orchestration advance time and
+commit actor rests. The runtime—not the caller—rolls each requested Hit Die,
+applies Constitution and the edition's minimum, and returns the roll audit. A
+2014 Long Rest may require an explicit
 `hit_dice_recovery` allocation across multiclass pools. A 2024 Long Rest restores
 all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery needs
 the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at

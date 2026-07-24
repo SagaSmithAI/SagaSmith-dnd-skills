@@ -174,7 +174,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
     duration without an explicit audited ruling.
-18. When a manifest PC is dead or departed, build one replacement through the
+18. Before advancing time for a Short Rest, preflight every participant through
+    `character_query(view="rest")` with that actor's exact Hit Die keys/counts
+    and optional Arcane Recovery allocation. All preflights must report ready
+    before the first write. Use the keys currently exposed by each authoritative
+    actor card; never derive a class-prefixed key from an older fixture or another
+    actor. The server rolls spent Hit Dice, applies Constitution, checks remaining
+    dice and the once-per-day Arcane Recovery allowance, and records the random
+    receipt. A failed preflight must leave both clock and actors unchanged.
+19. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`
     through `game_phase`, and restore the entry phase even when construction
