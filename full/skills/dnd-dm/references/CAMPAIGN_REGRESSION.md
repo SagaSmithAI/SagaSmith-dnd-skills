@@ -277,11 +277,13 @@ authoritative state, exact source reference, event/facts, ActorKnowledge, and
 manifest mutation before returning; only its action-local snapshot is omitted.
 After the related preparation, checks, events, loot, and ordinary time advances
 are complete, call the public `checkpoint` action once with a stable label that
-identifies the scene and outcome, then verify that snapshot. A deferred scene is
-not complete until this terminal checkpoint exists. If transport or the process
-stops first, resume the same idempotent actions, re-read public state, and create
-the missing scene checkpoint; never repair the database or fabricate a manifest
-head.
+identifies the scene and outcome, then verify that snapshot. Re-read the public
+manifest and require the returned snapshot id in `snapshot_dag.nodes` and as
+`snapshot_dag.head_snapshot_id`; seeing it only in the separate runtime
+projection does not close the scene. A deferred scene is not complete until this
+terminal checkpoint exists. If transport or the process stops first, resume the
+same idempotent actions, re-read public state, and create the missing scene
+checkpoint; never repair the database or fabricate a manifest head.
 
 Never defer a combat-end checkpoint, PC death or stable recovery, replacement
 handoff, level advance, Short or Long Rest, major branch point, module
