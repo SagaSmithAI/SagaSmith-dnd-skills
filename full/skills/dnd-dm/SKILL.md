@@ -151,6 +151,18 @@ After item writes, treat `character_query(view="get").derived.inventory.weapon_a
 active concentration spell as one active effect with `concentration: true` and its
 `source_spell_id`.
 
+When a source magic item casts spells from charges, add it through
+`inventory_change(action="add")` with the exact module `source_key`, charge
+resource, source-declared `charge_rules`, and active spell artifact ids under
+`mechanics.spellcasting`. Preserve any item-specific casting time, component,
+attunement, and class-spell-list requirements. The server hydrates the exact
+locked spell cards; never copy those spells into the actor's ordinary known or
+prepared list. Cast with `source_item_id` through `character_action` or
+`combat_cast_spell`: the item charges, action economy, automatic self effect, and
+last-charge check commit together. At the printed recovery trigger, call
+`inventory_change(action="recharge")`; the service rolls the source formula and
+clamps to the recorded maximum. Never roll or patch charges separately.
+
 When a searched and expanded module chunk grants one parcel containing currency
 and/or multiple objects, read the exact scene and use
 `campaign_change(action="loot_acquire")`. Give the parcel and every item stable

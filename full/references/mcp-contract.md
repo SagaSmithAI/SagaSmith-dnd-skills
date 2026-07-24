@@ -143,7 +143,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Create from direct/build/template/statblock or exact narrative identity evidence | `character_create_from(mode=...)` |
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
-| Inventory | `inventory_change(add/update/remove/equip/consume_ammunition)`, `inventory_transfer` |
+| Inventory | `inventory_change(add/update/remove/equip/recharge/consume_ammunition)`, `inventory_transfer` |
 | Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
@@ -183,6 +183,12 @@ normalizes the artifact, reports its checksum and `document_kind`, preserves
 manual-input choices, and explicitly sets `module_import_allowed=false` for
 character documents. Never force such a document through the module parser.
 
+For the initial campaign party, classify all supplied character documents before
+creating any generated PC. Use every applicable module pregenerated character
+first and preserve its exact source reference/checksum; build only the seats still
+missing from the module's source-cited maximum recommended party size. This
+precedence is a quality gate, not a party-composition suggestion.
+
 For a dead, missing, or departed PC, prefer an applicable unused module
 pregenerated character and otherwise create one new legal character through the
 same public Lobby tools. A replacement is a distinct actor and must have empty
@@ -202,6 +208,19 @@ satisfies both checks), plus current campaign/source/target revisions. A failed
 authorization or stale revision moves nothing. Party transfers instead use
 `party_to_character` or `character_to_party`; the facade maps those directions
 to one atomic shared-stash/actor mutation.
+
+A charged spellcasting magic item is one `kind="magic_item"` inventory record
+with an exact module `source_key`, structured `charges`, optional source-declared
+`mechanics.charge_rules`, and `mechanics.spellcasting.spells[].artifact_id`.
+`inventory_change(action="add")` resolves each artifact exactly once from the
+active content lock and embeds its pack/version/rule references. Item-specific
+casting times and component, attunement, and class-list requirements remain
+authoritative. Call `character_action(action="cast_spell")` or
+`combat_cast_spell` with `source_item_id`; the Runtime pays item charges instead
+of spell slots and commits the applicable action, effect, and last-charge check
+atomically. Use `inventory_change(action="recharge")` only when the recorded
+trigger occurs; its server roll and clamp are part of that mutation. Direct dice
+calls followed by charge patches are not equivalent.
 
 Prepared-spell selection is edition- and class-aware. In `lobby`, use
 `character_spell_prepare(mode="replace_all")` with the complete selected list and

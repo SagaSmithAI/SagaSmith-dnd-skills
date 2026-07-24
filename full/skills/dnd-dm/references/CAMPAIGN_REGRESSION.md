@@ -25,10 +25,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    an exact transport retry must reproduce the same key and payload, while a
    later stateful revisit must receive a different key. A target-scene-only key
    is invalid because hubs, towns, and headquarters are intentionally revisited.
-3. Prepare at least one complete source-bound PC using only active content catalog
-   ids. Use a level appropriate to the adventure segment. Exhaust advancement
-   follow-ups, prepared spells, features, derived-state re-reads, and a verified
-   snapshot before returning to `play`.
+3. Classify and import every module-supplied PC document before building seats.
+   Fill every applicable party seat from those pregenerated PCs first, up to the
+   module's source-cited maximum recommended party size; only then build the
+   remaining legal seats from active content catalog ids. A present applicable
+   pregen may not be skipped for a generated optimization. Preserve each pregen's
+   source reference and document checksum. Use a level appropriate to the
+   adventure segment. Exhaust advancement follow-ups, prepared spells, features,
+   derived-state re-reads, and a verified snapshot before returning to `play`.
 4. Prepare every important named NPC and every NPC/monster required by the
    selected encounter. When the module provides only a narrative identity and no
    combat statblock, use the public driver's `prepare-narrative-npc` path: cite
@@ -133,6 +137,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     stack decrement, service-owned `2d4+2` random receipt, HP clamp, Core rule
     receipt, ActorKnowledge recipients, manifest sync, and checkpoint. A dead PC
     is not a valid recipient and must not gain knowledge from the use.
+    For a charged magic item that grants spells, add one source-bound item with
+    its exact charge maximum, recovery and last-charge formulas, casting-time
+    overrides, attunement/class-list restrictions, and active spell artifact ids.
+    Cast it through the public spell tool with `source_item_id`; verify one atomic
+    action/charge payment, automatic effect, Core receipts, and any service-owned
+    last-charge roll. At an actually reached printed recovery trigger, call
+    `inventory_change(action="recharge")` and verify its random-stream receipt.
+    Never add the item spell to the actor's ordinary spell list, pay a spell slot,
+    pre-roll the resource, or patch the charge count.
 13. Give every source-cited scene event a stable identity derived from the run,
     scene, event type, and resolved summary. Before writing progress, merge the
     new entry into the existing `full_playthrough_events` map; never replace the
