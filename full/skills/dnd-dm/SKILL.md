@@ -184,13 +184,15 @@ clamps to the recorded maximum. Never roll or patch charges separately.
 An item whose card says that attunement is required enters Play as
 `attunement="required"`: do not add it as already attuned or change that field
 with `inventory_change(action="update")`. Put its item id in the actor's Short
-Rest request as `attune_item_id`; the rest, three-item limit, duplicate-copy
-limit, and activation of the item's magical properties commit together. An
+Rest request as `attune_item_id` and require the DM to submit
+`attunement_prerequisite_confirmed=true` after checking the exact source
+prerequisite; the rest, three-item limit, duplicate-copy limit, and activation
+of the item's magical properties commit together. An
 unattuned shield still grants its ordinary shield benefit but no magical bonus.
 Do not transfer an item while its state is `attuned`; transfer neither grants
 the recipient attunement nor, by itself, satisfies any 2014 condition that ends
 the original bond. If an attunement prerequisite cannot be proven from the
-actor card and source, stop for explicit DM review.
+actor card and source, do not set the confirmation and stop for DM review.
 For a source-authored combat sequence, keep each opening item cast in printed
 order and call `combat_cast_spell` with `source_item_id`. Its item-specific
 casting time remains authoritative even when the underlying spell card normally

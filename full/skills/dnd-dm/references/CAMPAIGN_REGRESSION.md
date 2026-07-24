@@ -245,7 +245,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `character_query(view="rest")` with that actor's exact Hit Die keys/counts
     and optional Arcane Recovery allocation. Include the complete
     `rest_schedule`, any Ki meditation under `rest_activity_minutes`, and one
-    `attune_item_id` when that rest is devoted to a source-required item.
+    `attune_item_id` when that rest is devoted to a source-required item. The DM
+    must verify the item's exact source prerequisite against the actor card and
+    pass `attunement_prerequisite_confirmed=true`; an unproven prerequisite
+    blocks the rest mutation.
     All preflights must report ready
     before the first write. Use the keys currently exposed by each authoritative
     actor card; never derive a class-prefixed key from an older fixture or another
