@@ -243,7 +243,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     duration without an explicit audited ruling.
 18. Before advancing time for a Short Rest, preflight every participant through
     `character_query(view="rest")` with that actor's exact Hit Die keys/counts
-    and optional Arcane Recovery allocation. All preflights must report ready
+    and optional Arcane Recovery allocation. Include the complete
+    `rest_schedule`, any Ki meditation under `rest_activity_minutes`, and one
+    `attune_item_id` when that rest is devoted to a source-required item.
+    All preflights must report ready
     before the first write. Use the keys currently exposed by each authoritative
     actor card; never derive a class-prefixed key from an older fixture or another
     actor. The server rolls spent Hit Dice, applies Constitution, checks remaining
@@ -270,6 +273,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     missing continuity event and checkpoint.
     Never run the rest twice, edit the database, or accept a receipt from an
     intervening campaign mutation.
+    Each member needs a schedule whose minutes equal the shared clock advance.
+    The normal 2014 path is at least 480 minutes with at least 360 minutes of
+    sleep, no more than 120 minutes of light activity, and less than 60 minutes
+    of strenuous activity. A 240-minute path is legal only when every included
+    actor using it has a source-bound `Trance` feature and records 240
+    `trance_minutes`; never infer the exception from a race name.
 20. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`

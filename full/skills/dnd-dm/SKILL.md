@@ -181,6 +181,16 @@ prepared list. Cast with `source_item_id` through `character_action` or
 last-charge check commit together. At the printed recovery trigger, call
 `inventory_change(action="recharge")`; the service rolls the source formula and
 clamps to the recorded maximum. Never roll or patch charges separately.
+An item whose card says that attunement is required enters Play as
+`attunement="required"`: do not add it as already attuned or change that field
+with `inventory_change(action="update")`. Put its item id in the actor's Short
+Rest request as `attune_item_id`; the rest, three-item limit, duplicate-copy
+limit, and activation of the item's magical properties commit together. An
+unattuned shield still grants its ordinary shield benefit but no magical bonus.
+Do not transfer an item while its state is `attuned`; transfer neither grants
+the recipient attunement nor, by itself, satisfies any 2014 condition that ends
+the original bond. If an attunement prerequisite cannot be proven from the
+actor card and source, stop for explicit DM review.
 For a source-authored combat sequence, keep each opening item cast in printed
 order and call `combat_cast_spell` with `source_item_id`. Its item-specific
 casting time remains authoritative even when the underlying spell card normally
@@ -258,6 +268,15 @@ rolls every spent die, adds the card's Constitution modifier, and returns
 `hit_dice_rolls` for audit. Long rests reject `hit_dice_spends`; short rests
 reject long-rest hit-die recovery allocations and `food_and_drink`. A creature
 at 0 HP or Dead receives no rest benefit.
+Every rest must also submit a complete `rest_schedule` whose sleep, light
+activity, optional trance, and strenuous-activity minutes equal the exact
+campaign-clock duration. A normal 2014 Long Rest needs at least 8 hours,
+including at least 6 hours of sleep and no more than 2 hours of light activity;
+1 hour or more of strenuous activity interrupts it. Only an actor card with the
+source-granted `Trance` feature can use `trance_minutes=240` to finish in 4
+hours. A Monk regains Ki only if the same rest records at least 30 minutes of
+`rest_activity_minutes.meditation`; never infer that activity merely because an
+hour elapsed.
 
 If a Wizard chooses Arcane Recovery at the end of that short rest, include
 `arcane_recovery={"<slot level>": <count>}` in the same rest call. The engine
@@ -287,7 +306,21 @@ always-prepared subclass spells, add newly selected prepared-class spell cards
 with `method="class_prepared"`, replace the complete prepared list with
 `event="level_up"`, and re-read derived state. Always-prepared spells stay outside
 the caller-selected list and do not consume its maximum. Snapshot before entering
-another sourced scene. When
+another sourced scene.
+When applying multiclass features, Channel Divinity is one shared resource,
+Extra Attack uses the highest source-granted attacks-per-Action value rather
+than adding class features together, and a character who already has the class
+feature Unarmored Defense cannot gain it again. Alternative AC calculations
+such as Draconic Resilience and Mage Armor remain alternatives; never sum their
+formulas. A Constitution or per-class-level feature changes maximum HP only
+unless an explicit initial-setup full-HP flag is accepted during Lobby.
+For 2014 Wizard Spell Mastery, keep the selected level 1 and level 2 spell
+prepared to use its lowest-level at-will casting; an upcast still spends a slot.
+Replacing a mastered spell is a Play operation requiring 8 elapsed study hours.
+Signature Spells are two level 3 spellbook spells, always prepared, with one
+separate free level-3 cast each per Short or Long Rest; higher-level casting
+always spends a slot.
+When
 several eligible party members advance together at the same downtime boundary,
 the public regression driver may defer their individual snapshots and create one
 verified aggregate party-advancement checkpoint after every actor passes this
