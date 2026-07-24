@@ -28,6 +28,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    an exact transport retry must reproduce the same key and payload, while a
    later stateful revisit must receive a different key. A target-scene-only key
    is invalid because hubs, towns, and headquarters are intentionally revisited.
+   In a public full-playthrough run, use the driver's `read-scene` action when
+   the indexed scene id is already known. It calls
+   `module_query(view="scene", scope_id="dm")` directly and validates the returned
+   id. Reserve `query-source` for locating an unknown chunk, then expand only the
+   selected hits. Do not inflate `top_k` or repeat broad searches to reconstruct
+   a scene that the exact scene query can return in one request.
 3. Classify and import every module-supplied PC document before building seats.
    Fill every applicable party seat from those pregenerated PCs first, up to the
    module's source-cited maximum recommended party size; only then build the
