@@ -258,8 +258,37 @@ another scene acceptable.
 
 Run destructive rehearsal steps on a disposable branch created from a verified
 source checkpoint. Carry fresh campaign/actor/scene revisions and idempotency keys
-through every mutation. Create and verify branch checkpoints during long scene
-walks and after continuity/combat. Then:
+through every mutation.
+
+Use scene-level checkpoint batching on a campaign's main timeline. Pass
+`--defer-checkpoint` only to repeated `prepare-statblock` calls on the main
+timeline and to these public playthrough-driver actions:
+`prepare-narrative-npc`, `resolve-check`, `record-event`, an intermediate
+`record-outcome`, `advance-time`, `provision-source-item`,
+`transfer-source-item`, and `acquire-loot`. Each action must still commit its
+authoritative state, exact source reference, event/facts, ActorKnowledge, and
+manifest mutation before returning; only its action-local snapshot is omitted.
+After the related preparation, checks, events, loot, and ordinary time advances
+are complete, call the public `checkpoint` action once with a stable label that
+identifies the scene and outcome, then verify that snapshot. A deferred scene is
+not complete until this terminal checkpoint exists. If transport or the process
+stops first, resume the same idempotent actions, re-read public state, and create
+the missing scene checkpoint; never repair the database or fabricate a manifest
+head.
+
+Never defer a combat-end checkpoint, PC death or stable recovery, replacement
+handoff, level advance, Short or Long Rest, major branch point, module
+transition, or campaign ending. Never combine both `--defer-checkpoint` and an
+isolated `prepare-statblock` branch: an isolated branch requires its own actor
+checkpoint so it can close and return without contaminating the source branch.
+For branch regression, keep only a verified parent checkpoint and the completed
+branch checkpoint unless an intervening key event above requires another one.
+Do not create one snapshot for every ordinary roll, narrative note, loot line,
+or repeated source-identical actor.
+
+Create and verify additional checkpoints after key combat and during genuinely
+long scene walks where recovery would otherwise require repeating substantial
+play. Then:
 
 An exact checkpoint retry may encounter a newer manifest revision after its
 sync. Reuse only the verified snapshot with the same stable label on the current

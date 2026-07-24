@@ -88,6 +88,13 @@ the campaign.
 9. Use an administrative `snapshot_create` only when no scene continuity unit is
    being written, such as immediately before a dangerous restore. Use
    `snapshot_query(view="verify" | "lineage")` before restore.
+   During full campaign regression, batch ordinary scene actions with the
+   public driver's supported `--defer-checkpoint` paths, then end the batch with
+   one public `checkpoint` action and verify it. Do not defer combat end,
+   death/stable recovery, replacement, advancement, rests, major branches,
+   module transitions, or campaign endings. Follow
+   `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
+   interrupted-batch recovery.
 
 ## MCP Tool Reference
 
