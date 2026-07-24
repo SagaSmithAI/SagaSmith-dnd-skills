@@ -264,7 +264,7 @@ Use scene-level checkpoint batching on a campaign's main timeline. Pass
 `--defer-checkpoint` only to repeated `prepare-statblock` calls on the main
 timeline and to these public playthrough-driver actions:
 `prepare-narrative-npc`, `resolve-check`, `record-event`, an intermediate
-`record-outcome`, `advance-time`, `provision-source-item`,
+`record-outcome`, `advance-time`, `stand-up`, `provision-source-item`,
 `transfer-source-item`, and `acquire-loot`. Each action must still commit its
 authoritative state, exact source reference, event/facts, ActorKnowledge, and
 manifest mutation before returning; only its action-local snapshot is omitted.

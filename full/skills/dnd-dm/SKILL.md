@@ -465,7 +465,12 @@ earlier event. The engine rolls the source-required `1d4` hours, restores exactl
 Prone. Never patch HP or choose the duration yourself. Once that actor is
 conscious and above 0 HP, use the restricted
 `character_state_change(action="stand")` to clear Prone; do not replace the
-whole sheet or expose arbitrary condition deletion.
+whole sheet or expose arbitrary condition deletion. Give each `stand-up`
+occurrence a distinct audited reason; its identity includes scene, Scene Atlas
+location, actor, reason, and optional exact source reference. An exact retry
+must replay while a later stand by that actor in the same broad scene must not
+reuse action, continuity, ActorKnowledge, or manifest-sync keys. `stand-up` may
+defer its ordinary action-local checkpoint into the terminal scene checkpoint.
 
 Before combat, call `module_query(view="readiness")` with source-grounded groups
 for required combatants, reinforcements, and optional actors. Each group includes
