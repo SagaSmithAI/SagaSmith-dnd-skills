@@ -228,6 +228,11 @@ exact module scene, excerpt, chunk hash, and matching
 checkpoint. An imported statblock's printed AC override remains its base
 calculation: an explicitly held magic-item AC bonus still applies, and a valid
 Mage Armor effect may select its better unarmored calculation before that bonus.
+If custody of that unique item changes, `transfer-source-item` validates the
+scene evidence and calls public `inventory_transfer(mode="character_to_party")`
+with current campaign and actor revisions. It moves the original record,
+including charges and condition; acquiring a second copy as generic loot is not
+equivalent.
 
 Prepared-spell selection is edition- and class-aware. In `lobby`, use
 `character_spell_prepare(mode="replace_all")` with the complete selected list and

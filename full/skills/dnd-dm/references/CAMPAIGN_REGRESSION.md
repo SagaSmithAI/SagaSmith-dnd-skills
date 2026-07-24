@@ -111,6 +111,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    only when escape is impossible, confirm both predicates from current state and
    end with `status="surrender"` before another attack. Do not relabel surrender
    as defeat, death, or a generic truce.
+   When surrender or defeat moves a unique equipped item into party custody,
+   use the public `transfer-source-item` path (`character_to_party`) with both
+   current revisions and the exact scene evidence. Do not create a duplicate
+   loot record; preserve the original item's charges, condition, and source key.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
    historical final combat projection as current state.
