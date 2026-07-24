@@ -275,18 +275,20 @@ Use scene-level checkpoint batching on a campaign's main timeline. Pass
 timeline and to these public playthrough-driver actions:
 `prepare-narrative-npc`, `resolve-check`, `record-event`, an intermediate
 `record-outcome`, `advance-time`, `stand-up`, `provision-source-item`,
-`transfer-source-item`, and `acquire-loot`. Each action must still commit its
-authoritative state, exact source reference, event/facts, ActorKnowledge, and
-manifest mutation before returning; only its action-local snapshot is omitted.
-After the related preparation, checks, events, loot, and ordinary time advances
-are complete, call the public `checkpoint` action once with a stable label that
-identifies the scene and outcome, then verify that snapshot. Re-read the public
-manifest and require the returned snapshot id in `snapshot_dag.nodes` and as
-`snapshot_dag.head_snapshot_id`; seeing it only in the separate runtime
-projection does not close the scene. A deferred scene is not complete until this
-terminal checkpoint exists. If transport or the process stops first, resume the
-same idempotent actions, re-read public state, and create the missing scene
-checkpoint; never repair the database or fabricate a manifest head.
+`transfer-source-item`, `acquire-loot`, `spend-coins`, `spend-item`, and
+`use-consumable`. Each action must still commit its authoritative state, exact
+source reference where applicable, event/facts, ActorKnowledge, and manifest
+mutation before returning; only its action-local snapshot is omitted. After the
+related preparation, checks, events, loot, expenses, consumables, and ordinary
+time advances are complete, call the public `checkpoint` action once with a
+stable label that identifies the scene and outcome, then verify that snapshot.
+Re-read the public manifest and require the returned snapshot id in
+`snapshot_dag.nodes` and as `snapshot_dag.head_snapshot_id`; seeing it only in
+the separate runtime projection does not close the scene. A deferred scene is
+not complete until this terminal checkpoint exists. If transport or the process
+stops first, resume the same idempotent actions, re-read public state, and create
+the missing scene checkpoint; never repair the database or fabricate a manifest
+head.
 
 Never defer a combat-end checkpoint, PC death or stable recovery, replacement
 handoff, level advance, Short or Long Rest, major branch point, module
