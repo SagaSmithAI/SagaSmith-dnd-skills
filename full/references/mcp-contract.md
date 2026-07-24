@@ -659,6 +659,15 @@ is interpreted by the selected 2014/2024 ruleset. The DM may provide a
 `hidden`, explicit `visible_to_actor_ids`, surprise, and initiative. Omit
 `visible_to_actor_ids` for an ordinarily visible creature; provide it when known
 special senses let only named participants see a hidden or Invisible creature.
+When the expanded encounter text explicitly declares that a participant begins
+combat under a condition, include `participant_config.source_conditions`. Each
+entry requires a supported condition, `duration="encounter"`, the immutable
+expanded-chunk `source_ref`, and an exact `source_excerpt`. The server verifies
+module, scene, chunk hash, pages, headings, and excerpt, applies all cited
+conditions atomically with `combat_start`, keeps the canonical cards synchronized
+during combat, and removes only conditions added by that encounter at
+`combat_end`. Never use a complete character-sheet replacement to inject or clear
+an authored opening condition.
 When a source-bound weapon records additional typed damage, one successful hit
 rolls all parts and applies per-type defenses as one simultaneous damage instance.
 The result's `damage.roll_parts` preserves every roll. A nonempty

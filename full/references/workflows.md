@@ -120,7 +120,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
    combat map from the recorded spatial scene and location. Load the owner/DM
    `play.combat_control` group for this transition. If it falls back to a
-   12-by-12 canvas, do not narrate those dimensions as module-authored facts.
+   12-by-12 canvas, do not narrate those dimensions as module-authored facts. If
+   the selected source chunk explicitly says a participant starts under a
+   condition, pass it in that actor's `source_conditions` with
+   `duration="encounter"`, the service-returned immutable `source_ref`, and the
+   exact excerpt. Apply the group in this one start mutation; do not issue
+   per-actor sheet replacements. The server retains the condition through combat
+   synchronization and removes the encounter-added condition on `combat_end`.
 5. Resolve surprise before `combat_start`, but do not turn an adventure's approach
    prerequisite into automatic surprise. A requirement such as "approach carefully
    and without light" only avoids the adventure's automatic alert unless its text
