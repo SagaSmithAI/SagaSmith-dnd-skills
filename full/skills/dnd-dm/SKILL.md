@@ -54,7 +54,10 @@ the campaign.
 2. Read that scene through `module_query(view="scene")`. Use `module_search` only to select a
    candidate, then call `module_expand` before relying on a chunk. A search/expanded chunk can
    lack a scene id or straddle scene boundaries; never reuse its heading or page match as combat
-   evidence until the exact indexed scene has been read.
+   evidence until the exact indexed scene has been read. Carry the exact
+   `source_ref` returned by `module_expand`, including its service-owned
+   `content_sha256`. If expansion omits it, stop and repair the import/exposure
+   path; never synthesize the hash client-side.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.

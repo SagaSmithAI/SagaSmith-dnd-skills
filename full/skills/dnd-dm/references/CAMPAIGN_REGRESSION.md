@@ -17,7 +17,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    must restore the phase that was exposed on entry.
 2. Read `module_query(view="index")`. Visit every non-reference/non-overview
    scene through `module_query(view="scene")`; require readable content, valid PDF
-   page ranges, and stable scene ids. Exercise every available atlas location by
+   page ranges, and stable scene ids. After `module_search`, take the immutable
+   chunk `source_ref` from `module_expand`, including the service-owned
+   `content_sha256`; a missing reference is an import/exposure defect, not
+   permission to calculate or invent a client-side hash. Exercise every available atlas location by
    writing scoped progress on a disposable branch. Do not invent topology for a
    scene without reviewed or explicit connections. A campaign may revisit the
    same scene after world, quest, party, or objective state changes. Derive each
