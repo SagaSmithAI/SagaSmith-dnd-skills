@@ -221,8 +221,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     exhaust all returned and newly applicable class/subclass feature artifacts,
     validate any subclass and known/spellbook choices against the active catalog,
     replace the complete prepared-spell list when the follow-up requires it,
-    re-read and verify the actor, restore `play`, sync the manifest, and verify a
-    checkpoint. Never edit the raw sheet, silently choose a subclass or feature,
+    re-read and verify the actor, and restore `play`. For a single advancement,
+    sync the manifest and verify its checkpoint. For a contiguous group of
+    eligible party members advancing from the same source-cited scene or
+    downtime boundary, pass `--defer-checkpoint` only after each actor's complete
+    advancement can be verified, then call one public `checkpoint` after the
+    final actor and verify the aggregate party state before entering another
+    sourced scene. Never edit the raw sheet, silently choose a subclass or feature,
     advance an ineligible/dead actor, or treat the level integer alone as a
     complete advancement.
 17. Advance campaign time through the public regression driver's
@@ -312,7 +317,10 @@ timeline and to these public playthrough-driver actions:
 `prepare-narrative-npc`, `resolve-check`, `record-event`, an intermediate
 `record-outcome`, `advance-time`, `roll-source`, `stand-up`, `provision-source-item`,
 `transfer-source-item`, `acquire-loot`, `spend-coins`, `spend-item`, and
-`use-consumable`. Each action must still commit its authoritative state, exact
+`use-consumable`. `advance-level` may also defer only as part of one contiguous
+same-scene or same-downtime party-advancement batch; every actor must complete
+and verify all required follow-up before the next actor, and one aggregate public
+checkpoint must immediately close the batch. Each action must still commit its authoritative state, exact
 source reference where applicable, event/facts, ActorKnowledge, and manifest
 mutation before returning; only its action-local snapshot is omitted. After the
 related preparation, checks, events, loot, expenses, consumables, and ordinary
@@ -327,8 +335,10 @@ the missing scene checkpoint; never repair the database or fabricate a manifest
 head.
 
 Never defer a combat-end checkpoint, PC death or stable recovery, replacement
-handoff, level advance, Short or Long Rest, major branch point, module
-transition, or campaign ending. Never combine both `--defer-checkpoint` and an
+handoff, standalone level advance, Short or Long Rest, major branch point,
+module transition, or campaign ending. A deferred party-advancement batch is
+incomplete and must not enter another sourced scene until its aggregate
+checkpoint verifies. Never combine both `--defer-checkpoint` and an
 isolated `prepare-statblock` branch: an isolated branch requires its own actor
 checkpoint so it can close and return without contaminating the source branch.
 For branch regression, keep only a verified parent checkpoint and the completed

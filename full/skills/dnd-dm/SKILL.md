@@ -100,8 +100,11 @@ the campaign.
    one public `checkpoint` action and verify it. The following manifest `get`
    must project that snapshot id as both a DAG node and
    `snapshot_dag.head_snapshot_id`; a runtime-only node is insufficient. Do not defer combat end,
-   death/stable recovery, replacement, advancement, rests, major branches,
-   module transitions, or campaign endings. Follow
+   death/stable recovery, replacement, rests, major branches, module
+   transitions, or campaign endings. A contiguous same-scene party advancement
+   may defer only the individual `advance-level` snapshots after each actor has
+   been fully verified, then seal the whole advancement batch with one public
+   checkpoint before entering another sourced scene. Follow
    `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
    interrupted-batch recovery.
 
@@ -279,7 +282,11 @@ content, rules, and XP-threshold checks and returns the roll in
 Then exhaust `advancement.follow_up`: apply eligible class features, resolve any
 subclass and spell choices from the active content catalog, apply newly eligible
 subclass features, replace the complete prepared list with `event="level_up"`,
-re-read derived state, and snapshot before returning to `play`. Follow the full
+and re-read derived state. Snapshot before entering another sourced scene. When
+several eligible party members advance together at the same downtime boundary,
+the public regression driver may defer their individual snapshots and create one
+verified aggregate party-advancement checkpoint after every actor passes this
+complete audit. Follow the full
 ordering and stop conditions in `references/CHAR_CREATION.md`.
 
 ## Combat boundary

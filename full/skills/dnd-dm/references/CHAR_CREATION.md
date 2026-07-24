@@ -207,7 +207,12 @@ limits by hand:
    to `play` while any required catalog item or player choice is missing.
 7. After confirmation, use `continuity_commit` for the level-up event and
    post-level snapshot, then return to `play` and reopen the phase-appropriate
-   exposure.
+   exposure. During full campaign regression only, a contiguous group of party
+   members advancing from the same source-cited scene or downtime boundary may
+   defer each actor-local snapshot after the complete actor audit. Create and
+   verify one aggregate party-advancement checkpoint immediately after the final
+   actor, before entering another sourced scene; a standalone advancement still
+   keeps its own checkpoint.
 
 The trigger timing is part of correctness. If a module says the party reaches
 level 2 after a tavern encounter, settle level 2 before entering the next
