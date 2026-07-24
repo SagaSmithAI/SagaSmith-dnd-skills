@@ -221,6 +221,13 @@ of spell slots and commits the applicable action, effect, and last-charge check
 atomically. Use `inventory_change(action="recharge")` only when the recorded
 trigger occurs; its server roll and clamp are part of that mutation. Direct dice
 calls followed by charge patches are not equivalent.
+The full-playthrough driver's `provision-source-item` action first validates the
+exact module scene, excerpt, chunk hash, and matching
+`module-chunk:<chunk_id>` item/charge source keys. It then uses only public
+`inventory_change(add/equip)`, re-reads the hydrated actor, and verifies a
+checkpoint. An imported statblock's printed AC override remains its base
+calculation: an explicitly held magic-item AC bonus still applies, and a valid
+Mage Armor effect may select its better unarmored calculation before that bonus.
 
 Prepared-spell selection is edition- and class-aware. In `lobby`, use
 `character_spell_prepare(mode="replace_all")` with the complete selected list and
@@ -660,6 +667,9 @@ therefore a per-participant scene fact, not the result of applying the ordinary
 half-success group-check rule to the party. `hidden` and `surprised` are distinct
 facts. Store the source prerequisite and comparison matrix in an auditable
 campaign event before supplying `participant_config.surprised`.
+If the source itself explicitly declares that a named participant can be
+surprised on the chosen route, the full-playthrough driver may supply that
+per-participant scene fact with the exact excerpt and no invented d20 check.
 Multiattack is an explicit action choice. `derived.attacks_per_action` represents
 the actor's ordinary Attack action (including a real Extra Attack feature); it is
 not inflated from a monster's Multiattack card. Pass a canonical
@@ -692,9 +702,13 @@ Joining initiative ties require an explicit `tie_breaker`. Create likely scene
 participants and their source-bound cards during lobby import, not during an
 active encounter.
 `combat_end` accepts an optional structured outcome with a bounded public
-`summary` and a status of victory, defeat, withdrawal, truce, or interrupted.
+`summary` and a status of victory, defeat, withdrawal, surrender, truce, or
+interrupted.
 It persists that outcome on the final encounter audit. It still refuses to end
 while a death-save participant remains dying rather than Dead or Stable.
+For an authored surrender threshold, the driver must verify that the named actor
+is alive at or below the threshold and every required no-escape predicate is
+true. It ends before another attack and preserves the exact surrender excerpt.
 Medicine stabilization is not a generic narrative check. Call
 `combat_check(kind="stabilize", ability="wisdom", target_id=...)`; the server
 requires the acting turn, recorded adjacency within 5 feet, and a living target

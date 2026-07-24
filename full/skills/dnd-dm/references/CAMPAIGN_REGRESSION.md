@@ -87,11 +87,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    its option id only on the first attack, resolve every remaining source-defined
    attack separately, and do not end that actor's turn while its Multiattack
    attack budget/remaining sequence is nonempty.
-   Resolve Surprise from the source positioning and the authoritative actor cards:
-   when multiple hostiles hide, call public `character_check` for each hostile's
-   Dexterity (Stealth), preserving its derived skill modifier and automatic armor
-   disadvantage, then compare every result with each opponent's passive
-   Perception. An opponent is surprised only when it detects none of the hiding
+   Resolve Surprise from the source positioning and the authoritative actor cards.
+   When the encounter text itself explicitly says that this route surprises a
+   named participant, preserve the exact excerpt and use the driver's
+   source-declared-surprise input for only that participant; do not invent a
+   Stealth or scout check. Otherwise, when multiple hostiles hide, call public
+   `character_check` for each hostile's Dexterity (Stealth), preserving its
+   derived skill modifier and automatic armor disadvantage, then compare every
+   result with each opponent's passive Perception. An opponent is surprised only
+   when it detects none of the hiding
    threats; a tied passive score detects that threat. Never hardcode a generic
    Stealth modifier or substitute one creature's profile for another. Use one
    shared hostile roll only when the exact encounter text explicitly says to roll
@@ -100,6 +104,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    combatant's `visible_to_actor_ids` includes each opponent whose passive score
    detected that combatant. Detecting one hider neither reveals the others nor
    makes the detected hider untargetable.
+   Preserve source-authored NPC tactics as ordered opening casts with exact
+   excerpts. Charged item spells must call `combat_cast_spell` with the actual
+   `source_item_id`; never copy the spell into the NPC's ordinary prepared list
+   or patch charges. If a source says a living NPC surrenders at an HP threshold
+   only when escape is impossible, confirm both predicates from current state and
+   end with `status="surrender"` before another attack. Do not relabel surrender
+   as defeat, death, or a generic truce.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
    historical final combat projection as current state.
@@ -241,6 +252,11 @@ Run destructive rehearsal steps on a disposable branch created from a verified
 source checkpoint. Carry fresh campaign/actor/scene revisions and idempotency keys
 through every mutation. Create and verify branch checkpoints during long scene
 walks and after continuity/combat. Then:
+
+An exact checkpoint retry may encounter a newer manifest revision after its
+sync. Reuse only the verified snapshot with the same stable label on the current
+branch; do not create a semantically different checkpoint under that label or
+silently select a same-named snapshot from another branch.
 
 If the parent snapshot's built-in Core fingerprint is unavailable in the current
 runtime, do not relock the live branch and retry a normal restore. Inspect the

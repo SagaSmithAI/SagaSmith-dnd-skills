@@ -162,6 +162,12 @@ prepared list. Cast with `source_item_id` through `character_action` or
 last-charge check commit together. At the printed recovery trigger, call
 `inventory_change(action="recharge")`; the service rolls the source formula and
 clamps to the recorded maximum. Never roll or patch charges separately.
+For a source-authored combat sequence, keep each opening item cast in printed
+order and call `combat_cast_spell` with `source_item_id`. Its item-specific
+casting time remains authoritative even when the underlying spell card normally
+uses another action type. A printed HP-threshold surrender fires only after the
+NPC is still alive and the required no-escape predicate is confirmed; close the
+encounter as `surrender` before resolving another attack.
 
 When a searched and expanded module chunk grants one parcel containing currency
 and/or multiple objects, read the exact scene and use
@@ -514,7 +520,7 @@ scene id, and page range. Do not select another occurrence where `D13` merely
 means a DC value or appears in unrelated prose.
 
 End an encounter with a structured `combat_end.outcome`: `status` is one of
-`victory`, `defeat`, `withdrawal`, `truce`, or `interrupted`, and `summary`
+`victory`, `defeat`, `withdrawal`, `surrender`, `truce`, or `interrupted`, and `summary`
 states the scene-supported reason and immediate public result. Do not close a
 fight merely because the regression has enough samples. The engine rejects an
 end while any death-save actor is still at 0 HP without Dead or Stable; settle
@@ -543,6 +549,9 @@ visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
 result against each opponent's passive Perception. Do not substitute the general
 half-success group-check rule, and do not treat satisfying an adventure's
 "careful/no light" prerequisite as guaranteed surprise unless the source says so.
+When the encounter text explicitly states that a particular route surprises a
+named participant, record that exact excerpt and set Surprise only for that
+participant without fabricating a Stealth or scout roll.
 An opponent that notices any threat is not surprised; record the comparison and
 set `surprised` per participant. Hidden and surprised are separate facts. A
 contextual observer feature such as Keen Smell changes passive Perception by
