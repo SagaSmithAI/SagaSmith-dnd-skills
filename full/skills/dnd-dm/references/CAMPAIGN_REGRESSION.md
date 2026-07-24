@@ -235,7 +235,20 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     choices, duration, and reason. Reuse that identity across its clock, actor,
     knowledge, continuity, and manifest-sync mutations, but never reuse those
     keys for a later rest with different choices or narrative occurrence.
-19. When a manifest PC is dead or departed, build one replacement through the
+19. Resolve every Long Rest through the atomic public
+    `campaign_change(action="party_rest")` surface, and derive occurrence-scoped
+    ActorKnowledge and manifest-sync identities from the complete normalized
+    member choices, duration, and reason. If that rest commits but its following
+    continuity checkpoint fails, retry the exact request first. A stale-revision
+    idempotency conflict means the rest may already exist: read its owner/DM-only
+    receipt with `state_revision(action="receipt")`, then require the receipt's
+    members, duration, campaign revision, and world clock to equal current public
+    state. Also require every member's `rest_history` completion/start minutes
+    and any requested prepared-spell selection to match. Only after all checks
+    pass may the driver commit the missing continuity event and checkpoint.
+    Never run the rest twice, edit the database, or accept a receipt from an
+    intervening campaign mutation.
+20. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`
     through `game_phase`, and restore the entry phase even when construction

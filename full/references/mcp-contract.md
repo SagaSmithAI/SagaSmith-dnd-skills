@@ -18,7 +18,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `continuity_commit`, `campaign_event(add/list)`, `memory_change(add/upsert/revise/supersede)`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
-| Audit | `state_revision(history/undo/redo)` |
+| Audit | `state_revision(history/receipt/undo/redo)` |
 
 `module_search` only selects candidates. Call `module_expand` or
 `module_query(view="scene")` before narrating a module fact. Always provide the active
@@ -930,6 +930,16 @@ all timed actor/world effects once, then settles the named actors and records
 their completion minute in the same mutation. It rejects 0-HP/dead starters and
 a second benefit less than 1,440 minutes after the previous one. Individual
 `character_rest` remains the short-rest surface and rejects `long_rest`.
+
+If an atomic party rest succeeds but the following continuity checkpoint fails,
+retry the exact request. When changed actor revisions make that retry conflict,
+an owner or DM may read the stored campaign mutation through
+`state_revision(action="receipt", payload={"idempotency_key": ...})`. Treat this
+as recovery evidence only when its member ids, duration, campaign revision, and
+world clock exactly match current public state, each member's `rest_history`
+matches the implied start/completion minutes, and requested prepared spells match
+the authoritative cards. Then add only the missing occurrence-scoped continuity
+and checkpoint writes; do not repeat the rest or patch storage.
 
 Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
 effect on a campaign, scene, location, or object. Each effect has a stable id,
