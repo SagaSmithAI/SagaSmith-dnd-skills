@@ -121,7 +121,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    loot record; preserve the original item's charges, condition, and source key.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
-   historical final combat projection as current state.
+   historical final combat projection as current state. On `record-event` or
+   `record-outcome`, keep `--event-knowledge-cause witnessed` only for actors
+   directly present and capable of perceiving the information. If the party
+   later briefs an absent, unconscious, newly joined, or replacement actor, run
+   a separate source-cited handoff with `--event-knowledge-cause told_by` and
+   name only the actual recipient actor ids. Update the manifest clue's
+   `known_by_actor_ids` projection to match the resulting ledgers; never copy
+   knowledge merely because the party collectively has it.
 9. When the resolved scene yields treasure, select and expand the exact treasure
    chunk and acquire the complete parcel through
    `campaign_change(action="loot_acquire")`. Use one stable acquisition id,
@@ -173,7 +180,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
 14. When a resolved event changes an NPC, quest, clue, or machine-verifiable
     world condition, use the public regression driver's `record-outcome` path.
     Give it a stable outcome id and exact source reference. It must atomically
-    commit the event, stable world facts, and witness-scoped ActorKnowledge,
+    commit the event, stable world facts, and cause-scoped ActorKnowledge,
     upsert (not replace) the manifest NPC/quest/clue projections, merge world
     state, then sync and verify a checkpoint containing the resulting manifest.
     For an outcome fulfilled in a later scene, pass the actual occurrence scene

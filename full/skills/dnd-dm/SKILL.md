@@ -84,7 +84,11 @@ the campaign.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
 8. Persist resolved scene continuity with one `continuity_commit`: one event,
    stable-key objective fact changes, exact per-actor knowledge changes, and an
-   optional snapshot. Never infer who knows a fact from the fact itself.
+   optional snapshot. Never infer who knows a fact from the fact itself. Mark
+   direct observation as `witnessed`; when an absent, unconscious, newly joined,
+   or replacement actor learns it through an explicit in-fiction briefing, mark
+   only that recipient's new entry as `told_by`. Party membership alone never
+   transfers ActorKnowledge.
 9. Use an administrative `snapshot_create` only when no scene continuity unit is
    being written, such as immediately before a dangerous restore. Use
    `snapshot_query(view="verify" | "lineage")` before restore.
