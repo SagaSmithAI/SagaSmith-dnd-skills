@@ -127,10 +127,24 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    combatant's `visible_to_actor_ids` includes each opponent whose passive score
    detected that combatant. Detecting one hider neither reveals the others nor
    makes the detected hider untargetable.
+   In a mixed group, pass only the source-named hiders as hidden actor ids. Do
+   not hide their visible allies or include those allies in a shared Stealth
+   profile. If the source says a present NPC waits until a later round, keep it
+   in the initial participant set but suppress its earlier turns with the exact
+   delayed-action excerpt; reserve `combat_join` for actors actually outside the
+   fight.
    Preserve source-authored NPC tactics as ordered opening casts with exact
    excerpts. Charged item spells must call `combat_cast_spell` with the actual
    `source_item_id`; never copy the spell into the NPC's ordinary prepared list
-   or patch charges. If a source says a living NPC surrenders at an HP threshold
+   or patch charges. A spell printed as cast before initiative must instead use
+   public noncombat `character_action(action="cast_spell")` before
+   `combat_start`, paying its slot and starting concentration. Bind a printed
+   first attack to that actor's reviewed weapon rather than allowing generic
+   weapon preference to override it. When an effect-only weapon hit opens an
+   on-hit ruling, settle its printed condition and escape terms through
+   `combat_on_hit_ruling`; a restrained target uses
+   `combat_check(action="escape")`, spends its action, and clears the condition
+   only on success. If a source says a living NPC surrenders at an HP threshold
    only when escape is impossible, confirm both predicates from current state and
    end with `status="surrender"` before another attack. Do not relabel surrender
    as defeat, death, or a generic truce.

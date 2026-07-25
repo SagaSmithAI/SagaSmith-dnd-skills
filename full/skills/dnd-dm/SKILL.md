@@ -579,7 +579,14 @@ Do not reject or rewrite a source attack merely because its `Hit` clause has no
 damage dice. Effect-only attacks such as a giant spider's Web retain an empty
 damage expression plus the exact `on_hit_effect`; resolve the attack roll
 normally, apply no fabricated HP damage, and send the printed condition and
-escape/destruction procedure to explicit DM settlement. If candidate validation
+escape/destruction procedure to explicit DM settlement. A hit that returns
+`pending_on_hit_ruling_id` blocks the turn: call public
+`combat_on_hit_ruling` with the printed condition, escape DC, permitted
+abilities, and an exact excerpt. If applied, keep the resulting ongoing effect
+on the target. On that target's turn, use
+`combat_check(action="escape")`; it must spend the action, roll the effect's
+recorded ability and DC, and remove the condition only on success. Never narrate
+an escape, patch a condition, or ignore the ruling window. If candidate validation
 instead reports that this kind of action lacks supported Hit dice, stop in lobby,
 repair and refresh the importer, and recreate the actor.
 If the printed card contains `Spellcasting`, a candidate warning that treats that
@@ -617,6 +624,20 @@ settlement would otherwise contradict each other.
 The excerpt is evidence, not a search hint: copy an exact normalized substring
 from the expanded same-module scene or a verified `module_search` hit. Never
 paraphrase, translate, or copy text from a different occurrence of the room key.
+Preserve authored tactics before generic automation. If only some initial
+hostiles hide, list exactly those actor ids; do not mark visible companions
+hidden or include them in a shared Stealth roll. A shared roll is legal only
+when the encounter text calls for one group roll and the selected actors have
+identical Stealth profiles. If the source says an NPC casts a spell before
+combat, call public noncombat `character_action(action="cast_spell")` before
+`combat_start` so the slot and concentration are real, then cite the same source
+when declaring its initial condition. If the NPC is present but joins the fray
+in a later round, keep it on the initial map and explicitly delay its actions;
+do not mislabel it as an off-map reinforcement. Bind every printed first-attack
+choice to that actor and weapon. In 2014, the Invisibility spell grants the
+attack's unseen-attacker benefit and ends after the attack is made, whether the
+roll hits or misses; do not clear it before preflight or leave it active after
+the attack.
 For a source-bound statblock spell marked with components not repeated in its
 reviewed card, obtain an explicit source or DM confirmation and pass
 `component_ruling.source_components_confirmed=true` before casting. The engine
