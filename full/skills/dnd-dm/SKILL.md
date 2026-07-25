@@ -413,6 +413,11 @@ the current turn's 2014/2024 spell limit. Select one of its returned
 spends the Reaction and slot, applies +5 AC to the triggering roll, and records
 the +5 AC effect until the start of that caster's next turn. Do not model Shield
 as an activity or add its AC manually.
+An automated encounter loop must stop immediately when any attack returns this
+window; it cannot call `combat_end_turn` first. Spend Shield at the lowest
+offered slot only when its projected +5 AC changes the triggering attack from a
+hit to a miss; otherwise decline. Against Magic Missile, use available Shield
+because it blocks that target's darts rather than comparing an attack roll.
 
 A source-bound Core `Magic Missile` is the exception to generic spell
 `pending_ruling`. Call `combat_cast_spell` with `target_allocations`, where every

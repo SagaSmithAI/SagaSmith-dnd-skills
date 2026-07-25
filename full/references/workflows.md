@@ -163,6 +163,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
 3. When an attack returns `pending_reaction`, read the target's
    `combat_query(view="reactions")`, then use
    `combat_choice(action="resolve_defense")`. Do not roll or apply damage twice.
+   Do not end the attacker's turn while this window is pending. Automated Shield
+   tactics use the lowest offered slot only when +5 AC changes the hit to a miss;
+   otherwise decline. Available Shield should block Magic Missile.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.

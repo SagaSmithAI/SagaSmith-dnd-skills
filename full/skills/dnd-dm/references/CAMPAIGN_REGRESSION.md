@@ -146,6 +146,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Choose the lowest available legal slot at or above the spell's level; when
    lower slots are empty, preserve the public higher-slot cast and its scaling
    rather than falling back to a weapon while usable slots remain.
+   If an attack returns a defensive reaction window, stop before ending the
+   attacker's turn. For automated Shield tactics, use the lowest offered slot
+   only when the candidate's projected AC changes the hit to a miss; decline an
+   attack that still hits, but use available Shield against Magic Missile.
    When surrender or defeat moves a unique equipped item into party custody,
    use the public `transfer-source-item` path (`character_to_party`) with both
    current revisions and the exact scene evidence. Do not create a duplicate
