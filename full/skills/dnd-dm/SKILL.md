@@ -585,6 +585,13 @@ and keep readiness false while any required actor is missing. If the source name
 other hostile groups, include them as combatant, reinforcement, or optional
 groups, or first record the scene-supported reason they are not participants;
 do not shorten the excerpt to conceal a printed count.
+If the source places creatures outside the immediate fight and says they climb,
+cross, arrive, or otherwise join only after combat begins, keep their canonical
+actors in a `reinforcement` group. The full-playthrough encounter driver must
+receive them as reinforcement reports with the exact entry excerpt, omit them
+from initial `participant_ids`, and queue them through public `combat_join`.
+They enter only at the next round boundary and cannot be targeted or act before
+then; never approximate the delay by placing them on the initial temporary map.
 When the statblock prints a complete numeric action for a known spell, its
 creature-specific range, damage, and effect override the base spell for that actor.
 After creation, verify that the spell card's displayed definition and structured

@@ -95,6 +95,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    branch-local DM composition fact, and prepare all required cards. Include other
    printed hostiles as initial, reinforcement, or optional groups, or record the
    scene-supported reason they are absent.
+   When the source says a group starts outside the fight and must climb, cross,
+   arrive, or otherwise spend time before joining, pass those actor reports as
+   delayed reinforcements. Keep them out of `combat_start`; queue each through
+   public `combat_join` immediately after the trigger so the engine admits them
+   only at the next round boundary. Do not place them on the initial map or let
+   the auto-runner target them before they enter.
 7. Start combat from `play` and require the automatic transition to `combat` plus
    an encounter-local temporary map whose encounter, spatial scene, module, and
    location provenance agree. Exercise at least one structured automatic path

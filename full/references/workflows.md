@@ -117,6 +117,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    and component, targeting, passive, or on-hit rulings remain separate.
 3. Required `combatant` actors go into initial `participant_ids`.
    `reinforcement` actors must stay out and join later through `combat_join`.
+   A source group that must climb, cross, arrive, or otherwise spend time before
+   joining is a delayed reinforcement, not an initially distant combatant. Pass
+   its exact entry excerpt and canonical actor reports to the full-playthrough
+   encounter driver; it queues the actors through public `combat_join`, so they
+   appear only at the next round boundary and are neither targetable nor acting
+   before entry.
 4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
    combat map from the recorded spatial scene and location. Load the owner/DM
    `play.combat_control` group for this transition. If it falls back to a
