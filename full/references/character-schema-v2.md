@@ -276,9 +276,17 @@ view for attack bonus and damage expression.
 
 Effects record source, optional `source_spell_id`, active state, `concentration`,
 a declared duration period/remaining count, structured changes, and a short
-description. The runtime permits at most one active concentration effect. It lists
+description. Hour/day durations may carry the service-managed
+`elapsed_minutes_remainder` needed to accumulate actual elapsed time across
+smaller clock advances. It must be non-negative and smaller than the duration
+unit; clients must not author, round, or patch it. The runtime permits at most one
+active concentration effect. It lists
 effect changes it cannot derive automatically in `derived.unresolved_rules`; the
 DM must read the rules before narrating their result.
+When the exact Invisibility spell effect ends—by attack, spell cast, duration,
+failed/replaced concentration, or Incapacitation—the runtime also removes the
+condition it granted. Incapacitated, Paralyzed, Petrified, Stunned,
+Unconscious, and death end every active concentration effect.
 
 `adventure_state` records actor-scoped reputation, contributions, blessings,
 wards, legendary boons, and durable status tags. Do not hide these campaign-facing

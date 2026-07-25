@@ -161,8 +161,10 @@ summary. The result stores source evidence in notes and reports
 `combat_statblock="not_imported"` and `combat_eligible=false`; its actor card is
 tagged `narrative_only` and `source_bound`. Those sentinel mechanics must not be
 used for checks or combat. The full-playthrough driver must switch from `play` to
-`lobby`, replay creation under a stable identity, restore `play` on success or
-failure, upsert the actor into `manifest.npcs`, and verify a checkpoint.
+`lobby`, replay creation under its explicit stable occurrence id, restore `play`
+on success or failure, upsert the actor into `manifest.npcs`, and verify a
+checkpoint. A later same-named NPC from the same source chunk needs a new
+occurrence id.
 The service canonicalizes the returned `source_ref` to its verified module,
 scene, chunk, page, heading, and content-hash fields. A regression verifier must
 compare that canonical field set, while retaining optional asset-path, asset
@@ -170,11 +172,11 @@ hash, and purpose fields in its continuity evidence; it must not treat removal
 of those unexecuted audit annotations as a failed actor creation.
 
 Full-playthrough scene transitions replace the snapshot-managed manifest through
-`playthrough_manifest(action="replace")`. The driver derives the transition
-idempotency identity from the complete normalized target manifest, not only the
-target scene id. Replaying the same transition therefore submits the same key and
-payload, while revisiting a town, hub, or headquarters after party/world/quest
-state changes submits a distinct key and cannot collide with the earlier visit.
+`playthrough_manifest(action="replace")`. The driver requires an explicit stable
+occurrence id for the transition; the complete normalized target manifest is
+request payload, not identity. Replaying the same transition therefore submits
+the same key and payload, while any later visit to a town, hub, or headquarters
+uses a new id even when the payload is identical.
 
 Source-defined conclusions use the public full-playthrough driver's
 `configure-ending` action to store exact source evidence and machine checks
@@ -926,12 +928,13 @@ applies Constitution and the edition's minimum, rolls one Song of Rest die for
 each hearing creature that spent at least one Hit Die, and returns both roll
 audits. The source Bard must participate in the same Short Rest; callers must
 not add the bonus once per spent die or patch HP after the rest.
-A full-playthrough driver derives one stable Short Rest identity from the
-complete normalized member choices, duration, and reason, and uses it for that
-rest's clock, actor, knowledge, continuity, and manifest-sync idempotency keys.
-A later rest must derive a distinct identity whenever its choices or narrative
-occurrence differ; a run-wide constant or actor-only key would incorrectly
-replay an earlier rest.
+A full-playthrough driver requires one explicit stable Short Rest occurrence id
+and uses it for that rest's clock, actor, knowledge, continuity, and
+manifest-sync idempotency keys. Complete normalized member choices, duration,
+and reason remain request payload and must match on an exact retry. A later rest
+must use a distinct occurrence id even when its choices and reason are
+identical; a payload-derived, run-wide constant, or actor-only key would
+incorrectly replay an earlier rest.
 
 2014 Long Rest may require an explicit
 `hit_dice_recovery` allocation across multiclass pools. A 2024 Long Rest restores
@@ -974,9 +977,12 @@ scene/scope row (`0` for its first write) and a fresh idempotency key.
 `campaign_change(action="clock_set")` establishes the branch-local campaign day,
 hour, and minute. `campaign_change(action="clock_advance")` advances an explicit
 `minute`, `hour`, `day`, `round`, or `encounter` count. Narrative-time advances
-update the snapshotted `state.world_time` and settle matching effect durations
-across all campaign actors and `state.world_effects` as one atomic group;
-round/encounter advances do not
+update the snapshotted `state.world_time` and settle effect durations by the
+actual elapsed interval across all campaign actors and `state.world_effects` as
+one atomic group. Thus 60 minutes, one hour, and two consecutive 30-minute
+advances have the same result for a one-hour effect. Any sub-hour/sub-day
+remainder is service-owned and persists on the canonical effect; round/encounter
+advances do not
 move the world clock. The clock must be set first, cannot change during active
 combat, and conversation time is never treated as elapsed campaign time. Once
 set, a different `clock_set` value is rejected; use `clock_advance`.

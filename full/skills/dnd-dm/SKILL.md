@@ -97,7 +97,9 @@ the campaign.
    `snapshot_query(view="verify" | "lineage")` before restore.
    During full campaign regression, batch ordinary scene actions with the
    public driver's supported `--defer-checkpoint` paths, then end the batch with
-   one public `checkpoint` action and verify it. The following manifest `get`
+   one public `checkpoint` action with a distinct stable `--occurrence-id` and
+   verify it. Reuse that id only for an exact retry; a later same-labeled
+   checkpoint gets a new id. The following manifest `get`
    must project that snapshot id as both a DAG node and
    `snapshot_dag.head_snapshot_id`; a runtime-only node is insufficient. Do not defer combat end,
    death/stable recovery, replacement, rests, major branches, module
@@ -107,6 +109,12 @@ the campaign.
    checkpoint before entering another sourced scene. Follow
    `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
    interrupted-batch recovery.
+   Every repeatable playthrough mutation must carry its explicit stable
+   occurrence/business id. Reuse it only for an exact retry; a later identical
+   scene visit, check, event, rest, recovery, XP award, checkpoint, explicit
+   manifest sync, narrative-NPC creation, source-item transfer,
+   environmental-damage event, or activity use gets a new id. Narrative reason
+   text is not an occurrence id.
    At a source-defined conclusion, first record exact outcome/world/NPC state,
    then use the public regression driver's `configure-ending` and
    `verify-ending` actions. Require every configured check to pass and a verified
@@ -549,17 +557,17 @@ potential participant cards during lobby/module preparation.
 A Stable creature at 0 HP cannot take a short or long rest. If the established
 scene permits waiting, use the public full-playthrough `recover-stable` path,
 which commits `campaign_change(action="stable_recovery")` for the exact member
-set. Give every occurrence a distinct audited reason; the driver's stable
-identity must include both the ordered actor ids and that reason, so an exact
-retry replays while a later recovery by the same actor cannot collide with the
-earlier event. The engine rolls the source-required `1d4` hours, restores exactly
+set. Give every occurrence a distinct `--occurrence-id`; keep both that id and
+the exact request unchanged for a retry, and use a new id for a later recovery
+even when actors and reason are identical. The engine rolls the source-required
+`1d4` hours, restores exactly
 1 HP, clears Stable and Unconscious, and keeps unrelated conditions such as
 Prone. Never patch HP or choose the duration yourself. Once that actor is
 conscious and above 0 HP, use the restricted
 `character_state_change(action="stand")` to clear Prone; do not replace the
 whole sheet or expose arbitrary condition deletion. Give each `stand-up`
-occurrence a distinct audited reason; its identity includes scene, Scene Atlas
-location, actor, reason, and optional exact source reference. An exact retry
+occurrence a distinct `--occurrence-id` plus its audited reason and exact scene
+evidence. An exact retry
 must replay while a later stand by that actor in the same broad scene must not
 reuse action, continuity, ActorKnowledge, or manifest-sync keys. `stand-up` may
 defer its ordinary action-local checkpoint into the terminal scene checkpoint.
@@ -605,8 +613,11 @@ repair and refresh the importer, and recreate the actor.
 For the exact Invisibility spell, preserve unseen-attacker advantage on the
 attack that reveals the actor, then end the effect after that attack resolves.
 Casting any spell also ends Invisibility immediately; this applies to ordinary
-and magic-item spell casts. Do not apply those termination rules to a different
-effect merely because it also grants the Invisible condition.
+and magic-item spell casts. Natural duration expiry, failed or replaced
+concentration, and becoming Incapacitated also end the spell and remove its
+Invisible condition. Paralyzed, Petrified, Stunned, and Unconscious all include
+Incapacitated. Do not apply those termination rules to a different effect merely
+because it also grants the Invisible condition.
 If the printed card contains `Spellcasting`, a candidate warning that treats that
 entry as a descriptive passive is a lobby blocker, not an optional DM boundary.
 Review the cited page/chunks and repair or refresh the importer before continuing;
@@ -841,6 +852,13 @@ advance without changing narrative time. Never infer elapsed time from chat
 pacing, and never set or advance the narrative clock during active combat. Once
 set, do not jump the clock with another `clock_set`; use `clock_advance` so no
 duration is skipped.
+
+Treat every narrative-time interval as actual elapsed time, not as an effect-unit
+selector. `60 minute`, `1 hour`, and two consecutive `30 minute` advances must
+settle the same one-hour actor and world effects exactly once. Short Rest,
+party-rest, Stable recovery, and spell-copying clock advances obey the same rule.
+The service owns any sub-hour/sub-day remainder; never round a duration or patch
+that bookkeeping into a card or manifest.
 
 Resolve every completed long rest through
 `campaign_change(action="party_rest", payload={members, duration_minutes})`, even

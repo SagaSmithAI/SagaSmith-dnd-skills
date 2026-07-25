@@ -14,7 +14,21 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    module import and explicitly resolve any warning gate before activation. Give
    every parser behavior change a new parser version before refreshing. A refresh
    may enter `lobby`, but on any stage/inspect/validate/ingest/activate failure it
-   must restore the phase that was exposed on entry.
+   must restore the phase that was exposed on entry. Its stage idempotency identity
+   must include the logical source key, active parent module id, actual source
+   content hash, and resolved title. An exact retry reuses the staged job; changed
+   content or a later active parent creates a new revision instead of colliding
+   with the earlier refresh.
+   For every repeatable driver mutation whose authored content may legitimately
+   be identical later, supply a non-empty stable `--occurrence-id`. Reuse it only
+   to retry that exact occurrence; use a new id for a later identical check,
+   scene advance, event, stand, source-state initialization, time advance,
+   Short/Long Rest, stable recovery, XP award, narrative-NPC creation,
+   source-item transfer, explicit checkpoint, or manual manifest sync. Human
+   summary/reason text and mutable request fields are payload, not occurrence
+   identity. Actions with an explicit business
+   id (`roll-id`, outcome, acquisition, spend, consumable-use, damage-event, or
+   activity-event id) use that id instead.
 2. Read `module_query(view="index")`. Visit every non-reference/non-overview
    scene through `module_query(view="scene")`; require readable content, valid PDF
    page ranges, and stable scene ids. After `module_search`, take the immutable
@@ -23,11 +37,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    permission to calculate or invent a client-side hash. Exercise every available atlas location by
    writing scoped progress on a disposable branch. Do not invent topology for a
    scene without reviewed or explicit connections. A campaign may revisit the
-   same scene after world, quest, party, or objective state changes. Derive each
-   `advance-scene` replace identity from the complete normalized target manifest:
-   an exact transport retry must reproduce the same key and payload, while a
-   later stateful revisit must receive a different key. A target-scene-only key
-   is invalid because hubs, towns, and headquarters are intentionally revisited.
+   same scene after world, quest, party, or objective state changes. Give each
+   `advance-scene` visit a stable `--occurrence-id`: an exact transport retry
+   must reuse that id and the same target manifest, while a later visit receives
+   a new id even if the payload is identical. A target-scene-only or
+   target-manifest-derived key is invalid because hubs, towns, and headquarters
+   are intentionally revisited and mutable payload is not occurrence identity.
    In a public full-playthrough run, use the driver's `read-scene` action when
    the indexed scene id is already known. It calls
    `module_query(view="scene", scope_id="dm")` directly and validates the returned
@@ -46,7 +61,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    selected encounter. When the module provides only a narrative identity and no
    combat statblock, use the public driver's `prepare-narrative-npc` path: cite
    the active module/scene/chunk/page/hash and an excerpt containing the exact
-   name, enter `lobby`, create `character_create_from(mode="narrative_npc")`,
+   name, assign the creation a stable `--occurrence-id`, enter `lobby`, create
+   `character_create_from(mode="narrative_npc")`,
    verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
    restore `play`, register the actor in the manifest, and verify its checkpoint.
    A `prepare-statblock` failure at candidate lookup, visual review, validation,
@@ -83,11 +99,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with
    one `continuity_commit`. A skill label belongs in the cited evidence; use
    `kind="check"` unless the tool contract explicitly defines another kind.
-   Derive each check's retry identity from the run, scene, Scene Atlas location,
-   check kind, ability/skill, actor, DC, proficiency, advantage/disadvantage, and
-   exact source chunk. Checks that share a scene, actor, ability, and DC but occur
-   at different locations or cite different chunks are separate rolls and must
-   not reuse progress, dice, continuity, knowledge, or manifest-sync keys.
+   Assign each check an explicit stable `--occurrence-id`. The run, scene, Scene
+   Atlas location, check kind, ability/skill, actor, DC, proficiency,
+   advantage/disadvantage, and exact source chunk are immutable retry payload,
+   not identity. Separate rolls must never reuse progress, dice, continuity,
+   knowledge, or manifest-sync keys even when every payload field is identical.
 6. Before combat, read the exact encounter scene and its location. Call
    `module_query(view="readiness")` with every source/DM-established group.
    `required_count` is the complete group count, not `len(actor_ids)`: derive it
@@ -140,8 +156,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    public noncombat `character_action(action="cast_spell")` before
    `combat_start`, paying its slot and starting concentration. Bind a printed
    Invisibility effect to the exact spell card and condition; it ends after the
-   invisible actor makes an attack or casts any spell, while the triggering
-   attack still receives the unseen-attacker benefit. Bind a printed
+   invisible actor makes an attack or casts any spell, when its duration expires,
+   or whenever concentration ends, while the triggering attack still receives
+   the unseen-attacker benefit. Incapacitated—and therefore Paralyzed,
+   Petrified, Stunned, or Unconscious—ends concentration. Bind a printed
    first attack to that actor's reviewed weapon rather than allowing generic
    weapon preference to override it. When an effect-only weapon hit opens an
    on-hit ruling, settle its printed condition and escape terms through
@@ -230,11 +248,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `inventory_change(action="recharge")` and verify its random-stream receipt.
     Never add the item spell to the actor's ordinary spell list, pay a spell slot,
     pre-roll the resource, or patch the charge count.
-13. Give every source-cited scene event a stable identity derived from the run,
-    scene, event type, and resolved summary. Before writing progress, merge the
+13. Give every source-cited scene event an explicit stable `--occurrence-id`.
+    Before writing progress, merge the
     new entry into the existing `full_playthrough_events` map; never replace the
-    map or reuse a run-only key. Re-read progress after the checkpoint and verify
-    that earlier events from the same run and scene remain present.
+    map or reuse an occurrence id for a later event, even when its scene, event
+    type, and summary are identical. Re-read progress after the checkpoint and
+    verify that earlier events from the same run and scene remain present.
 14. When a resolved event changes an NPC, quest, clue, or machine-verifiable
     world condition, use the public regression driver's `record-outcome` path.
     Give it a stable outcome id and exact source reference. It must atomically
@@ -264,10 +283,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     accepts only integer XP, stop for an explicit DM-reviewed rounding policy.
     A total-conserving deterministic remainder is acceptable only when the
     audit records the ordered remainder recipients, no two shares differ by
-    more than one XP, and no allocation is silent. The stable award and
-    manifest-sync identities must include the sorted recipient actor ids as
-    well as scene and amount, so a deliberately split remainder award cannot
-    collide with another actor's transaction.
+    more than one XP, and no allocation is silent. Give each public award call a
+    stable `--occurrence-id`; a split remainder therefore uses distinct ids for
+    its distinct recipient groups. The exact retry keeps the same id and payload.
 16. Advance each eligible survivor through the public regression driver's
     `advance-level` path one target level at a time. Supply the exact source
     reference that established the XP or milestone, an explicit fixed/rolled HP
@@ -294,12 +312,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     new maximum.
 17. Advance campaign time through the public regression driver's
     `advance-time` path whenever travel, waiting, or a source-triggered interval
-    matters. Cite the exact scene chunk and excerpt, supply a positive
+    matters. Give each interval a stable `--occurrence-id`, cite the exact scene
+    chunk and excerpt, supply a positive
     minute/hour/day count, and state any DM ruling used to turn narrative timing
     such as "late in the day" into a duration. The service-owned campaign clock,
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
     duration without an explicit audited ruling.
+    Treat that count as actual elapsed time rather than an effect-unit selector.
+    `60 minute`, `1 hour`, and two consecutive `30 minute` advances must expire
+    the same one-hour actor and world effects exactly once. The public receipt and
+    subsequent actor/campaign reads must agree on every advanced or expired effect;
+    never round or directly patch a sub-hour/sub-day remainder.
 18. Before advancing time for a Short Rest, preflight every participant through
     `character_query(view="rest")` with that actor's exact Hit Die keys/counts
     and optional Arcane Recovery or Natural Recovery allocation. Natural
@@ -324,14 +348,21 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     and the level-scaled single Song of Rest die per eligible creature, and
     records the random receipt. A
     failed preflight must leave both clock and actors unchanged. Give
-    each Short Rest a stable identity derived from the complete normalized member
-    choices, duration, and reason. Reuse that identity across its clock, actor,
-    knowledge, continuity, and manifest-sync mutations, but never reuse those
-    keys for a later rest with different choices or narrative occurrence.
+    each Short Rest a stable `--occurrence-id` and reuse it across that
+    occurrence's clock, actor, knowledge, continuity, and manifest-sync
+    mutations. A later rest needs a new id even when its normalized members,
+    duration, and reason are exactly identical. Reusing an id with changed
+    choices must fail rather than create another rest.
+    The Short Rest's minute clock write must also advance minute/hour/day actor
+    and world effects by the actual elapsed minutes. In particular, an established
+    one-hour Giant Spider poison/paralysis effect expires after a legal 60-minute
+    Short Rest (or two 30-minute advances), while unrelated conditions remain.
 19. Resolve every Long Rest through the atomic public
-    `campaign_change(action="party_rest")` surface, and derive occurrence-scoped
-    ActorKnowledge and manifest-sync identities from the complete normalized
-    member choices, duration, and reason. If that rest commits but its following
+    `campaign_change(action="party_rest")` surface. Supply one stable
+    `--occurrence-id` and use it for party-rest, clock, ActorKnowledge,
+    continuity, and manifest-sync identities. A later rest needs a new id even
+    when its complete normalized member choices, duration, and reason are
+    identical. If that rest commits but its following
     continuity checkpoint fails, retry the exact request first. A stale-revision
     idempotency conflict means the rest may already exist: read its owner/DM-only
     receipt with `state_revision(action="receipt")`. Require its branch and
@@ -419,6 +450,16 @@ manifest. Use a DM audience for hidden encounter checks. If the result triggers
 a second table roll, give that roll a different id and perform it through the
 same action; never generate either result client-side.
 
+For scene advances, narrative-NPC creation, source-cited noncombat checks,
+`record-event`, `stand-up`, `initialize-source-state`, `advance-time`,
+`transfer-source-item`, and XP awards, pass the explicit
+`--occurrence-id` described above. For environmental damage, use one distinct
+`--damage-event-id` for each actual damage occurrence; for `use-activity`, use
+one distinct `--activity-event-id` for each use, including another use after a
+legal rest in the same scene. Retry an interrupted occurrence with the same id
+and unchanged payload. Never derive these ids only from scene, actor, expression,
+activity, summary, reason, member choices, or recipient set.
+
 ## Snapshot and branch-isolation audit
 
 Run destructive rehearsal steps on a disposable branch created from a verified
@@ -429,9 +470,12 @@ Use scene-level checkpoint batching on a campaign's main timeline. Pass
 `--defer-checkpoint` only to repeated `prepare-statblock` calls on the main
 timeline and to these public playthrough-driver actions:
 `prepare-narrative-npc`, `resolve-check`, `record-event`, an intermediate
-`record-outcome`, `advance-time`, `roll-source`, `stand-up`, `provision-source-item`,
-`transfer-source-item`, `acquire-loot`, `spend-coins`, `spend-item`, and
-`use-consumable`. `advance-level` may also defer only as part of one contiguous
+`record-outcome`, `advance-time`, `roll-source`, `initialize-source-state`,
+`stand-up`, `use-activity`, `provision-source-item`, `transfer-source-item`,
+`acquire-loot`, `spend-coins`, `spend-item`, and `use-consumable`.
+`apply-damage` may defer only while the authoritative resulting HP remains above
+0; the driver must force a snapshot when damage reaches 0 HP even when deferral
+was requested. `advance-level` may also defer only as part of one contiguous
 same-scene or same-downtime party-advancement batch; every actor must complete
 and verify all required follow-up before the next actor, and one aggregate public
 checkpoint must immediately close the batch. Each action must still commit its authoritative state, exact
@@ -439,7 +483,10 @@ source reference where applicable, event/facts, ActorKnowledge, and manifest
 mutation before returning; only its action-local snapshot is omitted. After the
 related preparation, checks, events, loot, expenses, consumables, and ordinary
 time advances are complete, call the public `checkpoint` action once with a
-stable label that identifies the scene and outcome, then verify that snapshot.
+stable label that identifies the scene and outcome plus a distinct stable
+`--occurrence-id`, then verify that snapshot. Reuse the occurrence id only for an
+exact retry. A later visit may reuse the reader-facing label, but it must use a
+new occurrence id and create a new DAG node.
 Re-read the public manifest and require the returned snapshot id in
 `snapshot_dag.nodes` and as `snapshot_dag.head_snapshot_id`; seeing it only in
 the separate runtime projection does not close the scene. A deferred scene is
@@ -465,9 +512,12 @@ long scene walks where recovery would otherwise require repeating substantial
 play. Then:
 
 An exact checkpoint retry may encounter a newer manifest revision after its
-sync. Reuse only the verified snapshot with the same stable label on the current
-branch; do not create a semantically different checkpoint under that label or
-silently select a same-named snapshot from another branch.
+sync. Recover only through that occurrence's owner/DM idempotency receipt. Require
+the receipt request hash, label, branch, response snapshot id/slot/parent, current
+branch head, public snapshot list, integrity verification, and manifest DAG head
+to agree. Never recover by label search: distinct checkpoints may legitimately
+share a reader-facing label, and a same-named older or sibling-branch snapshot is
+not the retried occurrence.
 
 If the parent snapshot's built-in Core fingerprint is unavailable in the current
 runtime, do not relock the live branch and retry a normal restore. Inspect the
