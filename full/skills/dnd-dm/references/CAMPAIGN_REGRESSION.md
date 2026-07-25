@@ -139,6 +139,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    or patch charges. A spell printed as cast before initiative must instead use
    public noncombat `character_action(action="cast_spell")` before
    `combat_start`, paying its slot and starting concentration. Bind a printed
+   Invisibility effect to the exact spell card and condition; it ends after the
+   invisible actor makes an attack or casts any spell, while the triggering
+   attack still receives the unseen-attacker benefit. Bind a printed
    first attack to that actor's reviewed weapon rather than allowing generic
    weapon preference to override it. When an effect-only weapon hit opens an
    on-hit ruling, settle its printed condition and escape terms through

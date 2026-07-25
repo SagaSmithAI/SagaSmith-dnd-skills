@@ -596,6 +596,11 @@ Paralyzed while poisoned. Do not dismiss an explicit saving-throw damage clause
 or reduce it to condition-only settlement. If candidate validation
 instead reports that this kind of action lacks supported Hit dice, stop in lobby,
 repair and refresh the importer, and recreate the actor.
+For the exact Invisibility spell, preserve unseen-attacker advantage on the
+attack that reveals the actor, then end the effect after that attack resolves.
+Casting any spell also ends Invisibility immediately; this applies to ordinary
+and magic-item spell casts. Do not apply those termination rules to a different
+effect merely because it also grants the Invisible condition.
 If the printed card contains `Spellcasting`, a candidate warning that treats that
 entry as a descriptive passive is a lobby blocker, not an optional DM boundary.
 Review the cited page/chunks and repair or refresh the importer before continuing;
