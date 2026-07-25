@@ -480,6 +480,14 @@ For an image-only module card, use the reviewed visual workflow and
 English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
 numeric attack facts, 2024, ambiguous, or otherwise unsupported block must
 remain unresolved; do not replace it with a similar SRD creature or invent a card.
+An attack roll whose `Hit` clause applies only a condition or other effect is
+still an executable attack even when it prints no damage dice (for example, a
+giant spider's Web). Preserve an empty damage expression and the complete
+`on_hit_effect`; never invent zero damage, an ability-modifier damage value, or
+a substitute attack. On a hit, leave HP unchanged and surface the effect and any
+escape/destruction procedure for DM settlement. A candidate blocked solely
+because such an attack lacks damage dice indicates an importer defect that must
+be repaired and refreshed before combat.
 When a complete statblock action repeats a known spell, the action is authoritative
 for that creature. Hydration preserves the Core card's components and provenance
 but overlays the displayed effect/range and structured attack resolution together.

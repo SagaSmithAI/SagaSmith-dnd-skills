@@ -575,6 +575,13 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+Do not reject or rewrite a source attack merely because its `Hit` clause has no
+damage dice. Effect-only attacks such as a giant spider's Web retain an empty
+damage expression plus the exact `on_hit_effect`; resolve the attack roll
+normally, apply no fabricated HP damage, and send the printed condition and
+escape/destruction procedure to explicit DM settlement. If candidate validation
+instead reports that this kind of action lacks supported Hit dice, stop in lobby,
+repair and refresh the importer, and recreate the actor.
 If the printed card contains `Spellcasting`, a candidate warning that treats that
 entry as a descriptive passive is a lobby blocker, not an optional DM boundary.
 Review the cited page/chunks and repair or refresh the importer before continuing;
