@@ -243,7 +243,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     duration without an explicit audited ruling.
 18. Before advancing time for a Short Rest, preflight every participant through
     `character_query(view="rest")` with that actor's exact Hit Die keys/counts
-    and optional Arcane Recovery allocation. Include the complete
+    and optional Arcane Recovery or Natural Recovery allocation. Natural
+    Recovery also requires declared meditation in `rest_activity_minutes`; it
+    resets on a Long Rest rather than on a campaign-day boundary. A source-bound
+    level-20 Sorcerer's four-point Sorcerous Restoration is automatic. When a
+    conscious source-bound 2014
+    Bard performs Song of Rest, include that participating Bard's actor id as
+    `song_of_rest_source_actor_id` only for members who spend at least one Hit
+    Die and can hear the performance. Include the complete
     `rest_schedule`, any Ki meditation under `rest_activity_minutes`, and one
     `attune_item_id` when that rest is devoted to a source-required item. The DM
     must verify the item's exact source prerequisite against the actor card and
@@ -253,8 +260,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     before the first write. Use the keys currently exposed by each authoritative
     actor card; never derive a class-prefixed key from an older fixture or another
     actor. The server rolls spent Hit Dice, applies Constitution, checks remaining
-    dice and the once-per-day Arcane Recovery allowance, and records the random
-    receipt. A failed preflight must leave both clock and actors unchanged. Give
+    dice, Arcane Recovery's once-per-day allowance, Natural Recovery's
+    once-per-Long-Rest allowance, Sorcerous Restoration's capped four points,
+    and the level-scaled single Song of Rest die per eligible creature, and
+    records the random receipt. A
+    failed preflight must leave both clock and actors unchanged. Give
     each Short Rest a stable identity derived from the complete normalized member
     choices, duration, and reason. Reuse that identity across its clock, actor,
     knowledge, continuity, and manifest-sync mutations, but never reuse those

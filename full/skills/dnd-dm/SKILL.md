@@ -291,6 +291,25 @@ campaign day, not once per long rest: the MCP requires the branch-local clock,
 records the last-used day on the feature, and a long rest does not reset it. Do
 not apply the rest first and patch spell slots afterward.
 
+If a 2014 Circle of the Land Druid chooses Natural Recovery, include
+`natural_recovery={"<slot level>": <count>}` plus an explicit positive
+`rest_activity_minutes.meditation` declaration in that Short Rest call. The
+engine enforces the source-bound subclass feature, the half-Druid-level
+rounded-up limit, the level-6 exclusion, missing slots, and once-per-Long-Rest
+use. A level-20 2014 Sorcerer's source-bound Sorcerous Restoration is automatic:
+the same Short Rest restores exactly 4 missing Sorcery Points, capped at the
+resource maximum. Never use Arcane Recovery's once-per-campaign-day timing for
+Natural Recovery or restore all Sorcery Points.
+
+For a 2014 Bard's Song of Rest, include
+`song_of_rest_source_actor_id=<bard actor id>` in each same-rest member call
+that spends at least one Hit Die and can hear the performance. The Bard must
+participate in that Short Rest, remain conscious, and have the source-bound
+feature. The engine validates the Bard level, rolls exactly one extra die per
+eligible creature (d6, d8 at Bard 9, d10 at Bard 13, or d12 at Bard 17), caps
+healing at the creature's maximum HP, and records the roll. Do not add one die
+per Hit Die, apply the bonus to a member who spent none, or patch HP afterward.
+
 Level advancement is a `lobby` transaction, not a sheet replacement. Confirm the
 campaign's explicit `milestone` or `xp` mode. In XP mode, first use the atomic
 `campaign_change(action="experience_award")`; it records source-bound awards and

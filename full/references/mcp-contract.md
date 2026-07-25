@@ -875,12 +875,20 @@ patch HP.
 `character_state_change(action="rest")` applies v2-card short-rest recovery with
 a character revision and idempotency key. Before any Short Rest clock write,
 call `character_query(view="rest")` for every member with the exact
-`hit_dice_spends` keys/counts and optional `arcane_recovery` allocation. This is a
-read-only authoritative preflight: it validates remaining dice, the actor's
-current card, campaign day, Arcane Recovery allowance/usage, and rule readiness.
+`hit_dice_spends` keys/counts, optional `arcane_recovery` or
+`natural_recovery` allocation, and, for each eligible 2014 Song of Rest recipient,
+`song_of_rest_source_actor_id`. This is a read-only authoritative preflight: it
+validates remaining dice, the actor's current card, campaign day, Arcane
+Recovery allowance/usage, Natural Recovery's declared meditation and
+once-per-Long-Rest use, automatic level-20 Sorcerous Restoration, the source
+Bard's campaign membership, conscious state, source-bound feature,
+level-scaled die, and rule readiness.
 Only after every member reports `ready=true` may orchestration advance time and
 commit actor rests. The runtime—not the caller—rolls each requested Hit Die,
-applies Constitution and the edition's minimum, and returns the roll audit.
+applies Constitution and the edition's minimum, rolls one Song of Rest die for
+each hearing creature that spent at least one Hit Die, and returns both roll
+audits. The source Bard must participate in the same Short Rest; callers must
+not add the bonus once per spent die or patch HP after the rest.
 A full-playthrough driver derives one stable Short Rest identity from the
 complete normalized member choices, duration, and reason, and uses it for that
 rest's clock, actor, knowledge, continuity, and manifest-sync idempotency keys.
