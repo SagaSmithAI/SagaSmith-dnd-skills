@@ -502,6 +502,12 @@ source casting ability, slot maxima, and exact spell-name set with
 `derived.spellcasting.prepared_spell_ids`. Empty or incomplete hydration is not a
 DM ruling boundary; repair/refresh the parser and recreate the actor from a clean
 snapshot rather than patching its sheet.
+The text candidate normalizer must retain a named `Spellcasting` entry when its
+description begins with the creature's proper name, and must not mistake prose
+inside a `Hit` clause or surrounding monster lore for a new trait/action.
+Context-bounded OCR repair is allowed only when the token is mechanically
+impossible and the printed rule is unambiguous; unresolved spell names must make
+scene readiness fail with `incomplete_statblock_spell_hydration`.
 
 Before `combat_start`, call `module_query(view="readiness")` with a manifest:
 

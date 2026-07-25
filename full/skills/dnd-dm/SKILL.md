@@ -590,6 +590,11 @@ printed casting ability, every slot maximum, and the exact spell-name set with
 the source, then verify that `derived.spellcasting.prepared_spell_ids` and the
 source-bound spell cards contain the same executable list. A missing or extra
 spell, empty slot map, or unresolved active-content binding blocks combat.
+Also compare the normalized candidate's complete spell-name list with the
+created card rather than trusting `review_ready`: a dropped named
+`Spellcasting` trait or unresolved OCR spell name must surface
+`incomplete_statblock_spell_hydration`. Repair and refresh the importer, then
+create a fresh actor; do not keep or use the partial actor.
 `required_count` is the complete group count established by the cited scene, a
 recorded random-encounter roll, or an explicit branch-local DM composition fact.
 It is never shorthand for `len(actor_ids)`. Prepare every required card in lobby
