@@ -54,9 +54,24 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    module's source-cited maximum recommended party size; only then build the
    remaining legal seats from active content catalog ids. A present applicable
    pregen may not be skipped for a generated optimization. Preserve each pregen's
-   source reference and document checksum. Use a level appropriate to the
-   adventure segment. Exhaust advancement follow-ups, prepared spells, features,
-   derived-state re-reads, and a verified snapshot before returning to `play`.
+   source reference and document checksum. If extraction cannot find a party-size
+   range, search the complete normalized document, expand every plausible hit, and
+   visually inspect the introduction and character-creation pages. A semantic
+   search miss or unrelated numeral hit is not a source range. If the module is
+   genuinely silent, stop the source-confirmed gate and record an explicit DM
+   review before building any PC. The review must retain the reviewed module
+   pages, search terms, exact fallback rule reference and checksum, selected
+   count, and `represented_as_module_recommendation=false`. A completed review
+   may use an exact enabled-Core design baseline, but it must not relabel that
+   number as the module's recommendation; never silently default to four. Use a
+   level appropriate to the adventure segment. Exhaust advancement follow-ups,
+   prepared spells, features, derived-state re-reads, and a verified snapshot
+   before returning to `play`.
+   The same gate must verify complete class and background equipment, starting
+   wallet, and background characteristics. If the enabled 2014 catalog exposes
+   only a sample background, use the Core custom-background rule through the
+   public content-apply path to create distinct legal backgrounds; do not either
+   clone the sample across the whole party or import an inactive setting option.
 4. Prepare every important named NPC and every NPC/monster required by the
    selected encounter. When the module provides only a narrative identity and no
    combat statblock, use the public driver's `prepare-narrative-npc` path: cite

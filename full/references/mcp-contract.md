@@ -41,6 +41,16 @@ is executable: an item, species, class, or an option with unresolved choices
 returns `pending_ruling` rather than inventing a settlement. Use a source-bound
 rule pack mechanic only when the rule has been reviewed and validated.
 
+For a 2014 custom background, use one enabled base background artifact and pass
+`custom_name`, exactly two `skills`, the base artifact's required
+language/tool choices, and the retained package's `equipment_item_ids`.
+`background_grants.choices` records the base background, customization flag,
+and selected skills; the equipment ids must already exist on the validated
+inventory. This is the Core customization rule, not permission to name or apply
+an inactive extension background. Character setup must also retain every class
+equipment choice and pack, the complete background package and wallet grant,
+and the background characteristics in `notes.profile`.
+
 Supply `selection.source_class` and an appropriate spell grant `method` when a
 spell has class eligibility, `selection.target_class_name` for a multiclass
 subclass choice, and all required background choices. The runtime rejects a
@@ -201,6 +211,12 @@ creating any generated PC. Use every applicable module pregenerated character
 first and preserve its exact source reference/checksum; build only the seats still
 missing from the module's source-cited maximum recommended party size. This
 precedence is a quality gate, not a party-composition suggestion.
+If complete text search plus visual review proves that the module states no
+party-size range, keep the gate blocked until a DM review records the reviewed
+pages and searches, selected count, exact enabled-rule fallback and checksum, and
+`represented_as_module_recommendation=false`. A completed review may unblock
+party construction; a silent default to four or a semantically unrelated search
+hit may not.
 
 For a dead, missing, or departed PC, prefer an applicable unused module
 pregenerated character and otherwise create one new legal character through the

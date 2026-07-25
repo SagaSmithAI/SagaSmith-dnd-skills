@@ -46,6 +46,34 @@ Statblock import currently accepts reviewed English 2014 SRD-style weapon
 statblocks. If the exact creature is absent, spell-only, 2024, ambiguous, or
 unsupported, keep it unresolved instead of substituting a similar creature.
 
+Do not equate a missing module party-size range with four PCs. After complete
+text search and visual review prove that the module is silent, a regression may
+continue only after an explicit DM review records that negative finding and an
+exact enabled-rule fallback. Keep the reviewed count and rule checksum on the
+party manifest and mark it as a DM decision, not a module recommendation. Build
+the reviewed number of seats only after this gate; continue to prefer every
+applicable module pregen within those seats.
+
+Do not equate one structured sample-background artifact with a rule that every
+PC must use the same unmodified background. The 2014 Core rule **Customizing a
+Background** permits a reviewed custom name, any two nonduplicate skills, and a
+total of two tool proficiencies or languages available from the enabled sample
+backgrounds. Apply the enabled base background through
+`character_content_apply`, include `custom_name`, `skills`, the required
+language/tool choices, and the inventory ids for the retained background
+equipment package, and preserve the base artifact and selected skills in
+`background_grants.choices`. Never use an inactive setting supplement merely to
+make background names more varied.
+
+Complete starting equipment is part of the lobby quality gate. Reconcile every
+independent class equipment choice, its selected pack, ammunition quantities,
+the complete retained background package, and the background wallet grant.
+Record each item against the catalog item that defines it or, when a pack/package
+has no item artifact, against the exact class/background artifact that grants
+it. Also persist two personality traits, one ideal, one bond, and one flaw in
+`notes.profile`. A valid AC and weapon card do not excuse missing packs, mundane
+gear, or starting coin.
+
 An important named NPC may have an authored identity but no combat statblock at
 all. Create that identity only with
 `character_create_from(mode="narrative_npc")`. Supply the active
@@ -91,10 +119,12 @@ only HP already includes the grant, use the narrower
 `hit_points_include_species_grants` flag and let the other value settle normally.
 
 Before combat, audit at least: class and subclass features, species/subspecies
-features, proficiencies and expertise, resources and recovery periods, equipped
-weapons and ammunition, spellbook/known/prepared spells, AC, HP, speed, senses,
-resistances, and every unresolved rule. Missing feature cards are setup defects,
-not permissions for the DM agent to improvise abilities during combat.
+features, background customization and characteristics, proficiencies and
+expertise, complete class/background equipment and wallet, resources and
+recovery periods, equipped weapons and ammunition, spellbook/known/prepared
+spells, AC, HP, speed, senses, resistances, and every unresolved rule. Missing
+feature or equipment cards are setup defects, not permissions for the DM agent
+to improvise abilities during combat.
 
 For an NPC or monster statblock with Multiattack, record its exact legal attack
 compositions in one Action activity. Do not flatten it to a generic
