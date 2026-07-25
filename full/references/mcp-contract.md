@@ -176,6 +176,17 @@ target scene id. Replaying the same transition therefore submits the same key an
 payload, while revisiting a town, hub, or headquarters after party/world/quest
 state changes submits a distinct key and cannot collide with the earlier visit.
 
+Source-defined conclusions use the public full-playthrough driver's
+`configure-ending` action to store exact source evidence and machine checks
+against authoritative manifest, fact, actor/NPC, quest, and world-state paths.
+After the final sourced outcomes are checkpointed, `verify-ending` evaluates
+those checks, marks the achieved ending and manifest completed, and creates and
+verifies the terminal Snapshot DAG node. A nonempty historical combat projection
+is not active combat: only its authoritative `active=true` flag blocks ending
+verification. Preserve a completed encounter with
+`snapshot_role="historical_final_encounter"` and
+`combatant_state_is_current=false`; never erase it merely to make an ending pass.
+
 Before passing an allowlisted PDF/text file to module import, use
 `character_query(view="document")` when it may be a character sheet,
 pregenerated-PC packet, or ability-score option document. The result stages and

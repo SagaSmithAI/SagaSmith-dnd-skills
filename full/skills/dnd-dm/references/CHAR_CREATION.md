@@ -217,8 +217,12 @@ limits by hand:
    automatically always-prepared subclass spells from the caller-selected list
    and its maximum.
 6. Re-read the actor and audit level, HP maximum/current HP, Hit Dice, spell slots,
-   preparation, feature resources, subclass, spells, and `derived`. Do not return
-   to `play` while any required catalog item or player choice is missing.
+   preparation, feature resources, subclass, spells, and `derived`. Level
+   advancement raises maximum HP but does not heal current HP. A replacement
+   built at level 1 and advanced to a higher source entry gate keeps its lawful
+   current HP until a rest, spell, feature, potion, or other public healing path
+   changes it; never patch it to the new maximum. Do not return to `play` while
+   any required catalog item or player choice is missing.
 7. After confirmation, use `continuity_commit` for the level-up event and
    post-level snapshot, then return to `play` and reopen the phase-appropriate
    exposure. During full campaign regression only, a contiguous group of party

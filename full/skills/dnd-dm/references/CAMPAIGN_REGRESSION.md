@@ -252,11 +252,21 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     stable outcome id and identical outcome/fact payload: matching saved progress
     is a resume boundary, not a reason to rewrite it with a changed state version.
     Narrative event text alone is not a restorable NPC or quest state.
-15. Award one source-defined XP parcel to every exact eligible recipient in one
-    public `award-xp` call when possible. Never include a dead, departed, or
-    otherwise ineligible actor merely to match the original party count. The
-    stable award and manifest-sync identities must include the sorted recipient
-    actor ids as well as scene and amount, so a deliberately split award cannot
+15. Award one source-defined encounter XP parcel to the exact actors who
+    participated in earning it. A participant who dies later in that encounter
+    keeps the earned share on the retained actor record; death does not erase XP.
+    A replacement or relief party earns only the creatures and objectives that
+    group actually resolves, and never inherits a predecessor's award or
+    progression. Exclude an actor who did not participate, left before the
+    encounter, or joined afterward rather than using a historical party count.
+    Use one public `award-xp` call when all recipients receive the same integer
+    share. If equal division produces a fractional result but the public schema
+    accepts only integer XP, stop for an explicit DM-reviewed rounding policy.
+    A total-conserving deterministic remainder is acceptable only when the
+    audit records the ordered remainder recipients, no two shares differ by
+    more than one XP, and no allocation is silent. The stable award and
+    manifest-sync identities must include the sorted recipient actor ids as
+    well as scene and amount, so a deliberately split remainder award cannot
     collide with another actor's transaction.
 16. Advance each eligible survivor through the public regression driver's
     `advance-level` path one target level at a time. Supply the exact source
@@ -275,9 +285,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     downtime boundary, pass `--defer-checkpoint` only after each actor's complete
     advancement can be verified, then call one public `checkpoint` after the
     final actor and verify the aggregate party state before entering another
-    sourced scene. Never edit the raw sheet, silently choose a subclass or feature,
-    advance an ineligible/dead actor, or treat the level integer alone as a
-    complete advancement.
+    sourced scene. Raising maximum HP does not heal current HP. A newly built
+    replacement advanced to the module's source gate therefore keeps its
+    pre-advancement current HP until a legal rest, spell, feature, potion, or
+    other public healing path changes it. Never edit the raw sheet, silently
+    choose a subclass or feature, advance an ineligible/dead actor, treat the
+    level integer alone as a complete advancement, or patch current HP to the
+    new maximum.
 17. Advance campaign time through the public regression driver's
     `advance-time` path whenever travel, waiting, or a source-triggered interval
     matters. Cite the exact scene chunk and excerpt, supply a positive
@@ -353,6 +367,31 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     replace only its active manifest party slot, append the predecessor,
     replacement, and handoff-event ids to replacement history, and verify a
     checkpoint after the manifest update.
+21. Advance to the exact indexed conclusion scene only after its source-defined
+    prerequisites are true in authoritative runtime state. Record the decisive
+    conclusion facts, NPC state, quest state, world state, and actual-witness
+    ActorKnowledge through public outcome and manifest paths with exact source
+    references. Narrative prose by itself is not a machine-verifiable ending.
+22. Configure each source-defined ending through the public regression driver's
+    `configure-ending` action. Its `source_ref` must use the manifest source
+    schema and preserve the asset/checksum, module, scene, chunk, page, content
+    hash, and exact excerpt used as evidence. Define checks against specific
+    manifest paths, world facts, actor/NPC state, quest state, and other public
+    projections needed by that ending; do not use a broad narrative string as a
+    substitute for the printed conditions.
+23. Call `verify-ending` without deferral. Require every returned check to pass,
+    the selected ending id to be achieved, the manifest and ending state to be
+    `completed`, and a verified terminal checkpoint to become the Snapshot DAG
+    head. Only `combat.active=true` is an active-combat blocker. A retained
+    `combat_query(view="status")` projection with
+    `snapshot_role="historical_final_encounter"` and
+    `combatant_state_is_current=false` is audit evidence and must not block a
+    conclusion.
+24. Ordinary final-scene outcome writes may defer their individual checkpoints
+    only as one immediately closed terminal batch. End that batch with one
+    public checkpoint before `verify-ending`. Never defer ending verification
+    or its terminal checkpoint, and never reuse a final-scene batch key for a
+    later retrospective correction.
 
 ## Exact scene evidence
 

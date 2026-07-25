@@ -107,6 +107,12 @@ the campaign.
    checkpoint before entering another sourced scene. Follow
    `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
    interrupted-batch recovery.
+   At a source-defined conclusion, first record exact outcome/world/NPC state,
+   then use the public regression driver's `configure-ending` and
+   `verify-ending` actions. Require every configured check to pass and a verified
+   terminal checkpoint to become the manifest DAG head. Historical final combat
+   evidence does not block an ending; only a combat record whose authoritative
+   `active` flag is true does.
 
 ## MCP Tool Reference
 
@@ -700,6 +706,14 @@ record. Require `snapshot_role: "historical_final_encounter"` and
 `combatant_state_is_current: false`, and read current HP, conditions, resources,
 and recovery from `character_query`; never overwrite a recovered actor from the
 historical combatant projection.
+
+Encounter XP belongs to the actors who actually earned it. If an actor
+participates and then dies, retain that actor's earned share; do not transfer it
+to a replacement. A replacement or relief group earns only the enemies and
+objectives it resolves. If equal division is fractional while the public XP
+schema is integer-only, require an explicit audited rounding policy and record
+any deterministic remainder recipients rather than silently dropping or
+inventing XP.
 
 Preserve the source spell card's canonical casting time during import. Standard
 cards commonly use `1 action`, `1 bonus action`, or `1 reaction, ...`; do not
