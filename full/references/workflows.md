@@ -175,6 +175,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
    The cast spends its action and slot once; the individual attacks spend neither.
    Resolve any owned Shield window before the next attack. Do not end the caster's
    turn or the encounter until `remaining_attacks` is zero.
+   Automated tactics must read the current prepared/known spell projection, not
+   every spellbook card. Select the lowest available legal slot; when only a
+   higher slot remains, pass that `cast_level` and preserve the spell's scaling.
 5. A source offer such as “10 gp grants advantage on DC 15 Persuasion” requires
    the stated payment/offer fact and
    `combat_check(action="improvise", ability="persuasion", dc=15)`. Only on success

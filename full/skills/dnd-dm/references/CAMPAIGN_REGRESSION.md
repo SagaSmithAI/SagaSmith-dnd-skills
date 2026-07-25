@@ -141,6 +141,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    fighting. Bind retreat to one defeated actor id only when the source names
    that exact trigger. A downstream encounter receives the actor as a
    reinforcement only when the recorded source departure actually succeeded.
+   Automated party spell tactics may select only currently prepared spells or
+   spells the actor actually knows. A spellbook entry alone is not castable.
+   Choose the lowest available legal slot at or above the spell's level; when
+   lower slots are empty, preserve the public higher-slot cast and its scaling
+   rather than falling back to a weapon while usable slots remain.
    When surrender or defeat moves a unique equipped item into party custody,
    use the public `transfer-source-item` path (`character_to_party`) with both
    current revisions and the exact scene evidence. Do not create a duplicate

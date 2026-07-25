@@ -638,6 +638,13 @@ actor attempts to leave on its own turn, and every other living hostile remains
 in the encounter. Use a specific defeated actor trigger only when the source
 names that exact creature, and record a later reinforcement only if the
 retreating actor actually escaped.
+When the full-playthrough runner chooses a party spell, restrict the choice to
+the actor's current prepared list or genuinely known spells. A wizard's other
+spellbook entries are not available. Use the lowest legal slot that still has
+uses; if first-level slots are empty but a higher slot can cast the prepared
+spell, pass that higher `cast_level` and apply its printed scaling (including
+the additional magic-missile dart) instead of treating the caster as out of
+spells.
 After `combat_end`, `combat_query(view="status")` is a historical final encounter
 record. Require `snapshot_role: "historical_final_encounter"` and
 `combatant_state_is_current: false`, and read current HP, conditions, resources,
