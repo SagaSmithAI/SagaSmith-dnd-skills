@@ -488,6 +488,12 @@ a substitute attack. On a hit, leave HP unchanged and surface the effect and any
 escape/destruction procedure for DM settlement. A candidate blocked solely
 because such an attack lacks damage dice indicates an importer defect that must
 be repaired and refreshed before combat.
+If a reviewed on-hit clause prints a saving throw and additional damage,
+`combat_on_hit_ruling(id="saving_throw_damage")` validates and rolls the exact
+ability, DC, damage formula/type, and success treatment through the campaign
+random stream. A printed zero-HP rider must be supplied and settled in the same
+mutation. Explicit save-and-damage text cannot be dismissed or reduced to a
+condition-only ruling.
 When a complete statblock action repeats a known spell, the action is authoritative
 for that creature. Hydration preserves the Core card's components and provenance
 but overlays the displayed effect/range and structured attack resolution together.

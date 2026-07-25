@@ -144,7 +144,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    on-hit ruling, settle its printed condition and escape terms through
    `combat_on_hit_ruling`; a restrained target uses
    `combat_check(action="escape")`, spends its action, and clears the condition
-   only on success. If a source says a living NPC surrenders at an HP threshold
+   only on success. When the reviewed on-hit text instead prints a saving throw
+   plus damage, use `combat_on_hit_ruling(id="saving_throw_damage")` with the
+   exact ability, DC, dice, damage type, success treatment, and excerpt. Include
+   a structured zero-HP effect when printed; for a giant spider Bite this keeps
+   a target reduced to 0 HP stable, Poisoned for 1 hour, and Paralyzed while
+   poisoned. Never dismiss that explicit save-and-damage clause or apply only
+   its final condition. If a source says a living NPC surrenders at an HP threshold
    only when escape is impossible, confirm both predicates from current state and
    end with `status="surrender"` before another attack. Do not relabel surrender
    as defeat, death, or a generic truce.

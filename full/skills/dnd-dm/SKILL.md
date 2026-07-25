@@ -586,7 +586,14 @@ abilities, and an exact excerpt. If applied, keep the resulting ongoing effect
 on the target. On that target's turn, use
 `combat_check(action="escape")`; it must spend the action, roll the effect's
 recorded ability and DC, and remove the condition only on success. Never narrate
-an escape, patch a condition, or ignore the ruling window. If candidate validation
+an escape, patch a condition, or ignore the ruling window. If the reviewed
+`on_hit_effect` instead requires a saving throw and additional damage, call
+`combat_on_hit_ruling` with `id="saving_throw_damage"` plus the exact printed
+ability, DC, damage formula/type, success treatment, and source excerpt. Supply
+the exact structured zero-HP effect when present; the giant spider Bite, for
+example, makes a target reduced to 0 HP stable, Poisoned for 1 hour, and
+Paralyzed while poisoned. Do not dismiss an explicit saving-throw damage clause
+or reduce it to condition-only settlement. If candidate validation
 instead reports that this kind of action lacks supported Hit dice, stop in lobby,
 repair and refresh the importer, and recreate the actor.
 If the printed card contains `Spellcasting`, a candidate warning that treats that
