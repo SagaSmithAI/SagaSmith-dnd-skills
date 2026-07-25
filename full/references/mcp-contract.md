@@ -730,6 +730,12 @@ active encounter.
 interrupted.
 It persists that outcome on the final encounter audit. It still refuses to end
 while a death-save participant remains dying rather than Dead or Stable.
+Source-directed retreat orchestration must distinguish an exact defeated-actor
+trigger from a defeated-count threshold. A count threshold makes only the
+designated retreating actor attempt departure on its own turn; it does not end
+the encounter, skip other turns, or resolve other living hostiles. Count a
+retreater as resolved only after the public combat-map departure commits, and
+add it to a later encounter only from that recorded departure.
 For an authored surrender threshold, the driver must verify that the named actor
 is alive at or below the threshold and every required no-escape predicate is
 true. It ends before another attack and preserves the exact surrender excerpt.

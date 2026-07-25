@@ -128,6 +128,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    only when escape is impossible, confirm both predicates from current state and
    end with `status="surrender"` before another attack. Do not relabel surrender
    as defeat, death, or a generic truce.
+   If a source designates one actor to retreat after any printed number of other
+   hostiles fall, configure that actor with the defeated-count threshold. The
+   threshold neither ends combat nor skips intervening turns: the designated
+   actor attempts to leave on its own turn, and other living hostiles keep
+   fighting. Bind retreat to one defeated actor id only when the source names
+   that exact trigger. A downstream encounter receives the actor as a
+   reinforcement only when the recorded source departure actually succeeded.
    When surrender or defeat moves a unique equipped item into party custody,
    use the public `transfer-source-item` path (`character_to_party`) with both
    current revisions and the exact scene evidence. Do not create a duplicate

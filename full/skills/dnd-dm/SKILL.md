@@ -624,6 +624,13 @@ fight merely because the regression has enough samples. The engine rejects an
 end while any death-save actor is still at 0 HP without Dead or Stable; settle
 those actors first. Record longer consequences as post-combat events and memory,
 not by hiding them inside the outcome summary.
+For a source-authored retreat after any number of other hostiles are defeated,
+pass the retreating actor plus the printed defeated-count threshold. Reaching
+that threshold does not end combat or freeze the initiative: only the designated
+actor attempts to leave on its own turn, and every other living hostile remains
+in the encounter. Use a specific defeated actor trigger only when the source
+names that exact creature, and record a later reinforcement only if the
+retreating actor actually escaped.
 After `combat_end`, `combat_query(view="status")` is a historical final encounter
 record. Require `snapshot_role: "historical_final_encounter"` and
 `combatant_state_is_current: false`, and read current HP, conditions, resources,
