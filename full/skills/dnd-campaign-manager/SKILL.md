@@ -174,11 +174,11 @@ character_state_change | character_action | character_metadata_update
 campaign_query(view="party")
 ```
 
-Use `character_spell_prepare(mode="replace_all")` only in `lobby` for setup and level advancement.
-During live play, pass the complete
-new list as `prepared_spell_ids` on the actor's
-`character_state_change(action="rest")` long-rest
-transaction; do not toggle preparations one by one.
+Use `character_spell_prepare(mode="replace_all", event="setup")` only during
+initial lobby setup. Returning to lobby after live play starts does not reopen
+setup. During live play, pass the complete new list as `prepared_spell_ids` on
+that member of the atomic `campaign_change(action="party_rest")` transaction;
+do not toggle preparations one by one.
 
 For milestone advancement, record and settle the source-bound award immediately
 when its trigger occurs, before entering a later sourced scene. For XP advancement,
@@ -191,9 +191,11 @@ Once a milestone is earned or XP reports `eligible=true`, end combat, switch to
 `lobby`, and use `character_state_change(action="level_advance")`. XP mode rejects
 the call below the next cumulative threshold. Never patch the actor sheet.
 Treat the returned `advancement.follow_up` as a blocking checklist: all eligible
-features, subclass/player choices, spell gains, and the complete `level_up`
-prepared list must be reconciled from the active catalog before returning to
-`play`. Re-read the actor and create a post-advancement snapshot. Current 2014
+features, subclass/player choices, and spell gains must be reconciled from the
+active catalog before returning to `play`. A 2014 prepared-class spell
+application hydrates a legal unprepared card; the prepared list itself changes
+only through a later completed Long Rest. Re-read the actor and create a
+post-advancement snapshot. Current 2014
 single-class support is explicit; unsupported multiclass or 2024 advancement
 stops for review.
 

@@ -31,7 +31,7 @@
 
 准备法术列表必须按版本和职业处理。车卡或升级阶段用
 `character_spell_prepare(mode="replace_all")` 一次提交完整列表；游戏中只能把完整
-`prepared_spell_ids` 随 `character_state_change(action="rest")` 的长休一起原子提交，禁止连续切换单个法术来
+`prepared_spell_ids` 随 `campaign_change(action="party_rest")` 中对应成员的长休选择一起原子提交，禁止连续切换单个法术来
 绕过替换数量。2024 牧师/德鲁伊/法师长休可替换任意项，圣武士/游侠只可替换一项，
 吟游诗人/术士/邪术师只在获得本职业等级时替换一项；2014 吟游诗人/游侠/术士/
 邪术师使用已知法术，不建立准备列表。始终准备的法术不占名额，戏法不进入 1 环以上

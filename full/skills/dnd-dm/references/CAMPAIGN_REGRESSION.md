@@ -281,7 +281,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     sleep, no more than 120 minutes of light activity, and less than 60 minutes
     of strenuous activity. A 240-minute path is legal only when every included
     actor using it has a source-bound `Trance` feature and records 240
-    `trance_minutes`; never infer the exception from a race name.
+    `trance_minutes`; never infer the exception from a race name. For a changed
+    2014 prepared list, put the complete selected list in that member request
+    and reserve `rest_schedule.light_activity_minutes` equal to at least the sum
+    of every selected spell's level. This is the full-list preparation cost, not
+    the levels of only the replacements. A minimal 240-minute Trance therefore
+    cannot also change the list without extending the schedule.
 20. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`

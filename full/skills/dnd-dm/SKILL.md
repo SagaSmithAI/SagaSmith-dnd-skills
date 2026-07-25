@@ -250,24 +250,26 @@ currency exchange or change. A missing source, unresolved spell name,
 insufficient exact payment, unavailable Core lock, or failed validation must
 leave character, wallet, clock, inventory, and effects unchanged.
 
-During lobby setup or level advancement, submit the complete level 1+ prepared list
-through `character_spell_prepare(mode="replace_all")`; use `mode="set"` only for a
-setup edit. During live play, a prepared-list change must be part of
-`character_state_change(action="rest", rest_type="long_rest", prepared_spell_ids=[...])`. Do not
+During initial lobby setup, submit the complete level 1+ prepared list through
+`character_spell_prepare(mode="replace_all", event="setup")`; use `mode="set"`
+only for an initial setup edit. Once the campaign first enters live play,
+returning to lobby does not reopen setup. During live play, a prepared-list
+change must be a member choice in
+`campaign_change(action="party_rest", prepared_spell_ids=[...])`. Do not
 simulate a long rest by repeated toggles. The runtime enforces 2014/2024 class
 timing and replacement count, class-level spell eligibility, Wizard spellbook
 membership, always-prepared and cantrip exclusions, and multiclass
 `grant.source_key` ownership. An unprepared level 1+ spell on a prepared caster's
 card is not castable merely because its access record says it is known.
 
-A rest benefit and elapsed narrative time are separate writes. First establish
-that the uninterrupted rest actually occurred and advance the branch-local clock
-by its source-required duration; only then call
-`character_state_change(action="rest")` for each eligible actor. For a short
-rest, submit `hit_dice_spends=[{"key": <recorded hit-die key>, "count": <positive
-integer>}]`. Never submit a die result: the engine validates the available pool,
-rolls every spent die, adds the card's Constitution modifier, and returns
-`hit_dice_rolls` for audit. Long rests reject `hit_dice_spends`; short rests
+For a Short Rest, preflight every member, advance the branch-local clock once,
+then call `character_state_change(action="rest")` for each eligible actor with
+`hit_dice_spends=[{"key": <recorded hit-die key>, "count": <positive integer>}]`.
+Never submit a die result: the engine validates the available pool, rolls every
+spent die, adds the card's Constitution modifier, and returns `hit_dice_rolls`
+for audit. A Long Rest instead uses the one atomic party-rest write described
+below; never advance its clock separately or call individual actor rests.
+Long rests reject `hit_dice_spends`; short rests
 reject long-rest hit-die recovery allocations and `food_and_drink`. A creature
 at 0 HP or Dead receives no rest benefit.
 Every rest must also submit a complete `rest_schedule` whose sleep, light
@@ -305,9 +307,13 @@ subclass and spell choices from the active content catalog, apply newly eligible
 subclass features with every structured choice field and exact choice count
 satisfied, verify that the level transaction materialized newly unlocked
 always-prepared subclass spells, add newly selected prepared-class spell cards
-with `method="class_prepared"`, replace the complete prepared list with
-`event="level_up"`, and re-read derived state. Always-prepared spells stay outside
-the caller-selected list and do not consume its maximum. Snapshot before entering
+with `method="class_prepared"`, and re-read derived state. That method only
+hydrates a source-legal class-list card; it must leave `access.prepared=false`.
+For 2014 Cleric, Druid, Paladin, and Wizard, gaining a level never changes the
+prepared list. Wizard level choices add two spells to the spellbook only. Apply
+any new prepared list through the next completed Long Rest, including newly
+available preparation capacity. Always-prepared spells stay outside the
+caller-selected list and do not consume its maximum. Snapshot before entering
 another sourced scene.
 When applying multiclass features, Channel Divinity is one shared resource,
 Extra Attack uses the highest source-granted attacks-per-Action value rather
@@ -735,7 +741,12 @@ duration is skipped.
 Resolve every completed long rest through
 `campaign_change(action="party_rest", payload={members, duration_minutes})`, even
 for a one-character party. Each member supplies its current character revision
-and any prepared-spell or 2014 hit-die recovery choices. This one write advances
+and any prepared-spell or 2014 hit-die recovery choices. A changed 2014 prepared
+list costs light preparation activity equal to the sum of the spell levels of
+every spell in the complete selected list, not merely the added spells. Record
+at least that many `rest_schedule.light_activity_minutes`; a minimal four-hour
+Trance schedule has no preparation time, so extend its schedule when changing
+the list. This one write advances
 the campaign clock once, advances timed effects for every campaign actor and
 world object, applies benefits to only the named members, records completion on
 each card, and enforces the one-benefit-per-24-hours rule. A creature must have at

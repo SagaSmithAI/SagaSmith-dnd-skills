@@ -210,12 +210,12 @@ limits by hand:
    `rule_pack_query(view="content_catalog")`; apply only eligible artifact ids.
    A Wizard adds the reported spells with `method="spellbook"`. For a prepared
    caster, also apply each newly chosen class spell not yet present on the card
-   with `method="class_prepared"` and include it in the complete prepared list;
-   these card-hydration selections do not consume a reported known/spellbook
-   choice. Do not include automatically always-prepared subclass spells in that
-   caller-selected list or count them against its maximum. Then submit the complete
-   legal prepared list with
-   `character_spell_prepare(mode="replace_all", event="level_up")`.
+   with `method="class_prepared"`; these card-hydration selections do not consume
+   a reported known/spellbook choice and must leave `access.prepared=false`.
+   Do not change a 2014 prepared list during level advancement. Reconcile any
+   revised complete list through the next completed Long Rest, excluding
+   automatically always-prepared subclass spells from the caller-selected list
+   and its maximum.
 6. Re-read the actor and audit level, HP maximum/current HP, Hit Dice, spell slots,
    preparation, feature resources, subclass, spells, and `derived`. Do not return
    to `play` while any required catalog item or player choice is missing.

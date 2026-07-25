@@ -236,13 +236,21 @@ equivalent.
 
 Prepared-spell selection is edition- and class-aware. In `lobby`, use
 `character_spell_prepare(mode="replace_all")` with the complete selected list and
-`event: setup` or `event: level_up`; `mode="set"` is only a setup edit. In live
-`play`, use `character_state_change(action="rest")` and supply the complete
-`prepared_spell_ids` list so recovery and a legal long-rest replacement commit atomically.
+`event: setup` only before the campaign first enters live play; `mode="set"` is
+also only an initial setup edit. Returning to `lobby` does not reopen setup. In live
+`play`, use `campaign_change(action="party_rest")` and supply the complete
+`prepared_spell_ids` list on that member so recovery, campaign time, and a legal
+long-rest replacement commit atomically.
 In 2024, Cleric/Druid/Wizard may replace any number after a Long Rest,
 Paladin/Ranger may replace one, and Bard/Sorcerer/Warlock replace one only when
 gaining a class level. In 2014, Cleric/Druid/Paladin/Wizard may change their list
-after a Long Rest, while Bard/Ranger/Sorcerer/Warlock use spells known. Always-
+after a Long Rest, while Bard/Ranger/Sorcerer/Warlock use spells known. A 2014
+level advance never accepts `event: level_up`: `method="class_prepared"` only
+hydrates a legal class-list card with `access.prepared=false`, and a Wizard's
+two level choices enter the spellbook without changing the prepared list. When
+a 2014 Long Rest changes the list, its member `rest_schedule.light_activity_minutes`
+must cover the sum of the levels of every spell in the complete selected list.
+Always-
 prepared spells and cantrips never occupy selections. Wizard selections must be
 in the spellbook. Multiclass eligibility uses each spell's `grant.source_key`
 and that class's own level. Campaign-bound characters inherit campaign edition.
@@ -334,8 +342,10 @@ maximum HP and the matching HP-growth ledger entry. Its
 `advancement.follow_up` lists eligible feature artifacts, subclass options, and
 spell-choice counts. Those are mandatory subsequent catalog operations; after a
 subclass choice, query again for its features. Finish with a complete
-`character_spell_prepare(mode="replace_all", event="level_up")`, actor re-read,
-and snapshot before returning to `play`.
+actor re-read and snapshot before returning to `play`. For a 2014 prepared
+caster, `method="class_prepared"` only hydrates legal class-list cards and a
+Wizard's reported choices only enter the spellbook. Do not submit a prepared
+list during advancement; reconcile it through a later completed Long Rest.
 
 ## Branch-aware continuity
 
@@ -885,6 +895,10 @@ the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
 the ending actor's turn; any narrative rest consequence remains a DM ruling. A
 resource marked `recovers_on: short_rest` also recovers on a Long Rest; the marker
 means the earliest rest that restores it, not that a longer rest fails to do so.
+When a 2014 prepared caster changes its complete list, record light preparation
+activity equal to at least the sum of all selected spell levels. A bare
+240-minute Trance schedule contains no such time and must be extended before it
+can carry a changed list.
 
 A Stable creature at 0 HP cannot benefit from a rest. When the party can safely
 wait for the automatic recovery, call

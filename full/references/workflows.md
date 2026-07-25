@@ -209,10 +209,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    feature ids through `character_content_apply`. Resolve a listed subclass choice
    with the player, apply it, then query the catalog again for subclass features.
 4. Select only the reported number of legal cantrips/known/spellbook spells from
-   the active catalog. Apply Wizard additions as `method: spellbook`.
-5. Submit the complete prepared list with
-   `character_spell_prepare(mode="replace_all", event="level_up")`, re-read the
-   actor, and verify all resources and derived values.
+   the active catalog. Apply Wizard additions as `method: spellbook`. A 2014
+   prepared-class `method: class_prepared` selection hydrates a legal card only
+   and must remain unprepared.
+5. Do not change a 2014 prepared list during advancement. Re-read the actor and
+   verify all resources and derived values; submit any revised complete list
+   through the next completed `campaign_change(action="party_rest")`.
 6. Create a snapshot, switch back to `play`, and reopen phase exposure. Stop if
    the runtime reports unsupported edition/multiclass state or any catalog item
    remains unresolved.
