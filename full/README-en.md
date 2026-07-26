@@ -29,7 +29,7 @@ Campaign state, not the prompt, owns the phase. The MCP refreshes session exposu
 1. Read the active branch, continuity context, current scene, and caller-visible actor knowledge.
 2. Separate player statement, character intent, and missing rules inputs.
 3. Use `rule_search` then `rule_expand`; use the same search/expand pattern for modules.
-4. Let the engine settle deterministic mechanics and the agent/human GM rule on targets, sight, exceptions, and narrative cost.
+4. Let the engine settle deterministic mechanics and let the SagaSmith Agent perform ordinary GM rulings on targets, sight, exceptions, and narrative cost. Stop externally only for player-owned choices, owner approvals, permission changes, or missing/conflicting source evidence.
 5. Use controlled tools for state, scene progress, events, memory, and actor knowledge.
 6. Snapshot major divergence, danger, chapter transitions, and combat boundaries.
 

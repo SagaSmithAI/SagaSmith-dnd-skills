@@ -240,6 +240,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    If the action returns `pending_ruling`, inspect its payment and latest
    revision before applying any generic public dice/state/continuity writes;
    never pay the action twice or invent a `combat_choice` window.
+   A spell or activity pause with no payment is pre-commit: return it to the
+   named resolver before rolling healing, applying an effect, starting combat,
+   or assuming a charge/slot was consumed. A paid generic-effect pause is
+   post-payment and may be completed by the Agent without paying again.
    Assert that both a native result and any compact facade preserve
    `default_resolver`, `ruling_kind`, and `policy_ref`. A pre-commit
    `NeedsRuling` response must expose `committed=false`, missing facts, and a

@@ -105,6 +105,11 @@ exception string. An unclassified DM ruling defaults to Agent adjudication,
 while an explicitly external player choice or missing/conflicting-source review
 retains that owner. Declarative rule-pack `ruling.require` operations follow the
 same Agent default; `choice.require` remains a player-owned external input.
+This includes `character.validate` and `character.derive`: validation pauses
+return a typed, pre-commit ruling instead of a generic schema error, while
+derived cards expose structured `ruling_requirements` alongside
+`unresolved_rules`. Consumers must follow the declared resolver rather than
+inferring ownership from the word "review."
 
 ## Structured content catalog
 
