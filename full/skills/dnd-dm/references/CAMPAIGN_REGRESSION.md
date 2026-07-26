@@ -227,6 +227,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    If the action returns `pending_ruling`, inspect its payment and latest
    revision before applying any generic public dice/state/continuity writes;
    never pay the action twice or invent a `combat_choice` window.
+   When module prose establishes relative placement without a numeric map (for
+   example, creatures "clustered tightly" around a door), the Agent may map that
+   fact onto the temporary combat grid through repeated
+   `--agent-position-json` declarations. Every declaration must name a canonical
+   participant, unique in-bounds cell, exact encounter excerpt, and explicit
+   ruling reason. The driver passes those positions only through public
+   `combat_start`, records the ruling in its report, and rejects unsupported,
+   overlapping, or uncited placements.
    For a source-authored abstract casualty cohort, pass the printed initial
    count, hostile activity, casualty dice, and recharge instruction through the
    encounter driver's source-casualty declaration. Require a descriptive
