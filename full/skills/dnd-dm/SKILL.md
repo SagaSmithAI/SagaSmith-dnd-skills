@@ -437,6 +437,28 @@ DM-ruling boundary, never permission to skip distance enforcement. Repair the
 source-grounded card in lobby when the source states the range; otherwise choose
 a legal recorded mode such as melee or preserve the ruling explicitly.
 
+A reviewed monster action may replace an attack with a structured source
+activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws
+attack with its recorded option and then call `combat_use_activity` for Devour
+Intellect with one visible in-range target and the DM-confirmed
+`target_has_brain=true`; do not roll or patch the Intelligence save, psychic
+damage, 3d6 threshold, Intelligence 0 override, or Stunned condition yourself.
+On a later turn, if an in-range living Humanoid is Incapacitated (including by
+Stunned), prefer the separately recorded Body Thief action and pass
+`target_is_humanoid=true`. The public settlement rolls both Intelligence checks;
+a tie has no winner. On a win it preserves the victim actor and its independent
+knowledge, atomically copies all current ActorKnowledge to the devourer, records
+the victim body as hostile and controlled, uses the body's statistics with the
+devourer's mental scores, and gives the devourer total cover inside the host.
+The inside devourer does not take a separate turn and cannot be targeted; the
+host acts for the hostile side. If the host reaches 0 HP, the engine deactivates
+the host override, marks the brainless body Dead, and ejects the devourer to the
+nearest recorded unoccupied adjacent cell. A `protection from evil and good`
+expulsion, a `wish` brain restoration, or voluntary departure remains an
+explicit DM settlement unless the public tool returns a structured contract for
+that trigger. Never transfer the devourer's copied knowledge back to the
+victim, a replacement PC, or another actor.
+
 When an attack returns `status: pending_reaction`, no damage has been rolled or
 applied. The target actor reads its owned window with
 `combat_query(view="reactions")`, chooses a listed defense or `decline`, and calls
@@ -824,6 +846,16 @@ foot per foot spent entering those reviewed cells and returns the reduced moveme
 budget with a Core receipt. Do not add that surcharge to `distance` yourself:
 `distance` remains the geometric route length. Unmapped terrain still requires a
 DM ruling rather than an invented cell cost.
+When a public event and per-actor ActorKnowledge identify exact hazard cells and
+state that the actor will avoid them, pass that public report to the regression
+driver and require its voluntary path search to exclude every known cell. An
+endpoint that is safe is insufficient: audit the complete `payload.path`.
+Knowledge is actor-local, so give hostile creatures a separate cited
+`trap_locations_shared` event only when the module establishes that they know
+the traps; never copy the party's detection result to them. Do not apply this
+voluntary avoidance to a shove, forced movement, or teleport, and do not invent
+a hazard trigger when no submitted path or forced destination enters the
+recorded cell.
 If Prone, either use `combat_movement(action="stand")` (half speed, no action) or
 use `combat_movement(action="move", payload.crawl=true)`; crawling costs double movement.
 
