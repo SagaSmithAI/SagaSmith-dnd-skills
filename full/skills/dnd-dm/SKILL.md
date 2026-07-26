@@ -133,6 +133,14 @@ ruling by default.
 Do not pause merely because the boundary is labelled "DM ruling", and do not
 require a human to restate a decision that the active rules, exact module text,
 current scene, actor cards, and branch state can support.
+Read ownership from the domain result itself: a live `pending_ruling` must carry
+`default_resolver`, `ruling_kind`, and `policy_ref`, even on a native dynamically
+exposed call. A compact facade must preserve that same classification at its top
+level. If an engine prerequisite returns before commit with `committed=false`
+and a `retry_contract`, treat it as control returning to the named resolver;
+an Agent-owned boundary keeps the current revision while the Agent supplies the
+missing scene/rule fact and retries through public tools. Do not turn that
+pre-commit pause into a failed fictional action.
 
 Before deciding, read the exact expanded rule/module/scene evidence and the
 current affected actors. Record the ruling's source reference or exact excerpt,
@@ -152,6 +160,14 @@ Keep these distinct:
 - Missing or contradictory source evidence requires import/retrieval repair or
   explicit review. Owner-only pack activation, permission changes, and other
   approval boundaries remain owner/DM approvals rather than inferred facts.
+
+Cards and import diffs use the same ownership contract. Preserve
+`ruling_requirement`/`ruling_requirements` on descriptive activities, feat
+prerequisites, source-bound spells, critical follow-ups, party-size reviews, and
+`needs_dm_review` scene-progress impacts. Ordinary source-or-scene adjudication
+defaults to the Agent; a missing ranged/spell range, incomplete hydration, or
+other absent/contradictory source mechanic remains
+`missing_or_conflicting_source_review` and cannot be invented.
 
 `pending_ruling` may be returned after an action, use, slot, or reaction has
 already been paid. Read the receipt and latest revision and never pay it again.
@@ -690,8 +706,12 @@ marking them resolved. Read the returned `settlement`, `manual_rulings`,
 structured `ruling_requirements`, `automatic_spell_ids`, `ruling_spell_ids`, and
 `unavailable_attack_ids`. Every ordinary DM adjudication requirement names
 `default_resolver="agent"`; a player-owned choice or missing/conflicting source
-names its distinct external boundary instead. `ready` means the actor may enter
-the encounter, not that every action on the card is automatically executable.
+names its distinct external boundary instead. Also inspect
+`default_dm_resolver`, `agent_rulings`, and `external_input_requirements`;
+`settlement="source_review_required"` is a source repair gate, while `mixed`
+means the card can enter combat with listed Agent adjudications still explicit.
+`ready` means the actor may enter the encounter, not that every action on the
+card is automatically executable.
 `unarmed_attack_id` remains available even when every recorded weapon is
 unavailable. When an exact imported rule source contains the creature,
 create it in lobby with `character_create_from(mode="statblock")`; never substitute

@@ -124,10 +124,20 @@ or `player_name` as permission.
 `settlement`、`manual_rulings`、`ruling_requirements`、`automatic_spell_ids`、
 `ruling_spell_ids` 和 `unavailable_attack_ids`。`default_resolver="agent"` 的普通
 DM 判定由 Agent 直接思考并用公开工具落实；玩家选择和缺失/冲突来源仍保留各自边界。
+同时核对 `default_dm_resolver`、`agent_rulings` 和
+`external_input_requirements`：`settlement="source_review_required"` 表示必须修复或
+复核来源，不能由 Agent 编造；`mixed` 表示可入场，但列出的普通叙事裁决仍由 Agent
+承担。原生工具结果与 facade 顶层必须保留相同的 `ruling_kind`，不得把嵌套的来源复核
+误降级成通用 Agent 裁决。
 地图上缺失通常射程的远程攻击属于来源/卡片缺失，必须阻止开战；有来源数值时应先在
 lobby 修复卡片，不能由通用判定编造距离。无论装备状态或弹药是否耗尽，角色都可显式使用
 `weapon_id: "unarmed-strike"`。战斗结束后的 `combat_query(status)` 是最终历史快照，当前
 HP、状态和资源以 `character_query` 为准。
+
+若引擎在提交前返回 `pending_ruling`、`committed=false`、`missing` 与
+`retry_contract`，这不是已经发生的失败动作。按 `default_resolver` 接回控制：
+普通地图、观察、时序和场景事实由 Agent 思考后用当前 revision 重试；缺失射程、未水合规则
+或不受支持的来源契约保持 `missing_or_conflicting_source_review`，先修复导入/卡片。
 
 `source_excerpt` 必须是同一模组场景中精确的规范化子串，不是模糊搜索提示；不得改写、翻译或
 拿另一个同名房间的文字代替。`automatic_spell_ids` 只说明法术效果已有结构化结算，不会消除

@@ -65,6 +65,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    count, and `represented_as_module_recommendation=false`. A completed review
    may use an exact enabled-Core design baseline, but it must not relabel that
    number as the module's recommendation; never silently default to four. Use a
+   manifest `party_size_review` with `default_resolver="agent"` and
+   `ruling_kind="source_or_scene_fact"` for this Agent-owned review; image/source
+   evidence that still cannot be inspected remains an explicit external gate.
+   Use a
    level appropriate to the adventure segment. Exhaust advancement follow-ups,
    prepared spells, features, derived-state re-reads, and a verified snapshot
    before returning to `play`.
@@ -227,6 +231,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    If the action returns `pending_ruling`, inspect its payment and latest
    revision before applying any generic public dice/state/continuity writes;
    never pay the action twice or invent a `combat_choice` window.
+   Assert that both a native result and any compact facade preserve
+   `default_resolver`, `ruling_kind`, and `policy_ref`. A pre-commit
+   `NeedsRuling` response must expose `committed=false`, missing facts, and a
+   retry contract; supply Agent-owned facts and retry at the same revision.
+   Missing/conflicting source review and player-owned choices must not be
+   relabelled as Agent adjudication.
    When module prose establishes relative placement without a numeric map (for
    example, creatures "clustered tightly" around a door), the Agent may map that
    fact onto the temporary combat grid through repeated

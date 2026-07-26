@@ -66,6 +66,19 @@ one of the external-input exceptions instead names `external_input`. This
 annotation assigns the next work; it does not claim that the effect has already
 settled.
 
+The domain result itself also carries `default_resolver`, `ruling_kind`, and
+`policy_ref`, including native dynamically exposed calls. Compact facades must
+copy the nested ruling classification to their own top level; never discard an
+external-source exception and then fall back to generic Agent adjudication.
+An engine `NeedsRuling` boundary that is reached before commit returns the same
+structured `pending_ruling` contract with `committed=false`, its missing facts,
+and a retry contract for the classified resolver. Treat an Agent-owned result as
+control returning to the Agent, not as a failed campaign action or a request to
+ask a separate human. A missing range, unresolved hydration, or unsupported
+source contract remains `missing_or_conflicting_source_review`; the generic
+catch boundary must not relabel that source defect as Agent permission to invent
+a mechanic.
+
 The Agent must preserve the transaction boundary. It reads whether the first
 call already paid an action, Reaction, use, slot, or other resource; adjudicates
 without paying it twice; uses only public domain tools for dice and state; and
@@ -94,6 +107,10 @@ identifies a missing character-build or player choice, obtain that choice; if
 it identifies an actual DM adjudication, the Agent resolves it under the
 Agent-owned ruling boundary above. Use a source-bound rule pack mechanic only
 when the rule has been reviewed and validated.
+Non-numeric feat prerequisites and source-bound statblock spell/component
+boundaries retain a structured `ruling_requirement`/`ruling_requirements`
+record on the card. The record names the Agent or the true external-input
+boundary, so callers must not infer ownership from prose such as "DM review."
 
 For a 2014 custom background, use one enabled base background artifact and pass
 `custom_name`, exactly two `skills`, the base artifact's required
@@ -278,6 +295,10 @@ fallback and checksum, and
 `represented_as_module_recommendation=false`. A completed review may unblock
 party construction; a silent default to four or a semantically unrelated search
 hit may not.
+The manifest preserves this as `party_size_review` with
+`default_resolver="agent"` and `ruling_kind="source_or_scene_fact"` while the
+Agent performs the DM review. If the necessary page/source evidence is still
+unavailable, that evidence gap remains an external source-review boundary.
 
 For a dead, missing, or departed PC, prefer an applicable unused module
 pregenerated character and otherwise create one new legal character through the
@@ -1100,6 +1121,14 @@ still covers targets and effects.
 
 `module_set_progress` requires the current `expected_state_version` for that
 scene/scope row (`0` for its first write) and a fresh idempotency key.
+When a module revision can no longer remap a progressed scene,
+`module_import(action="validate")` returns
+`diff.progress_impact[action="needs_dm_review"]` with a structured
+`ruling_requirement`. Its default resolver is the Agent because selecting the
+best source-supported remap or retirement is a DM continuity decision; if the
+old/new source evidence is missing or contradictory, retain the external
+source-review classification instead. The aggregate validation
+`ruling_requirements` must preserve the same records.
 
 `campaign_change(action="clock_set")` establishes the branch-local campaign day,
 hour, and minute. `campaign_change(action="clock_advance")` advances an explicit
