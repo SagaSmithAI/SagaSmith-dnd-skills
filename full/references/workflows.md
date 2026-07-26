@@ -88,8 +88,14 @@ own exposure. Loading a group for one Agent must not expose it to another.
    cannot be used for a check or combat.
    When the module modifies a named standard creature, import that exact rule source
    and use its source-bound `variant` whitelist; never replace the whole actor sheet.
-   If rule-source statblock creation fails only because PDF extraction lost the
-   heading or required layout, call
+   If rule-source statblock creation fails because the indexed text split a card
+   across columns, retry `mode="statblock"` with the source-established
+   page/neighborhood `chunk_ids` and the exact printed heading in
+   `payload.source_statblock_name`. Keep the campaign instance name in
+   `payload.name`. The deterministic text-layout result must cite only chunks
+   from that heading through the next creature core and report
+   `source.text_layout_recovery`; it does not require Agent vision. If required
+   facts are still absent or conflicting, call
    `rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
    `name` is the exact printed creature heading, not a differently named campaign
    instance.

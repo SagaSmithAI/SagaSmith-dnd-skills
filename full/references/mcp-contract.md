@@ -604,8 +604,14 @@ creature present in an imported rule source, use
 `character_create_from(mode="statblock")` with the imported `source_id` and, when
 needed, reviewed `chunk_ids`. The parser preserves source provenance, exact AC,
 HP, abilities, defenses, senses, weapon attacks, and structured Multiattack.
-If that path fails only because PDF extraction lost the heading or a required
-statblock structure, call DM-only Lobby
+When PDF layout text splits the selected card across sibling columns, also pass
+the exact printed heading as `payload.source_statblock_name` while retaining the
+campaign instance name in `payload.name`. On direct-parse failure, the server
+selects that named creature core, stops before the next creature core,
+reconstructs the card from deterministic text chunks, and narrows provenance to
+the retained `source.text_layout_recovery.chunk_ids`. This first recovery path
+does not render a page and works for an Agent without image capability.
+If required source facts remain absent or conflicting, call DM-only Lobby
 `rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
 Use the exact printed heading for `name`; keep a differently named campaign
 instance in the later actor-creation payload.

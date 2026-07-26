@@ -35,19 +35,26 @@ and `source_bound_rule_packs` to be true. Consume the published
 6. Use `rule_search` with `source_ids=[<exact source_id>]`, select a hit from that
    source, and call
    `rule_expand`. Check the chunk text, heading path, page range, and source checksum.
-7. If `character_create_from(mode="statblock")` fails because the indexed text is
-   missing the creature heading, identity line, AC, HP, Speed, or ability table,
-   call `rule_import(action="recover_statblock")` with the same `job_id`, exact
-   printed creature heading as `name`, and a fresh idempotency key. Do not use a
-   campaign instance name such as a named dragon in place of `Adult Blue Dragon`.
-   Supply `page_number` only when it
-   is already source-established; otherwise let the server read the printed-page
-   index hint and scan nearby physical pages. This path is designed for a
-   text-only Agent: Core runs local layout OCR, isolates the target column,
-   rejects low-confidence critical fields, and requires either target-segment
-   embedded-text corroboration or agreement from an independent OCR scale. The
-   result is a checksum-bound reviewed statblock; retry actor creation with
-   `mode="reviewed_rule_statblock"` and its returned `review_id`.
+7. If `character_create_from(mode="statblock")` fails because the indexed text
+   split one card across columns or attached its headings to an adjacent
+   creature, retry it with the source-established page/neighborhood `chunk_ids`
+   and `payload.source_statblock_name` set to the exact printed creature heading.
+   Keep the differently named campaign instance in `payload.name`. The server
+   deterministically selects that creature's core chunk, stops at the next
+   creature core, reconstructs the ability and action sections, and returns
+   `source.text_layout_recovery` with the exact retained chunk ids. This is the
+   first recovery path for a text-only Agent and requires neither page rendering
+   nor image understanding. If the indexed text still omits or conflicts on a
+   required fact, call `rule_import(action="recover_statblock")` with the same
+   `job_id`, exact printed creature heading as `name`, and a fresh idempotency
+   key. Do not use a campaign instance name such as a named dragon in place of
+   `Adult Blue Dragon`. Supply `page_number` only when it is already
+   source-established; otherwise let the server read the printed-page index hint
+   and scan nearby physical pages. Core then runs local layout OCR, isolates the
+   target column, rejects low-confidence critical fields, and requires either
+   target-segment embedded-text corroboration or agreement from an independent
+   OCR scale. The result is a checksum-bound reviewed statblock; retry actor
+   creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
 8. If recovery cannot locate exactly one heading, the two evidence paths disagree,
    a critical field has low confidence, or no page can be inferred, stop at
    explicit missing/conflicting-source review. A capable reviewer may render the
