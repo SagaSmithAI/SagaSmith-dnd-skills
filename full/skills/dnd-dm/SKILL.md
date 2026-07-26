@@ -147,7 +147,11 @@ module/scene/chunk/page/hash `source_ref` and an exact excerpt to
 `chase_start`. Include the quarry and every pursuer as canonical actors,
 preserve the printed starting distance, and add a `close_transition` only when
 the same source explicitly redirects the chase when the quarry is nearly
-caught or reaches a destination. Advance only the actor returned by
+caught or reaches a destination. That transition must carry its own exact
+same-scene `source_ref` and `source_excerpt`, even when they point to a different
+chunk from the chase start; its `summary` must equal that normalized excerpt.
+Never submit a caller-authored destination summary without this second citation.
+Advance only the actor returned by
 `chase_query.current`. `chase_take_turn` owns initiative order, movement,
 the `3 + Constitution modifier` free Dash allowance, each later Dash's DC 10
 Constitution check, chase exhaustion, the Urban Chase Complications d20 and

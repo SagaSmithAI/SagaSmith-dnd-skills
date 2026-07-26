@@ -127,7 +127,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    distance, Dash counts, extra-Dash Constitution checks, chase exhaustion,
    Urban Chase Complications, damage, and the server random stream. A module
    transition such as a quarry ducking into a destination is legal only when
-   its exact source excerpt supports the configured close transition. Seal the
+   the `close_transition` carries its own exact same-scene `source_ref` and
+   `source_excerpt`; require its `summary` to equal that normalized excerpt,
+   including when the transition is stored in a different chunk from the
+   starting-distance evidence. Seal the
    completed chase and its manifest/world-state update with one checkpoint;
    never checkpoint each chase turn or replace the chase with a fabricated
    outcome event.
