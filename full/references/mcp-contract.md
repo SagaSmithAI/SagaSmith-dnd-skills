@@ -175,6 +175,12 @@ used for checks or combat. The full-playthrough driver must switch from `play` t
 on success or failure, upsert the actor into `manifest.npcs`, and verify a
 checkpoint. A later same-named NPC from the same source chunk needs a new
 occurrence id.
+When the source defines several anonymous instances under one printed identity,
+create a separate actor for each one with `source_identity` equal to that exact
+source label and a stable `instance_key`. The stored name must be exactly
+`<source_identity> [<instance_key>]`; the card gains
+`anonymous_source_instance`. This preserves independent NPC state and knowledge
+without inventing proper names or weakening source-identity validation.
 The service canonicalizes the returned `source_ref` to its verified module,
 scene, chunk, page, heading, and content-hash fields. A regression verifier must
 compare that canonical field set, while retaining optional asset-path, asset

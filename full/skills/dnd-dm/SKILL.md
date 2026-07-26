@@ -203,6 +203,11 @@ module/scene/chunk/page/hash and an excerpt containing the name. Treat its
 `narrative_only` default mechanics as sentinels, never as authored AC/HP/ability
 scores, and never include that actor in a check or encounter until an exact
 statblock is imported.
+For several anonymous NPCs sharing one source label, create distinct
+`anonymous_source_instance` cards with the exact printed `source_identity` and
+stable `instance_key`; use only the canonical
+`<source_identity> [<instance_key>]` name. Never invent proper names or merge
+their ActorKnowledge to work around name uniqueness.
 
 After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
 `character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one

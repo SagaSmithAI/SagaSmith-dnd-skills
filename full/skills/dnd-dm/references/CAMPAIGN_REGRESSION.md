@@ -80,6 +80,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `character_create_from(mode="narrative_npc")`,
    verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
    restore `play`, register the actor in the manifest, and verify its checkpoint.
+   For a source-counted anonymous group, create one actor per actual instance.
+   Set `--narrative-npc-source-identity` to the exact printed group label and a
+   distinct stable `--narrative-npc-instance-key`; the actor name must be
+   `<source identity> [<instance key>]`. Require the additional
+   `anonymous_source_instance` tag. Do not invent proper names merely to satisfy
+   database uniqueness, and do not collapse several NPCs into one knowledge scope.
    A `prepare-statblock` failure at candidate lookup, visual review, validation,
    creation, or verification must restore both the entry branch and entry phase
    before surfacing the error. Re-read the public phase after a failed review;
