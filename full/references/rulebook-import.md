@@ -51,8 +51,10 @@ and `source_bound_rule_packs` to be true. Consume the published
    separately installed version with `campaign_rules(action="set_pack")`, using
    the latest campaign revision.
 11. During non-combat play, use `character_check` for a rule-aware check. During
-    combat, use `combat_check`. DM-established situational facts go in `rule_facts`;
-    they cannot override actor, check kind, ability, or DC.
+    combat, use `combat_check`. For a 2014 opposed check, use the atomic
+    `character_contest` tool and supply rule facts independently for each side.
+    DM-established situational facts go in `rule_facts`; they cannot override
+    actor, check kind, ability, or DC.
 12. Verify the result with `campaign_rules(action="explain")` and
     `campaign_rules(action="receipts")`. A receipt must contain the imported chunk id, original
     document checksum, page range, exact pack lock, and ruleset fingerprint.

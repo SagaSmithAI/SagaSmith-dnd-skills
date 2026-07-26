@@ -13,7 +13,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
 | Rules | `rule_import(discover/stage/inspect/ingest/extract_candidates/review/compile/install/activate)`, `rule_document_page_render`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/explain/receipts)`, `character_content_apply` |
-| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
+| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_contest` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `continuity_commit`, `campaign_event(add/list)`, `memory_change(add/upsert/revise/supersede)`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
@@ -615,6 +615,14 @@ must be imported chunk ids and are resolved server-side to the exact source id,
 document checksum, heading path, and page range. Use `character_check` outside
 combat and `combat_check` during combat when an enabled `check.before` rule needs
 DM-established `rule_facts`.
+
+When a 2014 source requires a contest, do not invent a DC or compare two
+unrelated client-side rolls. Use `character_contest` with both campaign actors,
+both appropriate abilities or skills, and each side's printed or reviewed
+advantage/disadvantage. The server rolls both sides in one branch-scoped
+transaction, compares totals, and records a tie as `tie_no_change`, as required
+by the 2014 contest procedure. Use the full-playthrough driver's
+`resolve-contest` action when the contest is part of campaign regression.
 
 For source-cited playthrough checks, an idempotent retry means the exact same run,
 scene, Scene Atlas location, actor, kind, ability/skill, DC, proficiency,

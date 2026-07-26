@@ -258,8 +258,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    reviewed mechanic is needed. Arbitrary code is never executable rule content.
 4. Use `rule_pack_query(view="test")` and inspect the installed inactive pack.
    Activation requires explicit DM approval and a fresh campaign revision.
-5. Settle checks with `character_check` in play or `combat_check` in combat, then
-   audit `campaign_rules(action="receipts")`.
+5. Settle checks with `character_check` in play or `combat_check` in combat. For
+   a 2014 opposed check, use one atomic `character_contest` call instead of
+   inventing a DC or comparing client-side rolls. Then audit
+   `campaign_rules(action="receipts")`.
 
 ## Post-scene continuity and save
 

@@ -130,7 +130,7 @@ the campaign.
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
 | Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
-| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
+| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_contest` |
 | Chases | `chase_start`, `chase_query`, `chase_take_turn`, `chase_end` |
 | World continuity | `continuity_commit`, `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |

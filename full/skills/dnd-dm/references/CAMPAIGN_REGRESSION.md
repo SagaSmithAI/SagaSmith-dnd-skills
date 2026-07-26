@@ -119,6 +119,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    advantage/disadvantage, and exact source chunk are immutable retry payload,
    not identity. Separate rolls must never reuse progress, dice, continuity,
    knowledge, or manifest-sync keys even when every payload field is identical.
+   If the 2014 source directly opposes two creatures' efforts, use
+   `character_contest` (or the driver's `resolve-contest`) with both actors and
+   both abilities/skills. Never replace the contest with an invented fixed DC.
+   The target and source roll modes are independent; a source instruction such
+   as "the enemies make a check with advantage for the group" applies advantage
+   only to that enemy side. Compare totals atomically, and preserve
+   `tie_no_change` rather than declaring either side successful on a tie.
 5a. When the active route invokes the 2014 DMG chase rules, run
    `scripts.regression_chase` through the public stdio MCP exposure. Bind
    `chase_start` to the exact expanded scene `source_ref`, excerpt, quarry,
