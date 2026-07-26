@@ -119,6 +119,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    advantage/disadvantage, and exact source chunk are immutable retry payload,
    not identity. Separate rolls must never reuse progress, dice, continuity,
    knowledge, or manifest-sync keys even when every payload field is identical.
+5a. When the active route invokes the 2014 DMG chase rules, run
+   `scripts.regression_chase` through the public stdio MCP exposure. Bind
+   `chase_start` to the exact expanded scene `source_ref`, excerpt, quarry,
+   pursuers, and printed starting distance. Require `mode="theater_of_the_mind"`
+   and the absence of a battle map. Let `chase_take_turn` own initiative,
+   distance, Dash counts, extra-Dash Constitution checks, chase exhaustion,
+   Urban Chase Complications, damage, and the server random stream. A module
+   transition such as a quarry ducking into a destination is legal only when
+   its exact source excerpt supports the configured close transition. Seal the
+   completed chase and its manifest/world-state update with one checkpoint;
+   never checkpoint each chase turn or replace the chase with a fabricated
+   outcome event.
 6. Before combat, read the exact encounter scene and its location. Call
    `module_query(view="readiness")` with every source/DM-established group.
    `required_count` is the complete group count, not `len(actor_ids)`: derive it

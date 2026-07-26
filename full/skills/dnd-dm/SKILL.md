@@ -131,6 +131,7 @@ the campaign.
 | Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check` |
+| Chases | `chase_start`, `chase_query`, `chase_take_turn`, `chase_end` |
 | World continuity | `continuity_commit`, `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
@@ -138,6 +139,26 @@ the campaign.
 | DM choices | `combat_choice(open/resolve/resolve_defense)` |
 
 ## Actor Cards and Party State
+
+When a module invokes the 2014 DMG chase procedure, keep the campaign in
+`play` and load `play.chase`; do not enter combat or create a battle map.
+Read and expand the exact chase scene, then pass its service-owned
+module/scene/chunk/page/hash `source_ref` and an exact excerpt to
+`chase_start`. Include the quarry and every pursuer as canonical actors,
+preserve the printed starting distance, and add a `close_transition` only when
+the same source explicitly redirects the chase when the quarry is nearly
+caught or reaches a destination. Advance only the actor returned by
+`chase_query.current`. `chase_take_turn` owns initiative order, movement,
+the `3 + Constitution modifier` free Dash allowance, each later Dash's DC 10
+Constitution check, chase exhaustion, the Urban Chase Complications d20 and
+the next-participant rule. Supply a complication choice only from the printed
+options; do not pre-roll, patch distance, add fatigue, or apply complication
+damage separately. A visible quarry automatically fails the end-of-round
+escape check; never invent a Stealth roll while the lead pursuer still sees it.
+Chase exhaustion remains distinct evidence on the actor and every level gained
+that way ends on the next Short or Long Rest, while unrelated exhaustion
+remains. After the source-backed chase outcome, record the scene transition and
+create one verified scene checkpoint; do not checkpoint every chase turn.
 
 Every live PC, NPC, and monster is an authoritative v2 actor card. Use
 `character_query(view="get")` after every write. Use granular facade tools instead of replacing a whole

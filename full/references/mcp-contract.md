@@ -455,7 +455,7 @@ older exposure ids.
 | Phase | Intended state | Example groups |
 |---|---|---|
 | `lobby` | Game-outside setup, imports, campaign administration, character building | player-safe `lobby.characters`, `lobby.memory`; owner/DM `lobby.campaign`, `lobby.rules`, `lobby.modules`, `lobby.memory_control` |
-| `play` | Live non-combat exploration and downtime | player-safe `play.scene`, `play.characters`, `play.resolution`; owner/DM `play.scene_control`, `play.combat_control` |
+| `play` | Live non-combat exploration and downtime | player-safe `play.scene`, `play.characters`, `play.resolution`; owner/DM `play.scene_control`, `play.combat_control`, `play.chase` |
 | `combat` | Active structured encounter | player-safe `combat.observe`, `combat.turn`, `combat.actions`; owner/DM `combat.control`, `combat.save`, `combat.map` |
 
 For native clients supporting MCP `tools/list_changed`, loading or unloading a
