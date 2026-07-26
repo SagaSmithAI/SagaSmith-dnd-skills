@@ -160,6 +160,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    branch-local DM composition fact, and prepare all required cards. Include other
    printed hostiles as initial, reinforcement, or optional groups, or record the
    scene-supported reason they are absent.
+   A still-active PC does not have to be forced into every encounter. When the
+   current world state and Agent-as-DM adjudication establish that the PC remains
+   elsewhere (for example, stable and unconscious at the keep), pass one
+   `--agent-party-absence-json` entry with that `actor_id` and a concrete
+   `ruling_reason`. The driver must verify that participants plus declared
+   absences equal the live active manifest party. The absent actor remains in the
+   party and snapshot, is not added to combat, and receives no encounter
+   knowledge. Do not relabel absence as death, departure, or a player-owned
+   choice merely to satisfy the driver.
    When the source says a group starts outside the fight and must climb, cross,
    arrive, or otherwise spend time before joining, pass those actor reports as
    delayed reinforcements. Keep them out of `combat_start`; queue each through
