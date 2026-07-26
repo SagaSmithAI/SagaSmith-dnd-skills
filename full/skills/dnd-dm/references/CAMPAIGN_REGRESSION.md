@@ -237,6 +237,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    retry contract; supply Agent-owned facts and retry at the same revision.
    Missing/conflicting source review and player-owned choices must not be
    relabelled as Agent adjudication.
+   The encounter driver must preserve that same classification. It must not
+   interpret every `pending_ruling` from attack preflight or resolution as an
+   on-hit choice. A stopped auto-run reports `status`, resolver, missing facts,
+   attempted actor/target/action, and retry contract to the Agent. For
+   Sunlight Sensitivity, the Agent determines `direct_sunlight` from the
+   current scene, campaign clock, and rule card, then retries with a typed
+   `--source-attack-environment-json` declaration containing the actor, boolean
+   fact, exact trait excerpt, and explicit `ruling_reason`. An actual on-hit
+   window instead requires its returned `choice_id` and a typed
+   `--source-on-hit-ruling-json` settlement. Never substitute one boundary for
+   the other.
    When module prose establishes relative placement without a numeric map (for
    example, creatures "clustered tightly" around a door), the Agent may map that
    fact onto the temporary combat grid through repeated

@@ -88,6 +88,15 @@ when an owned pending choice window exists. Agent reasoning is not permission
 to fabricate a window, edit a raw sheet, write the database, override a player
 choice, infer missing source text, or approve an owner-only rule-pack change.
 
+Regression drivers are consumers of this contract and must return the same
+ownership metadata to the acting Agent. In particular, an attack
+`pending_ruling` with `missing=["direct_sunlight"]` is a pre-commit
+environmental adjudication, not an on-hit choice. The Agent derives the fact
+from current scene and time evidence, records its reasoning, and retries the
+same public attack at the current revision. Only a response with an actual
+pending on-hit `choice_id` may be sent to
+`combat_choice(action="on_hit_ruling")`.
+
 ## Structured content catalog
 
 For a campaign locked to 2014, the installed `dnd5e.content.srd2014` catalog
