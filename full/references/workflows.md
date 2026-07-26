@@ -59,9 +59,11 @@ own exposure. Loading a group for one Agent must not expose it to another.
    Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
    be submitted to `module_review(action="submit_content")` only with its exact
    `source_chunk_ids`. A `blocked` candidate is a stop condition: render its cited
-   managed PDF page and visually transcribe only observed fields, or leave it
-   unresolved. Never repair OCR from rules memory or silently relabel blocked
-   evidence as reviewed text.
+   managed PDF page and have an image-capable Agent or human DM transcribe only
+   observed fields, or leave it unresolved. A text-only Agent must choose the
+   unresolved path; it cannot claim to have inspected the returned image. Never
+   repair OCR from rules memory or silently relabel blocked evidence as reviewed
+   text.
 6. Set scoped progress with `module_set_progress`, including
    `current_location_key` and `state.location_scene_id` when the spatial room is a
    separate scene. The location key must be copied from the expanded scene's
@@ -86,6 +88,16 @@ own exposure. Loading a group for one Agent must not expose it to another.
    cannot be used for a check or combat.
    When the module modifies a named standard creature, import that exact rule source
    and use its source-bound `variant` whitelist; never replace the whole actor sheet.
+   If rule-source statblock creation fails only because PDF extraction lost the
+   heading or required layout, call
+   `rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
+   `name` is the exact printed creature heading, not a differently named campaign
+   instance.
+   The server performs local layout OCR and critical-fact corroboration without
+   asking the Agent to inspect an image. Retry with
+   `mode="reviewed_rule_statblock"` and the returned `review_id`. Stop for explicit
+   DM review on ambiguous headings, low confidence, or disagreement; never fill
+   the card from memory or substitute a similar creature.
    Read `module-image-content-review.md` for the distinction between an image-only
    full card and a standard card with module instance changes.
 9. Apply every confirmed class/subclass feature and complete species/background

@@ -12,7 +12,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/stage/inspect/render_page/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply` |
+| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
@@ -27,7 +27,7 @@ names or emulate aliases client-side. The consolidated calls are:
 - `chase(action="start" | "query" | "take_turn" | "end")`;
 - `character_check(action="check" | "contest")`;
 - `campaign_rules(action="core_relock")`;
-- `rule_import(action="render_page")`;
+- `rule_import(action="render_page" | "recover_statblock")`;
 - `module_review(action="render_page" | "submit_content")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
 - `combat_choice(action="on_hit_ruling")`.
@@ -35,6 +35,7 @@ names or emulate aliases client-side. The consolidated calls are:
 Every action uses only its documented payload fields. Unknown fields are an
 error, and a facade action retains the original role, phase, revision,
 idempotency, source-evidence, and random-stream boundary. In particular,
+`rule_import(render_page|recover_statblock)` is Lobby-only and DM-only;
 `module_review(submit_content)` is Lobby-only and DM-only; rendering may also be
 used by a DM during Play. Chase and contests are Play-only. On-hit rulings are
 Combat-only. Loading a facade through a lower-risk group does not authorize its
@@ -532,6 +533,21 @@ creature present in an imported rule source, use
 `character_create_from(mode="statblock")` with the imported `source_id` and, when
 needed, reviewed `chunk_ids`. The parser preserves source provenance, exact AC,
 HP, abilities, defenses, senses, weapon attacks, and structured Multiattack.
+If that path fails only because PDF extraction lost the heading or a required
+statblock structure, call DM-only Lobby
+`rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
+Use the exact printed heading for `name`; keep a differently named campaign
+instance in the later actor-creation payload.
+The server, not the Agent, finds the physical page, performs geometry-aware local
+OCR, isolates one target column, rejects low-confidence identity/core facts, and
+corroborates identity, AC, HP, Speed, all six ability scores, and Challenge
+against the target embedded-text segment. If that segment is unavailable, a
+second OCR scale must agree on the complete critical fingerprint. Use the
+returned checksum-bound `review_id` with
+`character_create_from(mode="reviewed_rule_statblock")`. This route requires no
+image understanding by the Agent. Ambiguous headings, missing page hints,
+low-confidence facts, evidence disagreement, unsupported statblocks, or parser
+warnings remain an explicit DM boundary; never repair them from model memory.
 For an image-only module card, use the reviewed visual workflow and
 `mode="module_statblock"` instead. Current automatic import supports reviewed
 English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
