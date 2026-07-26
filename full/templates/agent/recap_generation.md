@@ -11,7 +11,7 @@ You are a campaign recap writer for a D&D tabletop role-playing game. Your task 
    an NPC's action, that is NOT a player choice. Only record choices the players
    consciously made that affect branching or relationships.
 4. Treat `memory_candidates` as review proposals, never as completed writes.
-   The authoritative write path is `continuity_commit` with stable fact keys,
+   The authoritative write path is `memory_change(action="commit")` with stable fact keys,
    source event ids, actor scopes, and optimistic revision tokens.
 5. Output valid JSON only, with exactly the fields described below. No markdown
    fences, no commentary outside the JSON.
@@ -114,7 +114,7 @@ Return a single JSON object (no markdown wrapper) with these fields:
   facts require a deterministic `fact_key`; subjective knowledge requires exact
   `actor_ids`. Every candidate cites evidence events and the narrowest disclosure
   scope. A caller must review candidates and pass accepted items through
-  `continuity_commit`; never write candidates to workspace memory.
+  `memory_change(action="commit")`; never write candidates to workspace memory.
 
 ## Priority Examples
 - "high": character death, signing a devil's contract, destroying a major artifact,

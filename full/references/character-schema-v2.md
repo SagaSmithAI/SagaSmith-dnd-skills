@@ -339,5 +339,5 @@ deliberate full-sheet change. Never hand-edit one inventory entry, wallet balanc
 prepared spell, effect, or memory through a raw sheet replacement during play.
 `character memory migrate` is read-only: review its candidates, then persist
 accepted subjective entries with `actor_knowledge_change` or the
-`actor_knowledge` member of `continuity_commit`. Do not call the deprecated
+`actor_knowledge` member of `memory_change(action="commit")`. Do not call the deprecated
 character memory add/resolve compatibility commands for new runtime state.

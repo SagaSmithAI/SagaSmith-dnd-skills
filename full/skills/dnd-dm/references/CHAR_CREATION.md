@@ -203,7 +203,7 @@ limits by hand:
    [{character_id, amount, expected_revision}], reason, source_ref})`, using the
    current campaign revision. The award atomically updates all named PCs, records
    branch-local evidence, and returns threshold status; it never auto-levels.
-   Prepare a level-up event for the final `continuity_commit` that says why the
+   Prepare a level-up event for the final `memory_change(action="commit")` that says why the
    level was earned.
 2. End active combat, switch the campaign to `lobby`, read the actor's latest
    revision, verify that the milestone is earned or XP returns `eligible=true`,
@@ -253,7 +253,7 @@ limits by hand:
    current HP until a rest, spell, feature, potion, or other public healing path
    changes it; never patch it to the new maximum. Do not return to `play` while
    any required catalog item or player choice is missing.
-7. After confirmation, use `continuity_commit` for the level-up event and
+7. After confirmation, use `memory_change(action="commit")` for the level-up event and
    post-level snapshot, then return to `play` and reopen the phase-appropriate
    exposure. During full campaign regression only, a contiguous group of party
    members advancing from the same source-cited scene or downtime boundary may

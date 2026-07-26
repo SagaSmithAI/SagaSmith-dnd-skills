@@ -21,7 +21,7 @@
 6. 一次行动造成的 HP、资源、条件、位置、线索、NPC、怪物与世界变化要在同一轮完整
    写入。个人物品、钱包、装备、准备法术、效果和资源使用 `character` v2 子命令；
    共享物资使用 `party` 子命令，不能手改 JSON 或创建另一份简化角色卡。
-7. 场景结算以一次 `continuity_commit` 原子追加 event、稳定键 CampaignMemory 事实和
+7. 场景结算以一次 `memory_change(action="commit")` 原子追加 event、稳定键 CampaignMemory 事实和
    仅属于实际知情 actor 的 ActorKnowledge。NPC 的重要对话结果不能写入已弃用的
    `character memory add`，也不能把一个 NPC 的认知复制给其他角色。
 8. 新出现、获得、失去或转移的每件实物都必须是有稳定 `id`、名称和简短描述的 inventory
@@ -101,7 +101,7 @@
 
 确认规则版本正确、没有剧透、骰子可追溯、资源与条件已结算、状态写入完整、事件没有
 重复、长期事实已进入稳定键 CampaignMemory、主观信息已进入对应 ActorKnowledge，
-并在需要时通过同一次 `continuity_commit` 创建 Snapshot。
+并在需要时通过同一次 `memory_change(action="commit")` 创建 Snapshot。
 
 常用命令见仓库根目录 `references/cli-contract.md` 和 `references/workflows.md`。
 Runtime note: all state, rule, module, memory, and actor operations in Full mode

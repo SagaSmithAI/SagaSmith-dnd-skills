@@ -118,7 +118,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with
-   one `continuity_commit`. A skill label belongs in the cited evidence; use
+   one `memory_change(action="commit")`. A skill label belongs in the cited evidence; use
    `kind="check"` unless the tool contract explicitly defines another kind.
    Assign each check an explicit stable `--occurrence-id`. The run, scene, Scene
    Atlas location, check kind, ability/skill, actor, DC, proficiency,
@@ -126,7 +126,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    not identity. Separate rolls must never reuse progress, dice, continuity,
    knowledge, or manifest-sync keys even when every payload field is identical.
    If the 2014 source directly opposes two creatures' efforts, use
-   `character_contest` (or the driver's `resolve-contest`) with both actors and
+   `character_check(action="contest")` (or the driver's `resolve-contest`) with both actors and
    both abilities/skills. Never replace the contest with an invented fixed DC.
    The target and source roll modes are independent; a source instruction such
    as "the enemies make a check with advantage for the group" applies advantage
@@ -134,9 +134,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `tie_no_change` rather than declaring either side successful on a tie.
 5a. When the active route invokes the 2014 DMG chase rules, run
    `scripts.regression_chase` through the public stdio MCP exposure. Bind
-   `chase_start` to the exact expanded scene `source_ref`, excerpt, quarry,
+   `chase(action="start")` to the exact expanded scene `source_ref`, excerpt, quarry,
    pursuers, and printed starting distance. Require `mode="theater_of_the_mind"`
-   and the absence of a battle map. Let `chase_take_turn` own initiative,
+   and the absence of a battle map. Let `chase(action="take_turn")` own initiative,
    distance, Dash counts, extra-Dash Constitution checks, chase exhaustion,
    Urban Chase Complications, damage, and the server random stream. A module
    transition such as a quarry ducking into a destination is legal only when
@@ -206,11 +206,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    first attack to that actor's reviewed weapon rather than allowing generic
    weapon preference to override it. When an effect-only weapon hit opens an
    on-hit ruling, settle its printed condition and escape terms through
-   `combat_on_hit_ruling`; a restrained target uses
+   `combat_choice(action="on_hit_ruling")`; a restrained target uses
    `combat_check(action="escape")`, spends its action, and clears the condition
    only on success. When the reviewed on-hit text instead prints a saving throw
-   plus damage, use `combat_on_hit_ruling(id="saving_throw_damage")` with the
-   exact ability, DC, dice, damage type, success treatment, and excerpt. Include
+   plus damage, use `combat_choice(action="on_hit_ruling")` with
+   `payload.selection.id="saving_throw_damage"` and the exact ability, DC, dice,
+   damage type, success treatment, and excerpt. Include
    a structured zero-HP effect when printed; for a giant spider Bite this keeps
    a target reduced to 0 HP stable, Poisoned for 1 hour, and Paralyzed while
    poisoned. Never dismiss that explicit save-and-damage clause or apply only

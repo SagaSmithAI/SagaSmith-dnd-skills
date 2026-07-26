@@ -12,13 +12,35 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/stage/inspect/ingest/extract_candidates/review/compile/install/activate)`, `rule_document_page_render`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/explain/receipts)`, `character_content_apply` |
-| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_contest` |
+| Rules | `rule_import(discover/stage/inspect/render_page/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply` |
+| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review`, `module_search`, `module_expand`, `module_set_progress` |
-| Chronology | `continuity_commit`, `campaign_event(add/list)`, `memory_change(add/upsert/revise/supersede)`, `memory_query(list/search)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
+| Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
+
+The compact public contract contains exactly 82 tools, with 12 core discovery
+tools and phase ceilings of Lobby 61, Play 46, and Combat 44. Do not call retired
+names or emulate aliases client-side. The consolidated calls are:
+
+- `chase(action="start" | "query" | "take_turn" | "end")`;
+- `character_check(action="check" | "contest")`;
+- `campaign_rules(action="core_relock")`;
+- `rule_import(action="render_page")`;
+- `module_review(action="render_page" | "submit_content")`;
+- `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
+- `combat_choice(action="on_hit_ruling")`.
+
+Every action uses only its documented payload fields. Unknown fields are an
+error, and a facade action retains the original role, phase, revision,
+idempotency, source-evidence, and random-stream boundary. In particular,
+`module_review(submit_content)` is Lobby-only and DM-only; rendering may also be
+used by a DM during Play. Chase and contests are Play-only. On-hit rulings are
+Combat-only. Loading a facade through a lower-risk group does not authorize its
+other actions outside those action-level boundaries. `playthrough_manifest` and
+`combat_join` remain separate tools because their save/audit and turn-boundary
+transactions are independent.
 
 `module_search` only selects candidates. Call `module_expand` or
 `module_query(view="scene")` before narrating a module fact. Always provide the active
@@ -88,7 +110,7 @@ first and fails if it is cross-module or does not contain the recorded key; it
 must not silently select a different duplicate key elsewhere in the module.
 
 For visual evidence, an owner/DM calls `module_query(view="assets")`, then
-`module_page_render` for one page of the imported PDF. The tool returns an MCP
+`module_review(action="render_page")` for one page of the imported PDF. The tool returns an MCP
 image and registers a content-addressed derived asset. After inspecting that
 image, submit only observed edges through `module_set_progress.spatial_review`.
 Core validates same-module unique endpoints, the PDF/rendered asset and page,
@@ -100,7 +122,7 @@ omit `status` and `progress`; existing values are preserved. See
 `module-visual-atlas.md` for the full sequence and schema.
 
 When a creature card exists only in the PDF image layer, render and inspect its
-managed page, then call `module_content_review`. The MCP validates the normalized
+managed page, then call `module_review(action="submit_content")`. The MCP validates the normalized
 2014 statblock before Core stores immutable module/scene/page/asset evidence.
 Re-read it with `module_query(view="content")` and create campaign actors with
 `character_create_from(mode="module_statblock")`. See
@@ -393,8 +415,8 @@ World facts, chronology, and subjective actor knowledge are different ledgers.
 | Events | `campaign_event(add/list)` |
 | One actor's belief/knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Safe retrieved context | `continuity_context` with one shared `budget_chars` limit |
-| Atomic post-scene write | `continuity_commit` |
-| Continuity health | `continuity_diagnostics` (owner/DM only) |
+| Atomic post-scene write | `memory_change(action="commit")` |
+| Continuity health | `memory_query(view="diagnostics")` (owner/DM only) |
 
 Pass `branch_id` for an explicit historical branch. For player-safe narration,
 use `continuity_context` with the acting `actor_id`, `scope_id`, and audience;
@@ -417,7 +439,7 @@ Use the three ledgers deliberately:
 - `actor_knowledge_change` records one PC or NPC's belief, inference, secret, or
   misinformation. Revising one actor must never revise another actor's ledger.
 
-After a meaningful scene or combat outcome, call one `continuity_commit` with the
+After a meaningful scene or combat outcome, call one `memory_change(action="commit")` with the
 event, accepted fact changes, per-actor knowledge changes, and an optional
 snapshot. The transaction rolls back as a unit if any actor, revision token, or
 fact is invalid. Require a fresh `idempotency_key`; existing fact or knowledge
@@ -433,7 +455,7 @@ the branch delta. Before a restore call `snapshot_query(view="verify")`; after
 restore verify the new head and refresh campaign, characters, module progress,
 events, and continuity context.
 
-Use `continuity_diagnostics` to inspect active/inactive ledger counts, orphan
+Use `memory_query(view="diagnostics")` to inspect active/inactive ledger counts, orphan
 source-event references, unsnapshotted events, latest checkpoint size, recap
 provenance, and Skill-manifest drift. It returns health metadata rather than
 narrative content. A non-null drift or growing unsnapshotted count is an
@@ -524,7 +546,8 @@ escape/destruction procedure for DM settlement. A candidate blocked solely
 because such an attack lacks damage dice indicates an importer defect that must
 be repaired and refreshed before combat.
 If a reviewed on-hit clause prints a saving throw and additional damage,
-`combat_on_hit_ruling(id="saving_throw_damage")` validates and rolls the exact
+`combat_choice(action="on_hit_ruling")` with
+`payload.selection.id="saving_throw_damage"` validates and rolls the exact
 ability, DC, damage formula/type, and success treatment through the campaign
 random stream. A printed zero-HP rider must be supplied and settled in the same
 mutation. Explicit save-and-damage text cannot be dismissed or reduced to a
@@ -623,7 +646,7 @@ combat and `combat_check` during combat when an enabled `check.before` rule need
 DM-established `rule_facts`.
 
 When a 2014 source requires a contest, do not invent a DC or compare two
-unrelated client-side rolls. Use `character_contest` with both campaign actors,
+unrelated client-side rolls. Use `character_check(action="contest")` with both campaign actors,
 both appropriate abilities or skills, and each side's printed or reviewed
 advantage/disadvantage. The server rolls both sides in one branch-scoped
 transaction, compares totals, and records a tie as `tie_no_change`, as required
@@ -633,7 +656,7 @@ by the 2014 contest procedure. Use the full-playthrough driver's
 For source-cited playthrough checks, an idempotent retry means the exact same run,
 scene, Scene Atlas location, actor, kind, ability/skill, DC, proficiency,
 advantage/disadvantage, and checksum-addressed source chunk. Include that complete
-identity in progress, `character_check`, `continuity_commit`, ActorKnowledge, and
+identity in progress, `character_check`, `memory_change(action="commit")`, ActorKnowledge, and
 manifest-sync keys. A later check elsewhere in the same indexed scene is a new
 roll even when its actor, ability, and DC happen to match.
 
@@ -651,7 +674,7 @@ If a runtime upgrade changes the locked core fingerprint, settlement fails until
 the DM explicitly reviews and relocks the campaign profile. During active combat,
 first finish the current atomic write, call `snapshot_create`, and require
 `snapshot_query(view="verify")` to report that checkpoint valid and current. Then
-call `campaign_core_relock` with the exact old Core fingerprint from
+call `campaign_rules(action="core_relock")` with the exact old Core fingerprint from
 `campaign_rules(action="get_profile")`, current branch id, campaign revision,
 checkpoint head id, a bounded reason, and a fresh idempotency key. Re-read the
 effective profile, add a DM-visible maintenance event, and create/verify a second
@@ -695,7 +718,7 @@ All campaign-bound granular character writes require the character's current
 requires `expected_campaign_revision`, `expected_source_revision`, and
 `expected_target_revision`.
 
-`continuity_commit`, append-only `campaign_event(action="add")`, every
+`memory_change(action="commit")`, append-only `campaign_event(action="add")`, every
 `memory_change`, and `actor_knowledge_change(action="add")` require a fresh
 `idempotency_key`. Existing `memory_change(action="upsert" | "revise" |
 "supersede")` targets require the current fact `expected_revision_id`.

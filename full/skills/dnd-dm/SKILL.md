@@ -85,7 +85,7 @@ the campaign.
    without its granted feature cards and traits is an incomplete actor, not a
    usable shortcut. Never patch the raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
-8. Persist resolved scene continuity with one `continuity_commit`: one event,
+8. Persist resolved scene continuity with one `memory_change(action="commit")`: one event,
    stable-key objective fact changes, exact per-actor knowledge changes, and an
    optional snapshot. Never infer who knows a fact from the fact itself. Mark
    direct observation as `witnessed`; when an absent, unconscious, newly joined,
@@ -128,11 +128,11 @@ the campaign.
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_page_render`, `module_content_review` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
-| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_contest` |
-| Chases | `chase_start`, `chase_query`, `chase_take_turn`, `chase_end` |
-| World continuity | `continuity_commit`, `campaign_event`, `memory_change`, `memory_query` |
+| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
+| Chases | `chase(action="start")`, `chase(action="query")`, `chase(action="take_turn")`, `chase(action="end")` |
+| World continuity | `memory_change(action="commit")`, `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
@@ -144,7 +144,7 @@ When a module invokes the 2014 DMG chase procedure, keep the campaign in
 `play` and load `play.chase`; do not enter combat or create a battle map.
 Read and expand the exact chase scene, then pass its service-owned
 module/scene/chunk/page/hash `source_ref` and an exact excerpt to
-`chase_start`. Include the quarry and every pursuer as canonical actors,
+`chase(action="start")`. Include the quarry and every pursuer as canonical actors,
 preserve the printed starting distance, and add a `close_transition` only when
 the same source explicitly redirects the chase when the quarry is nearly
 caught or reaches a destination. That transition must carry its own exact
@@ -152,7 +152,9 @@ same-scene `source_ref` and `source_excerpt`, even when they point to a differen
 chunk from the chase start; its `summary` must equal that normalized excerpt.
 Never submit a caller-authored destination summary without this second citation.
 Advance only the actor returned by
-`chase_query.current`. `chase_take_turn` owns initiative order, movement,
+`chase(action="query").result.current`. For a turn, put `actor_id`,
+`turn_action`, complication choice, visibility, and the actor revision in that
+action's payload. `chase(action="take_turn")` owns initiative order, movement,
 the `3 + Constitution modifier` free Dash allowance, each later Dash's DC 10
 Constitution check, chase exhaustion, the Urban Chase Complications d20 and
 the next-participant rule. Supply a complication choice only from the printed
@@ -281,7 +283,7 @@ for each physically distinct book. Preserve its edition, exact source scene/key,
 copyability, owner mark, resolved catalog `spell_ids`, and
 `unresolved_spell_names`. A name absent from the active content catalog stays
 unresolved and non-executable; never drop it, substitute a similar spell, or
-fabricate an artifact id. Record discovery through `continuity_commit`, with the
+fabricate an artifact id. Record discovery through `memory_change(action="commit")`, with the
 objective item fact and separate ActorKnowledge entries only for actual witnesses.
 
 Discovery does not add spells to a Wizard's personal spellbook. During `play`,
@@ -652,14 +654,16 @@ damage expression plus the exact `on_hit_effect`; resolve the attack roll
 normally, apply no fabricated HP damage, and send the printed condition and
 escape/destruction procedure to explicit DM settlement. A hit that returns
 `pending_on_hit_ruling_id` blocks the turn: call public
-`combat_on_hit_ruling` with the printed condition, escape DC, permitted
+`combat_choice(action="on_hit_ruling")` with the target as `actor_id` and the
+pending `choice_id` plus printed condition, escape DC, permitted
 abilities, and an exact excerpt. If applied, keep the resulting ongoing effect
 on the target. On that target's turn, use
 `combat_check(action="escape")`; it must spend the action, roll the effect's
 recorded ability and DC, and remove the condition only on success. Never narrate
 an escape, patch a condition, or ignore the ruling window. If the reviewed
 `on_hit_effect` instead requires a saving throw and additional damage, call
-`combat_on_hit_ruling` with `id="saving_throw_damage"` plus the exact printed
+`combat_choice(action="on_hit_ruling")` with
+`payload.selection.id="saving_throw_damage"` plus the exact printed
 ability, DC, damage formula/type, success treatment, and source excerpt. Supply
 the exact structured zero-HP effect when present; the giant spider Bite, for
 example, makes a target reduced to 0 HP stable, Poisoned for 1 hour, and

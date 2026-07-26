@@ -20,7 +20,7 @@ and `source_bound_rule_packs` to be true. Consume the published
    silently publish mechanics. Scanned or corrupt-text PDFs may make the first
    inspection slow because OCR is selective and page based.
 4. For a PDF warning or a candidate that needs visual confirmation, call
-   `rule_document_page_render` with the same job id and exact one-based
+   `rule_import(action="render_page")` with the same job id and exact one-based
    `page_number`. Compare the returned checksum-bound image with the normalized
    heading, chunk, or candidate. Do not accept a warning from text alone when the
    disputed source page is available.
@@ -52,7 +52,7 @@ and `source_bound_rule_packs` to be true. Consume the published
    the latest campaign revision.
 11. During non-combat play, use `character_check` for a rule-aware check. During
     combat, use `combat_check`. For a 2014 opposed check, use the atomic
-    `character_contest` tool and supply rule facts independently for each side.
+    `character_check(action="contest")` tool and supply rule facts independently for each side.
     DM-established situational facts go in `rule_facts`; they cannot override
     actor, check kind, ability, or DC.
 12. Verify the result with `campaign_rules(action="explain")` and

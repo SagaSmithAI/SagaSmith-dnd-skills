@@ -44,7 +44,7 @@ write may omit `status` and `progress` so their current values remain unchanged.
 If the scene text names a creature but its appendix card is missing because the
 PDF stored it as an image, follow
 `../../../references/module-image-content-review.md`. Render and inspect the
-managed page, validate an immutable `module_content_review`, then create exact
+managed page, validate an immutable `module_review(action="submit_content")`, then create exact
 actors from its review id in lobby. Do not substitute another creature or create
 the missing card after combat starts.
 

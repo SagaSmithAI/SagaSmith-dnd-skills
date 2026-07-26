@@ -10,7 +10,7 @@ First call `module_query(view="candidates")` for the exact module. Route by the
 returned `execution_state`:
 
 - For `review_ready`, inspect `normalized_content`, validation, scene, and every
-  source chunk. Submit that exact normalized text to `module_content_review` with
+  source chunk. Submit that exact normalized text to `module_review(action="submit_content")` with
   the returned `scene_id` and `source_chunk_ids`; do not replace text evidence
   with a page-memory reconstruction.
 - For `blocked`, do not submit the candidate as text evidence. Use the managed
@@ -23,13 +23,13 @@ returned `execution_state`:
    confirm that the normalized text does not contain an executable statblock, or
    that the candidate was explicitly blocked by the evidence gate.
 2. Use `module_query(view="assets")`, select the managed PDF, and call
-   `module_page_render` for the cited page. Inspect the returned image itself.
+   `module_review(action="render_page")` for the cited page. Inspect the returned image itself.
 3. Transcribe only visible card facts into canonical English 2014 statblock
    Markdown. Preserve the exact name, size/type/alignment, AC, HP formula, speed,
    six abilities, listed saves/skills/defenses/senses/languages, CR/XP, headings,
    attack bonus, reach/range, damage dice, damage bonus, and damage type. Do not
    fill an absent field from memory or a similar creature.
-4. Call `module_content_review` with the appendix `scene_id`, stable
+4. Call `module_review(action="submit_content")` with the appendix `scene_id`, stable
    `content_key`, normalized Markdown, managed PDF or rendered-image asset,
    1-based page, a literal visual observation, and a fresh idempotency key.
 5. Stop if validation rejects the card. If it returns `mixed`, review every

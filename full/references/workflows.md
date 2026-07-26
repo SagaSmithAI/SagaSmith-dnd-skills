@@ -51,13 +51,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    parser found no source-backed topology.
    If a PDF map contains required topology, use
    `module-visual-atlas.md`: `module_query(view="assets")` ->
-   `module_page_render` -> visual inspection ->
+   `module_review(action="render_page")` -> visual inspection ->
    `module_set_progress(spatial_review=...)`. Never infer an edge from room order.
    If an appendix statblock is image-only, use `module-image-content-review.md`:
-   render and inspect the page, submit `module_content_review`, re-read the
+   render and inspect the page, submit `module_review(action="submit_content")`, re-read the
    immutable evidence, then use `character_create_from(mode="module_statblock")`.
    Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
-   be submitted to `module_content_review` only with its exact
+   be submitted to `module_review(action="submit_content")` only with its exact
    `source_chunk_ids`. A `blocked` candidate is a stop condition: render its cited
    managed PDF page and visually transcribe only observed fields, or leave it
    unresolved. Never repair OCR from rules memory or silently relabel blocked
@@ -95,7 +95,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
     the campaign clock and use one atomic `campaign_change(action="party_rest")`
     for all named members; do not call individual long rests.
 11. Only after every campaign resource has activated and all actors have passed
-    their completeness checks, record the opening with one `continuity_commit`:
+    their completeness checks, record the opening with one `memory_change(action="commit")`:
     include the opening event,
     deterministic-key objective facts, per-actor knowledge only for actual
     witnesses, and the initial snapshot. Supply a fresh `idempotency_key` and the
@@ -259,7 +259,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Use `rule_pack_query(view="test")` and inspect the installed inactive pack.
    Activation requires explicit DM approval and a fresh campaign revision.
 5. Settle checks with `character_check` in play or `combat_check` in combat. For
-   a 2014 opposed check, use one atomic `character_contest` call instead of
+   a 2014 opposed check, use one atomic `character_check(action="contest")` call instead of
    inventing a DC or comparing client-side rolls. Then audit
    `campaign_rules(action="receipts")`.
 
@@ -269,7 +269,7 @@ Load owner/DM `play.scene_control` before the following chronology and save
 writes. A player Agent uses `play.scene` and receives only audience-safe events,
 continuity, and its authorized actor knowledge.
 
-1. Build one `continuity_commit` payload from the structured `combat_end` or scene
+1. Build one `memory_change(action="commit")` payload from the structured `combat_end` or scene
    outcome. Include exactly one event, accepted objective fact changes, each
    affected actor's knowledge changes, and the snapshot request.
 2. Use `audience_scope="actor"` and owner-scoped ActorKnowledge for a witnessed

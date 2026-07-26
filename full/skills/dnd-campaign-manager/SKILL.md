@@ -68,11 +68,11 @@ replaces the earlier exposure, so discard every older exposure id.
    branch-aware, and snapshot-restorable; do not edit immutable import metadata.
    If a required creature card exists only as a PDF image, follow
    `../../references/module-image-content-review.md`: render and inspect the page,
-   submit `module_content_review`, re-read `module_query(view="content")`, and
+   submit `module_review(action="submit_content")`, re-read `module_query(view="content")`, and
    create the actor with `mode="module_statblock"` before play or combat.
    Inspect `module_query(view="candidates")` as a separate evidence gate.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
-   `module_content_review`; `blocked` candidates require a rendered managed page
+   `module_review(action="submit_content")`; `blocked` candidates require a rendered managed page
    and literal visual transcription. Never fill OCR gaps from memory.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
@@ -102,6 +102,12 @@ rulings require review but must not be erased from the readiness report. A
 or thrown ranges before switching to combat. The universal `unarmed-strike`
 fallback does not make an incomplete imported weapon or spell automatically
 settled.
+
+Keep each required count independent of the selected actor list. Derive it from
+the expanded source group or from a recorded, server-rolled encounter-table result,
+and pass both that count and its source basis to the regression driver. Never use
+the number of actors already selected by a filter as the expected count: that
+would allow an omitted combatant to validate the same incomplete manifest.
 
 When one indexed scene contains many numbered rooms, advance by the imported room
 chunk rather than assuming every room is a top-level scene. Search the exact room
@@ -166,6 +172,23 @@ source event as DM-only unless a PC has actually witnessed or learned it. Never
 fabricate a heal followed by nonlethal damage merely to obtain the same sheet
 conditions.
 
+During ordinary combat, a capture uses the Core knockout rule at the instant a
+melee attack would reduce the target to 0 HP. Preflight and resolve that exact
+melee attack with `action.knock_out=true`; never record a narrative capture after
+a ranged attack, lethal spell, or already-completed kill. In 2014 the resulting
+creature must be at 0 HP, Unconscious, Stable, and not Dead. Keep the captured
+actor and its ActorKnowledge ledger intact, and use the combat result as the
+source for any later interrogation or prisoner quest state.
+
+Do not interrogate that creature while it remains Unconscious. Under the 2014
+condition it is incapacitated and unaware of its surroundings, so a social check
+cannot make it answer. Restore consciousness through an actual legal effect such
+as healing, or use the server random stream for the stable creature's printed
+1d4-hour recovery to 1 HP. Persist the spent spell slot, time, HP, and remaining
+conditions before the check. A failed interrogation is final for that attempt:
+record only the refusal and do not reroll until the fiction supplies a genuinely
+new attempt. Do not leak the hidden answer into any actor's knowledge ledger.
+
 For normal play, mutate only the affected structure:
 
 ```text
@@ -214,14 +237,14 @@ fields are listed in `../../references/mcp-contract.md`.
 
 | Need | MCP tool |
 |---|---|
-| Commit a scene and optional save | `continuity_commit` |
+| Commit a scene and optional save | `memory_change(action="commit")` |
 | Create/list an administrative save | `snapshot_create`, `snapshot_query(view="list")` |
 | Validate / inspect lineage | `snapshot_query(view="verify" | "lineage")` |
 | Restore without deleting future history | `snapshot_restore` |
 | Regenerate recap | `snapshot_query(view="recap")` |
 | List/create/switch timeline | `branch_query`, `branch_change` |
 | Audit / undo / redo | `state_revision(history/undo/redo)` |
-| Inspect continuity health | `continuity_diagnostics` |
+| Inspect continuity health | `memory_query(view="diagnostics")` |
 
 Restore is a branch fork, never destructive overwrite. Verify the target first,
 then refresh campaign actors, party state, scene progress, events, and continuity
@@ -234,7 +257,7 @@ Use `memory_change/query` for branch-scoped durable world facts and
 revision-safe upserts; supersede obsolete facts instead of deleting them. Use
 `actor_knowledge_change/query` only for one PC/NPC/monster's subjective knowledge.
 
-After a resolved scene, use one `continuity_commit` for the event, objective fact
+After a resolved scene, use one `memory_change(action="commit")` for the event, objective fact
 revisions, actor-specific knowledge, and optional snapshot. Require a fresh
 idempotency key, plus current fact/knowledge revision ids for updates. A failed
 member rolls back the whole continuity unit. The individual ledgers remain valid

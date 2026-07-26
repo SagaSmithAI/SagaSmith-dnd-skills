@@ -28,7 +28,7 @@ Chroma、artifact 文件或本地 D&D CLI。
 - 金币、物品、弹药和跨角色变化必须使用对应 granular MCP tool。
 - 跨实体操作属于一个 mutation group，一次 undo/redo 必须整体恢复。
 - revision conflict 时重新读取和审查，禁止覆盖新状态。
-- 场景结算使用一次 `continuity_commit` 原子写入 event、稳定键 world facts、
+- 场景结算使用一次 `memory_change(action="commit")` 原子写入 event、稳定键 world facts、
   逐 actor knowledge 和可选 snapshot；更新已有事实或知识时携带各自的
   `expected_revision_id`。
 

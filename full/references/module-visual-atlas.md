@@ -14,8 +14,9 @@ reviewed topology.
 2. Call `module_query(view="assets", payload={"module_id": ...})`. Select the
    imported `application/pdf` asset; do not read an arbitrary local path.
 3. Locate a candidate page from scene page ranges or expanded source text, then
-   call `module_page_render(campaign_id, module_id, page_number,
-   source_asset_id)`. Inspect the returned image itself. Text extraction, room
+   call `module_review(action="render_page")` with `campaign_id` and a payload
+   containing `module_id`, `page_number`, and optional `source_asset_id`.
+   Inspect the returned image itself. Text extraction, room
    numbering, heading order, and a generic cross-reference are not visual proof.
    When using `exposure_call`, read provenance from its JSON envelope and inspect
    the separately forwarded MCP image content block; the fallback deliberately
