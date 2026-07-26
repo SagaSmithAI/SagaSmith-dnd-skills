@@ -83,4 +83,6 @@ The canonical 2014 Rogue Cunning Action feature uses the same tool with
 `declaration.action` set to Dash, Disengage, or Hide. Dash and Disengage settle
 their deterministic tactical effect. Hide pays and records the bonus-action
 declaration but still requires a DM ruling for eligibility and observation; do
-not pay a second action or infer Hidden from the card text alone.
+not pay a second action or infer Hidden from the card text alone. The SagaSmith
+Agent performs that ruling from the scene, positions, senses, and exact rule by
+default.

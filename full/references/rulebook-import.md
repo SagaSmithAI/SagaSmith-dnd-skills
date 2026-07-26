@@ -9,8 +9,10 @@ and `source_bound_rule_packs` to be true. Consume the published
 ## End-to-end workflow
 
 1. Read `storage_status.rules.import_roots`, then call
-   `rule_import(action="discover")`. The DM must select a returned document under
-   one of these roots. Never copy or invent a path supplied by an untrusted player.
+   `rule_import(action="discover")`. The SagaSmith Agent acting as DM selects an
+   exact returned document under one of these roots. Ask the owner only when the
+   requested document is ambiguous or activation authority is missing. Never
+   copy or invent a path supplied by an untrusted player.
 2. Call `rule_import(action="stage")` with the discovered `payload.source_path`, `source_key`,
    title, edition, locale, publication id, and version. Keep the returned `job_id`,
    artifact name, and source checksum.
@@ -24,8 +26,9 @@ and `source_bound_rule_packs` to be true. Consume the published
    `rule_import(action="render_page")` with the exact one-based page. A text-only
    Agent must not call page rendering and pretend it inspected the image; keep
    the warning blocked until a capable reviewer records the decision.
-5. Call `rule_import(action="ingest")`. If and only if the DM reviewed all warnings,
-   pass `payload.acknowledge_warnings=true`. This uses the same Core PDF/Markdown
+5. Call `rule_import(action="ingest")`. If and only if the Agent acting as DM
+   reviewed all warnings from available exact evidence, pass
+   `payload.acknowledge_warnings=true`. This uses the same Core PDF/Markdown
    normalization path as module documents and stores page-aware retrieval chunks.
    Normalized and page-extraction results are content-addressed, so exact retries and
    later parser passes reuse verified work instead of repeatedly decoding/OCRing the PDF.
@@ -47,7 +50,8 @@ and `source_bound_rule_packs` to be true. Consume the published
    `mode="reviewed_rule_statblock"` and its returned `review_id`.
 8. If recovery cannot locate exactly one heading, the two evidence paths disagree,
    a critical field has low confidence, or no page can be inferred, stop at
-   explicit DM review. A capable reviewer may render the exact page and transcribe
+   explicit missing/conflicting-source review. A capable reviewer may render the
+   exact page and transcribe
    only observed fields through `rule_import(action="review_statblock")`. A
    text-only Agent must not repair tokens from rules memory, select a similar SRD
    creature, or acknowledge a conflict as success.
@@ -62,17 +66,18 @@ and `source_bound_rule_packs` to be true. Consume the published
    Do not use an unbound draft for a
    user-imported executable rule. The server replaces every chunk id with a canonical
    source/checksum/page citation and rejects a chunk from another source.
-11. Call `rule_pack_query(view="test" | "inspect")`. Show failures and parser
-   warnings to the DM. Install only a validated exact version with
+11. Call `rule_pack_query(view="test" | "inspect")`. The Agent acting as DM
+   reviews failures and parser warnings from exact evidence. Install only a validated exact version with
    `rule_import(action="install")` or `rule_pack_change(action="install")`.
-12. After explicit DM approval, read `campaign_rules(action="get_profile")` and
+12. After explicit campaign-owner/DM approval, read
+   `campaign_rules(action="get_profile")` and
    activate the reviewed import with `rule_import(action="activate")`, or pin a
    separately installed version with `campaign_rules(action="set_pack")`, using
    the latest campaign revision.
 13. During non-combat play, use `character_check` for a rule-aware check. During
     combat, use `combat_check`. For a 2014 opposed check, use the atomic
     `character_check(action="contest")` tool and supply rule facts independently for each side.
-    DM-established situational facts go in `rule_facts`; they cannot override
+    Agent-as-DM-established situational facts go in `rule_facts`; they cannot override
     actor, check kind, ability, or DC.
 14. Verify the result with `campaign_rules(action="explain")` and
     `campaign_rules(action="receipts")`. A receipt must contain the imported chunk id, original

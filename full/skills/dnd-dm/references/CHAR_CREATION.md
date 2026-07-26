@@ -48,9 +48,12 @@ unsupported, keep it unresolved instead of substituting a similar creature.
 
 Do not equate a missing module party-size range with four PCs. After complete
 text search and visual review prove that the module is silent, a regression may
-continue only after an explicit DM review records that negative finding and an
-exact enabled-rule fallback. Keep the reviewed count and rule checksum on the
-party manifest and mark it as a DM decision, not a module recommendation. Build
+continue only after the SagaSmith Agent acting as DM records that negative
+finding and an exact enabled-rule fallback. Missing or conflicting text/image
+evidence still requires a capable external source review. Keep the reviewed
+count and rule checksum on the
+party manifest and mark it as an Agent-as-DM decision, not a module
+recommendation. Build
 the reviewed number of seats only after this gate; continue to prefer every
 applicable module pregen within those seats.
 

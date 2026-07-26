@@ -59,7 +59,12 @@ activities, generic spell effects, Ready releases, environmental facts, and
 module-specific procedures.
 `server_capabilities.ruling_policy` publishes this split for cold-start Agents;
 use it instead of treating every `pending_ruling` as the same kind of missing
-input.
+input. For the fixed 12-tool Agent path, every `exposure_call` result whose live
+status is `pending_ruling` also carries `ruling_resolution` and a policy
+reference. Its default resolver is `agent`; a result explicitly classified as
+one of the external-input exceptions instead names `external_input`. This
+annotation assigns the next work; it does not claim that the effect has already
+settled.
 
 The Agent must preserve the transaction boundary. It reads whether the first
 call already paid an action, Reaction, use, slot, or other resource; adjudicates
@@ -175,9 +180,9 @@ starting play.
 
 When `combat_start` has a current scene (or receives `scene_id`), the server
 creates and freezes an encounter-local `battle_map`. It may enforce supplied
-grid bounds and DM-confirmed blocked cells, but never invents walls, line of
+grid bounds and Agent-as-DM-confirmed blocked cells, but never invents walls, line of
 sight, doors, terrain cost, or a global tactical map. Use `combat_map_patch`
-only for DM-confirmed world changes; it stores the patch in the encounter audit
+only for Agent-as-DM-confirmed world changes; it stores the patch in the encounter audit
 and the scene runtime state. End combat before treating that temporary map as a
 different scene or module revision. When progress references a same-module
 spatial scene, map `source.scene_id` identifies that spatial evidence and
@@ -267,8 +272,9 @@ first and preserve its exact source reference/checksum; build only the seats sti
 missing from the module's source-cited maximum recommended party size. This
 precedence is a quality gate, not a party-composition suggestion.
 If complete text search plus visual review proves that the module states no
-party-size range, keep the gate blocked until a DM review records the reviewed
-pages and searches, selected count, exact enabled-rule fallback and checksum, and
+party-size range, keep the gate blocked until the SagaSmith Agent acting as DM
+records the reviewed pages and searches, selected count, exact enabled-rule
+fallback and checksum, and
 `represented_as_module_recommendation=false`. A completed review may unblock
 party construction; a silent default to four or a semantically unrelated search
 hit may not.
@@ -573,7 +579,8 @@ returned checksum-bound `review_id` with
 `character_create_from(mode="reviewed_rule_statblock")`. This route requires no
 image understanding by the Agent. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
-warnings remain an explicit DM boundary; never repair them from model memory.
+warnings remain an explicit missing/conflicting-source review boundary; never
+repair them from model memory.
 For an image-only module card, use the reviewed visual workflow and
 `mode="module_statblock"` instead. Current automatic import supports reviewed
 English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
@@ -584,7 +591,7 @@ still an executable attack even when it prints no damage dice (for example, a
 giant spider's Web). Preserve an empty damage expression and the complete
 `on_hit_effect`; never invent zero damage, an ability-modifier damage value, or
 a substitute attack. On a hit, leave HP unchanged and surface the effect and any
-escape/destruction procedure for DM settlement. A candidate blocked solely
+escape/destruction procedure for Agent-as-DM settlement. A candidate blocked solely
 because such an attack lacks damage dice indicates an importer defect that must
 be repaired and refreshed before combat.
 If a reviewed on-hit clause prints a saving throw and additional damage,
@@ -651,7 +658,8 @@ exact normalized substring of that same module scene; it is not a fuzzy query an
 a paraphrase or another occurrence of the room label is rejected. `ready=true`
 means that the actor may enter combat, not that every card entry is automatic.
 `required_count` is the complete branch-local group count established by the
-source, a recorded source-table roll, or an explicit DM composition fact. It is
+source, a recorded source-table roll, or an explicit Agent-as-DM composition
+fact. It is
 not derived from the current length of `actor_ids`; missing cards must keep the
 group unready. If an excerpt names a larger count or additional hostile groups,
 manifest the complete composition or record the source-supported branch change
@@ -809,8 +817,9 @@ an authored opening condition.
 When a source-bound weapon records additional typed damage, one successful hit
 rolls all parts and applies per-type defenses as one simultaneous damage instance.
 The result's `damage.roll_parts` preserves every roll. A nonempty
-`on_hit_ruling` means damage is committed while the quoted secondary condition or
-choice still requires explicit DM settlement; it is not permission to repeat the hit.
+`on_hit_ruling` means damage is committed while the quoted secondary condition
+or choice still requires explicit Agent-as-DM settlement; it is not permission
+to repeat the hit.
 For 2014 surprise, first satisfy any imported scene prerequisites that merely
 avoid automatic detection, then resolve each hiding actor's canonical Stealth
 check and compare the individual results with each opposing creature's passive
@@ -827,14 +836,17 @@ the actor's ordinary Attack action (including a real Extra Attack feature); it i
 not inflated from a monster's Multiattack card. Pass a canonical
 `multiattack_option_id` only when selecting that structured Multiattack and omit
 it for one ordinary weapon attack. A descriptive Multiattack without executable
-options requires a DM ruling only if selected and must not disable ordinary attacks.
+options requires an Agent-performed DM ruling only if selected and must not
+disable ordinary attacks.
 With valid grid positions, `combat_movement(action="move")`
 verifies the declared five-foot grid distance and creates an owned
 `opportunity_attack` reaction window only when a mover leaves an eligible
 hostile's reach; `combat_reaction_attack` settles that window and its attack in
 one mutation. Collision, terrain, forced movement, line of sight, unrecorded
-triggers, and narrative consequences remain explicit DM choices through
-`combat_choice(action="open" | "resolve" | "resolve_defense")`.
+triggers, and narrative consequences remain Agent-performed DM adjudications.
+Use the relevant public map, check, dice, state, memory, and manifest tools;
+use `combat_choice` only when an owned pending window already exists, and never
+fabricate a window merely to store the ruling.
 `combat_common_action` settles the action payment for Dash, Disengage, Dodge,
 Help, Hide, Search, Influence, Study, Utilize/Use an Object, and non-spell Ready
 without inventing their narrative result;
@@ -905,7 +917,8 @@ transaction instead:
    Declining rearms the same held spell for a later occurrence before expiry.
 
 For a generic non-spell Ready action, use `combat_common_action(action="ready")`,
-then let the DM confirm the trigger with `combat_ready(action="trigger_action")`
+then let the Agent acting as DM confirm the trigger with
+`combat_ready(action="trigger_action")`
 and let the actor release or decline with `combat_ready(action="resolve_action")`. Releasing pays
 the reaction and returns `pending_ruling`; it never fabricates the declared
 effect.
@@ -916,11 +929,12 @@ dissipates it without effect. When a normally-concentration spell is released,
 its original concentration duration continues; otherwise the holding effect
 ends. Release returns `pending_ruling`, because targeting, spell attacks, saves,
 damage, areas, and narrative consequences still require the relevant settlement
-tools and DM decisions. Reaction spells and activities otherwise require an
+tools and Agent-performed DM decisions. Reaction spells and activities otherwise require an
 owned pending reaction window; they cannot be invoked merely because it is not
 the actor's turn.
 Numeric attack modifiers and damage formulas supplied by a client are ignored;
-they must come from `derived.inventory.weapon_attacks` or an explicit DM ruling.
+they must come from `derived.inventory.weapon_attacks` or an explicit
+Agent-performed DM ruling.
 
 Every combat write should provide `expected_revision` and `idempotency_key`.
 `combat_preflight_attack` never mutates; `combat_resolve_attack`,
@@ -1045,8 +1059,10 @@ incorrectly replay an earlier rest.
 2014 Long Rest may require an explicit
 `hit_dice_recovery` allocation across multiclass pools. A 2024 Long Rest restores
 all expended Hit Dice; exhaustion falls by one. In 2014 exhaustion recovery needs
-the DM-confirmed `food_and_drink=true` condition. Timed card effects advance at
-the ending actor's turn; any narrative rest consequence remains a DM ruling. A
+the Agent-as-DM-confirmed `food_and_drink=true` condition, derived from current
+state rather than requested from a separate human by default. Timed card effects
+advance at the ending actor's turn; any narrative rest consequence remains an
+Agent-performed DM ruling. A
 resource marked `recovers_on: short_rest` also recovers on a Long Rest; the marker
 means the earliest rest that restores it, not that a longer rest fails to do so.
 When a 2014 prepared caster changes its complete list, record light preparation
@@ -1074,7 +1090,8 @@ uses the recorded `pact_magic.slot_level` and is counted as a slot expenditure.
 A custom source-bound statblock spell whose component details were not present in
 the reviewed card requires `component_ruling.source_components_confirmed=true`
 before it pays an action, slot, or concentration. Confirm this only from an
-explicit DM ruling or an active exact spell rule; the later `pending_ruling`
+explicit Agent-performed DM ruling or an active exact spell rule; the later
+`pending_ruling`
 still covers targets and effects.
 
 `module_set_progress` requires the current `expected_state_version` for that

@@ -75,8 +75,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - Do not load entire rulebooks or modules into context.
 - For user rulebooks, use the staged Core parser workflow in
   `references/rulebook-import.md`; never make an imported PDF executable without
-  source-bound chunks, validation, and explicit DM activation. Inspection warnings
-  require an explicit DM acknowledgement before ingest; never bypass that gate.
+  source-bound chunks, validation, and explicit campaign-owner activation. The
+  Agent acting as DM reviews inspection warnings from exact text or page evidence
+  before acknowledging ingest; missing/conflicting evidence remains an external
+  review boundary. Never bypass either gate.
 - For module maps or diagrams, follow `references/module-visual-atlas.md`.
   Text parsing remains fail-closed; only an inspected page image may support a
   `reviewed_image` connection.

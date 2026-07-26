@@ -194,7 +194,8 @@ rule effect. `point_cost` supports spell-point variants. The authoritative daily
   `choices.reaction_defense = {kind: "armor_class_bonus", bonus,
   attack_modes, requires_visible_attacker, requires_wielded_melee_weapon}` on a
   Reaction activity. This is a conditional post-hit mechanic, never a permanent
-  AC modifier. Unstructured reaction prose remains a DM ruling.
+  AC modifier. Unstructured reaction prose remains an Agent-performed DM ruling
+  by default.
 - `content.selections` records structural catalog choices that are represented
   elsewhere on the sheet, such as background and subclass. Each entry retains
   `artifact_id`, kind, name, exact pack id/version, rule/mechanic references,
@@ -256,7 +257,8 @@ otherwise armor or `combat.ac.base`; then shield, equipped magic-item AC bonuses
 and supported active effects. `derived.armor_class_breakdown` explains every
 applied source. A supported effect change uses
 `{ "path": "derived.armor_class", "mode": "add|override", "value": <integer> }`.
-Other effect changes remain in `derived.unresolved_rules` for DM adjudication.
+Other effect changes remain in `derived.unresolved_rules` for Agent-performed
+DM adjudication.
 
 Actor effects remain in `sheet.effects`. Effects attached to a room, object,
 scene, or the campaign instead live in `campaign.state.world_effects` and are
@@ -287,7 +289,8 @@ smaller clock advances. It must be non-negative and smaller than the duration
 unit; clients must not author, round, or patch it. The runtime permits at most one
 active concentration effect. It lists
 effect changes it cannot derive automatically in `derived.unresolved_rules`; the
-DM must read the rules before narrating their result.
+The SagaSmith Agent acting as DM must read the rules before narrating their
+result.
 When the exact Invisibility spell effect ends—by attack, spell cast, duration,
 failed/replaced concentration, or Incapacitation—the runtime also removes the
 condition it granted. Incapacitated, Paralyzed, Petrified, Stunned,

@@ -29,8 +29,9 @@ replaces the earlier exposure, so discard every older exposure id.
 3. Read `campaign_rules(action="get_profile")` and
    `campaign_rules(action="explain")`. Confirm the locked Core provider matches
    the selected edition. For an existing campaign, change the profile only in
-   `lobby`, with the fresh campaign revision and an explicit DM decision, before
-   any character option is applied.
+   `lobby`, with the fresh campaign revision and explicit campaign-owner/DM
+   approval, before any character option is applied. The Agent must not infer
+   this approval from its adjudication role.
 4. Resolve the caller's stable `principal_id`; use
    `access_grant(scope="campaign" | "actor")` for access instead of treating
    `player_name` as authorization.

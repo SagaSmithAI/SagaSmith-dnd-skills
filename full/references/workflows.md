@@ -96,8 +96,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    The server performs local layout OCR and critical-fact corroboration without
    asking the Agent to inspect an image. Retry with
    `mode="reviewed_rule_statblock"` and the returned `review_id`. Stop for explicit
-   DM review on ambiguous headings, low confidence, or disagreement; never fill
-   the card from memory or substitute a similar creature.
+   source review on ambiguous headings, low confidence, or disagreement. This is
+   the missing/conflicting-source exception to Agent-owned DM rulings and may
+   require an image-capable reviewer; never fill the card from memory or
+   substitute a similar creature.
    Read `module-image-content-review.md` for the distinction between an image-only
    full card and a standard card with module instance changes.
 9. Apply every confirmed class/subclass feature and complete species/background
@@ -170,8 +172,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `derived.attacks_per_action`. To choose a source statblock Multiattack, pass one
    `derived.multiattack_options` id on the first attack and consume only its
    remaining source-defined entries. Omit the id to choose one ordinary Attack.
-   An unstructured/descriptive Multiattack remains a DM boundary but never blocks
-   that ordinary single weapon attack.
+   An unstructured/descriptive Multiattack remains an Agent-as-DM adjudication
+   boundary but never blocks that ordinary single weapon attack.
 3. When an attack returns `pending_reaction`, read the target's
    `combat_query(view="reactions")`, then use
    `combat_choice(action="resolve_defense")`. Do not roll or apply damage twice.
@@ -269,7 +271,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
 3. Compile only safe declarative IR through `rule_pack_compile` when a separate
    reviewed mechanic is needed. Arbitrary code is never executable rule content.
 4. Use `rule_pack_query(view="test")` and inspect the installed inactive pack.
-   Activation requires explicit DM approval and a fresh campaign revision.
+   Activation requires explicit campaign-owner/DM approval and a fresh campaign
+   revision; the Agent must not infer that approval from its own adjudication.
 5. Settle checks with `character_check` in play or `combat_check` in combat. For
    a 2014 opposed check, use one atomic `character_check(action="contest")` call instead of
    inventing a DC or comparing client-side rolls. Then audit

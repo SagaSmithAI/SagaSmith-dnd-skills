@@ -65,8 +65,9 @@ the campaign.
    `rule_import` in order: `stage` -> `inspect` -> `ingest` ->
    `extract_candidates` -> `review` -> `compile` -> `install` -> `activate`, then
    search/expand the exact source. Compile a separate source-bound mechanic with
-   `rule_pack_compile(action="from_source")` only after review, install it inactive,
-   show the DM its report, and enable an exact version only with explicit DM approval. Never change the
+   `rule_pack_compile(action="from_source")` only after review, install it
+   inactive, have the Agent acting as DM inspect its report, and enable an exact
+   version only with explicit campaign-owner/DM approval. Never change the
    lock during combat or silently substitute a missing version.
    `campaign_rules(action="explain")` must also show the locked `dnd5e.core.2014` or
    `dnd5e.core.2024` provider; treat a missing or mismatched core fingerprint as
@@ -173,7 +174,8 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
-| DM choices | `combat_choice(open/resolve/resolve_defense)` |
+| Owned pending combat windows | `combat_choice(resolve/resolve_defense/on_hit_ruling)` |
+| Agent DM adjudication without an owned window | Relevant public dice, check, map, state, memory, and manifest tools |
 
 ## Actor Cards and Party State
 
@@ -275,7 +277,9 @@ unattuned shield still grants its ordinary shield benefit but no magical bonus.
 Do not transfer an item while its state is `attuned`; transfer neither grants
 the recipient attunement nor, by itself, satisfies any 2014 condition that ends
 the original bond. If an attunement prerequisite cannot be proven from the
-actor card and source, do not set the confirmation and stop for DM review.
+actor card and exact source, do not set the confirmation. The Agent first
+searches the locked rules and imported source; only missing or conflicting
+evidence goes to external source review.
 For a source-authored combat sequence, keep each opening item cast in printed
 order and call `combat_cast_spell` with `source_item_id`. Its item-specific
 casting time remains authoritative even when the underlying spell card normally
@@ -469,27 +473,28 @@ A source-bound weapon can carry multiple simultaneous typed damage parts. Let th
 engine roll every recorded part and apply resistance, immunity, and vulnerability
 per type as one hit; never collapse them into one type or manually add the second
 part. If the same hit also returns `on_hit_ruling.required`, the damage is already
-committed but the quoted secondary effect is still a DM boundary. Resolve that
-effect explicitly and do not silently omit it or apply the damage again.
+committed but the quoted secondary effect is still an Agent-as-DM boundary. Resolve that
+effect through Agent-as-DM adjudication and do not silently omit it or apply the
+damage again.
 
 Multiattack is a distinct action choice. For a structured monster Multiattack,
 pass `multiattack_option_id` on its first `combat_preflight_attack` and
 `combat_resolve_attack`, then make only the exact weapon/mode/count sequence still
 recorded by that option. Omit the id to choose one ordinary Attack. A descriptive
-Multiattack without options remains a DM boundary only when selected and does not
+Multiattack without options remains an Agent-as-DM boundary only when selected and does not
 block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
 override. A melee weapon with the Thrown property remains a
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
-On a positioned combat map, a ranged attack without a recorded normal range is a
-DM-ruling boundary, never permission to skip distance enforcement. Repair the
+On a positioned combat map, a ranged attack without a recorded normal range is an
+Agent-as-DM ruling boundary, never permission to skip distance enforcement. Repair the
 source-grounded card in lobby when the source states the range; otherwise choose
 a legal recorded mode such as melee or preserve the ruling explicitly.
 
 A reviewed monster action may replace an attack with a structured source
 activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws
 attack with its recorded option and then call `combat_use_activity` for Devour
-Intellect with one visible in-range target and the DM-confirmed
+Intellect with one visible in-range target and the Agent-as-DM-confirmed
 `target_has_brain=true`; do not roll or patch the Intelligence save, psychic
 damage, 3d6 threshold, Intelligence 0 override, or Stunned condition yourself.
 On a later turn, if an in-range living Humanoid is Incapacitated (including by
@@ -504,8 +509,8 @@ host acts for the hostile side. If the host reaches 0 HP, the engine deactivates
 the host override, marks the brainless body Dead, and ejects the devourer to the
 nearest recorded unoccupied adjacent cell. A `protection from evil and good`
 expulsion, a `wish` brain restoration, or voluntary departure remains an
-explicit DM settlement unless the public tool returns a structured contract for
-that trigger. Never transfer the devourer's copied knowledge back to the
+explicit Agent-as-DM settlement unless the public tool returns a structured
+contract for that trigger. Never transfer the devourer's copied knowledge back to the
 victim, a replacement PC, or another actor.
 
 When an attack returns `status: pending_reaction`, no damage has been rolled or
@@ -581,15 +586,17 @@ The canonical 2014 Rogue Cunning Action card is also engine-owned. Call
 is `dash`, `disengage`, or `hide`. Dash spends the bonus action and adds the
 actor's recorded Speed to remaining movement; Disengage spends it and records
 the no-opportunity-attack turn flag. Hide spends the bonus action and records a
-source-linked Hide declaration, but remains `pending_ruling`: the DM must still
-decide whether the circumstances permit hiding and resolve the Stealth/observer
-boundary. Never spend a second main action for the same declaration, and never
-mark the actor Hidden merely because the bonus action was paid.
+source-linked Hide declaration, but remains `pending_ruling`: the SagaSmith
+Agent acting as DM decides whether the circumstances permit hiding and resolves
+the Stealth/observer boundary by default. Never spend
+a second main action for the same declaration, and never mark the actor Hidden
+merely because the bonus action was paid.
 
 The canonical 2014 Cleric Channel Divinity card's `Turn Undead` option is
 engine-owned. Call `combat_use_activity` with activity id
 `dnd5e.content.srd2014.feature.cleric-channel-divinity` and declaration
-`{option: "turn_undead", perception: [...]}`. The DM must include exactly one
+`{option: "turn_undead", perception: [...]}`. The SagaSmith Agent acting as DM
+must include exactly one
 perception entry for every living Undead whose recorded battle-map position is
 within 30 feet: `{target_id, can_see_or_hear, reason?}`. Use `reason` whenever an
 Undead is excluded because it can neither see nor hear the cleric. Do not omit a
@@ -598,7 +605,8 @@ explicit sensory ruling. The server derives the cleric spell save DC, rolls each
 included target's Wisdom save, spends the main action and Channel Divinity, and
 atomically updates every failed target. A turned creature cannot react, must try
 to move away, and may use its action only to Dash, escape an effect preventing
-movement, or Dodge when the DM confirms it has nowhere to move. Damage ends the
+movement, or Dodge when the Agent acting as DM confirms it has nowhere to move.
+Damage ends the
 effect immediately; otherwise the combat duration clock ends it after one minute
 (ten rounds). Use the returned target saves, effects, combat state, and Core
 receipt. Never roll the saves separately, patch `turned`, edit target reactions,
@@ -689,7 +697,7 @@ Do not reject or rewrite a source attack merely because its `Hit` clause has no
 damage dice. Effect-only attacks such as a giant spider's Web retain an empty
 damage expression plus the exact `on_hit_effect`; resolve the attack roll
 normally, apply no fabricated HP damage, and send the printed condition and
-escape/destruction procedure to explicit DM settlement. A hit that returns
+escape/destruction procedure to explicit Agent-as-DM settlement. A hit that returns
 `pending_on_hit_ruling_id` blocks the turn: call public
 `combat_choice(action="on_hit_ruling")` with the target as `actor_id` and the
 pending `choice_id` plus printed condition, escape DC, permitted
@@ -790,13 +798,13 @@ If a hidden caster uses a spell with verbal, somatic, or source-unknown
 components, include `component_ruling.casting_perception` before casting. It must
 contain exactly one `{observer_id, perceived, reason?}` entry for every living
 combatant that does not already know the caster's position; a negative ruling
-requires `reason`. Only the DM owns this observer matrix. The MCP rejects an
+requires `reason`. The Agent acting as DM owns this observer matrix. The MCP rejects an
 incomplete matrix before spending the action or spell resource and then updates
 per-observer visibility atomically with the cast. Do not leave `hidden=true`
 unchanged after audible or visible casting. If an already-recorded legacy or
 interrupted workflow needs correction, use `combat_map_patch` with a
 `combatant_visibility` patch containing `actor_id`, `hidden` and/or
-`visible_to_actor_ids`, and an explicit DM `reason`; never edit encounter state
+`visible_to_actor_ids`, and an explicit Agent-as-DM `reason`; never edit encounter state
 outside MCP.
 
 For a room such as `D13` nested inside a larger indexed location scene, call
@@ -863,7 +871,7 @@ participant without fabricating a Stealth or scout roll.
 An opponent that notices any threat is not surprised; record the comparison and
 set `surprised` per participant. Hidden and surprised are separate facts. A
 contextual observer feature such as Keen Smell changes passive Perception by
-`+5` only when the DM confirms that the particular attempt can be perceived by
+`+5` only when the Agent acting as DM confirms that the particular attempt can be perceived by
 that sense; preserve that sensory ruling per observer instead of raising every
 observer's passive score globally. For every d20 result, retain `roll_mode`,
 `advantage_applied`, and `disadvantage_applied` with the raw `rolls` and rule
@@ -892,7 +900,7 @@ overrides, checksums, and world patches; do not disclose those fields from a DM
 read or an earlier tool result.
 A voluntary grid move cannot end in another living combatant's recorded space.
 Set `participant_config.can_share_space=true` only when a source-bound trait
-(for example, a swarm trait) or an explicit DM ruling permits it; preserve that
+(for example, a swarm trait) or an explicit Agent-performed DM ruling permits it; preserve that
 decision when the creature joins later. Passing through occupied spaces,
 different creature sizes, and effect-specific forced/teleport overlap are not
 inferred from endpoints. A forced or teleport destination that is already
@@ -911,15 +919,17 @@ When the temporary battle map records `difficult_cells`, provide a cell-by-cell
 `payload.path` for any move longer than one square. The engine charges one extra
 foot per foot spent entering those reviewed cells and returns the reduced movement
 budget with a Core receipt. Do not add that surcharge to `distance` yourself:
-`distance` remains the geometric route length. Unmapped terrain still requires a
-DM ruling rather than an invented cell cost.
+`distance` remains the geometric route length. For unmapped terrain, the Agent
+performs the DM ruling from the exact scene and current state and records the
+result through public map/state tools rather than inventing an unsupported cell
+cost.
 When a public event and per-actor ActorKnowledge identify exact hazard cells and
 state that the actor will avoid them, pass that public report to the regression
 driver and require its voluntary path search to exclude every known cell. An
 endpoint that is safe is insufficient: audit the complete `payload.path`.
 Knowledge is actor-local, so give hostile creatures a separate cited
 `trap_locations_shared` event only when the module establishes that they know
-the traps or an explicit DM review confirms that knowledge; never copy the
+the traps or an explicit Agent-performed DM review confirms that knowledge; never copy the
 party's detection result to them. Do not apply this
 voluntary avoidance to a shove, forced movement, or teleport, and do not invent
 a hazard trigger when no submitted path or forced destination enters the
@@ -945,7 +955,7 @@ other choices or prose outcomes return `pending_ruling`. Never treat a generic
 
 Core Preserve Life is an exception with a complete deterministic contract. In
 noncombat play, its `declaration.allocations` must contain every target's id,
-current character revision, positive healing amount, and DM-confirmed
+current character revision, positive healing amount, and Agent-as-DM-confirmed
 `within_30_ft: true`. Submit the whole allocation once. The MCP enforces the
 five-times-Cleric-level pool, the half-maximum-HP ceiling, and the Undead/Construct
 exclusion, then atomically spends Channel Divinity and updates all target cards.
@@ -956,14 +966,15 @@ call them solely because it is another actor's turn. Do not hide a spell inside
 the generic Ready payload. For a spell with an Action casting time, call
 `combat_ready(action="ready_spell")`: it pays the action and spell slot or other casting resource
 immediately, replaces any existing concentration, and arms one perceivable
-trigger until the start of the caster's next turn. The DM confirms that the
+trigger until the start of the caster's next turn. The SagaSmith Agent acting
+as DM confirms that the
 trigger occurred with `combat_ready(action="trigger_spell")`. The caster then uses
 `combat_ready(action="resolve_spell")` to release the spell with its reaction or decline
 that occurrence without spending the reaction; declining leaves the spell armed.
 Losing concentration, reaching the caster's next turn, or ending combat makes the
 held spell dissipate without effect. A released spell returns `pending_ruling`:
 resolve its targets, attack, save, damage, area, and narrative consequences with
-the appropriate combat tools and DM ruling rather than treating release as the
+the appropriate combat tools and Agent-performed DM ruling rather than treating release as the
 spell's complete effect.
 
 Before a module can branch on opening hours, daylight, watches, or travel time,

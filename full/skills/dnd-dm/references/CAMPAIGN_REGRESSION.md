@@ -58,8 +58,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    range, search the complete normalized document, expand every plausible hit, and
    visually inspect the introduction and character-creation pages. A semantic
    search miss or unrelated numeral hit is not a source range. If the module is
-   genuinely silent, stop the source-confirmed gate and record an explicit DM
-   review before building any PC. The review must retain the reviewed module
+   genuinely silent, stop the source-confirmed gate and have the SagaSmith Agent
+   acting as DM record an explicit review before building any PC. The review
+   must retain the reviewed module
    pages, search terms, exact fallback rule reference and checksum, selected
    count, and `represented_as_module_recommendation=false`. A completed review
    may use an exact enabled-Core design baseline, but it must not relabel that
@@ -98,7 +99,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    idempotency identity scoped by the run, review, actor name, actor type, and
    source variant. Retrying one actor must recover that actor, while the next
    actor must not collide with the previous creation. A descriptive passive or
-   action is a DM boundary only when it becomes relevant; it does not authorize
+   action is an Agent-as-DM boundary only when it becomes relevant; it does not authorize
    replacing the creature or blocking unrelated automatic attacks. Before any prepared
    spellcaster enters combat, a printed `Spellcasting` entry must have parsed as
    structured spellcasting rather than a descriptive passive. Compare its
@@ -113,8 +114,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    one ordinary attack in place of the source-defined action. A generic
    “N melee/ranged [weapon] attacks” composition (where “weapon” may be omitted
    in the source) is deterministic only when the actor card has exactly one
-   compatible weapon for that mode. Multiple compatible weapons remain an
-   explicit DM-review boundary.
+   compatible weapon for that mode. When multiple compatible weapons remain,
+   the Agent performs the DM review from the exact statblock and current
+   loadout; missing or conflicting source evidence remains external review.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with
@@ -233,6 +235,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    active. For a source-authored minimum separation, pass the exact distance
    excerpt through the source-separation declaration; keep the hostile at or
    beyond it and do not make melee-only actors approach illegally.
+   Before initiative, have the Agent inspect the canonical equipped attacks
+   against that geometry. If an owned ranged or thrown weapon is present but
+   not equipped, declare a pre-combat party loadout and let the driver call the
+   public inventory facade in Play. Do not treat backpack ownership as an
+   executable combat attack, equip during active combat for free, or bypass
+   ammunition and range settlement. Keep the short participant-identity excerpt
+   distinct from any longer multi-sentence encounter-procedure excerpt.
    If a source designates one actor to retreat after any printed number of other
    hostiles fall, configure that actor with the defeated-count threshold. The
    threshold neither ends combat nor skips intervening turns: the designated
@@ -347,7 +356,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     encounter, or joined afterward rather than using a historical party count.
     Use one public `award-xp` call when all recipients receive the same integer
     share. If equal division produces a fractional result but the public schema
-    accepts only integer XP, stop for an explicit DM-reviewed rounding policy.
+    accepts only integer XP, have the Agent acting as DM select and record an
+    explicit rounding policy from the locked advancement rules.
     A total-conserving deterministic remainder is acceptable only when the
     audit records the ordered remainder recipients, no two shares differ by
     more than one XP, and no allocation is silent. Give each public award call a
@@ -381,7 +391,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `advance-time` path whenever travel, waiting, or a source-triggered interval
     matters. Give each interval a stable `--occurrence-id`, cite the exact scene
     chunk and excerpt, supply a positive
-    minute/hour/day count, and state any DM ruling used to turn narrative timing
+    minute/hour/day count, and state any Agent-as-DM ruling used to turn narrative timing
     such as "late in the day" into a duration. The service-owned campaign clock,
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
