@@ -833,7 +833,14 @@ interrupted.
 It persists that outcome on the final encounter audit. It still refuses to end
 while a death-save participant remains dying rather than Dead or Stable.
 Source-directed retreat orchestration must distinguish an exact defeated-actor
-trigger from a defeated-count threshold. A count threshold makes only the
+trigger, a defeated-count threshold, cumulative damage actually applied, and a
+server-settled critical hit. Preserve authored alternatives such as “24 damage
+or one critical hit” as parallel OR triggers. For damage, accumulate
+`damage.applied_amount` after resistance, immunity, vulnerability, and temporary
+hit points; never use the input roll, caller arithmetic, or a current-HP
+difference. Include structured spell damage such as each Magic Missile dart.
+Recover the accumulator and critical-hit evidence from the public combat log
+when resuming an interrupted encounter. A satisfied trigger makes only the
 designated retreating actor attempt departure on its own turn; it does not end
 the encounter, skip other turns, or resolve other living hostiles. Count a
 retreater as resolved only after the public combat-map departure commits, and
