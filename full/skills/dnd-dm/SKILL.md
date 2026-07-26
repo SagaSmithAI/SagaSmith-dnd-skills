@@ -379,7 +379,12 @@ than adding class features together, and a character who already has the class
 feature Unarmored Defense cannot gain it again. Alternative AC calculations
 such as Draconic Resilience and Mage Armor remain alternatives; never sum their
 formulas. A Constitution or per-class-level feature changes maximum HP only
-unless an explicit initial-setup full-HP flag is accepted during Lobby.
+unless an explicit initial-setup full-HP flag is accepted during Lobby. Under
+2014 rules, level advancement increases the recorded base maximum but does not
+remove exhaustion: at exhaustion level 4 or higher, the derived and manifest
+maximum must remain half the new base maximum, rounded down, and current HP must
+not exceed it. Re-read both the character's derived hit points and the synced
+manifest projection after advancement.
 For 2014 Wizard Spell Mastery, keep the selected level 1 and level 2 spell
 prepared to use its lowest-level at-will casting; an upcast still spends a slot.
 Replacing a mastered spell is a Play operation requiring 8 elapsed study hours.

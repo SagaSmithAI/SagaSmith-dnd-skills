@@ -431,7 +431,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     facts. Keep the predecessor actor and its independent knowledge unchanged,
     replace only its active manifest party slot, append the predecessor,
     replacement, and handoff-event ids to replacement history, and verify a
-    checkpoint after the manifest update.
+    checkpoint after the manifest update. Re-read every ending condition after
+    registration: an active-party `sheet.progression.level` check must follow
+    the replacement party slot, while every other actor check remains attached
+    to the predecessor unless its own source condition says otherwise.
 21. Advance to the exact indexed conclusion scene only after its source-defined
     prerequisites are true in authoritative runtime state. Record the decisive
     conclusion facts, NPC state, quest state, world state, and actual-witness
@@ -443,7 +446,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     hash, and exact excerpt used as evidence. Define checks against specific
     manifest paths, world facts, actor/NPC state, quest state, and other public
     projections needed by that ending; do not use a broad narrative string as a
-    substitute for the printed conditions.
+    substitute for the printed conditions. After a parser-backed module refresh,
+    require each ending citation for that same source asset to resolve to exactly
+    one new chunk with the same content hash and excerpt. Re-read the condition
+    and require its module, scene, chunk, pages, heading, and any
+    `current.scene_id` check to reference the active revision. The refresh must
+    fail closed on zero or multiple matches and must scope idempotency to the
+    exact refreshed manifest payload.
 23. Call `verify-ending` without deferral. Require every returned check to pass,
     the selected ending id to be achieved, the manifest and ending state to be
     `completed`, and a verified terminal checkpoint to become the Snapshot DAG
