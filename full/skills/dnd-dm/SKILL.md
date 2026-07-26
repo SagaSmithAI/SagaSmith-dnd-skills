@@ -147,7 +147,11 @@ module/scene/chunk/page/hash `source_ref` and an exact excerpt to
 `chase_start`. Include the quarry and every pursuer as canonical actors,
 preserve the printed starting distance, and add a `close_transition` only when
 the same source explicitly redirects the chase when the quarry is nearly
-caught or reaches a destination. Advance only the actor returned by
+caught or reaches a destination. That transition must carry its own exact
+same-scene `source_ref` and `source_excerpt`, even when they point to a different
+chunk from the chase start; its `summary` must equal that normalized excerpt.
+Never submit a caller-authored destination summary without this second citation.
+Advance only the actor returned by
 `chase_query.current`. `chase_take_turn` owns initiative order, movement,
 the `3 + Constitution modifier` free Dash allowance, each later Dash's DC 10
 Constitution check, chase exhaustion, the Urban Chase Complications d20 and
@@ -375,7 +379,12 @@ than adding class features together, and a character who already has the class
 feature Unarmored Defense cannot gain it again. Alternative AC calculations
 such as Draconic Resilience and Mage Armor remain alternatives; never sum their
 formulas. A Constitution or per-class-level feature changes maximum HP only
-unless an explicit initial-setup full-HP flag is accepted during Lobby.
+unless an explicit initial-setup full-HP flag is accepted during Lobby. Under
+2014 rules, level advancement increases the recorded base maximum but does not
+remove exhaustion: at exhaustion level 4 or higher, the derived and manifest
+maximum must remain half the new base maximum, rounded down, and current HP must
+not exceed it. Re-read both the character's derived hit points and the synced
+manifest projection after advancement.
 For 2014 Wizard Spell Mastery, keep the selected level 1 and level 2 spell
 prepared to use its lowest-level at-will casting; an upcast still spends a slot.
 Replacing a mastered spell is a Play operation requiring 8 elapsed study hours.
@@ -432,6 +441,28 @@ On a positioned combat map, a ranged attack without a recorded normal range is a
 DM-ruling boundary, never permission to skip distance enforcement. Repair the
 source-grounded card in lobby when the source states the range; otherwise choose
 a legal recorded mode such as melee or preserve the ruling explicitly.
+
+A reviewed monster action may replace an attack with a structured source
+activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws
+attack with its recorded option and then call `combat_use_activity` for Devour
+Intellect with one visible in-range target and the DM-confirmed
+`target_has_brain=true`; do not roll or patch the Intelligence save, psychic
+damage, 3d6 threshold, Intelligence 0 override, or Stunned condition yourself.
+On a later turn, if an in-range living Humanoid is Incapacitated (including by
+Stunned), prefer the separately recorded Body Thief action and pass
+`target_is_humanoid=true`. The public settlement rolls both Intelligence checks;
+a tie has no winner. On a win it preserves the victim actor and its independent
+knowledge, atomically copies all current ActorKnowledge to the devourer, records
+the victim body as hostile and controlled, uses the body's statistics with the
+devourer's mental scores, and gives the devourer total cover inside the host.
+The inside devourer does not take a separate turn and cannot be targeted; the
+host acts for the hostile side. If the host reaches 0 HP, the engine deactivates
+the host override, marks the brainless body Dead, and ejects the devourer to the
+nearest recorded unoccupied adjacent cell. A `protection from evil and good`
+expulsion, a `wish` brain restoration, or voluntary departure remains an
+explicit DM settlement unless the public tool returns a structured contract for
+that trigger. Never transfer the devourer's copied knowledge back to the
+victim, a replacement PC, or another actor.
 
 When an attack returns `status: pending_reaction`, no damage has been rolled or
 applied. The target actor reads its owned window with
@@ -820,6 +851,17 @@ foot per foot spent entering those reviewed cells and returns the reduced moveme
 budget with a Core receipt. Do not add that surcharge to `distance` yourself:
 `distance` remains the geometric route length. Unmapped terrain still requires a
 DM ruling rather than an invented cell cost.
+When a public event and per-actor ActorKnowledge identify exact hazard cells and
+state that the actor will avoid them, pass that public report to the regression
+driver and require its voluntary path search to exclude every known cell. An
+endpoint that is safe is insufficient: audit the complete `payload.path`.
+Knowledge is actor-local, so give hostile creatures a separate cited
+`trap_locations_shared` event only when the module establishes that they know
+the traps or an explicit DM review confirms that knowledge; never copy the
+party's detection result to them. Do not apply this
+voluntary avoidance to a shove, forced movement, or teleport, and do not invent
+a hazard trigger when no submitted path or forced destination enters the
+recorded cell.
 If Prone, either use `combat_movement(action="stand")` (half speed, no action) or
 use `combat_movement(action="move", payload.crawl=true)`; crawling costs double movement.
 

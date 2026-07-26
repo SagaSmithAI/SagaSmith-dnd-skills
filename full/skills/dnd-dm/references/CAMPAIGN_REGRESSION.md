@@ -127,7 +127,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    distance, Dash counts, extra-Dash Constitution checks, chase exhaustion,
    Urban Chase Complications, damage, and the server random stream. A module
    transition such as a quarry ducking into a destination is legal only when
-   its exact source excerpt supports the configured close transition. Seal the
+   the `close_transition` carries its own exact same-scene `source_ref` and
+   `source_excerpt`; require its `summary` to equal that normalized excerpt,
+   including when the transition is stored in a different chunk from the
+   starting-distance evidence. Seal the
    completed chase and its manifest/world-state update with one checkpoint;
    never checkpoint each chase turn or replace the chase with a fabricated
    outcome event.
@@ -281,6 +284,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     map or reuse an occurrence id for a later event, even when its scene, event
     type, and summary are identical. Re-read progress after the checkpoint and
     verify that earlier events from the same run and scene remain present.
+    Every `advance-scene` must cite the exact transition text from the manifest's
+    current scene through `--source-scene-id`, `--source-ref-json`, and
+    `--source-excerpt`. The driver persists that evidence under the occurrence id
+    and rejects an arbitrary jump, a stale source scene, or a changed retry.
 14. When a resolved event changes an NPC, quest, clue, or machine-verifiable
     world condition, use the public regression driver's `record-outcome` path.
     Give it a stable outcome id and exact source reference. It must atomically
@@ -424,7 +431,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     facts. Keep the predecessor actor and its independent knowledge unchanged,
     replace only its active manifest party slot, append the predecessor,
     replacement, and handoff-event ids to replacement history, and verify a
-    checkpoint after the manifest update.
+    checkpoint after the manifest update. Re-read every ending condition after
+    registration: an active-party `sheet.progression.level` check must follow
+    the replacement party slot, while every other actor check remains attached
+    to the predecessor unless its own source condition says otherwise.
 21. Advance to the exact indexed conclusion scene only after its source-defined
     prerequisites are true in authoritative runtime state. Record the decisive
     conclusion facts, NPC state, quest state, world state, and actual-witness
@@ -436,7 +446,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     hash, and exact excerpt used as evidence. Define checks against specific
     manifest paths, world facts, actor/NPC state, quest state, and other public
     projections needed by that ending; do not use a broad narrative string as a
-    substitute for the printed conditions.
+    substitute for the printed conditions. After a parser-backed module refresh,
+    require each ending citation for that same source asset to resolve to exactly
+    one new chunk with the same content hash and excerpt. Re-read the condition
+    and require its module, scene, chunk, pages, heading, and any
+    `current.scene_id` check to reference the active revision. The refresh must
+    fail closed on zero or multiple matches and must scope idempotency to the
+    exact refreshed manifest payload.
 23. Call `verify-ending` without deferral. Require every returned check to pass,
     the selected ending id to be achieved, the manifest and ending state to be
     `completed`, and a verified terminal checkpoint to become the Snapshot DAG
