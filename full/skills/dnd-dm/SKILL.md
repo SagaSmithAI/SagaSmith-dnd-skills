@@ -168,6 +168,10 @@ prerequisites, source-bound spells, critical follow-ups, party-size reviews, and
 defaults to the Agent; a missing ranged/spell range, incomplete hydration, or
 other absent/contradictory source mechanic remains
 `missing_or_conflicting_source_review` and cannot be invented.
+Declarative extension rules follow the same distinction:
+`ruling.require` defaults to Agent reasoning, while `choice.require` remains an
+external player-owned choice. Regression drivers must preserve the typed ruling
+as structured output instead of reducing it to a generic failure message.
 
 `pending_ruling` may be returned after an action, use, slot, or reaction has
 already been paid. Read the receipt and latest revision and never pay it again.

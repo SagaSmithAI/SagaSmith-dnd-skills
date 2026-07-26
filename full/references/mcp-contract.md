@@ -96,6 +96,15 @@ from current scene and time evidence, records its reasoning, and retries the
 same public attack at the current revision. Only a response with an actual
 pending on-hit `choice_id` may be sent to
 `combat_choice(action="on_hit_ruling")`.
+This applies to party construction, source checks and contests, level
+advancement, and catalog application as well as encounters. A regression
+driver must write a machine-readable stopped report with top-level
+`status="pending_ruling"`, `default_resolver`, and the complete
+`ruling_requirements`; it must not flatten the domain result into a generic
+exception string. An unclassified DM ruling defaults to Agent adjudication,
+while an explicitly external player choice or missing/conflicting-source review
+retains that owner. Declarative rule-pack `ruling.require` operations follow the
+same Agent default; `choice.require` remains a player-owned external input.
 
 ## Structured content catalog
 

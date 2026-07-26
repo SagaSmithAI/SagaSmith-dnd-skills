@@ -248,6 +248,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    window instead requires its returned `choice_id` and a typed
    `--source-on-hit-ruling-json` settlement. Never substitute one boundary for
    the other.
+   Apply the same rule to every regression driver, not only encounter attacks.
+   Party catalog application, checks, contests, and level-up subclass, feature,
+   or spell application must stop with a structured output report carrying
+   top-level `status="pending_ruling"`, `default_resolver`, and the original
+   `ruling_requirements`. The acting Agent reads that report, adjudicates
+   Agent-owned entries, and resumes the public operation; a generic
+   `RuntimeError` is not an acceptable handoff. Rule-pack `ruling.require`
+   defaults to the Agent, whereas `choice.require` and explicitly classified
+   source/approval exceptions retain external ownership.
    When module prose establishes relative placement without a numeric map (for
    example, creatures "clustered tightly" around a door), the Agent may map that
    fact onto the temporary combat grid through repeated
