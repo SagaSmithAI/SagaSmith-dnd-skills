@@ -284,6 +284,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     map or reuse an occurrence id for a later event, even when its scene, event
     type, and summary are identical. Re-read progress after the checkpoint and
     verify that earlier events from the same run and scene remain present.
+    Every `advance-scene` must cite the exact transition text from the manifest's
+    current scene through `--source-scene-id`, `--source-ref-json`, and
+    `--source-excerpt`. The driver persists that evidence under the occurrence id
+    and rejects an arbitrary jump, a stale source scene, or a changed retry.
 14. When a resolved event changes an NPC, quest, clue, or machine-verifiable
     world condition, use the public regression driver's `record-outcome` path.
     Give it a stable outcome id and exact source reference. It must atomically
