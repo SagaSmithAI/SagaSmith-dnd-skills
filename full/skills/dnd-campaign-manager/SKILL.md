@@ -102,10 +102,12 @@ default the SagaSmith Agent performs that DM review from exact source and curren
 state; player-owned choices, missing evidence, and owner approvals remain their
 respective boundaries. A
 `ready: true` manifest can still have `settlement: mixed`: inspect per-card
-`manual_rulings`, `ruling_spell_ids`, `unavailable_attack_ids`, and missing ranged
-or thrown ranges before switching to combat. The universal `unarmed-strike`
-fallback does not make an incomplete imported weapon or spell automatically
-settled.
+`manual_rulings`, structured `ruling_requirements`, `ruling_spell_ids`, and
+`unavailable_attack_ids` before switching to combat. Resolve entries marked
+`default_resolver="agent"` through Agent reasoning and public tools. Missing
+ranged or thrown ranges are source/card blockers, not discretionary DM ranges;
+the universal `unarmed-strike` fallback does not make an incomplete imported
+weapon or spell automatically settled.
 
 Keep each required count independent of the selected actor list. Derive it from
 the expanded source group or from a recorded, server-rolled encounter-table result,

@@ -126,9 +126,10 @@ the campaign.
 ### Agent adjudication is the default DM ruling
 
 When a public tool returns `pending_ruling`, or readiness exposes a
-`manual_rulings` entry about scene facts, eligibility, observation, an
-unstructured source action, a spell effect, or a narrative consequence, the
-SagaSmith Agent assumes the DM role and reasons through that ruling by default.
+`manual_rulings`/`ruling_requirements` entry about scene facts, eligibility,
+observation, an unstructured source action, a spell effect, or a narrative
+consequence, the SagaSmith Agent assumes the DM role and reasons through that
+ruling by default.
 Do not pause merely because the boundary is labelled "DM ruling", and do not
 require a human to restate a decision that the active rules, exact module text,
 current scene, actor cards, and branch state can support.
@@ -269,10 +270,11 @@ clamps to the recorded maximum. Never roll or patch charges separately.
 An item whose card says that attunement is required enters Play as
 `attunement="required"`: do not add it as already attuned or change that field
 with `inventory_change(action="update")`. Put its item id in the actor's Short
-Rest request as `attune_item_id` and require the DM to submit
-`attunement_prerequisite_confirmed=true` after checking the exact source
-prerequisite; the rest, three-item limit, duplicate-copy limit, and activation
-of the item's magical properties commit together. An
+Rest request as `attune_item_id`. The Agent acting as DM checks the exact source
+prerequisite and submits `attunement_prerequisite_confirmed=true`; do not pause
+for a separate human when the locked rule and actor state answer the question.
+The rest, three-item limit, duplicate-copy limit, and activation of the item's
+magical properties commit together. An
 unattuned shield still grants its ordinary shield benefit but no magical bonus.
 Do not transfer an item while its state is `attuned`; transfer neither grants
 the recipient attunement nor, by itself, satisfies any 2014 condition that ends
@@ -486,10 +488,12 @@ block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
 override. A melee weapon with the Thrown property remains a
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
-On a positioned combat map, a ranged attack without a recorded normal range is an
-Agent-as-DM ruling boundary, never permission to skip distance enforcement. Repair the
-source-grounded card in lobby when the source states the range; otherwise choose
-a legal recorded mode such as melee or preserve the ruling explicitly.
+On a positioned combat map, a ranged attack without a recorded normal range is
+a missing-card/source boundary, not permission for a generic DM ruling to invent
+distance. Repair the source-grounded card in lobby when the source states the
+range. If the exact source genuinely does not establish one, keep the attack
+blocked and choose a legal recorded mode such as melee or unarmed; never skip
+distance enforcement.
 
 A reviewed monster action may replace an attack with a structured source
 activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws
@@ -683,10 +687,13 @@ normalized `source_excerpt`. Required combatants must be in the initial particip
 list; reinforcements must not be. Treat missing cards, 0 HP/Dead actors, and
 unresolved executable rules as blockers. Surface manual rulings without silently
 marking them resolved. Read the returned `settlement`, `manual_rulings`,
-`automatic_spell_ids`, `ruling_spell_ids`, and `unavailable_attack_ids`; `ready`
-means the actor may enter the encounter, not that every action on the card is
-automatically executable. `unarmed_attack_id` remains available even when every
-recorded weapon is unavailable. When an exact imported rule source contains the creature,
+structured `ruling_requirements`, `automatic_spell_ids`, `ruling_spell_ids`, and
+`unavailable_attack_ids`. Every ordinary DM adjudication requirement names
+`default_resolver="agent"`; a player-owned choice or missing/conflicting source
+names its distinct external boundary instead. `ready` means the actor may enter
+the encounter, not that every action on the card is automatically executable.
+`unarmed_attack_id` remains available even when every recorded weapon is
+unavailable. When an exact imported rule source contains the creature,
 create it in lobby with `character_create_from(mode="statblock")`; never substitute
 a similar creature when the named statblock is unavailable or unsupported. When
 the exact card is visible only on a module PDF page, follow
@@ -790,7 +797,8 @@ actor's own turn. These are source procedures adjudicated by the Agent, not
 permission to add a one-module mechanic to Core or fabricate a generic choice
 window.
 For a source-bound statblock spell marked with components not repeated in its
-reviewed card, obtain an explicit source or DM confirmation and pass
+reviewed card, have the Agent acting as DM confirm the components from the exact
+source and pass
 `component_ruling.source_components_confirmed=true` before casting. The engine
 checks this before paying the action, slot, or concentration. Never spend first
 and ask for the component ruling afterward.

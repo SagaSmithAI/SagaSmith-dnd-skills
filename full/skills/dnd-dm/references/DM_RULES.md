@@ -121,9 +121,11 @@ or `player_name` as permission.
 | 2014/2024 突袭差异、反应支付、每回合法术限制 | 先攻同值时玩家/DM 的最终顺序选择 |
 
 战斗 readiness 的 `ready` 只表示角色可进入遭遇，不表示整张卡都可自动结算。逐项检查
-`settlement`、`manual_rulings`、`automatic_spell_ids`、`ruling_spell_ids` 和
-`unavailable_attack_ids`。地图上缺失通常射程的远程攻击必须暂停并裁决；有来源数值时应先在
-lobby 修复卡片。无论装备状态或弹药是否耗尽，角色都可显式使用
+`settlement`、`manual_rulings`、`ruling_requirements`、`automatic_spell_ids`、
+`ruling_spell_ids` 和 `unavailable_attack_ids`。`default_resolver="agent"` 的普通
+DM 判定由 Agent 直接思考并用公开工具落实；玩家选择和缺失/冲突来源仍保留各自边界。
+地图上缺失通常射程的远程攻击属于来源/卡片缺失，必须阻止开战；有来源数值时应先在
+lobby 修复卡片，不能由通用判定编造距离。无论装备状态或弹药是否耗尽，角色都可显式使用
 `weapon_id: "unarmed-strike"`。战斗结束后的 `combat_query(status)` 是最终历史快照，当前
 HP、状态和资源以 `character_query` 为准。
 

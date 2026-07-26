@@ -653,7 +653,11 @@ Before `combat_start`, call `module_query(view="readiness")` with a manifest:
 Required combatants must be present in the initial `participant_ids`.
 Reinforcements must not be initial participants. Readiness is false when a
 required actor is missing, at 0 HP/Dead, or has unresolved executable card rules;
-manual rulings are surfaced but do not falsely disappear. The excerpt must be an
+manual rulings are surfaced but do not falsely disappear. Each combat card also
+returns structured `ruling_requirements`: ordinary adjudications identify the
+Agent as the default resolver, while player intent and missing/conflicting source
+identify their external boundary. A missing ranged or thrown range is a blocking
+card/source defect rather than a license to invent distance. The excerpt must be an
 exact normalized substring of that same module scene; it is not a fuzzy query and
 a paraphrase or another occurrence of the room label is rejected. `ready=true`
 means that the actor may enter combat, not that every card entry is automatic.

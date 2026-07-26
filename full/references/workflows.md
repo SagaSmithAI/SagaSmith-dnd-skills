@@ -126,9 +126,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    missing, Dead/at 0 HP, lacks an executable card, or carries unresolved required
    rules. `source_excerpt` is an evidence assertion and must be an exact normalized
    substring of the expanded same-module scene; use a verified `module_search` hit
-   when needed, never a paraphrase. Review surfaced manual rulings rather than
-   hiding them. `ready=true` authorizes entry only: automatic effect settlement
-   and component, targeting, passive, or on-hit rulings remain separate.
+   when needed, never a paraphrase. Review surfaced manual rulings and their
+   structured `ruling_requirements` rather than hiding them. The Agent resolves
+   entries marked `default_resolver="agent"`; missing/conflicting source and
+   player-owned choices keep their declared boundary. `ready=true` authorizes
+   entry only: automatic effect settlement and component, targeting, passive, or
+   on-hit rulings remain separate.
 3. Required `combatant` actors go into initial `participant_ids`.
    `reinforcement` actors must stay out and join later through `combat_join`.
    A source group that must climb, cross, arrive, or otherwise spend time before
