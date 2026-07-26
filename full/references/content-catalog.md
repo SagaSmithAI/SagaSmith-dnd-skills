@@ -37,8 +37,10 @@ citations before the pack can be installed.
    `hit_points_include_species_grants` separately; for example, a printed Hill
    Dwarf card may already include ability increases but still be missing the
    per-level HP grant.
-5. If the response is `pending_ruling`, obtain the required choices or resolve
-   the effect as a DM decision. Do not bypass the result by editing raw sheets.
+5. If the response is `pending_ruling`, distinguish a player-owned build choice
+   from a DM adjudication. Obtain the former from the player; the SagaSmith Agent
+   resolves the latter by default from the exact rule/source and current actor
+   state. Do not bypass either result by editing raw sheets.
 
 An imported extension is not automatically enabled, and installation is not a
 mechanics claim. The DM selects its exact pack version per branch. Snapshots

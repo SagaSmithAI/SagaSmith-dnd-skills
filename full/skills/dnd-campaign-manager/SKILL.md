@@ -96,7 +96,10 @@ count, canonical actor ids, same-module `source_scene_id`, and exact normalized
 group. Actors in a `reinforcement` group stay out of the initial list and may enter
 only through `combat_join` after the source condition succeeds. Missing, Dead/0 HP,
 or mechanically unresolved required actors block combat start; surfaced manual
-rulings require review but must not be erased from the readiness report. A
+rulings require review but must not be erased from the readiness report. By
+default the SagaSmith Agent performs that DM review from exact source and current
+state; player-owned choices, missing evidence, and owner approvals remain their
+respective boundaries. A
 `ready: true` manifest can still have `settlement: mixed`: inspect per-card
 `manual_rulings`, `ruling_spell_ids`, `unavailable_attack_ids`, and missing ranged
 or thrown ranges before switching to combat. The universal `unarmed-strike`

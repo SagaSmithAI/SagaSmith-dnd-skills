@@ -47,6 +47,29 @@ transactions are independent.
 `module_query(view="scene")` before narrating a module fact. Always provide the active
 `scope_id` to `module_query(view="current")` and `module_set_progress`.
 
+### Agent-owned DM ruling boundary
+
+The word "DM" names an adjudication role, not a requirement for a separate
+human. Unless a workflow explicitly requires player intent, owner approval,
+missing-source review, or permission escalation, the SagaSmith Agent performs
+the DM ruling itself from the locked rules, exact expanded source, current
+scene, canonical actor cards, and branch state. This is the default for
+`status="pending_ruling"`, readiness `manual_rulings`, descriptive source
+activities, generic spell effects, Ready releases, environmental facts, and
+module-specific procedures.
+`server_capabilities.ruling_policy` publishes this split for cold-start Agents;
+use it instead of treating every `pending_ruling` as the same kind of missing
+input.
+
+The Agent must preserve the transaction boundary. It reads whether the first
+call already paid an action, Reaction, use, slot, or other resource; adjudicates
+without paying it twice; uses only public domain tools for dice and state; and
+records the exact source reference/excerpt, facts, decision, rolls, revision,
+and resulting continuity/manifest changes. `combat_choice` is required only
+when an owned pending choice window exists. Agent reasoning is not permission
+to fabricate a window, edit a raw sheet, write the database, override a player
+choice, infer missing source text, or approve an owner-only rule-pack change.
+
 ## Structured content catalog
 
 For a campaign locked to 2014, the installed `dnd5e.content.srd2014` catalog
@@ -61,8 +84,11 @@ entry into the catalog listing.
 and a selected subclass on a character card, preserving its pack version and
 source references. Catalog presence is not a claim that every narrative effect
 is executable: an item, species, class, or an option with unresolved choices
-returns `pending_ruling` rather than inventing a settlement. Use a source-bound
-rule pack mechanic only when the rule has been reviewed and validated.
+returns `pending_ruling` rather than inventing a settlement. If the response
+identifies a missing character-build or player choice, obtain that choice; if
+it identifies an actual DM adjudication, the Agent resolves it under the
+Agent-owned ruling boundary above. Use a source-bound rule pack mechanic only
+when the rule has been reviewed and validated.
 
 For a 2014 custom background, use one enabled base background artifact and pass
 `custom_name`, exactly two `skills`, the base artifact's required
@@ -929,7 +955,11 @@ again; then read the relevant campaign, character, or combat state.
 one `resource_key` resource when present, otherwise one limited card use, and
 pay the card's action/bonus-action/reaction timing in combat. Card prose,
 choices, targeting, and any non-deterministic result are returned for an
-explicit DM ruling rather than automatically materialized.
+explicit Agent-performed DM ruling rather than automatically materialized.
+A reviewed descriptive statblock action records
+`choices.manual_ruling.kind="descriptive_activity"` with its source excerpt.
+Calling it pays the recorded timing and returns `pending_ruling`; adjudicate
+the prose from that excerpt and do not repeat the payment.
 The canonical 2014 Fighter Action Surge id is a narrow Core exception:
 `combat_use_activity` consumes its use and atomically grants one current-turn
 `extra_action`. It rejects off-turn or twice-on-one-turn activation, and any

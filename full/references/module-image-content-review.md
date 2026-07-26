@@ -103,7 +103,10 @@ in actor provenance.
 Numeric melee, ranged, weapon, and spell attacks with explicit to-hit, range or
 reach, dice, bonus, and type can settle automatically. Narrative traits,
 ambiguous multiattacks, incomplete spellcasting, recharge/choice semantics, or
-other unsupported effects remain warnings or DM rulings. Never erase a warning
+other unsupported effects remain warnings or DM rulings. The SagaSmith Agent
+performs those DM adjudications by default after reading the exact reviewed
+source; player choices and missing-image/source review still pause at their
+own boundaries. Never erase a warning
 to make readiness pass.
 
 The review belongs to the imported campaign module and is immutable provenance;

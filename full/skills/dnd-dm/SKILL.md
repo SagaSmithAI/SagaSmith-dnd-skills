@@ -122,6 +122,43 @@ the campaign.
    evidence does not block an ending; only a combat record whose authoritative
    `active` flag is true does.
 
+### Agent adjudication is the default DM ruling
+
+When a public tool returns `pending_ruling`, or readiness exposes a
+`manual_rulings` entry about scene facts, eligibility, observation, an
+unstructured source action, a spell effect, or a narrative consequence, the
+SagaSmith Agent assumes the DM role and reasons through that ruling by default.
+Do not pause merely because the boundary is labelled "DM ruling", and do not
+require a human to restate a decision that the active rules, exact module text,
+current scene, actor cards, and branch state can support.
+
+Before deciding, read the exact expanded rule/module/scene evidence and the
+current affected actors. Record the ruling's source reference or exact excerpt,
+facts used, conclusion, any server-side rolls, and the public mutations that
+commit the outcome. Prefer an existing structured public settlement whenever
+one applies. Otherwise use only generic public dice, check, HP, condition, map,
+continuity, knowledge, clock, and manifest operations; never turn Agent
+reasoning into a direct database or raw-sheet write.
+
+Keep these distinct:
+
+- A DM adjudication is Agent-owned by default. This includes a module-specific
+  procedure that the generic rules engine intentionally does not encode.
+- A player-owned choice remains player-owned: targets, build options, prepared
+  spells, reaction use/decline, and other character intent must not be silently
+  chosen by the Agent.
+- Missing or contradictory source evidence requires import/retrieval repair or
+  explicit review. Owner-only pack activation, permission changes, and other
+  approval boundaries remain owner/DM approvals rather than inferred facts.
+
+`pending_ruling` may be returned after an action, use, slot, or reaction has
+already been paid. Read the receipt and latest revision and never pay it again.
+A descriptive reviewed statblock action carries
+`choices.manual_ruling.kind="descriptive_activity"`; invoking it through
+`combat_use_activity` pays its recorded timing and returns the exact source
+excerpt for Agent adjudication. A module-specific ruling does not require
+`combat_choice` unless the server actually opened an owned choice window.
+
 ## MCP Tool Reference
 
 | Workflow | MCP tools |
@@ -728,6 +765,22 @@ choice to that actor and weapon. In 2014, the Invisibility spell grants the
 attack's unseen-attacker benefit and ends after the attack is made, whether the
 roll hits or misses; do not clear it before preflight or leave it active after
 the attack.
+If the source gives a special encounter procedure that is not a reusable Core
+mechanic, keep it in the encounter driver as exact source evidence and transfer
+its unresolved effect to the Agent adjudication boundary. For an abstract NPC
+defender cohort, declare the printed initial count, the reviewed hostile
+activity, casualty dice, recharge instruction, and exact excerpt. The driver
+must call `combat_use_activity`, require its descriptive card to return
+`pending_ruling`, roll all printed dice through the server, and store the
+bounded/idempotent cohort state in the manifest; it must not redirect that
+source activity onto PCs. For a printed minimum separation, declare the exact
+distance excerpt and keep the hostile at that distance; an actor without a
+legal ranged attack ends its action instead of walking into a source-prohibited
+space. For a retreat triggered by cumulative server-settled damage or one
+critical hit, use those exact source thresholds and check them on the retreating
+actor's own turn. These are source procedures adjudicated by the Agent, not
+permission to add a one-module mechanic to Core or fabricate a generic choice
+window.
 For a source-bound statblock spell marked with components not repeated in its
 reviewed card, obtain an explicit source or DM confirmation and pass
 `component_ruling.source_components_confirmed=true` before casting. The engine

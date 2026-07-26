@@ -219,6 +219,20 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    only when escape is impossible, confirm both predicates from current state and
    end with `status="surrender"` before another attack. Do not relabel surrender
    as defeat, death, or a generic truce.
+   A module-specific encounter procedure does not need a new Core mechanic.
+   Preserve its exact source excerpt, invoke the reviewed action through the
+   public tool, and let the SagaSmith Agent perform the resulting DM ruling.
+   If the action returns `pending_ruling`, inspect its payment and latest
+   revision before applying any generic public dice/state/continuity writes;
+   never pay the action twice or invent a `combat_choice` window.
+   For a source-authored abstract casualty cohort, pass the printed initial
+   count, hostile activity, casualty dice, and recharge instruction through the
+   encounter driver's source-casualty declaration. Require a descriptive
+   activity card, server-side recharge/casualty rolls, a bounded idempotent
+   manifest projection, and no attacks against PCs while that procedure is
+   active. For a source-authored minimum separation, pass the exact distance
+   excerpt through the source-separation declaration; keep the hostile at or
+   beyond it and do not make melee-only actors approach illegally.
    If a source designates one actor to retreat after any printed number of other
    hostiles fall, configure that actor with the defeated-count threshold. The
    threshold neither ends combat nor skips intervening turns: the designated
@@ -226,6 +240,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    fighting. Bind retreat to one defeated actor id only when the source names
    that exact trigger. A downstream encounter receives the actor as a
    reinforcement only when the recorded source departure actually succeeded.
+   If retreat instead triggers after cumulative server-settled damage or a
+   single critical hit, configure the printed damage threshold and critical
+   trigger together with their exact excerpt. Count only committed applied
+   damage and server-confirmed critical attacks, resume from the bounded combat
+   log after interruption, and let the actor depart on its own turn.
    Automated party spell tactics may select only currently prepared spells or
    spells the actor actually knows. A spellbook entry alone is not castable.
    Choose the lowest available legal slot at or above the spell's level; when
