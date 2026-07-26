@@ -852,7 +852,8 @@ driver and require its voluntary path search to exclude every known cell. An
 endpoint that is safe is insufficient: audit the complete `payload.path`.
 Knowledge is actor-local, so give hostile creatures a separate cited
 `trap_locations_shared` event only when the module establishes that they know
-the traps; never copy the party's detection result to them. Do not apply this
+the traps or an explicit DM review confirms that knowledge; never copy the
+party's detection result to them. Do not apply this
 voluntary avoidance to a shove, forced movement, or teleport, and do not invent
 a hazard trigger when no submitted path or forced destination enters the
 recorded cell.
