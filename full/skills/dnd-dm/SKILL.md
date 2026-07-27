@@ -798,7 +798,10 @@ timed condition only on failure, and rolls each repeat save automatically in
 ability, DC, damage formula/type, success treatment, and source excerpt. Supply
 the exact structured zero-HP effect when present; the giant spider Bite, for
 example, makes a target reduced to 0 HP stable, Poisoned for 1 hour, and
-Paralyzed while poisoned. Do not dismiss an explicit saving-throw damage clause
+Paralyzed while poisoned. The structure is not creature-specific: the server
+must match the selected damage type's 0-HP trigger, Stable result, every
+condition, and the printed duration against the complete reviewed effect. Do
+not dismiss an explicit saving-throw damage clause
 or reduce it to condition-only settlement. The Agent must classify the complete
 reviewed action semantically; never infer these branches from a monster name or
 add a creature-specific phrase patch. If the source combines several conditions,

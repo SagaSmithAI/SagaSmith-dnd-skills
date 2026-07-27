@@ -716,8 +716,10 @@ If a reviewed on-hit clause prints a saving throw and additional damage,
 `payload.selection.id="saving_throw_damage"` validates and rolls the exact
 ability, DC, damage formula/type, and success treatment through the campaign
 random stream. A printed zero-HP rider must be supplied and settled in the same
-mutation. Explicit save-and-damage text cannot be dismissed or reduced to a
-condition-only ruling.
+mutation. Its structured Stable flag, condition labels, and duration are
+validated against the complete reviewed effect and selected damage type, not a
+creature-name or phrase allowlist. Explicit save-and-damage text cannot be
+dismissed or reduced to a condition-only ruling.
 If the reviewed clause instead gates a timed condition behind an immediate save
 and explicitly grants repeat saves at the end of the target's turns, use
 `payload.selection.id="saving_throw_condition"` with the exact condition,
