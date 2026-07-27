@@ -75,6 +75,13 @@ and `source_bound_rule_packs` to be true. Consume the published
    ordinals; it rejects both facts absent from the evidence and selected evidence
    omitted from the normalized card. Use the returned `review_id` with
    `character_create_from(mode="reviewed_rule_statblock")`.
+   Any reviewed passive that is not one of the engine's structured source traits
+   must remain on the actor card as
+   `choices.manual_ruling.kind="descriptive_passive"` with
+   `default_resolver="agent"` and its exact description as `source_excerpt`.
+   A warning without this typed entry is an importer defect: repair and recreate
+   the actor through the public review path rather than adding a creature-name or
+   phrase-specific settlement exception.
    This is layout normalization, not model-memory reconstruction. If the indexed
    facts themselves are missing or conflicting, stop at explicit source review.
    An image-capable reviewer may instead render the exact page and transcribe only

@@ -707,6 +707,13 @@ activity id and excerpt and select only parsed weapon ids, modes, and explicit
 counts. The immutable rule review stores and applies the fill when
 `character_create_from(mode="reviewed_rule_statblock")` creates the actor. A
 parser-produced composition is only a proposal here as well.
+Every other unstructured reviewed passive is preserved on the created actor as
+`choices.manual_ruling.kind="descriptive_passive"` with the Agent as default
+resolver and the exact passive description as its source excerpt. Read that
+typed card entry before supplying any situational ruling. A parser warning with
+no corresponding structured source trait or typed manual-ruling entry is an
+importer defect; do not compensate with creature-name checks, ad hoc `once`
+flags, or post-damage HP edits.
 The stored review uses `confidence="reviewed_text"` and retains per-chunk
 checksums. Visual review remains `review_mode="visual"` and
 `confidence="reviewed_image"`. Missing or conflicting indexed facts remain an
