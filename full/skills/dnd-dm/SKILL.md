@@ -322,6 +322,12 @@ and/or multiple objects, read the exact scene and use
 ids, pass the exact chunk `source_ref`, and then record ActorKnowledge only for
 the witnesses. Do not credit the shared wallet and add the items in separate
 writes: a transport failure must not leave half of a chest acquired.
+For every weapon in that parcel, set `mechanics.proficient` explicitly from the
+intended recipient's current class, species, feat, and other rule-backed
+proficiencies. A monster is proficient with weapons in its own stat block, but
+a PC who retrieves one uses the normal equipment proficiency rules; never copy
+the monster's attack bonus or let an omitted field grant proficiency. If the
+recipient is not yet known or proficiency is not proven, record `false`.
 
 For lodging, supplies, services, and other shared-wallet expenses in `play`, use
 `campaign_change(action="currency_spend")`. Pass one stable branch-local spend

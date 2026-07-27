@@ -62,6 +62,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   promise chunk as the source while separately recording and validating the scene
   and Scene Atlas location where payment actually occurs; never relabel the old
   source location as the payout location.
+- For a looted weapon, set `mechanics.proficient` explicitly for the intended
+  recipient from current rule-backed proficiencies. Do not inherit the defeated
+  monster's proficiency or attack bonus; use `false` when the recipient or
+  proficiency is not yet proven.
 - Use `campaign_change(action="consumable_use")` for a shared standard healing
   potion outside combat so item consumption, server-side `2d4+2`, healing, the
   random-stream position, and their rule receipt commit together.
