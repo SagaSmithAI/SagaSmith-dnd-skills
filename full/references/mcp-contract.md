@@ -70,6 +70,12 @@ The domain result itself also carries `default_resolver`, `ruling_kind`, and
 `policy_ref`, including native dynamically exposed calls. Compact facades must
 copy the nested ruling classification to their own top level; never discard an
 external-source exception and then fall back to generic Agent adjudication.
+Classify the complete nested `pending`, `ruling_requirement`, and
+`ruling_requirements` set, not only the outer envelope. Any genuine external
+exception in that set takes precedence over Agent-owned work; when no such
+exception exists, an unclassified DM ruling defaults to Agent reasoning.
+Reject or normalize a contradictory `default_resolver`/`ruling_kind` pair
+instead of trusting whichever field happens to be outermost.
 An engine `NeedsRuling` boundary that is reached before commit returns the same
 structured `pending_ruling` contract with `committed=false`, its missing facts,
 and a retry contract for the classified resolver. Treat an Agent-owned result as
