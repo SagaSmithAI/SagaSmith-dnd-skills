@@ -1006,11 +1006,13 @@ action uses `action="improvise"`. The server derives the named skill from the
 actor card and rejects caller-supplied proficiency or bonus values. The check
 and action payment commit together even when the check fails.
 
-`combat_join` queues an existing canonical campaign actor as a reinforcement for
-the next round. The queued actor remains outside `combatants` until the round
-boundary, is omitted from player combat views, and cannot act, be targeted, or
-participate in reaction geometry early. At the boundary it is inserted by
-initiative without changing the actor whose turn was already in progress.
+`combat_join` queues an existing canonical campaign actor as a reinforcement.
+By default it joins next round; an exact source-authored later boundary may be
+passed as future `participant_config.join_round`. The queued actor remains
+outside `combatants` until that round boundary, is omitted from player combat
+views, and cannot act, be targeted, or participate in reaction geometry early.
+At the boundary it is inserted by initiative without changing the actor whose
+turn was already in progress.
 Joining initiative ties require an explicit `tie_breaker`. Create likely scene
 participants and their source-bound cards during lobby import, not during an
 active encounter.

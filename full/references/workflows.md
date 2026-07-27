@@ -151,9 +151,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    A source group that must climb, cross, arrive, or otherwise spend time before
    joining is a delayed reinforcement, not an initially distant combatant. Pass
    its exact entry excerpt and canonical actor reports to the full-playthrough
-   encounter driver; it queues the actors through public `combat_join`, so they
-   appear only at the next round boundary and are neither targetable nor acting
-   before entry.
+   encounter driver; it queues the actors through public `combat_join`. If the
+   source names a later round, pass `--reinforcement-round`; otherwise they enter
+   at the next round boundary. They are neither targetable nor acting before
+   their queued round.
 4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
    combat map from the recorded spatial scene and location. Load the owner/DM
    `play.combat_control` group for this transition. If it falls back to a

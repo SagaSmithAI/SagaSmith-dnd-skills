@@ -208,9 +208,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    When the source says a group starts outside the fight and must climb, cross,
    arrive, or otherwise spend time before joining, pass those actor reports as
    delayed reinforcements. Keep them out of `combat_start`; queue each through
-   public `combat_join` immediately after the trigger so the engine admits them
-   only at the next round boundary. Do not place them on the initial map or let
-   the auto-runner target them before they enter.
+   public `combat_join` so the engine admits them only at the correct round
+   boundary. For a printed later round, pass `--reinforcement-round`; otherwise
+   queue after the trigger for next-round entry. Do not place them on the initial
+   map or let the auto-runner target them before they enter.
 7. Start combat from `play` and require the automatic transition to `combat` plus
    an encounter-local temporary map whose encounter, spatial scene, module, and
    location provenance agree. Exercise at least one structured automatic path

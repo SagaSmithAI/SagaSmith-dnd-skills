@@ -717,7 +717,10 @@ card, call `combat_join` with its explicit position, disposition, initiative (or
 let the engine roll), and a `tie_breaker` whenever its initiative ties another
 participant. The actor is stored under `reinforcements`, cannot act, be targeted,
 or trigger reactions during the current round, and is inserted into initiative
-only when the next round starts. Do not patch the combatant list, create a
+only when the next round starts. When the exact source names a later round,
+include that future `join_round`; the engine retains the actor outside combatants
+until that boundary instead of approximating the delay with map distance. Do not
+patch the combatant list, create a
 mid-combat placeholder card, or queue the NPC after a failed check. Establish
 potential participant cards during lobby/module preparation.
 
@@ -832,8 +835,10 @@ cross, arrive, or otherwise join only after combat begins, keep their canonical
 actors in a `reinforcement` group. The full-playthrough encounter driver must
 receive them as reinforcement reports with the exact entry excerpt, omit them
 from initial `participant_ids`, and queue them through public `combat_join`.
-They enter only at the next round boundary and cannot be targeted or act before
-then; never approximate the delay by placing them on the initial temporary map.
+They enter only at their queued round boundary and cannot be targeted or act
+before then. If the source states an exact later round, pass
+`--reinforcement-round`; otherwise the default is the next round. Never
+approximate the delay by placing them on the initial temporary map.
 When the statblock prints a complete numeric action for a known spell, its
 creature-specific range, damage, and effect override the base spell for that actor.
 After creation, verify that the spell card's displayed definition and structured
