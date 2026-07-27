@@ -1298,6 +1298,13 @@ otherwise the entire mutation is rejected before the clock, actor effects, or
 world effects change. A campaign-specific travel-day index is not an elapsed-day
 count: first project all source-defined rest days and calendar offsets, then
 derive the duration from the current public clock and bind the resulting target.
+The public full-playthrough driver additionally accepts branch-current narrative
+preconditions for `advance-time`: `--prerequisite-scene-id` and
+`--prerequisite-outcome-id` must identify an outcome already present in public
+scene progress, while repeated `--prerequisite-actor-id` values must resolve to
+actors in the same campaign. These are orchestration guards, not replacements for
+the atomic clock transaction. A missing prerequisite is rejected before any
+clock mutation.
 
 `campaign_change(action="party_rest")` is the only long-rest write. Its
 `members` array contains `character_id`, that actor's `expected_revision`, and
@@ -1320,6 +1327,12 @@ exactly match current public state, each member's `rest_history` must match the
 implied start/completion minutes, and its prepared-spell receipt must match the
 authoritative cards. Then add only the missing occurrence-scoped continuity and
 checkpoint writes; do not repeat the rest or patch storage.
+For a Short or Long Rest that follows a sourced outcome, the full-playthrough
+driver applies the same scene/outcome and actor prerequisite guards before the
+rest write. `--rest-expected-start-clock-json` binds the exact current
+day/hour/minute/elapsed-minute state and rejects a stale, skipped, or
+cross-branch sequence before `character_rest`, `clock_advance`, or `party_rest`
+can mutate state.
 
 Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
 effect on a campaign, scene, location, or object. Each effect has a stable id,

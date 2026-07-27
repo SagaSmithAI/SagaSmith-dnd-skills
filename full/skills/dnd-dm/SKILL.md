@@ -110,6 +110,12 @@ the campaign.
    checkpoint before entering another sourced scene. Follow
    `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
    interrupted-batch recovery.
+   For a multi-action event, validate every source/actor report, manifest event
+   predecessor, and public clock before the first mutation. Bind following time
+   or rest writes to the current branch with the driver's explicit prerequisite
+   outcome/actor flags and, for a rest, its expected start clock. Run dependent
+   actions in one fail-fast process; never let a failed prepare or outcome command
+   fall through to a later time advance or rest.
    Every repeatable playthrough mutation must carry its explicit stable
    occurrence/business id. Reuse it only for an exact retry; a later identical
    scene visit, check, event, rest, recovery, XP award, checkpoint, explicit

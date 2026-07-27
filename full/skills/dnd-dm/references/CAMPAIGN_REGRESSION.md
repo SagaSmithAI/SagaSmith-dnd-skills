@@ -532,6 +532,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     duration without an explicit audited ruling. Missing or conflicting source
     evidence remains an external review boundary only when the disputed source
     fact itself must be recovered; ordinary DM estimation belongs to the Agent.
+    Before the first write in a multi-action event, validate every local source
+    and actor report, the current manifest event ordinal, and the public world
+    clock. If the interval follows an already recorded result, pass
+    `--prerequisite-scene-id` with `--prerequisite-outcome-id`; if it requires
+    already prepared narrative or combat actors, pass every id separately with
+    `--prerequisite-actor-id`. These checks read current branch state through
+    public MCP tools and must reject before `clock_advance` when an outcome or
+    actor is missing. A passed JSON report from another attempt or branch is not
+    proof that the current branch satisfies the prerequisite.
     Treat that count as actual elapsed time rather than an effect-unit selector.
     `60 minute`, `1 hour`, and two consecutive `30 minute` advances must expire
     the same one-hour actor and world effects exactly once. The public receipt and
@@ -589,6 +598,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     missing continuity event and checkpoint.
     Never run the rest twice, edit the database, or accept a receipt from an
     intervening campaign mutation.
+    When the rest closes a sourced event, require that event's recorded outcome
+    with `--prerequisite-scene-id` and `--prerequisite-outcome-id`, and bind the
+    exact pre-rest clock with `--rest-expected-start-clock-json`. A branch whose
+    clock already advanced but whose prerequisite outcome is absent must reject
+    the rest; it is not made valid by a locally cached passed report. Execute
+    `prepare -> resolve -> rest` in one fail-fast orchestration process, or check
+    every child exit code explicitly before starting the next action. Validate
+    all dependent reports before the first time write. Preserve each failed
+    attempt under a distinct report path so a successful retry cannot overwrite
+    the evidence needed to audit or recover it.
     Each member needs a schedule whose minutes equal the shared clock advance.
     The normal 2014 path is at least 480 minutes with at least 360 minutes of
     sleep, no more than 120 minutes of light activity, and less than 60 minutes
