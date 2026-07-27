@@ -675,7 +675,8 @@ reconstructs the card from deterministic text chunks, and narrows provenance to
 the retained `source.text_layout_recovery.chunk_ids`. This first recovery path
 does not render a page and works for an Agent without image capability.
 If required source facts remain absent or conflicting, call DM-only Lobby
-`rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
+`rule_import(action="recover_statblock",
+payload={job_id, name, page_number?, agent_fill?})`.
 Use the exact printed heading for `name`; keep a differently named campaign
 instance in the later actor-creation payload.
 The server, not the Agent, finds the physical page, performs geometry-aware local
@@ -688,6 +689,13 @@ returned checksum-bound `review_id` with
 image understanding by the Agent. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
 warnings do not authorize repair from model memory.
+When recovered text includes Multiattack, `agent_fill` is required in the same
+call. OCR owns the transcription and critical facts; the Agent owns only the
+semantic composition of the exact action prose into parsed weapon ids, modes,
+and counts. The server requires every recovered Multiattack activity exactly
+once and reports expected and received activity ids on mismatch. This closes the
+text-only path without making the lexical parser authoritative or requiring a
+second image-capable model.
 Text-layout recovery also compares every explicit
 `Melee/Ranged [Weapon|Spell] Attack:` source marker with the parsed weapon and
 identified statblock-spell actions. One successfully parsed attack cannot hide

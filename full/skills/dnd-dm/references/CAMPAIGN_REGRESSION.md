@@ -125,7 +125,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    the exact job before requesting layout-OCR recovery. The public driver may
    combine exact `--chunk-id` selections with a source-established
    `--source-page`: chunks remain the first text-layout attempt and the page is
-   the bounded OCR fallback. Repeated decorative/narrative copies of a creature
+   the bounded OCR fallback. A single-field ambiguity such as
+   `statblock INT score is ambiguous` must enter this generic fallback just as a
+   missing six-score table does. If the OCR-recovered card has Multiattack,
+   supply `--agent-statblock-fill` and `--review-observation` on that same
+   `prepare-rule-statblock` invocation. The driver passes the strict fill into
+   `rule_import(action="recover_statblock")`, so the checksum-bound OCR review
+   and Agent action composition are retained atomically without host-model image
+   capability. If an activity id is wrong, use the expected and received ids in
+   the server error to correct the fill; never add a named-monster special case.
+   Repeated decorative/narrative copies of a creature
    heading are valid when exactly one copy is immediately bound to a complete
    creature core. If OCR still cannot isolate the card but those exact indexed
    chunks form one complete, ordered, contiguous segment on that page, use

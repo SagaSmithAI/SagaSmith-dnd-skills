@@ -49,7 +49,13 @@ and `source_bound_rule_packs` to be true. Consume the published
    the exact `source_id` to its retained import `job_id`; this also works when
    the source was indexed in an earlier process. Then call
    `rule_import(action="recover_statblock")` with that `job_id`, exact printed
-   creature heading as `name`, and a fresh idempotency key. Do not use a
+   creature heading as `name`, and a fresh idempotency key. If the exact card
+   contains Multiattack, include `payload.agent_fill` in this same recovery
+   call; local OCR remains authoritative for card facts, while the Agent maps
+   only the returned/diagnosed activity id and exact action prose to canonical
+   weapon ids, modes, and counts. A mismatched submission reports both expected
+   and received activity ids; correct the generic fill rather than adding a
+   creature-specific parser rule. Do not use a
    campaign instance name such as a named dragon in place of
    `Adult Blue Dragon`. Supply `page_number` only when it is already
    source-established; otherwise let the server read the printed-page index hint
@@ -58,7 +64,8 @@ and `source_bound_rule_packs` to be true. Consume the published
    creature name by the adjacent size/type/alignment core, rejects
    low-confidence critical fields, and requires either
    target-segment embedded-text corroboration or agreement from an independent
-   OCR scale. The result is a checksum-bound reviewed statblock; retry actor
+   OCR scale. The result is a checksum-bound reviewed statblock with any
+   validated Agent action fill retained atomically; retry actor
    creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
 8. If layout OCR cannot isolate a card but the already-indexed chunks still contain
    the complete card as one ordered, contiguous segment on an exact page, a
