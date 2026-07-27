@@ -531,16 +531,23 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`
     through `game_phase`, and restore the entry phase even when construction
-    fails. Then use `register-replacement` in `play` at the current source-cited
-    Scene Atlas location. The new actor must start with empty ActorKnowledge; the
-    joining event may add only its witnessed join and explicit `told_by` handoff
-    facts. Keep the predecessor actor and its independent knowledge unchanged,
-    replace only its active manifest party slot, append the predecessor,
-    replacement, and handoff-event ids to replacement history, and verify a
-    checkpoint after the manifest update. Re-read every ending condition after
-    registration: an active-party `sheet.progression.level` check must follow
-    the replacement party slot, while every other actor check remains attached
-    to the predecessor unless its own source condition says otherwise.
+    fails. Then use `register-replacement` in `play` at the current Scene Atlas
+    location. Cite exact module text only when it actually prescribes the
+    arrival. For an ordinary DM-authored meeting, have the Agent inspect the
+    current scene, party and world state and submit
+    `--replacement-agent-ruling-json` with a concrete `decision`, `reason`,
+    `default_resolver="agent"`, and
+    `ruling_kind="module_specific_procedure"`; do not borrow an unrelated source
+    excerpt. The source-reference and Agent-ruling paths are mutually exclusive.
+    The new actor must start with empty ActorKnowledge; the joining event may add
+    only its witnessed join and explicit `told_by` handoff facts. Keep the
+    predecessor actor and its independent knowledge unchanged, replace only its
+    active manifest party slot, append the predecessor, replacement, and
+    handoff-event ids to replacement history, and verify a checkpoint after the
+    manifest update. Re-read every ending condition after registration: an
+    active-party `sheet.progression.level` check must follow the replacement
+    party slot, while every other actor check remains attached to the
+    predecessor unless its own source condition says otherwise.
 21. Advance to the exact indexed conclusion scene only after its source-defined
     prerequisites are true in authoritative runtime state. Record the decisive
     conclusion facts, NPC state, quest state, world state, and actual-witness

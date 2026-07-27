@@ -350,11 +350,18 @@ ActorKnowledge before joining; never duplicate the predecessor's sheet or
 knowledge. Preserve the predecessor and its independent ledger. A full-playthrough
 driver may transition `play` to `lobby` for this build only through `game_phase`
 and must restore the entry phase after either success or failure. Back in `play`,
-register the replacement at the manifest's current source-cited Scene Atlas
-location with one atomic continuity event. Give the replacement only the joining
-fact it witnessed and explicit `told_by` handoff propositions, replace the
-predecessor's active manifest slot, retain both actor ids and the handoff event in
-replacement history, then create and verify a post-manifest checkpoint.
+register the replacement at the manifest's current Scene Atlas location with one
+atomic continuity event. If the module explicitly prescribes that arrival, cite
+the exact source excerpt and reference. Otherwise the Agent acting as DM decides
+whether and how the new adventurer can plausibly join from the current scene and
+world state, then supplies a settled
+`default_resolver="agent"`, `ruling_kind="module_specific_procedure"` decision
+and reason. These evidence paths are mutually exclusive: never cite merely
+adjacent module prose to legitimize a DM-authored arrival. Give the replacement
+only the joining fact it witnessed and explicit `told_by` handoff propositions,
+replace the predecessor's active manifest slot, retain both actor ids and the
+handoff event in replacement history, then create and verify a post-manifest
+checkpoint.
 
 `inventory_transfer(mode="character_to_character")` mutates two private actor
 documents and therefore requires the caller to control both actors (an owner/DM
