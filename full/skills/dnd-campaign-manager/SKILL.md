@@ -106,6 +106,9 @@ respective boundaries. A
 `unavailable_attack_ids` before switching to combat. Resolve entries marked
 `default_resolver="agent"` through Agent reasoning and public tools. Missing
 ranged or thrown ranges are source/card blockers, not discretionary DM ranges;
+when the exact statblock instead supplies a complete positional restriction such
+as "one target directly below", treat it as Agent-owned targeting, require the
+current map positions to satisfy it, and never invent a numeric range;
 the universal `unarmed-strike` fallback does not make an incomplete imported
 weapon or spell automatically settled.
 

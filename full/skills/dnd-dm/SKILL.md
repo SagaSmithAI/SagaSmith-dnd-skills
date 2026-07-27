@@ -524,9 +524,14 @@ This distinction controls reach, range, disadvantage, and melee-only modifiers.
 On a positioned combat map, a ranged attack without a recorded normal range is
 a missing-card/source boundary, not permission for a generic DM ruling to invent
 distance. Repair the source-grounded card in lobby when the source states the
-range. If the exact source genuinely does not establish one, keep the attack
-blocked and choose a legal recorded mode such as melee or unarmed; never skip
-distance enforcement.
+range. If the exact source instead replaces a numeric range with a complete
+positional target restriction, such as "one target directly below the kobold",
+readiness must surface that restriction as an Agent-as-DM ruling rather than a
+missing-source blocker. Select that attack only when the current scene and
+temporary-map positions satisfy the printed restriction; otherwise choose a legal
+recorded mode such as melee or unarmed. If the source provides neither a range nor
+a complete positional restriction, keep the attack blocked. Never invent a
+generic distance or skip distance enforcement.
 
 A reviewed monster action may replace an attack with a structured source
 activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws

@@ -727,7 +727,12 @@ manual rulings are surfaced but do not falsely disappear. Each combat card also
 returns structured `ruling_requirements`: ordinary adjudications identify the
 Agent as the default resolver, while player intent and missing/conflicting source
 identify their external boundary. A missing ranged or thrown range is a blocking
-card/source defect rather than a license to invent distance. The excerpt must be an
+card/source defect rather than a license to invent distance. When the exact
+source replaces a numeric range with a complete positional target restriction
+(for example, one target directly below the attacker), readiness instead reports
+that restriction as an Agent-owned manual ruling and remains combat-ready. The
+Agent may select the action only when current scene/map positions satisfy the
+printed restriction; it must not invent a generic numeric range. The excerpt must be an
 exact normalized substring of that same module scene; it is not a fuzzy query and
 a paraphrase or another occurrence of the room label is rejected. `ready=true`
 means that the actor may enter combat, not that every card entry is automatic.
