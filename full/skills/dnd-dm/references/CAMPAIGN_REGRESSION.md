@@ -341,7 +341,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
 8. Back in `play`, persist the public outcome and only the knowledge actually
    gained by each PC/NPC/monster. Re-read actor cards rather than treating the
    historical final combat projection as current state. On `record-event` or
-   `record-outcome`, keep `--event-knowledge-cause witnessed` only for actors
+   `record-outcome`, cite exact source evidence when the text defines the event.
+   If the source establishes a situation but leaves its consequence to the DM,
+   also submit `--event-agent-ruling-json`; if it is an ordinary source-independent
+   DM event, submit the ruling alone rather than attaching adjacent prose. Use
+   `default_resolver="agent"`, a concrete decision and reason, and
+   `ruling_kind="agent_dm_adjudication"` or
+   `ruling_kind="module_specific_procedure"`. Keep
+   `--event-knowledge-cause witnessed` only for actors
    directly present and capable of perceiving the information. If the party
    later briefs an absent, unconscious, newly joined, or replacement actor, run
    a separate source-cited handoff with `--event-knowledge-cause told_by` and
@@ -403,7 +410,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     and rejects an arbitrary jump, a stale source scene, or a changed retry.
 14. When a resolved event changes an NPC, quest, clue, or machine-verifiable
     world condition, use the public regression driver's `record-outcome` path.
-    Give it a stable outcome id and exact source reference. It must atomically
+    Give it a stable outcome id and exact source reference or the settled
+    Agent-ruling evidence described above; use both when source-defined premises
+    require a DM-decided consequence. It must atomically
     commit the event, stable world facts, and cause-scoped ActorKnowledge,
     upsert (not replace) the manifest NPC/quest/clue projections, merge world
     state, then sync and verify a checkpoint containing the resulting manifest.

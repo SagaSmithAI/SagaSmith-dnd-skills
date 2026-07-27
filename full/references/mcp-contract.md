@@ -463,6 +463,14 @@ event actually occurs and where scene progress is written; optional
 exact excerpt and match `source_ref`. Continuity retains both ids. This supports
 delayed rescue returns, deliveries, promises, and quest completion without
 rewriting progress in the original scene or fabricating a return there.
+When a module-specific consequence is left to the DM, attach a settled
+`--event-agent-ruling-json` with `default_resolver="agent"`, a concrete decision
+and reason, and `ruling_kind="agent_dm_adjudication"` or
+`"module_specific_procedure"`. It may accompany exact source evidence when the
+text establishes the situation but not its consequence, or stand alone for an
+ordinary source-independent DM event. At least one evidence channel is required;
+an Agent-only event must not name a fake `source_scene_id`, excerpt, or ref.
+Scene progress and continuity preserve the committed ruling unchanged.
 
 `campaign_change(action="currency_spend")` is the play-phase transaction for one
 shared-wallet bill. Supply a stable branch-local `spend_id`, a nonempty `coins`
