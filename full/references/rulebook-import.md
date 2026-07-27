@@ -45,18 +45,24 @@ and `source_bound_rule_packs` to be true. Consume the published
    `source.text_layout_recovery` with the exact retained chunk ids. This is the
    first recovery path for a text-only Agent and requires neither page rendering
    nor image understanding. If the indexed text still omits or conflicts on a
-   required fact, call `rule_import(action="recover_statblock")` with the same
-   `job_id`, exact printed creature heading as `name`, and a fresh idempotency
-   key. Do not use a campaign instance name such as a named dragon in place of
+   required fact, call `import_query(view="list", kind="rulebook")` and match
+   the exact `source_id` to its retained import `job_id`; this also works when
+   the source was indexed in an earlier process. Then call
+   `rule_import(action="recover_statblock")` with that `job_id`, exact printed
+   creature heading as `name`, and a fresh idempotency key. Do not use a
+   campaign instance name such as a named dragon in place of
    `Adult Blue Dragon`. Supply `page_number` only when it is already
    source-established; otherwise let the server read the printed-page index hint
    and scan nearby physical pages. Core then runs local layout OCR, isolates the
-   target column, rejects low-confidence critical fields, and requires either
+   target column, distinguishes repeated decorative/narrative copies of the
+   creature name by the adjacent size/type/alignment core, rejects
+   low-confidence critical fields, and requires either
    target-segment embedded-text corroboration or agreement from an independent
    OCR scale. The result is a checksum-bound reviewed statblock; retry actor
    creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
-8. If recovery cannot locate exactly one heading, the two evidence paths disagree,
-   a critical field has low confidence, or no page can be inferred, stop at
+8. If recovery cannot isolate exactly one structurally complete statblock heading,
+   the two evidence paths disagree, a critical field has low confidence, or no
+   page can be inferred, stop at
    explicit missing/conflicting-source review. A capable reviewer may render the
    exact page and transcribe
    only observed fields through `rule_import(action="review_statblock")`. A

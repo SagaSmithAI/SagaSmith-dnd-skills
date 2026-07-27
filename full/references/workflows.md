@@ -100,12 +100,15 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `payload.name`. The deterministic text-layout result must cite only chunks
    from that heading through the next creature core and report
    `source.text_layout_recovery`; it does not require Agent vision. If required
-   facts are still absent or conflicting, call
+   facts are still absent or conflicting, use
+   `import_query(view="list", kind="rulebook")` to find the retained `job_id`
+   whose `source_id` exactly matches the selected source, then call
    `rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
    `name` is the exact printed creature heading, not a differently named campaign
    instance.
-   The server performs local layout OCR and critical-fact corroboration without
-   asking the Agent to inspect an image. Retry with
+   The server performs local layout OCR, uses the adjacent creature core to
+   disambiguate repeated decorative/narrative copies of the same heading, and
+   corroborates critical facts without asking the Agent to inspect an image. Retry with
    `mode="reviewed_rule_statblock"` and the returned `review_id`. Stop for explicit
    source review on ambiguous headings, low confidence, or disagreement. This is
    the missing/conflicting-source exception to Agent-owned DM rulings and may
