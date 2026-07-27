@@ -1330,7 +1330,21 @@ preconditions for `advance-time`: `--prerequisite-scene-id` and
 scene progress, while repeated `--prerequisite-actor-id` values must resolve to
 actors in the same campaign. These are orchestration guards, not replacements for
 the atomic clock transaction. A missing prerequisite is rejected before any
-clock mutation.
+clock mutation. Prepare every actor required by the destination event before the
+time write, then name those actors as prerequisites; actor preparation after time
+advancement recreates a cross-tool partial-failure window.
+
+When an exact-target `advance-time` committed its clock mutation but its response
+or following continuity write was interrupted, retry the same occurrence and
+payload. If the public clock already equals `--time-expected-after-json`, the
+driver may call the same idempotent `clock_advance` request once to recover its
+original response; it reconstructs the pre-advance clock from that exact target
+and duration and binds continuity to the recovered clock mutation's original
+campaign revision. A missing idempotency record makes the server reject the
+would-be second advance because it cannot reach the already-current target. An
+intervening campaign mutation makes the continuity revision guard fail. Never
+change the occurrence id, omit the exact target, accept a merely similar clock,
+or patch the clock/continuity records directly.
 
 `campaign_change(action="party_rest")` is the only long-rest write. Its
 `members` array contains `character_id`, that actor's `expected_revision`, and
@@ -1353,6 +1367,9 @@ exactly match current public state, each member's `rest_history` must match the
 implied start/completion minutes, and its prepared-spell receipt must match the
 authoritative cards. Then add only the missing occurrence-scoped continuity and
 checkpoint writes; do not repeat the rest or patch storage.
+The continuity commit uses the atomic party-rest response's campaign revision,
+not a fresh later revision; any unrelated write between the rest and continuity
+therefore conflicts instead of receiving a falsely attached rest narrative.
 For a Short or Long Rest that follows a sourced outcome, the full-playthrough
 driver applies the same scene/outcome and actor prerequisite guards before the
 rest write. `--rest-expected-start-clock-json` binds the exact current

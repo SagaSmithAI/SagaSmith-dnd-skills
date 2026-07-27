@@ -541,7 +541,20 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `--prerequisite-actor-id`. These checks read current branch state through
     public MCP tools and must reject before `clock_advance` when an outcome or
     actor is missing. A passed JSON report from another attempt or branch is not
-    proof that the current branch satisfies the prerequisite.
+    proof that the current branch satisfies the prerequisite. Instantiate and
+    validate the complete destination-event cast before advancing time; doing so
+    creates no party knowledge, while preparing it afterward leaves a
+    cross-tool partial-failure window.
+    If the exact-target clock write committed but the response or continuity
+    commit was interrupted, retry the identical occurrence and payload. The
+    driver recognizes only an exact match with
+    `--time-expected-after-json`, replays the original public idempotency key,
+    reconstructs the pre-advance instant from the duration, and uses the
+    recovered clock response's original campaign revision for continuity. With
+    no matching receipt, the service rejects the second advance at its expected
+    target; with an intervening mutation, continuity rejects the stale original
+    revision. Do not use a new occurrence id or treat any later current clock as
+    recovery evidence.
     Treat that count as actual elapsed time rather than an effect-unit selector.
     `60 minute`, `1 hour`, and two consecutive `30 minute` advances must expire
     the same one-hour actor and world effects exactly once. The public receipt and
@@ -596,7 +609,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     to equal current public state. Also require every member's `rest_history`
     completion/start minutes and any prepared-spell receipt to match the
     authoritative card. Only after all checks pass may the driver commit the
-    missing continuity event and checkpoint.
+    missing continuity event and checkpoint. Bind that continuity commit to the
+    atomic party-rest response's exact campaign revision; do not re-read and use
+    a later revision, because that would attach the rest narrative across an
+    unrelated intervening write.
     Never run the rest twice, edit the database, or accept a receipt from an
     intervening campaign mutation.
     When the rest closes a sourced event, require that event's recorded outcome
