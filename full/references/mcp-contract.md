@@ -280,7 +280,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/recharge/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/rest/level_advance/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(party_rest/advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/level_advance/stable_recovery/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -1397,6 +1397,12 @@ response in the same transaction. It rejects 0-HP/dead starters and a second
 Long Rest benefit less than 1,440 minutes after the previous one. Do not split a
 Short Rest into a clock advance followed by individual actor writes.
 
+At the tenth completed combat round, `combat_end_turn` crosses the same
+one-minute boundary: it advances the branch clock, all campaign actors'
+elapsed-time effects (including noncombatants), and world effects in the turn
+transaction. Replaying an older turn response projects that stored encounter
+revision rather than substituting the latest live combat.
+
 If an atomic party rest succeeds but response delivery or the following
 continuity checkpoint fails,
 retry the exact request. When changed actor revisions make that retry conflict,
@@ -1419,8 +1425,7 @@ For a Short or Long Rest that follows a sourced outcome, the full-playthrough
 driver applies the same scene/outcome and actor prerequisite guards before the
 rest write. `--rest-expected-start-clock-json` binds the exact current
 day/hour/minute/elapsed-minute state and rejects a stale, skipped, or
-cross-branch sequence before `character_rest`, `clock_advance`, or `party_rest`
-can mutate state.
+cross-branch sequence before `clock_advance` or `party_rest` can mutate state.
 
 Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
 effect on a campaign, scene, location, or object. Each effect has a stable id,

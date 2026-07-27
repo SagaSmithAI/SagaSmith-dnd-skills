@@ -401,13 +401,17 @@ membership, always-prepared and cantrip exclusions, and multiclass
 `grant.source_key` ownership. An unprepared level 1+ spell on a prepared caster's
 card is not castable merely because its access record says it is known.
 
-For a Short Rest, preflight every member, advance the branch-local clock once,
-then call `character_state_change(action="rest")` for each eligible actor with
-`hit_dice_spends=[{"key": <recorded hit-die key>, "count": <positive integer>}]`.
+For a Short Rest, preflight every member, then submit one
+`campaign_change(action="party_rest", payload={rest_type: "short_rest",
+duration_minutes, members})` transaction. Put
+`hit_dice_spends=[{"key": <recorded hit-die key>, "count": <positive integer>}]`
+on the applicable member record.
 Never submit a die result: the engine validates the available pool, rolls every
 spent die, adds the card's Constitution modifier, and returns `hit_dice_rolls`
-for audit. A Long Rest instead uses the one atomic party-rest write described
-below; never advance its clock separately or call individual actor rests.
+for audit. Long Rests use the same atomic party-rest surface. Never advance
+either rest's clock separately or call individual actor rests; the retired
+`character_state_change(action="rest")` path cannot preserve one transaction
+across the clock and every participant.
 Long rests reject `hit_dice_spends`; short rests
 reject long-rest hit-die recovery allocations and `food_and_drink`. A creature
 at 0 HP or Dead receives no rest benefit.
@@ -1113,6 +1117,9 @@ Treat every narrative-time interval as actual elapsed time, not as an effect-uni
 selector. `60 minute`, `1 hour`, and two consecutive `30 minute` advances must
 settle the same one-hour actor and world effects exactly once. Short Rest,
 party-rest, Stable recovery, and spell-copying clock advances obey the same rule.
+Ten completed combat rounds also advance the shared clock by one minute and
+settle elapsed effects for combatants, noncombatants, and world objects in the
+same turn-ending transaction.
 The service owns any sub-hour/sub-day remainder; never round a duration or patch
 that bookkeeping into a card or manifest.
 
@@ -1130,8 +1137,8 @@ attunement, and activity choices in the same member records. This one write adva
 the campaign clock once, advances timed effects for every campaign actor and
 world object, applies benefits to only the named members, records completion on
 each card, and for Long Rests enforces the one-benefit-per-24-hours rule. A creature must have at
-least 1 HP at the start. Do not call individual `character_rest` for a long rest
-or advance any rest duration separately before/after the party rest.
+least 1 HP at the start. Do not call individual `character_rest` for either rest
+type or advance any rest duration separately before/after the party rest.
 
 An effect on a room, object, scene, or the campaign belongs in structured
 `campaign_change(action="effect_add")`, not an arbitrary `module_set_progress.state`
