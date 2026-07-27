@@ -146,18 +146,19 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    not permission to accept an empty spell list or patch the actor manually.
    Before any prepared
    monster enters combat, compare every printed Multiattack with
-   `derived.multiattack_options`. For every module-authored Multiattack, inspect
-   the candidate's `agent_fill_requirements`; even a parser-recognized composition
-   is only a proposal and cannot be used to create the actor until the Agent
-   confirms it. If a deterministic printed composition is missing, stop at the
+   `derived.multiattack_options`. For every module or reviewed-rulebook
+   Multiattack, inspect `agent_fill_requirements`; even a parser-recognized
+   composition is only a proposal and cannot be used to create the actor until
+   the Agent confirms it. If a deterministic printed composition is missing, stop at the
    quality gate; do not silently run one ordinary attack in place of the
    source-defined action. Do not grow phrase-by-phrase parser exceptions. Have
-   the Agent read the exact reviewed source and resubmit
-   `module_review(action="submit_content")` with
+   the Agent read the exact reviewed source and resubmit either
+   `module_review(action="submit_content")` or
+   `rule_import(action="review_statblock")` with
    `payload.agent_fill.multiattack_options`: the activity id, exact source
    excerpt, a short reason, and canonical options containing only parsed weapon
    ids, attack modes, and counts. The server validates and stores that semantic
-   fill in the immutable content review and requires exact coverage of every
+   fill in the immutable review and requires exact coverage of every
    Multiattack activity. The regression driver accepts the same object through
    `--agent-statblock-fill`. If a composition includes a special activity or
    unsupported module procedure, submit `resolution="agent_ruling"` without

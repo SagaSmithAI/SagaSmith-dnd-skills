@@ -700,6 +700,13 @@ different artifact identities require explicit source review and
 the staged PDF checksum and page render checksum, verifies source/page/ordinal
 membership, parses the normalized card, rejects every normalized fact absent
 from the selected text, and rejects omission of any selected statblock evidence.
+If that reviewed card contains Multiattack,
+`rule_import(action="review_statblock")` also requires
+`payload.agent_fill.multiattack_options`; the Agent must cite the exact parsed
+activity id and excerpt and select only parsed weapon ids, modes, and explicit
+counts. The immutable rule review stores and applies the fill when
+`character_create_from(mode="reviewed_rule_statblock")` creates the actor. A
+parser-produced composition is only a proposal here as well.
 The stored review uses `confidence="reviewed_text"` and retains per-chunk
 checksums. Visual review remains `review_mode="visual"` and
 `confidence="reviewed_image"`. Missing or conflicting indexed facts remain an

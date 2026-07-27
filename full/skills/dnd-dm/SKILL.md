@@ -535,10 +535,10 @@ pass `multiattack_option_id` on its first `combat_preflight_attack` and
 recorded by that option. Omit the id to choose one ordinary Attack. A descriptive
 Multiattack without options remains an Agent-as-DM boundary only when selected and does not
 block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
-override. Before a module-specific monster enters combat, inspect its
-`agent_fill_requirements`. Every exact reviewed Multiattack must return to Lobby
-and have the Agent submit the immutable content review with
-`payload.agent_fill.multiattack_options`. Cite the activity id and exact source
+override. Before any reviewed module or rulebook monster enters combat, inspect
+its `agent_fill_requirements`. Every exact reviewed Multiattack must return to
+Lobby and have the Agent submit the immutable content or rule-statblock review
+with `payload.agent_fill.multiattack_options`. Cite the activity id and exact source
 excerpt and use only existing parsed weapon ids, legal modes, and explicit
 counts. A parser-produced composition remains only a candidate and cannot bypass
 this gate. If the exact procedure mixes a special activity or another unsupported
