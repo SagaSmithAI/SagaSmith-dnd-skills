@@ -81,4 +81,4 @@ Agent：检测 D&D MCP → 可用则加载 full → 不可用时询问是否明�
 
 ## 许可
 
-Skill 代码与原创文档使用 MIT License。SRD 与翻译内容遵循各自 NOTICE/许可；商业规则书不会随本仓库分发。
+Skill 代码与原创文档使用 Apache-2.0。SRD 与翻译内容遵循各自 NOTICE/许可；商业规则书不会随本仓库分发。
