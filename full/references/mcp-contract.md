@@ -977,7 +977,19 @@ during combat, and removes only conditions added by that encounter at
 an authored opening condition.
 When a source-bound weapon records additional typed damage, one successful hit
 rolls all parts and applies per-type defenses as one simultaneous damage instance.
-The result's `damage.roll_parts` preserves every roll. A nonempty
+The result's `damage.roll_parts` preserves every roll and the recorded source of
+each extra part. A reviewed descriptive passive may add damage only through an
+owner/DM `action.rulings` entry with
+`kind="source_conditional_extra_damage"`, `source="dm_ruling"`,
+`default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a unique
+application id, the exact passive feature id/excerpt/printed dice expression,
+typed nonempty trigger facts, and a recorded decision and reason. The server
+must verify the excerpt against the immutable actor card and append the dice to
+the preflight plan before resolving the attack. A player cannot self-declare
+this ruling. The conditional dice, critical doubling, typed defenses, 0-HP
+effects, concentration consequences, and target revision settle in the same
+attack transaction; never emulate the feature with a later `combat_hp_change`.
+A nonempty
 `on_hit_ruling` means damage is committed while the quoted secondary condition
 or choice still requires explicit Agent-as-DM settlement; it is not permission
 to repeat the hit.
