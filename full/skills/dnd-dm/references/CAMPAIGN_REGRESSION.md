@@ -629,7 +629,23 @@ verbatim rule excerpt. The action advances the server-owned random stream,
 records the receipt and result in scene progress and continuity, and syncs the
 manifest. Use a DM audience for hidden encounter checks. If the result triggers
 a second table roll, give that roll a different id and perform it through the
-same action; never generate either result client-side.
+same action; never generate either result client-side. For a source-defined
+sequence of identical independent checks, such as one hidden road-event check
+per travel day, pass `--roll-count` and one stable roll-id prefix. The driver
+keeps one MCP process but expands the sequence into independently identified
+public server-dice calls with ordinal suffixes, separate idempotency keys,
+continuity events, and random-stream receipts. It does not combine the dice or
+generate them client-side. Use `--defer-checkpoint` for the sequence only when a
+single public scene checkpoint immediately closes the complete batch.
+
+A noncombat check or contest can occur in one scene while its printed table or
+procedure is indexed under another. Keep `--scene-id` and `--location-key`
+bound to the actual occurrence scene, and pass the indexed rule scene through
+`--source-scene-id`. The public driver validates the exact reference and excerpt
+against that source scene while writing progress, continuity, and
+ActorKnowledge to the occurrence scene. Never move the party to a rules-only
+scene or copy the source text into the current scene merely to satisfy
+validation.
 
 For scene advances, narrative-NPC creation, source-cited noncombat checks,
 `record-event`, `stand-up`, `initialize-source-state`, `advance-time`,
