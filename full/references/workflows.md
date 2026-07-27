@@ -78,15 +78,16 @@ own exposure. Loading a group for one Agent must not expose it to another.
    establish `campaign_change(action="clock_set")` before resolving the branch.
    Advance only source- or DM-established elapsed time with
    `campaign_change(action="clock_advance")`; it updates the branch-local clock
-   and timed effects atomically. When a locked event calendar, opening hour, or
-   other established schedule fixes the destination instant, include
+   and timed effects atomically. Every minute, hour, or day advance must include
    `payload.expected_world_time={day,hour,minute,elapsed_minutes}`. Derive the
-   elapsed count from the current public clock; never hand-copy a large minute
-   literal without this target. The MCP rejects a duration that would land
+   exact destination from the current public clock and the reviewed interval,
+   even when no printed calendar names it; never hand-copy a large minute
+   literal without this target. The MCP rejects a missing target or duration that would land
    anywhere else before changing the clock or any timed effect.
-   For a completed long rest, use `campaign_change(action="party_rest")` instead:
+   For a completed Short or Long Rest, use
+   `campaign_change(action="party_rest")` instead:
    it advances the clock once and settles all named members atomically. Never
-   loop an eight-hour clock advance per character or call individual long rests.
+   advance the rest clock separately or loop individual actor rests.
 8. Load `lobby.characters`. Use `character_create_from(mode="build")` for confirmed
    PCs and `mode="direct"`, `mode="template"`, `mode="statblock"`, or
    `mode="module_statblock"` for mechanically authoritative NPCs and monsters.

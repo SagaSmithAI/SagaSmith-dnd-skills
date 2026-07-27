@@ -559,10 +559,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     fake timing evidence; submit the settled Agent ruling alone. It must use
     `default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a concrete
     `decision` and `reason`, and `period`/`count` exactly matching the requested
-    clock advance. If the event calendar or prior ruling fixes the destination
-    instant, also pass
+    clock advance. Always pass
     `--time-expected-after-json={day,hour,minute,elapsed_minutes}`. Read the
-    current public clock and derive the interval; never equate a travel-day
+    current public clock and derive the interval and exact destination; never equate a travel-day
     difference with elapsed days or hand-copy a large minute constant without
     this target. The driver rejects a mismatch before the public write and
     `campaign_change(clock_advance)` verifies it again atomically. The
@@ -572,6 +571,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     duration without an explicit audited ruling. Missing or conflicting source
     evidence remains an external review boundary only when the disputed source
     fact itself must be recovered; ordinary DM estimation belongs to the Agent.
+    Campaign, playthrough, and encounter regression commands hold one
+    cross-process lock for the entire command, keyed by MCP home and campaign.
+    Do not bypass that lock or run two commands against the same campaign in
+    parallel; separate campaigns remain independently runnable.
     Before the first write in a multi-action event, validate every local source
     and actor report, the current manifest event ordinal, and the public world
     clock. If the interval follows an already recorded result, pass
@@ -584,7 +587,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     validate the complete destination-event cast before advancing time; doing so
     creates no party knowledge, while preparing it afterward leaves a
     cross-tool partial-failure window.
-    If the exact-target clock write committed but the response or continuity
+    The state mutation, entity revisions, and exact public response persist in
+    one transaction. If the exact-target clock write committed but response delivery or continuity
     commit was interrupted, retry the identical occurrence and payload. The
     driver recognizes only an exact match with
     `--time-expected-after-json`, replays the original public idempotency key,
@@ -615,20 +619,25 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     pass `attunement_prerequisite_confirmed=true`; an unproven prerequisite
     blocks the rest mutation.
     All preflights must report ready
-    before the first write. Use the keys currently exposed by each authoritative
+    before the first write. Submit all members and choices through one
+    `campaign_change(action="party_rest", rest_type="short_rest")`; that
+    transaction advances the clock and effects, settles every member, records
+    random receipts, and stores the exact replay response. Never call
+    `clock_advance` and then loop `character_state_change(rest)`.
+    Use the keys currently exposed by each authoritative
     actor card; never derive a class-prefixed key from an older fixture or another
     actor. The server rolls spent Hit Dice, applies Constitution, checks remaining
     dice, Arcane Recovery's once-per-day allowance, Natural Recovery's
     once-per-Long-Rest allowance, Sorcerous Restoration's capped four points,
     and the level-scaled single Song of Rest die per eligible creature, and
     records the random receipt. A
-    failed preflight must leave both clock and actors unchanged. Give
+    failed preflight or settlement must leave both clock and actors unchanged. Give
     each Short Rest a stable `--occurrence-id` and reuse it across that
-    occurrence's clock, actor, knowledge, continuity, and manifest-sync
+    occurrence's party-rest, knowledge, continuity, and manifest-sync
     mutations. A later rest needs a new id even when its normalized members,
     duration, and reason are exactly identical. Reusing an id with changed
     choices must fail rather than create another rest.
-    The Short Rest's minute clock write must also advance minute/hour/day actor
+    The Short Rest's atomic party-rest write must also advance minute/hour/day actor
     and world effects by the actual elapsed minutes. In particular, an established
     one-hour Giant Spider poison/paralysis effect expires after a legal 60-minute
     Short Rest (or two 30-minute advances), while unrelated conditions remain.

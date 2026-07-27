@@ -1092,7 +1092,8 @@ Before a module can branch on opening hours, daylight, watches, or travel time,
 establish its branch-local clock with
 `campaign_change(action="clock_set", payload={day, hour, minute, label})` and cite
 the narrative/source assumption. After the DM establishes elapsed time, use
-`campaign_change(action="clock_advance", payload={period, count})`. Minute, hour,
+`campaign_change(action="clock_advance",
+payload={period, count, expected_world_time})`. Minute, hour,
 and day advances update the snapshotted campaign clock and settle all matching
 canonical actor and campaign-space effect durations in the same mutation; round and encounter durations
 advance without changing narrative time. Never infer elapsed time from chat
@@ -1100,10 +1101,10 @@ pacing, and never set or advance the narrative clock during active combat. Once
 set, do not jump the clock with another `clock_set`; use `clock_advance` so no
 duration is skipped.
 
-If a source schedule or prior Agent ruling fixes the destination day and time,
-include
+For every minute, hour, or day advance, include
 `payload.expected_world_time={day,hour,minute,elapsed_minutes}`. Re-read the
-current public clock and derive `count`; do not manually reuse a travel-day
+current public clock and derive both `count` and the exact destination; do not
+manually reuse a travel-day
 difference as an elapsed-day difference, because rest days and event timing
 anchors can diverge. The server must reject a count that cannot reach the exact
 target before advancing any clock or timed effect.
@@ -1115,20 +1116,22 @@ party-rest, Stable recovery, and spell-copying clock advances obey the same rule
 The service owns any sub-hour/sub-day remainder; never round a duration or patch
 that bookkeeping into a card or manifest.
 
-Resolve every completed long rest through
-`campaign_change(action="party_rest", payload={members, duration_minutes})`, even
+Resolve every completed Short or Long Rest through
+`campaign_change(action="party_rest",
+payload={rest_type, members, duration_minutes})`, even
 for a one-character party. Each member supplies its current character revision
-and any prepared-spell or 2014 hit-die recovery choices. A changed 2014 prepared
+and only the choices valid for that rest type. A changed 2014 prepared
 list costs light preparation activity equal to the sum of the spell levels of
 every spell in the complete selected list, not merely the added spells. Record
 at least that many `rest_schedule.light_activity_minutes`; a minimal four-hour
 Trance schedule has no preparation time, so extend its schedule when changing
-the list. This one write advances
+the list. For a Short Rest, put Hit Dice, Arcane/Natural Recovery, Song of Rest,
+attunement, and activity choices in the same member records. This one write advances
 the campaign clock once, advances timed effects for every campaign actor and
 world object, applies benefits to only the named members, records completion on
-each card, and enforces the one-benefit-per-24-hours rule. A creature must have at
+each card, and for Long Rests enforces the one-benefit-per-24-hours rule. A creature must have at
 least 1 HP at the start. Do not call individual `character_rest` for a long rest
-or advance eight hours separately before/after the party rest.
+or advance any rest duration separately before/after the party rest.
 
 An effect on a room, object, scene, or the campaign belongs in structured
 `campaign_change(action="effect_add")`, not an arbitrary `module_set_progress.state`

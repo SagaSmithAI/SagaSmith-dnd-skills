@@ -1256,8 +1256,8 @@ before the next attack. Pending spell attacks block `combat_end_turn` and
 model the attacks as weapon actions, repeat the cast, combine damage packets, or
 patch HP.
 
-`character_state_change(action="rest")` applies v2-card short-rest recovery with
-a character revision and idempotency key. Before any Short Rest clock write,
+`character_query(view="rest")` preflights v2-card Short Rest recovery. Before
+the atomic Short Rest write,
 call `character_query(view="rest")` for every member with the exact
 `hit_dice_spends` keys/counts, optional `arcane_recovery` or
 `natural_recovery` allocation, and, for each eligible 2014 Song of Rest recipient,
@@ -1267,14 +1267,16 @@ Recovery allowance/usage, Natural Recovery's declared meditation and
 once-per-Long-Rest use, automatic level-20 Sorcerous Restoration, the source
 Bard's campaign membership, conscious state, source-bound feature,
 level-scaled die, and rule readiness.
-Only after every member reports `ready=true` may orchestration advance time and
-commit actor rests. The runtime—not the caller—rolls each requested Hit Die,
+Only after every member reports `ready=true` may orchestration call one
+`campaign_change(action="party_rest",
+payload={rest_type:"short_rest",members,duration_minutes})`. The runtime—not the
+caller—advances time and effects once, settles every member atomically, rolls each requested Hit Die,
 applies Constitution and the edition's minimum, rolls one Song of Rest die for
 each hearing creature that spent at least one Hit Die, and returns both roll
 audits. The source Bard must participate in the same Short Rest; callers must
 not add the bonus once per spent die or patch HP after the rest.
 A full-playthrough driver requires one explicit stable Short Rest occurrence id
-and uses it for that rest's clock, actor, knowledge, continuity, and
+and uses it for that rest's party-rest, knowledge, continuity, and
 manifest-sync idempotency keys. Complete normalized member choices, duration,
 and reason remain request payload and must match on an exact retry. A later rest
 must use a distinct occurrence id even when its choices and reason are
@@ -1342,8 +1344,9 @@ advances do not
 move the world clock. The clock must be set first, cannot change during active
 combat, and conversation time is never treated as elapsed campaign time. Once
 set, a different `clock_set` value is rejected; use `clock_advance`.
-When the destination instant is already fixed, `clock_advance.payload` also
-supplies `expected_world_time={day,hour,minute,elapsed_minutes}`. Those four
+Every `minute`, `hour`, or `day` `clock_advance.payload` supplies
+`expected_world_time={day,hour,minute,elapsed_minutes}`; omission is rejected.
+Those four
 values must be internally consistent and must equal the server-computed result;
 otherwise the entire mutation is rejected before the clock, actor effects, or
 world effects change. A campaign-specific travel-day index is not an elapsed-day
@@ -1359,28 +1362,43 @@ clock mutation. Prepare every actor required by the destination event before the
 time write, then name those actors as prerequisites; actor preparation after time
 advancement recreates a cross-tool partial-failure window.
 
-When an exact-target `advance-time` committed its clock mutation but its response
+The state mutation group and the exact public clock response are persisted in
+the same database transaction. When an exact-target `advance-time` committed
+but delivery of its response
 or following continuity write was interrupted, retry the same occurrence and
 payload. If the public clock already equals `--time-expected-after-json`, the
 driver may call the same idempotent `clock_advance` request once to recover its
-original response; it reconstructs the pre-advance clock from that exact target
-and duration and binds continuity to the recovered clock mutation's original
-campaign revision. A missing idempotency record makes the server reject the
-would-be second advance because it cannot reach the already-current target. An
+atomically stored original response; it reconstructs the pre-advance clock from
+that exact target and duration and binds continuity to the recovered clock
+mutation's original campaign revision. Older mutation groups without an exact
+response may be recovered only by matching their public request hash, branch,
+entity revisions, and exact current target. An
 intervening campaign mutation makes the continuity revision guard fail. Never
 change the occurrence id, omit the exact target, accept a merely similar clock,
 or patch the clock/continuity records directly.
 
-`campaign_change(action="party_rest")` is the only long-rest write. Its
-`members` array contains `character_id`, that actor's `expected_revision`, and
-optional `prepared_spell_ids`, `hit_dice_recovery`, and `food_and_drink` choices.
-`duration_minutes` defaults to 480 and cannot be lower. The MCP advances time and
-all timed actor/world effects once, then settles the named actors and records
-their completion minute in the same mutation. It rejects 0-HP/dead starters and
-a second benefit less than 1,440 minutes after the previous one. Individual
-`character_rest` remains the short-rest surface and rejects `long_rest`.
+Every other public operation that moves narrative time—Short/Long party rest,
+Stable recovery, and source-bound spellbook copying—uses the same atomic replay
+boundary. Its clock, actor/world effects, character changes, random-stream
+position where applicable, entity revisions, and exact response commit or roll
+back together.
 
-If an atomic party rest succeeds but the following continuity checkpoint fails,
+`campaign_change(action="party_rest")` is the full-playthrough write for both
+Short and Long Rests. Its
+`members` array contains `character_id`, that actor's `expected_revision`, and
+rest-type-specific choices. Long Rest members may supply
+`prepared_spell_ids`, `hit_dice_recovery`, and `food_and_drink`; Short Rest
+members may supply Hit Dice spends, Arcane/Natural Recovery, Song of Rest,
+attunement, and activity fields. `duration_minutes` defaults to 480 for a Long
+Rest and must be at least 60 for a Short Rest. The MCP advances time and
+all timed actor/world effects once, then settles the named actors and records
+their completion minute, exact dice receipt, entity revisions, and replay
+response in the same transaction. It rejects 0-HP/dead starters and a second
+Long Rest benefit less than 1,440 minutes after the previous one. Do not split a
+Short Rest into a clock advance followed by individual actor writes.
+
+If an atomic party rest succeeds but response delivery or the following
+continuity checkpoint fails,
 retry the exact request. When changed actor revisions make that retry conflict,
 an owner or DM may read the stored campaign mutation through
 `state_revision(action="receipt", payload={"idempotency_key": ...})`. Treat this
@@ -1390,7 +1408,9 @@ exact pre-rest request reconstructed from those before revisions and all member
 choices. Its member ids, duration, campaign revision, and world clock must also
 exactly match current public state, each member's `rest_history` must match the
 implied start/completion minutes, and its prepared-spell receipt must match the
-authoritative cards. Then add only the missing occurrence-scoped continuity and
+authoritative cards. For a random-capable Short Rest, require the stored exact
+response, each requested Hit Die roll, and its matching random-stream receipt;
+current HP alone is not enough to reconstruct dice. Then add only the missing occurrence-scoped continuity and
 checkpoint writes; do not repeat the rest or patch storage.
 The continuity commit uses the atomic party-rest response's campaign revision,
 not a fresh later revision; any unrelated write between the rest and continuity
