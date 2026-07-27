@@ -180,6 +180,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    compatible weapon for that mode. When multiple compatible weapons remain,
    the Agent performs the DM review from the exact statblock and current
    loadout; missing or conflicting source evidence remains external review.
+   If a retained, checksum-bound rule-statblock review already contains the
+   correct complete transcription but predates a required Agent semantic fill,
+   do not re-import the managed PDF, rerun OCR, or require the host model to
+   inspect an image. Call `prepare-rule-statblock` with the retained
+   `--source-id`, its exact `--source-job-id`, `--base-rule-review-id`, a new
+   `--review-observation`, and `--agent-statblock-fill`. The facade derives a
+   new immutable review only after rechecking review ownership, source and
+   artifact checksums, normalized-text checksum, page render, original review
+   mode, and original text evidence. The derived review records
+   `derived_from_review_id`; it cannot replace or mutate the base review.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with

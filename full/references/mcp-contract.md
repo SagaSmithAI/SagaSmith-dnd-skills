@@ -707,6 +707,16 @@ activity id and excerpt and select only parsed weapon ids, modes, and explicit
 counts. The immutable rule review stores and applies the fill when
 `character_create_from(mode="reviewed_rule_statblock")` creates the actor. A
 parser-produced composition is only a proposal here as well.
+When a checksum-bound retained review already has a complete transcription but
+needs a newly required Agent semantic fill, the same action accepts the strict
+alternative payload `{job_id, base_review_id, observation, agent_fill}`. It
+does not accept replacement content, a new page, or new evidence ids in that
+form. The server revalidates the base review's job ownership, source and PDF
+checksums, normalized-content checksum, page render, review mode, and original
+text evidence, then retains a derived immutable review with
+`derived_from_review_id`. This lets a text-only Agent add structured
+Multiattack choices to trusted OCR output without re-importing the managed PDF
+or pretending to have inspected an image.
 Every other unstructured reviewed passive is preserved on the created actor as
 `choices.manual_ruling.kind="descriptive_passive"` with the Agent as default
 resolver and the exact passive description as its source excerpt. Read that
