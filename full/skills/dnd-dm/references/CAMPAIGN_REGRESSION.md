@@ -101,6 +101,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    creation, or verification must restore both the entry branch and entry phase
    before surfacing the error. Re-read the public phase after a failed review;
    never leave the campaign in `lobby` and repair it out of band.
+   Treat every rule-source discovery or statblock-preparation driver command as
+   a campaign-state operation even when its requested content is read-only:
+   while entered from `play`, the command temporarily performs
+   `play -> lobby -> play`. Run at most one such command for the same
+   `home + campaign_id` at a time. The public driver enforces this with a
+   cross-process campaign phase lock covering entry inspection, both phase
+   transitions, the requested operation, and failure recovery. Never bypass or
+   remove that lock to parallelize same-campaign discovery. Commands for
+   different campaigns may still run concurrently. After a batch, verify the
+   authoritative phase, clock, branch, snapshot head, and campaign revision;
+   a content-only batch must not change the clock or snapshot head.
    Such a card supports identity, notes, relationships, and ActorKnowledge; its
    default mechanical shell is not an authored statblock and must never enter
    combat. If a later encounter makes that same actor mechanical, use
