@@ -107,7 +107,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `prepare-rule-statblock` or `prepare-statblock` with
    `--replace-actor-id` to materialize the exact rule/reviewed statblock in
    place. Verify that Actor ID, name, summary, prior notes, and ActorKnowledge
-   remain intact; do not create a duplicate combat identity. For encounter
+   remain intact; do not create a duplicate combat identity. If the managed
+   rule artifact exists but its source id is not in the run manifest, use the
+   read-only `discover-rule-sources` action and then `discover-rule-chunks`;
+   never inspect the database or re-import a managed artifact from outside the
+   configured roots. For encounter
    participants, use exact rule statblocks or reviewed module image cards and
    retain all warnings. A module candidate's parser output
    is transcription support, not final semantic authority. When one reviewed statblock must
