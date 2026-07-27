@@ -692,8 +692,11 @@ warnings do not authorize repair from model memory.
 When OCR is structurally ambiguous but the indexed rule source contains the
 complete card in one exact-page, ordered contiguous chunk segment, DM-only
 `rule_import(action="review_statblock")` also accepts
-`review_mode="agent_text"` and `evidence_chunk_ids`. The import job must be the
-unique retained job for that same `source_id`. The server binds the review to
+`review_mode="agent_text"` and `evidence_chunk_ids`. The import job must belong
+to that same `source_id`. A driver may deterministically choose among historical
+jobs only when every candidate has the same nonempty artifact name and checksum;
+different artifact identities require explicit source review and
+`--source-job-id`. The server binds the review to
 the staged PDF checksum and page render checksum, verifies source/page/ordinal
 membership, parses the normalized card, rejects every normalized fact absent
 from the selected text, and rejects omission of any selected statblock evidence.

@@ -120,9 +120,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    chunks form one complete, ordered, contiguous segment on that page, use
    `prepare-rule-statblock --agent-rule-statblock-review <normalized.md>` with
    every ordered `--chunk-id`, `--source-id`, `--source-page`, and
-   `--review-observation`. The driver requires a unique retained import job and
-   sends `review_mode="agent_text"`; the MCP rechecks page ownership, ordinal
-   continuity, full evidence coverage, and absence of invented facts. A gap,
+   `--review-observation`. The driver accepts several historical jobs only when
+   all share one nonempty artifact name and checksum, then selects the
+   lexicographically first job id and reports every equivalent id. If artifact
+   identities differ, review them and pass the intended `--source-job-id`.
+   The driver sends `review_mode="agent_text"`; the MCP rechecks page ownership,
+   ordinal continuity, full evidence coverage, and absence of invented facts. A gap,
    missing source fact, or conflict remains blocked and cannot be filled from
    model memory. Never inspect the database or re-import a managed artifact
    from outside the configured roots. For encounter
