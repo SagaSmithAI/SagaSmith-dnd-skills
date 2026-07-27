@@ -1087,6 +1087,14 @@ pacing, and never set or advance the narrative clock during active combat. Once
 set, do not jump the clock with another `clock_set`; use `clock_advance` so no
 duration is skipped.
 
+If a source schedule or prior Agent ruling fixes the destination day and time,
+include
+`payload.expected_world_time={day,hour,minute,elapsed_minutes}`. Re-read the
+current public clock and derive `count`; do not manually reuse a travel-day
+difference as an elapsed-day difference, because rest days and event timing
+anchors can diverge. The server must reject a count that cannot reach the exact
+target before advancing any clock or timed effect.
+
 Treat every narrative-time interval as actual elapsed time, not as an effect-unit
 selector. `60 minute`, `1 hour`, and two consecutive `30 minute` advances must
 settle the same one-hour actor and world effects exactly once. Short Rest,

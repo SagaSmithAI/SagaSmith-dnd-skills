@@ -1276,6 +1276,13 @@ advances do not
 move the world clock. The clock must be set first, cannot change during active
 combat, and conversation time is never treated as elapsed campaign time. Once
 set, a different `clock_set` value is rejected; use `clock_advance`.
+When the destination instant is already fixed, `clock_advance.payload` also
+supplies `expected_world_time={day,hour,minute,elapsed_minutes}`. Those four
+values must be internally consistent and must equal the server-computed result;
+otherwise the entire mutation is rejected before the clock, actor effects, or
+world effects change. A campaign-specific travel-day index is not an elapsed-day
+count: first project all source-defined rest days and calendar offsets, then
+derive the duration from the current public clock and bind the resulting target.
 
 `campaign_change(action="party_rest")` is the only long-rest write. Its
 `members` array contains `character_id`, that actor's `expected_revision`, and

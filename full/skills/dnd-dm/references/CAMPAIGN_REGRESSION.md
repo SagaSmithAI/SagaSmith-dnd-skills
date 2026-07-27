@@ -508,7 +508,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     fake timing evidence; submit the settled Agent ruling alone. It must use
     `default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a concrete
     `decision` and `reason`, and `period`/`count` exactly matching the requested
-    clock advance. The service-owned campaign clock,
+    clock advance. If the event calendar or prior ruling fixes the destination
+    instant, also pass
+    `--time-expected-after-json={day,hour,minute,elapsed_minutes}`. Read the
+    current public clock and derive the interval; never equate a travel-day
+    difference with elapsed days or hand-copy a large minute constant without
+    this target. The driver rejects a mismatch before the public write and
+    `campaign_change(clock_advance)` verifies it again atomically. The
+    service-owned campaign clock,
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
     duration without an explicit audited ruling. Missing or conflicting source
