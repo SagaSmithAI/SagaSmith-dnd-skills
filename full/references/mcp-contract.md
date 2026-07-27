@@ -76,6 +76,16 @@ exception in that set takes precedence over Agent-owned work; when no such
 exception exists, an unclassified DM ruling defaults to Agent reasoning.
 Reject or normalize a contradictory `default_resolver`/`ruling_kind` pair
 instead of trusting whichever field happens to be outermost.
+The ownership contract also covers lobby review states that are not yet live
+actions. `rule_import(action="extract_candidates")` returns
+`job.review_resolution` plus `job.review_requirements`, and each pending or
+needs-revision candidate carries a `ruling_requirement`. A
+`module_query(view="candidates")` entry with `execution_state="review_ready"`
+likewise names the Agent as the source-or-scene resolver. These are ordinary
+Agent reviews when exact chunks are present. A blocked/manual-review candidate
+with `ruling_kind="missing_or_conflicting_source_review"` retains external
+ownership, and that nested external requirement takes precedence in the job
+aggregate.
 An engine `NeedsRuling` boundary that is reached before commit returns the same
 structured `pending_ruling` contract with `committed=false`, its missing facts,
 and a retry contract for the classified resolver. Treat an Agent-owned result as
@@ -140,6 +150,10 @@ Non-numeric feat prerequisites and source-bound statblock spell/component
 boundaries retain a structured `ruling_requirement`/`ruling_requirements`
 record on the card. The record names the Agent or the true external-input
 boundary, so callers must not infer ownership from prose such as "DM review."
+A reviewed rule-statblock response applies the same contract to every parser
+warning through `validation.ruling_requirements` and
+`validation.default_dm_resolver`; do not reduce those warnings to an unowned
+`warnings` list.
 
 For a 2014 custom background, use one enabled base background artifact and pass
 `custom_name`, exactly two `skills`, the base artifact's required

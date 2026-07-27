@@ -270,6 +270,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `RuntimeError` is not an acceptable handoff. Rule-pack `ruling.require`
    defaults to the Agent, whereas `choice.require` and explicitly classified
    source/approval exceptions retain external ownership.
+   Audit pre-action review states too. A rule import job in `review_required`
+   must expose `review_resolution` and every candidate requirement; a
+   `review_ready` module statblock candidate must identify the Agent as resolver.
+   If any nested requirement is a missing/conflicting-source review, preserve
+   that external owner in the aggregate rather than accepting the candidate.
    When module prose establishes relative placement without a numeric map (for
    example, creatures "clustered tightly" around a door), the Agent may map that
    fact onto the temporary combat grid through repeated

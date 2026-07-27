@@ -56,14 +56,16 @@ own exposure. Loading a group for one Agent must not expose it to another.
    If an appendix statblock is image-only, use `module-image-content-review.md`:
    render and inspect the page, submit `module_review(action="submit_content")`, re-read the
    immutable evidence, then use `character_create_from(mode="module_statblock")`.
-   Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
-   be submitted to `module_review(action="submit_content")` only with its exact
-   `source_chunk_ids`. A `blocked` candidate is a stop condition: render its cited
-   managed PDF page and have an image-capable Agent or human DM transcribe only
-   observed fields, or leave it unresolved. A text-only Agent must choose the
-   unresolved path; it cannot claim to have inspected the returned image. Never
-   repair OCR from rules memory or silently relabel blocked evidence as reviewed
-   text.
+    Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
+    be submitted to `module_review(action="submit_content")` only with its exact
+    `source_chunk_ids`. Read its structured `ruling_requirement`: complete-text
+    review defaults to the Agent, so do not pause merely because the workflow
+    calls it a DM review. A `blocked` candidate whose requirement names
+    `missing_or_conflicting_source_review` is a stop condition: first use the
+    server's text/layout OCR recovery. If ambiguity remains, an image-capable
+    reviewer may transcribe only observed fields, or leave it unresolved. A
+    text-only Agent cannot claim to have inspected a returned image. Never repair
+    OCR from rules memory or silently relabel blocked evidence as reviewed text.
 6. Set scoped progress with `module_set_progress`, including
    `current_location_key` and `state.location_scene_id` when the spatial room is a
    separate scene. The location key must be copied from the expanded scene's

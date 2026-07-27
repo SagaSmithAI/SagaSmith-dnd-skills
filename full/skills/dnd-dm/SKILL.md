@@ -168,6 +168,13 @@ prerequisites, source-bound spells, critical follow-ups, party-size reviews, and
 defaults to the Agent; a missing ranged/spell range, incomplete hydration, or
 other absent/contradictory source mechanic remains
 `missing_or_conflicting_source_review` and cannot be invented.
+Apply the same rule before a live action exists. A rule import job whose
+`state="review_required"` publishes `review_resolution` and
+`review_requirements`; a `review_ready` rule or module candidate publishes its
+own `ruling_requirement`. The Agent reviews those entries from the exact text
+chunks by default. A blocked/manual-review candidate whose requirement names
+`missing_or_conflicting_source_review` remains external and must not be accepted
+from rules memory.
 Declarative extension rules follow the same distinction:
 `ruling.require` defaults to Agent reasoning, while `choice.require` remains an
 external player-owned choice. Regression drivers must preserve the typed ruling
