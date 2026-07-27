@@ -1016,6 +1016,12 @@ turn was already in progress.
 Joining initiative ties require an explicit `tie_breaker`. Create likely scene
 participants and their source-bound cards during lobby import, not during an
 active encounter.
+An Agent-owned encounter driver may provide a unique `tie_breaker` before the
+server rolls initiative. It is inert unless a tie occurs and represents only
+the Agent's DM ordering, never a caller-supplied initiative. Safe pre-commit
+Agent ruling boundaries rewind only their unpersisted random suffix, so a retry
+at the same campaign revision reproduces the original roll after the missing
+ruling is supplied.
 `combat_end` accepts an optional structured outcome with a bounded public
 `summary` and a status of victory, defeat, withdrawal, surrender, truce, or
 interrupted.

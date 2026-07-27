@@ -723,6 +723,12 @@ until that boundary instead of approximating the delay with map distance. Do not
 patch the combatant list, create a
 mid-combat placeholder card, or queue the NPC after a failed check. Establish
 potential participant cards during lobby/module preparation.
+An automated Agent encounter driver may preselect a unique `tie_breaker` while
+leaving `initiative` absent: this records the Agent's DM-owned ordering only if
+the server roll ties, without replacing or predicting that roll. If a safe
+pre-commit ruling is returned after a roll, keep the current revision; the
+server discards that call's uncommitted random suffix so the Agent can supply
+the ruling and replay the same roll through a new public call.
 
 A Stable creature at 0 HP cannot take a short or long rest. If the established
 scene permits waiting, use the public full-playthrough `recover-stable` path,
