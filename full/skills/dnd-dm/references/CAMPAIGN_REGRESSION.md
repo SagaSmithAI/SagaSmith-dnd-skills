@@ -460,13 +460,21 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     new maximum.
 17. Advance campaign time through the public regression driver's
     `advance-time` path whenever travel, waiting, or a source-triggered interval
-    matters. Give each interval a stable `--occurrence-id`, cite the exact scene
-    chunk and excerpt, supply a positive
-    minute/hour/day count, and state any Agent-as-DM ruling used to turn narrative timing
-    such as "late in the day" into a duration. The service-owned campaign clock,
+    matters. Give each interval a stable `--occurrence-id` and supply a positive
+    minute/hour/day count. When the module states the exact interval, cite its
+    exact scene chunk and excerpt. When text such as "late in the day" needs an
+    exact conversion, preserve that source evidence and also submit
+    `--time-agent-ruling-json`. When the module establishes the journey or wait
+    but leaves its duration wholly to the DM, do not borrow adjacent prose as
+    fake timing evidence; submit the settled Agent ruling alone. It must use
+    `default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a concrete
+    `decision` and `reason`, and `period`/`count` exactly matching the requested
+    clock advance. The service-owned campaign clock,
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
-    duration without an explicit audited ruling.
+    duration without an explicit audited ruling. Missing or conflicting source
+    evidence remains an external review boundary only when the disputed source
+    fact itself must be recovered; ordinary DM estimation belongs to the Agent.
     Treat that count as actual elapsed time rather than an effect-unit selector.
     `60 minute`, `1 hour`, and two consecutive `30 minute` advances must expire
     the same one-hour actor and world effects exactly once. The public receipt and

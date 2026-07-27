@@ -181,6 +181,18 @@ matching actor/world duration expiry, and applicable rule modifiers such as
 Evocation Savant. Ordinary `method="spellbook"` grants belong to lobby setup or
 level advancement. A failure commits none of those state changes.
 
+Campaign travel, waiting, and other material elapsed intervals go through the
+public playthrough driver's `advance-time` path. Exact source-defined durations
+retain their scene excerpt and `source_ref`. If narrative source timing needs an
+exact conversion, retain that evidence and add a settled Agent-as-DM ruling. If
+the module leaves duration to the DM, use that ruling without attaching
+unrelated prose as false evidence. A time ruling is a strict
+`default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"` object with a
+concrete decision and reason; its `period` and `count` must exactly equal the
+clock mutation. The committed continuity event stores both evidence channels,
+and the authoritative clock, timed effects, actual-witness ActorKnowledge,
+checkpoint policy, and manifest sync must agree.
+
 ## Modules, space evidence, and temporary combat maps
 
 Module re-imports are revisions: earlier sources are retained for snapshots and
