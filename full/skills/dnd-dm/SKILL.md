@@ -772,6 +772,13 @@ the exact card is visible only on a module PDF page, follow
 `../../references/module-image-content-review.md` and use
 `character_create_from(mode="module_statblock")` only after the reviewed record
 validates. Never create or repair a required actor after combat begins.
+For a standard rule card whose complete text exists but whose PDF columns defeat
+automatic isolation, a text-only Agent may use only an exact same-page contiguous
+segment through `rule_import(action="review_statblock",
+review_mode="agent_text")`. Supply every ordered evidence chunk, normalize the
+full card, and let the MCP reject invented facts or omissions. Never use this
+route when the indexed source itself is incomplete or conflicting, and never
+describe it as visual review.
 Do not reject or rewrite a source attack merely because its `Hit` clause has no
 damage dice. Effect-only attacks such as a giant spider's Web retain an empty
 damage expression plus the exact `on_hit_effect`; resolve the attack roll

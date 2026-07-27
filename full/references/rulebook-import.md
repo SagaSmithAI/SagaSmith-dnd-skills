@@ -60,14 +60,25 @@ and `source_bound_rule_packs` to be true. Consume the published
    target-segment embedded-text corroboration or agreement from an independent
    OCR scale. The result is a checksum-bound reviewed statblock; retry actor
    creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
-8. If recovery cannot isolate exactly one structurally complete statblock heading,
-   the two evidence paths disagree, a critical field has low confidence, or no
-   page can be inferred, stop at
-   explicit missing/conflicting-source review. A capable reviewer may render the
-   exact page and transcribe
-   only observed fields through `rule_import(action="review_statblock")`. A
-   text-only Agent must not repair tokens from rules memory, select a similar SRD
-   creature, or acknowledge a conflict as success.
+8. If layout OCR cannot isolate a card but the already-indexed chunks still contain
+   the complete card as one ordered, contiguous segment on an exact page, a
+   text-only Agent acting as DM may normalize only that segment. Require
+   `server_capabilities.features.indexed_text_statblock_review`, exactly one
+   retained import job whose `source_id` matches, and call
+   `rule_import(action="review_statblock")` with
+   `review_mode="agent_text"`, the exact `page_number`, normalized full card,
+   observation, and ordered `evidence_chunk_ids`. The MCP independently requires
+   every chunk to belong to that source, cover the page, and have contiguous
+   ordinals; it rejects both facts absent from the evidence and selected evidence
+   omitted from the normalized card. Use the returned `review_id` with
+   `character_create_from(mode="reviewed_rule_statblock")`.
+   This is layout normalization, not model-memory reconstruction. If the indexed
+   facts themselves are missing or conflicting, stop at explicit source review.
+   An image-capable reviewer may instead render the exact page and transcribe only
+   observed fields through the same action with `review_mode="visual"` (the
+   default). A text-only Agent must not claim visual review, repair tokens from
+   rules memory, select a similar SRD creature, or acknowledge a conflict as
+   success.
 9. Call `rule_import(action="extract_candidates")`, review every candidate, and
    submit explicit decisions through `rule_import(action="review")`. Candidate
    extraction never makes content executable. Translate only a reviewed rule into

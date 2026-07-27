@@ -116,7 +116,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `--source-page`: chunks remain the first text-layout attempt and the page is
    the bounded OCR fallback. Repeated decorative/narrative copies of a creature
    heading are valid when exactly one copy is immediately bound to a complete
-   creature core. Never inspect the database or re-import a managed artifact
+   creature core. If OCR still cannot isolate the card but those exact indexed
+   chunks form one complete, ordered, contiguous segment on that page, use
+   `prepare-rule-statblock --agent-rule-statblock-review <normalized.md>` with
+   every ordered `--chunk-id`, `--source-id`, `--source-page`, and
+   `--review-observation`. The driver requires a unique retained import job and
+   sends `review_mode="agent_text"`; the MCP rechecks page ownership, ordinal
+   continuity, full evidence coverage, and absence of invented facts. A gap,
+   missing source fact, or conflict remains blocked and cannot be filled from
+   model memory. Never inspect the database or re-import a managed artifact
    from outside the configured roots. For encounter
    participants, use exact rule statblocks or reviewed module image cards and
    retain all warnings. A module candidate's parser output

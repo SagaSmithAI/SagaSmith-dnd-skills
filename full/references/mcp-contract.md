@@ -12,7 +12,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply` |
+| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
@@ -687,8 +687,20 @@ returned checksum-bound `review_id` with
 `character_create_from(mode="reviewed_rule_statblock")`. This route requires no
 image understanding by the Agent. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
-warnings remain an explicit missing/conflicting-source review boundary; never
-repair them from model memory.
+warnings do not authorize repair from model memory.
+
+When OCR is structurally ambiguous but the indexed rule source contains the
+complete card in one exact-page, ordered contiguous chunk segment, DM-only
+`rule_import(action="review_statblock")` also accepts
+`review_mode="agent_text"` and `evidence_chunk_ids`. The import job must be the
+unique retained job for that same `source_id`. The server binds the review to
+the staged PDF checksum and page render checksum, verifies source/page/ordinal
+membership, parses the normalized card, rejects every normalized fact absent
+from the selected text, and rejects omission of any selected statblock evidence.
+The stored review uses `confidence="reviewed_text"` and retains per-chunk
+checksums. Visual review remains `review_mode="visual"` and
+`confidence="reviewed_image"`. Missing or conflicting indexed facts remain an
+explicit external source-review boundary.
 For an image-only module card, use the reviewed visual workflow and
 `mode="module_statblock"` instead. Every module-authored Multiattack is an
 Agent-review gate. `module_query(view="candidates")` returns

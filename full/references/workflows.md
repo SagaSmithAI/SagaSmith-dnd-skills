@@ -115,10 +115,16 @@ own exposure. Loading a group for one Agent must not expose it to another.
    disambiguate repeated decorative/narrative copies of the same heading, and
    corroborates critical facts without asking the Agent to inspect an image. Retry with
    `mode="reviewed_rule_statblock"` and the returned `review_id`. Stop for explicit
-   source review on ambiguous headings, low confidence, or disagreement. This is
-   the missing/conflicting-source exception to Agent-owned DM rulings and may
-   require an image-capable reviewer; never fill the card from memory or
-   substitute a similar creature.
+   source review on low confidence or disagreement. If OCR is structurally
+   ambiguous but one exact indexed page still contains the complete card as an
+   ordered contiguous chunk segment, a text-only Agent may normalize that segment
+   through `rule_import(action="review_statblock",
+   payload={job_id,page_number,normalized_content,observation,
+   review_mode:"agent_text",evidence_chunk_ids:[...]})`. The MCP verifies source,
+   page, ordinal continuity, no invented normalized fact, and no omitted selected
+   evidence. This path is forbidden when the indexed facts themselves are missing
+   or conflicting. That remaining boundary may require an image-capable reviewer;
+   never fill the card from memory or substitute a similar creature.
    Read `module-image-content-review.md` for the distinction between an image-only
    full card and a standard card with module instance changes.
 9. Apply every confirmed class/subclass feature and complete species/background
