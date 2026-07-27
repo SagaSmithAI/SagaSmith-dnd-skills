@@ -155,6 +155,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    card, and require the prepared spell ids to cover that executable set. OCR
    tokens such as a broken ordinal are an importer regression to fix and refresh,
    not permission to accept an empty spell list or patch the actor manually.
+   Apply the same completeness rule to actions: count every explicit
+   `Melee/Ranged [Weapon|Spell] Attack:` marker in the normalized source and
+   require it to belong to a parsed weapon action or an identified statblock
+   spell action. A card with at least one working attack still fails when another
+   source attack marker was swallowed into the preceding description. The text
+   layout normalizer may repair only context-bounded punctuation and range OCR
+   inside a generic action signature; any remaining mismatch must trigger the
+   bounded OCR/review path. Never approve a partial card merely because
+   `attack_count >= 1`, and never add a creature-name-specific parser exception.
    Before any prepared
    monster enters combat, compare every printed Multiattack with
    `derived.multiattack_options`. For every module or reviewed-rulebook

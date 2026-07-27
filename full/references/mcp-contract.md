@@ -688,6 +688,13 @@ returned checksum-bound `review_id` with
 image understanding by the Agent. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
 warnings do not authorize repair from model memory.
+Text-layout recovery also compares every explicit
+`Melee/Ranged [Weapon|Spell] Attack:` source marker with the parsed weapon and
+identified statblock-spell actions. One successfully parsed attack cannot hide
+a later OCR-damaged action. Context-bounded generic repairs may normalize a
+mismatched action-qualifier bracket or an OCR-corrupted numeric range, but an
+uncovered marker rejects the card and enters bounded OCR recovery. This
+coverage check is independent of creature name.
 
 When OCR is structurally ambiguous but the indexed rule source contains the
 complete card in one exact-page, ordered contiguous chunk segment, DM-only
