@@ -55,9 +55,12 @@ ActorKnowledge, but no caller may treat its placeholder AC, HP, abilities, speed
 or other derived mechanics as authored.
 For repeated anonymous source identities, keep one card and knowledge scope per
 instance. Supply the exact printed `source_identity` plus a stable
-`instance_key`; the canonical display name is
-`<source_identity> [<instance_key>]` and the card is additionally tagged
-`anonymous_source_instance`.
+`instance_key`; the default display name is
+`<source_identity> [<instance_key>]` and the card is tagged
+`anonymous_source_instance`. A settled Agent DM naming decision may instead
+bind a proper display name to exactly that source identity and instance key.
+Such a card also carries `agent_named_source_instance`; its name is narrative
+identity only and does not authorize any mechanical fields.
 
 ```powershell
 # Public library templates and direct campaign instances both support pc/npc/monster.

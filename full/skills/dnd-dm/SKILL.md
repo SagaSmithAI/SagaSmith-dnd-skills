@@ -274,9 +274,14 @@ scores, and never include that actor in a check or encounter until an exact
 statblock is imported.
 For several anonymous NPCs sharing one source label, create distinct
 `anonymous_source_instance` cards with the exact printed `source_identity` and
-stable `instance_key`; use only the canonical
-`<source_identity> [<instance_key>]` name. Never invent proper names or merge
-their ActorKnowledge to work around name uniqueness.
+stable `instance_key`. The safe default display name is
+`<source_identity> [<instance_key>]`. When distinct names materially help the
+Agent run or remember those source-authored instances, the Agent may assign each
+one a proper name only through a settled, strictly bound
+`identity_agent_ruling`: its `assigned_name`, `source_identity`, and
+`instance_key` must exactly match the creation request. Preserve the
+`agent_named_source_instance` provenance tag. Never use naming to create extra
+instances, invent mechanics, or merge their ActorKnowledge.
 
 After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
 `character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one

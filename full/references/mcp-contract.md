@@ -303,10 +303,15 @@ checkpoint. A later same-named NPC from the same source chunk needs a new
 occurrence id.
 When the source defines several anonymous instances under one printed identity,
 create a separate actor for each one with `source_identity` equal to that exact
-source label and a stable `instance_key`. The stored name must be exactly
+source label and a stable `instance_key`. By default, store the canonical name
 `<source_identity> [<instance_key>]`; the card gains
-`anonymous_source_instance`. This preserves independent NPC state and knowledge
-without inventing proper names or weakening source-identity validation.
+`anonymous_source_instance`. If the Agent assigns a distinct proper name, send a
+settled `identity_agent_ruling` with
+`default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, and exact
+`assigned_name`, `source_identity`, and `instance_key` bindings. The service
+adds `agent_named_source_instance` and rejects any mismatch or unbound name.
+This preserves independent NPC state and knowledge without weakening source
+identity, count, source evidence, or mechanics.
 The service canonicalizes the returned `source_ref` to its verified module,
 scene, chunk, page, heading, and content-hash fields. A regression verifier must
 compare that canonical field set, while retaining optional asset-path, asset

@@ -87,10 +87,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    restore `play`, register the actor in the manifest, and verify its checkpoint.
    For a source-counted anonymous group, create one actor per actual instance.
    Set `--narrative-npc-source-identity` to the exact printed group label and a
-   distinct stable `--narrative-npc-instance-key`; the actor name must be
-   `<source identity> [<instance key>]`. Require the additional
-   `anonymous_source_instance` tag. Do not invent proper names merely to satisfy
-   database uniqueness, and do not collapse several NPCs into one knowledge scope.
+   distinct stable `--narrative-npc-instance-key`. Use
+   `<source identity> [<instance key>]` by default. If the Agent needs distinct
+   proper names for real play, pass
+   `--narrative-npc-identity-agent-ruling-json` with a settled Agent DM decision
+   whose `assigned_name`, `source_identity`, and `instance_key` exactly match the
+   request; require both `anonymous_source_instance` and
+   `agent_named_source_instance`. This naming decision cannot change the printed
+   count, ancestry, role, mechanics, or source evidence. Do not assign names
+   merely for database uniqueness, and do not collapse several NPCs into one
+   knowledge scope.
    A `prepare-statblock` failure at candidate lookup, visual review, validation,
    creation, or verification must restore both the entry branch and entry phase
    before surfacing the error. Re-read the public phase after a failed review;
