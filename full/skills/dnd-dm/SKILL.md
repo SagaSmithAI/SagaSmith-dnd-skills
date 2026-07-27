@@ -282,6 +282,12 @@ one a proper name only through a settled, strictly bound
 `instance_key` must exactly match the creation request. Preserve the
 `agent_named_source_instance` provenance tag. Never use naming to create extra
 instances, invent mechanics, or merge their ActorKnowledge.
+If that same narrative actor later needs mechanics and an exact rule or reviewed
+module statblock is available, rebuild it in place with the statblock creation
+path's `replace_character_id` and current revision. Preserve its Actor ID, name,
+summary, prior notes, and ActorKnowledge; the service appends statblock
+provenance while replacing only the sentinel sheet with authoritative mechanics.
+Do not create a second combat double for the same person.
 
 After item writes, treat `character_query(view="get").derived.inventory.weapon_attacks` and
 `character_query(view="get").derived.inventory.encumbrance` as authoritative. Represent one

@@ -312,6 +312,12 @@ settled `identity_agent_ruling` with
 adds `agent_named_source_instance` and rejects any mismatch or unbound name.
 This preserves independent NPC state and knowledge without weakening source
 identity, count, source evidence, or mechanics.
+When a narrative-only actor later receives an exact combat statblock, call the
+same rule/reviewed statblock creation mode with `replace_character_id` and
+`expected_revision`. In-place materialization must preserve the existing actor
+name, summary, notes, Actor ID, and ActorKnowledge while appending the new
+statblock provenance. A replacement that renames or rewrites the narrative
+identity is rejected; never create a parallel combat actor.
 The service canonicalizes the returned `source_ref` to its verified module,
 scene, chunk, page, heading, and content-hash fields. A regression verifier must
 compare that canonical field set, while retaining optional asset-path, asset

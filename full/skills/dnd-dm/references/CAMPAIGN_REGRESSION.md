@@ -103,8 +103,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    never leave the campaign in `lobby` and repair it out of band.
    Such a card supports identity, notes, relationships, and ActorKnowledge; its
    default mechanical shell is not an authored statblock and must never enter
-   combat. For encounter participants, use exact rule statblocks or reviewed
-   module image cards and retain all warnings. A module candidate's parser output
+   combat. If a later encounter makes that same actor mechanical, use
+   `prepare-rule-statblock` or `prepare-statblock` with
+   `--replace-actor-id` to materialize the exact rule/reviewed statblock in
+   place. Verify that Actor ID, name, summary, prior notes, and ActorKnowledge
+   remain intact; do not create a duplicate combat identity. For encounter
+   participants, use exact rule statblocks or reviewed module image cards and
+   retain all warnings. A module candidate's parser output
    is transcription support, not final semantic authority. When one reviewed statblock must
    create several source-identical actors, create every actor separately with an
    idempotency identity scoped by the run, review, actor name, actor type, and
