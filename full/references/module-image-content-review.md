@@ -31,7 +31,10 @@ returned `execution_state`:
    fill an absent field from memory or a similar creature.
 4. Call `module_review(action="submit_content")` with the appendix `scene_id`, stable
    `content_key`, normalized Markdown, managed PDF or rendered-image asset,
-   1-based page, a literal visual observation, and a fresh idempotency key.
+   1-based page, a literal visual observation, and a fresh idempotency key. If
+   the Agent can read an exact module-specific Multiattack whose composition was
+   not safely structured, include the source-bound semantic fill described
+   below in `payload.agent_fill`; do not add another phrase-specific parser rule.
 5. Stop if validation rejects the card. If it returns `mixed`, review every
    warning and keep unresolved mechanics visible. `automatic` means only that
    the transcribed mechanics represented by the current engine are executable.
@@ -101,13 +104,40 @@ in actor provenance.
 ```
 
 Numeric melee, ranged, weapon, and spell attacks with explicit to-hit, range or
-reach, dice, bonus, and type can settle automatically. Narrative traits,
-ambiguous multiattacks, incomplete spellcasting, recharge/choice semantics, or
-other unsupported effects remain warnings or DM rulings. The SagaSmith Agent
-performs those DM adjudications by default after reading the exact reviewed
-source; player choices and missing-image/source review still pause at their
-own boundaries. Never erase a warning
-to make readiness pass.
+reach, dice, bonus, and type can settle automatically. For an exact
+module-specific Multiattack, the Agent may submit:
+
+```json
+{
+  "agent_fill": {
+    "multiattack_options": [
+      {
+        "activity_id": "multiattack-action",
+        "source_excerpt": "The drake attacks twice, once with its bite and once with its tail.",
+        "reason": "The exact source names one use of each parsed weapon.",
+        "options": [
+          {
+            "id": "bite-and-tail",
+            "attacks": [
+              {"weapon_id": "bite", "attack_mode": "melee", "count": 1},
+              {"weapon_id": "tail", "attack_mode": "melee", "count": 1}
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The excerpt must exactly match the reviewed activity, and every weapon id and
+mode must already exist on the parsed card. The stored fill is attributed to
+the Agent with `module_specific_procedure`; it is not a raw sheet patch.
+Multiattacks that replace attacks with special activities, narrative traits,
+incomplete spellcasting, recharge/choice semantics, or other unsupported
+effects remain Agent DM rulings when selected. Player choices and
+missing-image/source review still pause at their own boundaries. Never erase a
+warning to make readiness pass.
 
 The review belongs to the imported campaign module and is immutable provenance;
 it is not branch-scoped narrative state. Actors created from it retain the review

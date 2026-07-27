@@ -114,8 +114,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Before any prepared
    monster enters combat, compare every printed Multiattack with
    `derived.multiattack_options`. If a deterministic printed composition is
-   missing, stop at the quality gate and repair/reimport it; do not silently run
-   one ordinary attack in place of the source-defined action. A generic
+   missing, stop at the quality gate; do not silently run one ordinary attack in
+   place of the source-defined action. For a module-specific creature, do not
+   grow phrase-by-phrase parser exceptions. Have the Agent read the exact
+   reviewed source and resubmit `module_review(action="submit_content")` with
+   `payload.agent_fill.multiattack_options`: the activity id, exact source
+   excerpt, a short reason, and canonical options containing only parsed weapon
+   ids, attack modes, and counts. The server validates and stores that semantic
+   fill in the immutable content review. The regression driver accepts the same
+   object through `--agent-statblock-fill`. A generic
    “N melee/ranged [weapon] attacks” composition (where “weapon” may be omitted
    in the source) is deterministic only when the actor card has exactly one
    compatible weapon for that mode. When multiple compatible weapons remain,

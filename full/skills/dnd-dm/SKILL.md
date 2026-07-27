@@ -518,7 +518,13 @@ pass `multiattack_option_id` on its first `combat_preflight_attack` and
 recorded by that option. Omit the id to choose one ordinary Attack. A descriptive
 Multiattack without options remains an Agent-as-DM boundary only when selected and does not
 block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
-override. A melee weapon with the Thrown property remains a
+override. Before a module-specific monster enters combat, if the exact reviewed
+Multiattack prose is unambiguous but the parser did not structure it, return to
+Lobby and have the Agent resubmit the immutable content review with
+`payload.agent_fill.multiattack_options`. Cite the activity id and exact source
+excerpt and use only existing parsed weapon ids, legal modes, and explicit
+counts. Do not encode that one creature as another parser phrase exception or
+patch the actor sheet. A melee weapon with the Thrown property remains a
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
 On a positioned combat map, a ranged attack without a recorded normal range is

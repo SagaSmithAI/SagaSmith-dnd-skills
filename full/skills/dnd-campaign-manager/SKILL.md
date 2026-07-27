@@ -74,7 +74,12 @@ replaces the earlier exposure, so discard every older exposure id.
    Inspect `module_query(view="candidates")` as a separate evidence gate.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
    `module_review(action="submit_content")`; `blocked` candidates require a rendered managed page
-   and literal visual transcription. Never fill OCR gaps from memory.
+   and literal visual transcription. Never fill OCR gaps from memory. For an
+   exact module-specific Multiattack that remains unstructured, the Agent may
+   attach a source-bound `payload.agent_fill.multiattack_options` to that
+   immutable review, using only parsed weapon ids, modes, and explicit counts.
+   Do not solve individual monster prose by adding phrase-specific parser cases
+   or by patching the resulting actor sheet.
    Then choose a scene and use `module_set_progress` with an explicit
    `scope_id` to enter it. Do not narrate from a `module_search` snippet until
    `module_expand` or `module_query(view="scene")` has been called. If an

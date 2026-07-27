@@ -916,7 +916,15 @@ not inflated from a monster's Multiattack card. Pass a canonical
 `multiattack_option_id` only when selecting that structured Multiattack and omit
 it for one ordinary weapon attack. A descriptive Multiattack without executable
 options requires an Agent-performed DM ruling only if selected and must not
-disable ordinary attacks.
+disable ordinary attacks. During Lobby review, an Agent that can read an exact
+module-specific composition may attach
+`payload.agent_fill.multiattack_options` to
+`module_review(action="submit_content")`. Each declaration is bound to the
+activity id and exact source excerpt and may contain only existing parsed weapon
+ids, compatible modes, and explicit counts. The server validates it and stores
+the normalized Agent attribution in immutable review metadata. This is a
+semantic review result, not a generic sheet patch or a reason to grow
+phrase-specific parser exceptions.
 With valid grid positions, `combat_movement(action="move")`
 verifies the declared five-foot grid distance and creates an owned
 `opportunity_attack` reaction window only when a mover leaves an eligible
