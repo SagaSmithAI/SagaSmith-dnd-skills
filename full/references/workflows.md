@@ -197,6 +197,17 @@ own exposure. Loading a group for one Agent must not expose it to another.
    Do not end the attacker's turn while this window is pending. Automated Shield
    tactics use the lowest offered slot only when +5 AC changes the hit to a miss;
    otherwise decline. Available Shield should block Magic Missile.
+   When a committed hit instead returns `pending_on_hit_ruling_id`, the Agent
+   reviews the complete card and exact excerpt and settles that owned window
+   through `combat_choice(action="on_hit_ruling")`. Use `apply_condition` only
+   for printed action/check escape terms. Use `saving_throw_condition` for an
+   immediate save-gated timed condition with printed turn-end repeat saves; pass
+   the exact condition, ability, DC, repeat timing, duration, and excerpt.
+   `combat_end_turn` rolls those repeat saves automatically without spending an
+   action. Use `saving_throw_damage` for printed save-dependent extra damage.
+   Never classify by creature name, silently dismiss a structured rider, repeat
+   the already committed hit, or let the driver mistake a non-escape effect for
+   an action escape.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.

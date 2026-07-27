@@ -775,7 +775,14 @@ abilities, and an exact excerpt. If applied, keep the resulting ongoing effect
 on the target. On that target's turn, use
 `combat_check(action="escape")`; it must spend the action, roll the effect's
 recorded ability and DC, and remove the condition only on success. Never narrate
-an escape, patch a condition, or ignore the ruling window. If the reviewed
+an escape, patch a condition, or ignore the ruling window. This action-consuming
+escape path is not valid for a condition whose source instead calls for a saving
+throw. For an immediate save-gated condition that repeats at the end of each
+target turn, use `payload.selection.id="saving_throw_condition"` with the exact
+condition, ability, DC, `repeat_save_timing="turn_end"`, printed duration, and
+full on-hit excerpt. The server rolls the initial save immediately, records the
+timed condition only on failure, and rolls each repeat save automatically in
+`combat_end_turn`; it does not spend the target's action. If the reviewed
 `on_hit_effect` instead requires a saving throw and additional damage, call
 `combat_choice(action="on_hit_ruling")` with
 `payload.selection.id="saving_throw_damage"` plus the exact printed
@@ -783,7 +790,13 @@ ability, DC, damage formula/type, success treatment, and source excerpt. Supply
 the exact structured zero-HP effect when present; the giant spider Bite, for
 example, makes a target reduced to 0 HP stable, Poisoned for 1 hour, and
 Paralyzed while poisoned. Do not dismiss an explicit saving-throw damage clause
-or reduce it to condition-only settlement. If candidate validation
+or reduce it to condition-only settlement. The Agent must classify the complete
+reviewed action semantically; never infer these branches from a monster name or
+add a creature-specific phrase patch. If the source combines several conditions,
+damage, suppression, or another rider that the selected structured branch cannot
+represent, leave the owned window pending and use the reported Agent-as-DM
+boundary to add the missing generic settlement capability before continuing.
+If candidate validation
 instead reports that this kind of action lacks supported Hit dice, stop in lobby,
 repair and refresh the importer, and recreate the actor.
 For the exact Invisibility spell, preserve unseen-attacker advantage on the

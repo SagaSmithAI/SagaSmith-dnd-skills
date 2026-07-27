@@ -718,6 +718,17 @@ ability, DC, damage formula/type, and success treatment through the campaign
 random stream. A printed zero-HP rider must be supplied and settled in the same
 mutation. Explicit save-and-damage text cannot be dismissed or reduced to a
 condition-only ruling.
+If the reviewed clause instead gates a timed condition behind an immediate save
+and explicitly grants repeat saves at the end of the target's turns, use
+`payload.selection.id="saving_throw_condition"` with the exact condition,
+ability, DC, `repeat_save_timing="turn_end"`, structured printed duration, and
+full excerpt. The initial save and any failed condition application commit
+atomically. `combat_end_turn` performs later saves through the campaign random
+stream without consuming an action, removes only that effect on success, and
+returns `repeat_saves`; action-consuming `apply_condition` escape terms are not
+interchangeable. The Agent selects this semantic settlement from the complete
+reviewed card and exact source, never from a creature-name allowlist or a
+phrase-specific parser patch.
 When a complete statblock action repeats a known spell, the action is authoritative
 for that creature. Hydration preserves the Core card's components and provenance
 but overlays the displayed effect/range and structured attack resolution together.
