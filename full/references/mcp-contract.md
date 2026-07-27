@@ -659,7 +659,16 @@ low-confidence facts, evidence disagreement, unsupported statblocks, or parser
 warnings remain an explicit missing/conflicting-source review boundary; never
 repair them from model memory.
 For an image-only module card, use the reviewed visual workflow and
-`mode="module_statblock"` instead. Current automatic import supports reviewed
+`mode="module_statblock"` instead. Every module-authored Multiattack is an
+Agent-review gate. `module_query(view="candidates")` returns
+`agent_fill_requirements` with the exact activity excerpt and available parsed
+weapon ids; `module_review(action="submit_content")` rejects a parser-only
+composition until `payload.agent_fill` covers every listed activity exactly
+once. This remains true when phrase matching happened to produce the correct
+candidate. Each requirement allows `structured` or `agent_ruling`: the latter
+accepts an exact excerpt and reason without options, removes any executable
+parser proposal, and preserves the source procedure as an Agent-owned ruling
+when selected. Current automatic import supports reviewed
 English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
 numeric attack facts, 2024, ambiguous, or otherwise unsupported block must
 remain unresolved; do not replace it with a similar SRD creature or invent a card.
@@ -923,15 +932,19 @@ not inflated from a monster's Multiattack card. Pass a canonical
 `multiattack_option_id` only when selecting that structured Multiattack and omit
 it for one ordinary weapon attack. A descriptive Multiattack without executable
 options requires an Agent-performed DM ruling only if selected and must not
-disable ordinary attacks. During Lobby review, an Agent that can read an exact
-module-specific composition may attach
+disable ordinary attacks. During Lobby review, the Agent must read every exact
+module-specific composition and attach
 `payload.agent_fill.multiattack_options` to
 `module_review(action="submit_content")`. Each declaration is bound to the
 activity id and exact source excerpt and may contain only existing parsed weapon
 ids, compatible modes, and explicit counts. The server validates it and stores
 the normalized Agent attribution in immutable review metadata. This is a
 semantic review result, not a generic sheet patch or a reason to grow
-phrase-specific parser exceptions.
+phrase-specific parser exceptions. Parser-produced options are suggestions only
+for module cards and cannot bypass this fill gate. If the source combines a
+special activity, recharge/choice procedure, or another unsupported semantic,
+submit `resolution="agent_ruling"` without `options`; the server removes parsed
+options and keeps the exact action as an Agent-owned DM boundary.
 With valid grid positions, `combat_movement(action="move")`
 verifies the declared five-foot grid distance and creates an owned
 `opportunity_attack` reaction window only when a mover leaves an eligible

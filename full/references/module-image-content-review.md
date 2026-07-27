@@ -32,9 +32,10 @@ returned `execution_state`:
 4. Call `module_review(action="submit_content")` with the appendix `scene_id`, stable
    `content_key`, normalized Markdown, managed PDF or rendered-image asset,
    1-based page, a literal visual observation, and a fresh idempotency key. If
-   the Agent can read an exact module-specific Multiattack whose composition was
-   not safely structured, include the source-bound semantic fill described
-   below in `payload.agent_fill`; do not add another phrase-specific parser rule.
+   the card contains any module-authored Multiattack, inspect the returned
+   `agent_fill_requirements` and include the source-bound semantic fill described
+   below in `payload.agent_fill`. This is mandatory even when the parser proposed
+   executable options; do not add another phrase-specific parser rule.
 5. Stop if validation rejects the card. If it returns `mixed`, review every
    warning and keep unresolved mechanics visible. `automatic` means only that
    the transcribed mechanics represented by the current engine are executable.
@@ -104,8 +105,8 @@ in actor provenance.
 ```
 
 Numeric melee, ranged, weapon, and spell attacks with explicit to-hit, range or
-reach, dice, bonus, and type can settle automatically. For an exact
-module-specific Multiattack, the Agent may submit:
+reach, dice, bonus, and type can settle automatically. For every exact
+module-specific Multiattack, the Agent must submit:
 
 ```json
 {
@@ -130,12 +131,16 @@ module-specific Multiattack, the Agent may submit:
 }
 ```
 
-The excerpt must exactly match the reviewed activity, and every weapon id and
-mode must already exist on the parsed card. The stored fill is attributed to
-the Agent with `module_specific_procedure`; it is not a raw sheet patch.
+The excerpt must exactly match the reviewed activity, every weapon id and mode
+must already exist on the parsed card, and the declarations must cover every
+Multiattack activity exactly once. A parser-recognized option is only a candidate
+until this submission. The stored fill is attributed to the Agent with
+`module_specific_procedure`; it is not a raw sheet patch.
 Multiattacks that replace attacks with special activities, narrative traits,
 incomplete spellcasting, recharge/choice semantics, or other unsupported
-effects remain Agent DM rulings when selected. Player choices and
+effects use the same declaration with `resolution="agent_ruling"` and no
+`options`. This explicitly removes any parser proposal and leaves the action as
+an Agent DM ruling when selected. Player choices and
 missing-image/source review still pause at their own boundaries. Never erase a
 warning to make readiness pass.
 

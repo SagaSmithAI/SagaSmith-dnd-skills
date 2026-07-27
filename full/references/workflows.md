@@ -58,9 +58,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    immutable evidence, then use `character_create_from(mode="module_statblock")`.
     Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
     be submitted to `module_review(action="submit_content")` only with its exact
-    `source_chunk_ids`. Read its structured `ruling_requirement`: complete-text
-    review defaults to the Agent, so do not pause merely because the workflow
-    calls it a DM review. A `blocked` candidate whose requirement names
+     `source_chunk_ids`. Read its structured `ruling_requirement`: complete-text
+     review defaults to the Agent, so do not pause merely because the workflow
+     calls it a DM review. If `agent_fill_requirements.required` is true, the
+     Agent must cover every listed Multiattack as `structured` or
+     `agent_ruling`; parser-produced options are never authoritative for module
+     creatures. A `blocked` candidate whose requirement names
     `missing_or_conflicting_source_review` is a stop condition: first use the
     server's text/layout OCR recovery. If ambiguity remains, an image-capable
     reviewer may transcribe only observed fields, or leave it unresolved. A
