@@ -267,7 +267,9 @@ Actor effects remain in `sheet.effects`. Effects attached to a room, object,
 scene, or the campaign instead live in `campaign.state.world_effects` and are
 written through `campaign_change(effect_add/effect_remove)`. Their visibility is
 `public`, `party`, or `dm`; their minute/hour/day/round/encounter duration is
-advanced by the same atomic campaign clock paths as actor effects.
+advanced by the same atomic campaign time paths as actor effects.
+`created_at_elapsed_ticks` binds creation to the one six-second tick stream;
+`created_at_elapsed_minutes` is its floor-divided compatibility projection.
 
 Containers are ordinary `kind: "container"` items. Items reference their parent
 with `container_id`; containers cannot form cycles. Container mechanics record
@@ -286,7 +288,9 @@ view for attack bonus and damage expression.
 
 Effects record source, optional `source_spell_id`, active state, `concentration`,
 a declared duration period/remaining count, structured changes, and a short
-description. Hour/day durations may carry the service-managed
+description. Every elapsed-time mutation advances round durations by its exact
+tick count and minute/hour/day durations at the boundaries it crosses. Hour/day
+durations may carry the service-managed
 `elapsed_minutes_remainder` needed to accumulate actual elapsed time across
 smaller clock advances. It must be non-negative and smaller than the duration
 unit; clients must not author, round, or patch it. The runtime permits at most one

@@ -565,7 +565,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     difference with elapsed days or hand-copy a large minute constant without
     this target. The driver rejects a mismatch before the public write and
     `campaign_change(clock_advance)` verifies it again atomically. The
-    service-owned campaign clock,
+    service-owned `state.game_time.elapsed_ticks` (six seconds per tick),
+    optional anchored `state.world_time`,
     continuity event, actual-witness ActorKnowledge, snapshot, and manifest sync
     must all agree. Never update only the manifest's projected clock or invent a
     duration without an explicit audited ruling. Missing or conflicting source
@@ -600,9 +601,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     recovery evidence.
     Treat that count as actual elapsed time rather than an effect-unit selector.
     `60 minute`, `1 hour`, and two consecutive `30 minute` advances must expire
-    the same one-hour actor and world effects exactly once. The public receipt and
+    the same round- and one-hour actor/world effects exactly once. Completed
+    combat and chase rounds accumulate on that same stream across encounter
+    boundaries; completed out-of-combat casts include their printed casting time
+    and a ritual adds ten minutes. The public receipt and
     subsequent actor/campaign reads must agree on every advanced or expired effect;
-    never round or directly patch a sub-hour/sub-day remainder.
+    never round or directly patch a subminute/sub-hour/sub-day remainder.
 18. Before advancing time for a Short Rest, preflight every participant through
     `character_query(view="rest")` with that actor's exact Hit Die keys/counts
     and optional Arcane Recovery or Natural Recovery allocation. Natural

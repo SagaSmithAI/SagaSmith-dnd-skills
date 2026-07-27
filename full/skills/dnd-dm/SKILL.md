@@ -1093,14 +1093,17 @@ the appropriate combat tools and Agent-performed DM ruling rather than treating 
 spell's complete effect.
 
 Before a module can branch on opening hours, daylight, watches, or travel time,
-establish its branch-local clock with
+remember that `state.game_time.elapsed_ticks` is the only advancing chronology
+(one tick is six seconds); `state.world_time` is an optional calendar view. Anchor
+that view with
 `campaign_change(action="clock_set", payload={day, hour, minute, label})` and cite
 the narrative/source assumption. After the DM establishes elapsed time, use
 `campaign_change(action="clock_advance",
 payload={period, count, expected_world_time})`. Minute, hour,
-and day advances update the snapshotted campaign clock and settle all matching
-canonical actor and campaign-space effect durations in the same mutation; round and encounter durations
-advance without changing narrative time. Never infer elapsed time from chat
+day, and round advances update the same tick stream and settle all elapsed
+round/minute/hour/day actor and campaign-space durations in the same mutation.
+An encounter-only advance has no fixed real duration and affects only
+encounter-bound lifecycle state. Never infer elapsed time from chat
 pacing, and never set or advance the narrative clock during active combat. Once
 set, do not jump the clock with another `clock_set`; use `clock_advance` so no
 duration is skipped.
@@ -1115,12 +1118,14 @@ target before advancing any clock or timed effect.
 
 Treat every narrative-time interval as actual elapsed time, not as an effect-unit
 selector. `60 minute`, `1 hour`, and two consecutive `30 minute` advances must
-settle the same one-hour actor and world effects exactly once. Short Rest,
-party-rest, Stable recovery, and spell-copying clock advances obey the same rule.
-Ten completed combat rounds also advance the shared clock by one minute and
+settle the same round- and one-hour actor/world effects exactly once. Short/Long
+party rest, Stable recovery, completed out-of-combat casting (including the
+ritual's added ten minutes), and spell-copying obey the same rule. Completed
+combat and chase rounds use the same ticks; any ten completed rounds, even
+across separate encounters, advance one minute and
 settle elapsed effects for combatants, noncombatants, and world objects in the
 same turn-ending transaction.
-The service owns any sub-hour/sub-day remainder; never round a duration or patch
+The service owns every subminute/sub-hour/sub-day remainder; never round a duration or patch
 that bookkeeping into a card or manifest.
 
 Resolve every completed Short or Long Rest through

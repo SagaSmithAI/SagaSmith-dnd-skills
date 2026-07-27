@@ -1332,18 +1332,22 @@ old/new source evidence is missing or contradictory, retain the external
 source-review classification instead. The aggregate validation
 `ruling_requirements` must preserve the same records.
 
-`campaign_change(action="clock_set")` establishes the branch-local campaign day,
-hour, and minute. `campaign_change(action="clock_advance")` advances an explicit
+Every campaign owns one monotonic `state.game_time.elapsed_ticks` chronology;
+one tick is six seconds. `state.world_time` is only an optional branch-local
+calendar projection anchored to that chronology. `campaign_change(action="clock_set")`
+anchors its day, hour, and minute without resetting ticks.
+`campaign_change(action="clock_advance")` advances an explicit
 `minute`, `hour`, `day`, `round`, or `encounter` count. Narrative-time advances
-update the snapshotted `state.world_time` and settle effect durations by the
+update `state.game_time`, update an anchored `state.world_time`, and settle effect durations by the
 actual elapsed interval across all campaign actors and `state.world_effects` as
 one atomic group. Thus 60 minutes, one hour, and two consecutive 30-minute
-advances have the same result for a one-hour effect. Any sub-hour/sub-day
-remainder is service-owned and persists on the canonical effect; round/encounter
-advances do not
-move the world clock. The clock must be set first, cannot change during active
-combat, and conversation time is never treated as elapsed campaign time. Once
-set, a different `clock_set` value is rejected; use `clock_advance`.
+advances have the same result for both round- and hour-duration effects. Any
+subminute/sub-hour/sub-day remainder is service-owned. A `round` advances one
+tick; `encounter` advances only encounter-bound lifecycle state because an
+encounter has no fixed elapsed duration. Game time can advance before a calendar
+is anchored. The calendar cannot be set during active combat, and conversation
+time is never elapsed campaign time. Once anchored, a different `clock_set`
+instant is rejected; use `clock_advance`.
 Every `minute`, `hour`, or `day` `clock_advance.payload` supplies
 `expected_world_time={day,hour,minute,elapsed_minutes}`; omission is rejected.
 Those four
@@ -1378,7 +1382,8 @@ change the occurrence id, omit the exact target, accept a merely similar clock,
 or patch the clock/continuity records directly.
 
 Every other public operation that moves narrative time—Short/Long party rest,
-Stable recovery, and source-bound spellbook copying—uses the same atomic replay
+Stable recovery, completed out-of-combat spell/ritual casting, and source-bound
+spellbook copying—uses the same atomic replay
 boundary. Its clock, actor/world effects, character changes, random-stream
 position where applicable, entity revisions, and exact response commit or roll
 back together.
@@ -1397,8 +1402,9 @@ response in the same transaction. It rejects 0-HP/dead starters and a second
 Long Rest benefit less than 1,440 minutes after the previous one. Do not split a
 Short Rest into a clock advance followed by individual actor writes.
 
-At the tenth completed combat round, `combat_end_turn` crosses the same
-one-minute boundary: it advances the branch clock, all campaign actors'
+Every completed combat or chase round advances the same tick stream. Ten rounds
+accumulate to one minute even when split across multiple encounters. At a crossed
+minute boundary, the turn transaction advances all campaign actors'
 elapsed-time effects (including noncombatants), and world effects in the turn
 transaction. Replaying an older turn response projects that stored encounter
 revision rather than substituting the latest live combat.
@@ -1430,7 +1436,8 @@ cross-branch sequence before `clock_advance` or `party_rest` can mutate state.
 Use `campaign_change(action="effect_add" | "effect_remove")` for a structured
 effect on a campaign, scene, location, or object. Each effect has a stable id,
 source, target, active flag, duration period/remaining count, and visibility
-`public|party|dm`. Timed effects require an established campaign clock. Do not
+`public|party|dm`. Timed effects bind to `state.game_time` and therefore do not
+require an anchored calendar. Do not
 store a timed Light, hazard, ward, weather effect, or similar object state only
 inside arbitrary scene-progress JSON, because that bypasses the duration engine.
 

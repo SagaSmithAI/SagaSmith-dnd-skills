@@ -75,15 +75,19 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `spatial.locations`; a slug, display label, or guessed room id is not valid.
    Never merge narrative text merely because two scenes refer to the same encounter.
 7. If the scene changes by opening hours, daylight, watches, or travel duration,
-   establish `campaign_change(action="clock_set")` before resolving the branch.
+   treat `state.game_time.elapsed_ticks` as the one elapsed-time authority and
+   `state.world_time` as its optional calendar projection. Establish
+   `campaign_change(action="clock_set")` before resolving a calendar-dependent branch.
    Advance only source- or DM-established elapsed time with
-   `campaign_change(action="clock_advance")`; it updates the branch-local clock
-   and timed effects atomically. Every minute, hour, or day advance must include
+   `campaign_change(action="clock_advance")`; it updates the tick stream,
+   anchored calendar, and timed effects atomically. Every minute, hour, or day advance must include
    `payload.expected_world_time={day,hour,minute,elapsed_minutes}`. Derive the
    exact destination from the current public clock and the reviewed interval,
    even when no printed calendar names it; never hand-copy a large minute
    literal without this target. The MCP rejects a missing target or duration that would land
-   anywhere else before changing the clock or any timed effect.
+   anywhere else before changing the clock or any timed effect. Completed
+   combat/chase rounds and out-of-combat spell/ritual casting use the same tick
+   stream; do not add a second narrative clock write for them.
    For a completed Short or Long Rest, use
    `campaign_change(action="party_rest")` instead:
    it advances the clock once and settles all named members atomically. Never
