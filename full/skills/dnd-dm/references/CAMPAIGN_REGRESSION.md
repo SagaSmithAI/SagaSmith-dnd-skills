@@ -378,6 +378,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    window instead requires its returned `choice_id` and a typed
    `--source-on-hit-ruling-json` settlement. Never substitute one boundary for
    the other.
+   When module prose makes the current terrain, tactic, or fictional position
+   grant advantage or disadvantage without defining a new rule procedure, have
+   the Agent settle that fact with `--agent-attack-context-json`. Bind one exact
+   participant and `melee` or `ranged` mode to the current scene's immutable
+   `source_ref`, an exact excerpt contained in the encounter evidence, one
+   unambiguous advantage state, a concrete decision, and its ruling reason. The
+   context applies only to that attack mode. Do not add creature-, room-, or
+   phrase-specific engine exceptions, and do not let a melee ruling leak into a
+   ranged attack.
    Apply the same rule to every regression driver, not only encounter attacks.
    Party catalog application, checks, contests, and level-up subclass, feature,
    or spell application must stop with a structured output report carrying
@@ -426,7 +435,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    single critical hit, configure the printed damage threshold and critical
    trigger together with their exact excerpt. Count only committed applied
    damage and server-confirmed critical attacks, resume from the bounded combat
-   log after interruption, and let the actor depart on its own turn.
+   log after interruption, and test the trigger immediately after damage
+   settlement, before another actor can act. A living actor whose source trigger
+   is met departs through the public combat-map path at that boundary. Keep this
+   distinct from a defeated-count trigger that says the actor attempts to leave
+   on its own turn; one timing rule must not silently rewrite the other.
    Automated party spell tactics may select only currently prepared spells or
    spells the actor actually knows. A spellbook entry alone is not castable.
    Choose the lowest available legal slot at or above the spell's level; when
@@ -879,6 +892,13 @@ not complete until this terminal checkpoint exists. If transport or the process
 stops first, resume the same idempotent actions, re-read public state, and create
 the missing scene checkpoint; never repair the database or fabricate a manifest
 head.
+
+An interrupted encounter command may have committed one or more public
+transactions before the caller timed out. Before retrying, read combat, actors,
+manifest, current branch, random-stream position, and snapshot head through
+public queries. If the committed state is no longer a legal retry point, preserve
+that lineage and create a disposable child from the last verified parent
+snapshot through `branch_change`; never rewind or patch the active database.
 
 Never defer a combat-end checkpoint, PC death or stable recovery, replacement
 handoff, standalone level advance, Short or Long Rest, major branch point,
