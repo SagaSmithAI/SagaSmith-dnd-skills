@@ -999,6 +999,13 @@ snapshot before resuming settlement. This tool changes only the built-in Core
 lock; edition, locale, publications, user options, and optional pack activations
 remain unchanged. Never use `campaign_rules(action="set_profile")` to bypass this
 checkpointed combat path.
+
+The public campaign and full-playthrough regression drivers both require
+`--core-relock-reason`. Supply a concise reason specific to the active campaign,
+the tested rule change, and whether any data migration occurs. Never hard-code or
+reuse a reason from another module: the exact text is persisted in the relock
+receipt and is part of the campaign audit trail.
+
 Snapshot restore and branch checkout check the saved Core lock before changing
 live state. A legacy save without that lock, or a save requiring an unavailable
 Core fingerprint, needs an explicit conversion path and is never silently
