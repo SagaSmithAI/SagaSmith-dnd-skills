@@ -145,10 +145,23 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    lexicographically first job id and reports every equivalent id. If artifact
    identities differ, review them and pass the intended `--source-job-id`.
    The driver sends `review_mode="agent_text"`; the MCP rechecks page ownership,
-   ordinal continuity, full evidence coverage, and absence of invented facts. A gap,
-   missing source fact, or conflict remains blocked and cannot be filled from
-   model memory. Never inspect the database or re-import a managed artifact
-   from outside the configured roots. For encounter
+   ordinal continuity, full evidence coverage, and absence of invented facts.
+   It may repair at most bounded OCR glyph errors while preserving every
+   numeric token; it must still reject changed DCs, bonuses, dice, damage types,
+   and rule terms. When a continuous PDF segment interleaves a preceding or
+   adjacent creature column, submit
+   `--agent-evidence-exclusions <exclusions.json>`. Each entry must name a
+   selected `chunk_id`, quote one exact source substring, and give a reason.
+   Exclude only the contaminating span, including a prefix when the target
+   resumes later in the same chunk. The MCP requires an exact single match,
+   rejects overlapping ranges, retains the source-chunk checksum plus exclusion
+   offset/hash/reason, and still requires every nonexcluded source sentence in
+   the normalized card. This lets a text-only Agent restore semantic statblock
+   order without pretending the broken two-column reading order is authoritative.
+   A gap, unexplained exclusion, missing retained source fact, or conflict
+   remains blocked and cannot be filled from model memory. Never inspect the
+   database or re-import a managed artifact from outside the configured roots.
+   For encounter
    participants, use exact rule statblocks or reviewed module image cards and
    retain all warnings. A module candidate's parser output
    is transcription support, not final semantic authority. When one reviewed statblock must
