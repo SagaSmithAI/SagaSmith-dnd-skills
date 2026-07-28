@@ -584,6 +584,9 @@ projection with a second write.
 | Subjective belief | Branch-local `ActorKnowledge` revision head per actor | `notes.memories` is import-only legacy data; objective `CampaignMemory` is a different ledger |
 | Actor conditions | Validated character-card condition state plus active effect-source ownership | Encounter combatants are synchronized mirrors; removing one cause must not clear a condition still supplied by another effect, and immunity is checked by the shared condition engine |
 | HP and expendable resources | Validated character sheet, mutated through shared HP/resource functions | Encounter combatants mirror condition/position state only; CLI or generic campaign patches cannot create a second combat/HP/resource ledger |
+| D&D roll, rest, and spell arithmetic | `sagasmith-dnd` attack/check, exhaustion, lifecycle, effective-ability, healing-expression, save-damage reduction, HP, and bounded-resource helpers | MCP facades and regression drivers validate orchestration inputs but must not repeat ability-modifier, exhaustion, rest-duration, healing-scaling, half-damage, or resource-capacity formulas |
+| Exact module evidence | Core exact-source field order, document suffix catalog, and source-evidence normalizer | D&D manifests may add purpose/asset/excerpt fields, but public calls project only the Core exact citation and must not maintain a second typography or hash-field contract |
+| ASCII lookup keys and slugs | Core compact-key and slug normalizers | Each domain owns its fallback, maximum length, and ID prefix, but must not repeat the base case-fold/separator algorithm |
 | Playthrough ending | Coupled manifest `status` and `ending` verification | A campaign row's administrative `status` is not a module ending |
 | Audited mutations | One state transaction containing entity changes, revision group, rule receipts, random position, and idempotent response | Never update an entity and append its revision or replay receipt in a later transaction |
 | Integrity encoding | Core canonical JSON plus SHA-256 | Snapshot checksum, rule-pack checksum/fingerprint, map checksum, and idempotency request hash keep their domain names but must not implement separate JSON encoders |
@@ -601,6 +604,14 @@ Operational UTC timestamps and exposure expiry are produced by the MCP
 operational wall clock, taking one timestamp per mutation or lease update. They
 must never be copied into, compared with, or used to advance the campaign's
 six-second game-time tick stream.
+
+Facade maintenance follows the same rule: a compact action may keep a strict
+schema, permission check, phase guard, revision, and idempotency boundary, but
+its deterministic D&D result must delegate to the owning engine primitive.
+Regression drivers may derive expected values with those public library
+primitives and must still perform every state mutation and die roll through the
+public MCP tools. A new local formula is a contract regression even when its
+current result happens to match.
 
 ## Branch-aware continuity
 
