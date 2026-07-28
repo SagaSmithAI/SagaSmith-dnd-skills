@@ -76,6 +76,12 @@ exception in that set takes precedence over Agent-owned work; when no such
 exception exists, an unclassified DM ruling defaults to Agent reasoning.
 Reject or normalize a contradictory `default_resolver`/`ruling_kind` pair
 instead of trusting whichever field happens to be outermost.
+The D&D rule engine owns the ruling-kind vocabulary and the precedence used
+when one result contains multiple requirements. Agents, facade clients, and
+regression drivers must consume the server-returned top-level classification;
+they must not copy, alphabetize, or independently prioritize a local list of
+ruling kinds. This preserves player intent and approval boundaries when a
+single result also contains Agent-owned or source-review work.
 The ownership contract also covers lobby review states that are not yet live
 actions. `rule_import(action="extract_candidates")` returns
 `job.review_resolution` plus `job.review_requirements`, and each pending or

@@ -175,6 +175,11 @@ and a `retry_contract`, treat it as control returning to the named resolver;
 an Agent-owned boundary keeps the current revision while the Agent supplies the
 missing scene/rule fact and retries through public tools. Do not turn that
 pre-commit pause into a failed fictional action.
+When several nested requirements coexist, accept the rule engine's returned
+top-level ownership classification. Do not keep a second client-side ruling-kind
+list or derive precedence by sorting strings; the server owns that vocabulary
+and priority so a player choice, approval, or source-review boundary cannot be
+silently downgraded by an Agent-owned requirement.
 
 Before deciding, read the exact expanded rule/module/scene evidence and the
 current affected actors. Record the ruling's source reference or exact excerpt,
