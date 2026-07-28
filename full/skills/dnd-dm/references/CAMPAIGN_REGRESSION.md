@@ -48,6 +48,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `module_query(view="scene", scope_id="dm")` directly and validates the returned
    id. Reserve `query-source` for locating an unknown chunk, then expand only the
    selected hits. Do not inflate `top_k` or repeat broad searches to reconstruct
+   manifest evidence. Every manifest citation is exact-resolved on write against
+   the same managed module revision. Preserve ordered heading paths, collapsing
+   only adjacent parser duplicates; a later same-named section is a distinct path
+   step. Manifest excerpts may select ordered source fragments, whereas event,
+   memory, progress, and ruling excerpts must remain contiguous exact text.
    a scene that the exact scene query can return in one request.
 3. Classify and import every module-supplied PC document before building seats.
    Fill every applicable party seat from those pregenerated PCs first, up to the

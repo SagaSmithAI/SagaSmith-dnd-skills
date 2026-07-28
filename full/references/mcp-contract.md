@@ -323,6 +323,14 @@ scene, chunk, page, heading, and content-hash fields. A regression verifier must
 compare that canonical field set, while retaining optional asset-path, asset
 hash, and purpose fields in its continuity evidence; it must not treat removal
 of those unexecuted audit annotations as a failed actor creation.
+Every `source_ref` embedded in a full-playthrough manifest is resolved through
+that same managed-chunk contract when the manifest is written. Heading paths are
+ordered paths: collapse only adjacent duplicate parser headings and preserve a
+later re-entry into a same-named section. Manifest excerpts may omit intervening
+prose while retaining source order, but every retained fragment must occur in
+the cited chunk; runtime event, memory, progress, and ruling excerpts remain
+contiguous exact evidence. A schema-valid but unresolved manifest citation is a
+hard source error, not deferred documentation.
 
 Full-playthrough scene transitions replace the snapshot-managed manifest through
 `playthrough_manifest(action="replace")`. The driver requires an explicit stable
@@ -549,7 +557,7 @@ projection with a second write.
 |---|---|---|
 | Rules edition and locale | Core campaign Rule Profile | Bound character `sheet.edition` is projected on every write; legacy campaign settings copies are removed |
 | Elapsed campaign time | `campaign.state.game_time.elapsed_ticks` | `world_time` is an optional anchored calendar projection; wall-clock timestamps and exposure TTLs are operational time |
-| Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | Exposure phase is derived and refreshed; `game_phase="combat"` is invalid legacy input |
+| Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | The campaign view's `effective_game_phase` is the server-owned derivation consumed by drivers; exposure refreshes from it, and `game_phase="combat"` is invalid legacy input |
 | Active module | Core active `ModuleSource` revision set, captured as exact `module_activations` in a snapshot | Import-job `activated` is a workflow receipt; do not store `module_imports.active` in campaign state |
 | Rule source revision | Immutable `RuleSource` id and chunks | A reimport retires the prior revision; default search selects the active revision, while an exact historic source id/citation remains auditable |
 | Current branch | `campaign.active_branch_id` | Public `is_current` is derived; no independent branch boolean exists |
@@ -560,6 +568,8 @@ projection with a second write.
 | HP and expendable resources | Validated character sheet, mutated through shared HP/resource functions | Encounter combatants mirror condition/position state only; CLI or generic campaign patches cannot create a second combat/HP/resource ledger |
 | Playthrough ending | Coupled manifest `status` and `ending` verification | A campaign row's administrative `status` is not a module ending |
 | Audited mutations | One state transaction containing entity changes, revision group, rule receipts, random position, and idempotent response | Never update an entity and append its revision or replay receipt in a later transaction |
+| Integrity encoding | Core canonical JSON plus SHA-256 | Snapshot checksum, rule-pack checksum/fingerprint, map checksum, and idempotency request hash keep their domain names but must not implement separate JSON encoders |
+| Local service identity | Core `system:local` principal identity and campaign membership | CLI, MCP, gateway, and regression-driver defaults are projections of that principal, not separately invented service accounts |
 
 When old data contains a compatibility field, read through the authority and let
 the schema/migration path normalize it. Do not make ordinary reads write legacy
