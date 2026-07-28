@@ -397,12 +397,16 @@ Never call `inventory_change(remove)`, `dnd_dice_roll`, and
 `character_state_change(heal)` as three substitutes for drinking one potion.
 
 For a source-cited bargain, tribute, gift, handoff, or destruction that removes
-a non-consumable shared item, call `campaign_change(action="item_spend")`.
-Provide a stable spend id, exact item id and positive quantity, reason, and
-expanded module chunk reference. Use the full-playthrough `spend-item` path so
-the inventory removal, branch audit, witnessed ActorKnowledge, manifest sync,
+a non-consumable party or character item, call
+`campaign_change(action="item_spend")`. Provide a stable spend id, exact item id
+and positive quantity, reason, and expanded module chunk reference. For a
+character-owned item, also provide that character id and its current revision;
+the facade requires both together and atomically revises the character card and
+campaign audit. Omit both only for the shared party stash. Use the
+full-playthrough `spend-item` path with `--item-actor-id` for private inventory
+so the inventory removal, branch audit, witnessed ActorKnowledge, manifest sync,
 and checkpoint remain linked. Never record only the narrative disposition while
-the canonical stash still contains the item.
+the canonical owner still contains the item.
 
 When a module yields a found spellbook, add one `kind="spellbook"` inventory item
 for each physically distinct book. Preserve its edition, exact source scene/key,

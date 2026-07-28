@@ -531,12 +531,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     Commit witness ActorKnowledge, sync the manifest, and verify the checkpoint;
     never decompose one bill into negative `wallet_change` calls.
 11. If a source-cited bargain, tribute, gift, handoff, or destruction removes a
-    non-consumable shared item, use the public regression driver's `spend-item`
-    path. Supply one stable spend id, exact item id and positive quantity, actual
-    Scene Atlas location, exact source excerpt and chunk reference, and every
-    witness actor id. Verify the atomic stash decrement, branch-local
-    `item_spends` audit, ActorKnowledge, manifest sync, and checkpoint. Never
-    represent the disposition only in prose while the item remains in inventory.
+    non-consumable party or character item, use the public regression driver's
+    `spend-item` path. Supply one stable spend id, exact item id and positive
+    quantity, actual Scene Atlas location, exact source excerpt and chunk
+    reference, and every witness actor id. Pass `--item-actor-id` for a privately
+    owned item; the driver must bind the owner's current revision, and the facade
+    must reject a character id without that revision or vice versa. Omit both
+    only for shared party inventory. Verify the atomic owner decrement,
+    branch-local `item_spends` audit, ActorKnowledge, manifest sync, and
+    checkpoint. Never represent the disposition only in prose while the item
+    remains in either canonical inventory.
 12. Exercise a source-acquired standard healing potion when a living PC is
     wounded: call `campaign_change(action="consumable_use")` once, then verify the
     stack decrement, service-owned `2d4+2` random receipt, HP clamp, Core rule
