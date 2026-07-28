@@ -89,6 +89,13 @@ the campaign.
    without its granted feature cards and traits is an incomplete actor, not a
    usable shortcut. Never patch the raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
+   For Play-phase `character_check` and full-playthrough `resolve-check`, pass a
+   named skill such as `perception` or `persuasion` as `ability` and omit
+   client `proficient`/`bonus` fields. The service derives none, half
+   proficiency, proficiency, expertise, persistent skill bonuses, and the
+   associated ability from the authoritative actor card. The same rule applies
+   independently to both sides of `character_check(action="contest")`; a
+   boolean facade must never collapse expertise into ordinary proficiency.
    Before a module table roll with external modifiers, build a branch-local
    modifier ledger from the complete expanded procedure. Keep every modifier
    source in its own entry with a stable id, numeric value, applicability,

@@ -475,6 +475,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    name only the actual recipient actor ids. Update the manifest clue's
    `known_by_actor_ids` projection to match the resulting ledgers; never copy
    knowledge merely because the party collectively has it.
+   For every named non-combat skill check or contest side, pass the skill name
+   as `ability` and omit client proficiency/bonus overrides. The Play facade and
+   regression driver must derive the complete modifier from the current actor
+   card, including half proficiency, ordinary proficiency, expertise, and
+   persistent skill bonuses. A boolean `proficient=true` is not a safe encoding
+   of expertise and must be rejected rather than merely recorded in progress.
    For a source table with external modifiers, first expand the whole procedure
    and enumerate every currently applicable modifier in a branch-local ledger.
    Give each source its own `modifier_id`, `value`, `kind`, `lifetime`,
