@@ -589,6 +589,11 @@ to Agent DM adjudication. Do not encode that one creature as another parser
 phrase exception or patch the actor sheet. A melee weapon with the Thrown property remains a
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
+An automated encounter may prefer a valid Multiattack, but if that complete
+option is illegal at the current range it must retry the same actor's legal
+ordinary Attack choices before moving. A melee-only Multiattack never disables
+one legal thrown or ranged weapon attack. Do not move into a known hazard merely
+to preserve the preferred Multiattack.
 On a positioned combat map, a ranged attack without a recorded normal range is
 a missing-card/source boundary, not permission for a generic DM ruling to invent
 distance. Repair the source-grounded card in lobby when the source states the
@@ -1107,6 +1112,10 @@ When a public event and per-actor ActorKnowledge identify exact hazard cells and
 state that the actor will avoid them, pass that public report to the regression
 driver and require its voluntary path search to exclude every known cell. An
 endpoint that is safe is insufficient: audit the complete `payload.path`.
+Use `event_type="movement_hazard_marked"` for a visible environmental hazard
+that is not a trap; retain `trap_detected`/`trap_locations_shared` for actual
+traps. The event summary and every actor-local proposition must name the exact
+map cells, and every proposition must explicitly say the actor avoids them.
 Knowledge is actor-local, so give hostile creatures a separate cited
 `trap_locations_shared` event only when the module establishes that they know
 the traps or an explicit Agent-performed DM review confirms that knowledge; never copy the

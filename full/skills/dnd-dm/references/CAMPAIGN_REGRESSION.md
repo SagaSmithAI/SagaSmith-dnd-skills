@@ -419,6 +419,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    source rule establishes that termination boundary. This is the common route
    for module-specific monster tactics; never add creature-name branches or
    silently replace them with an ordinary weapon attack.
+   When exact map cells are a visible movement hazard and the Agent decides
+   informed actors will not enter them, first record a public
+   `movement_hazard_marked` event with exact scene evidence and actor-local
+   knowledge that names and avoids every cell. Pass that report through
+   `--source-avoidance-report`; the pathfinder must inspect the entire voluntary
+   path. If a preferred Multiattack is illegal at range, retry one legal
+   ordinary Attack before considering movement. Never cross the marked cells
+   solely to preserve Multiattack, and never apply voluntary avoidance to
+   forced movement or teleportation.
    Apply the same rule to every regression driver, not only encounter attacks.
    Party catalog application, checks, contests, and level-up subclass, feature,
    or spell application must stop with a structured output report carrying
