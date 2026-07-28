@@ -850,6 +850,16 @@ legal rest in the same scene. Retry an interrupted occurrence with the same id
 and unchanged payload. Never derive these ids only from scene, actor, expression,
 activity, summary, reason, member choices, or recipient set.
 
+A scene advance must update the branch-scoped authoritative SceneProgress before
+the manifest transition is replaced. Record the occurrence-specific transition
+evidence in that target scene's progress state, preserve an existing completed
+scene on a revisit, and bind any supplied location to its Scene Atlas. A manifest
+write by itself is not a scene move: manifest synchronization will correctly
+project the old SceneProgress current scene back over it. If SceneProgress
+committed before the manifest response was lost, retry the same occurrence id;
+the driver must recognize the exact progress record and finish the manifest
+write without advancing the scene twice.
+
 ## Snapshot and branch-isolation audit
 
 Run destructive rehearsal steps on a disposable branch created from a verified
