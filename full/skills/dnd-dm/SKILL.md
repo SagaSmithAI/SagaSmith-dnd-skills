@@ -132,6 +132,12 @@ the campaign.
    checkpoint before entering another sourced scene. Follow
    `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
    interrupted-batch recovery.
+   Post-advance verification must also reject duplicate representations of one
+   class resource. A feature with empty `resource_key` owns its card-local
+   `uses`; if a legacy actor also has an unreferenced same-label, same-class
+   top-level counter, run the public Lobby-only
+   `sync-character-resources` regression action and verify the conservative
+   removal before the batch checkpoint.
    For a multi-action event, validate every source/actor report, manifest event
    predecessor, and public clock before the first mutation. Bind following time
    or rest writes to the current branch with the driver's explicit prerequisite

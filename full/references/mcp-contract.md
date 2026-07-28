@@ -1298,6 +1298,14 @@ A reviewed descriptive statblock action records
 `choices.manual_ruling.kind="descriptive_activity"` with its source excerpt.
 Calling it pays the recorded timing and returns `pending_ruling`; adjudicate
 the prose from that excerpt and do not repeat the payment.
+Do not seed a second `sheet.resources` counter for a feature whose structured
+card has an empty `resource_key`: that card-local `uses` counter is
+authoritative. If a legacy/imported actor already contains both
+representations, switch to Lobby and call
+`character_state_change(action="resource_sync")` with an audited reason. The
+server recomputes level/ability scaling and removes only an unreferenced
+top-level counter whose label and class source exactly shadow one local-use
+card; it must preserve any counter referenced by another card or spell.
 The canonical 2014 Fighter Action Surge id is a narrow Core exception:
 `combat_use_activity` consumes its use and atomically grants one current-turn
 `extra_action`. It rejects off-turn or twice-on-one-turn activation, and any

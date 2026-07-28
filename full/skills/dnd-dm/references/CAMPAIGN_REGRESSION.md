@@ -672,6 +672,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     remains in `source_ref` and the milestone explanation remains in `reason`.
     Never concatenate or truncate those machine-audit fields to fit the display
     label.
+    During the post-advance verification, distinguish shared top-level resources
+    from card-local uses. A feature with an empty `resource_key` spends its own
+    `uses`; never create or trust a second same-label `sheet.resources` counter.
+    If an older generated/imported actor contains both, use the driver's public
+    `sync-character-resources` Lobby transaction with the actor id, an audited
+    reason, the intended return phase, and `--defer-checkpoint` only when it is
+    part of the same verified advancement batch. Confirm the report removed only
+    an unreferenced semantic shadow and that the authoritative card capacity and
+    recovery cadence match the locked class rules.
 17. Advance campaign time through the public regression driver's
     `advance-time` path whenever travel, waiting, or a source-triggered interval
     matters. Give each interval a stable `--occurrence-id` and supply a positive
