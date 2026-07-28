@@ -1043,6 +1043,11 @@ orders differently, stop play, repair the parser's shared heading normalization,
 bump its revision, and refresh the module through the public import facade.
 Verify that Markdown headings, unmarked numbered lines, and OCR-spliced display
 headings yield one source-ordered location list before resuming.
+If validation reports progress on a removed scene, let the Agent settle the
+source/scene-fact remap. Accept an automatic remap only for one exact
+chapter/title/page-range match; otherwise inspect and provide an explicit
+old/new scene ruling. The activation transaction and manifest traversal must
+consume that same mapping.
 Player map views intentionally omit blocked cells, difficult terrain, DM
 overrides, checksums, and world patches; do not disclose those fields from a DM
 read or an earlier tool result.

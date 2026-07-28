@@ -805,7 +805,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     hash, and exact excerpt used as evidence. Define checks against specific
     manifest paths, world facts, actor/NPC state, quest state, and other public
     projections needed by that ending; do not use a broad narrative string as a
-    substitute for the printed conditions. After a parser-backed module refresh,
+    substitute for the printed conditions. Before activating a parser-backed
+    module refresh, resolve every removed scene that owns progress through the
+    Agent-default DM review returned by validation. An exact unique
+    chapter/title/page-range match may settle the remap automatically; otherwise
+    inspect the candidate index and submit an explicit old/new scene ruling.
+    Pass the same reviewed mapping to the activation transaction and the
+    playthrough manifest remap so progress, traversal, current scene, and
+    Snapshot recovery cannot disagree. After a parser-backed module refresh,
     require each ending citation for that same source asset to resolve to exactly
     one new chunk with the same content hash and excerpt. Re-read the condition
     and require its module, scene, chunk, pages, heading, and any
