@@ -68,9 +68,11 @@
 
 ## Snapshot、Recap 与恢复
 
-- Snapshot v2 必须含战役元数据、规则档案、所有 PC/NPC/怪物完整卡、队伍背包和钱包、
-  动态世界、场景进度、玩家角色映射、按时间顺序的 events、有效 memory 正文，以及当前
-  undo/redo cursor；不复制规则、模组静态原文和 embeddings。
+- 当前 Snapshot schema 必须含战役元数据、规则档案、精确的模组激活修订集、所有
+  PC/NPC/怪物完整卡、队伍背包和钱包、动态世界、场景进度、玩家角色映射、按时间顺序
+  的 events、有效 memory 正文，以及当前 undo/redo cursor；不复制规则、模组静态原文
+  和 embeddings。恢复时先恢复模组激活修订集，再恢复当前 scene；当前 scene 不得属于
+  已退役模组修订。
 - Recap 只描述相对上一存档的差量：剧情推进、新角色/地点、事件、后续影响、
   玩家选择和记忆候选；首个存档是基线。
 - `restore` 前先 `verify`，说明目标和分支语义。恢复先保护当前状态，再产生新分支，

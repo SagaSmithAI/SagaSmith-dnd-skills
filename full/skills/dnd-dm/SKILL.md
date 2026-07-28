@@ -1099,7 +1099,7 @@ that view with
 `campaign_change(action="clock_set", payload={day, hour, minute, label})` and cite
 the narrative/source assumption. After the DM establishes elapsed time, use
 `campaign_change(action="clock_advance",
-payload={period, count, expected_world_time})`. Minute, hour,
+payload={period, count, expected_elapsed_ticks, expected_world_time?})`. Minute, hour,
 day, and round advances update the same tick stream and settle all elapsed
 round/minute/hour/day actor and campaign-space durations in the same mutation.
 An encounter-only advance has no fixed real duration and affects only
@@ -1109,8 +1109,11 @@ set, do not jump the clock with another `clock_set`; use `clock_advance` so no
 duration is skipped.
 
 For every minute, hour, or day advance, include
-`payload.expected_world_time={day,hour,minute,elapsed_minutes}`. Re-read the
-current public clock and derive both `count` and the exact destination; do not
+the canonical `payload.expected_elapsed_ticks`. Re-read
+`state.game_time.elapsed_ticks` and derive both `count` and the exact destination.
+When a calendar is anchored, also include
+`payload.expected_world_time={day,hour,minute,elapsed_minutes}` as a projection
+guard; do not
 manually reuse a travel-day
 difference as an elapsed-day difference, because rest days and event timing
 anchors can diverge. The server must reject a count that cannot reach the exact
@@ -1141,7 +1144,8 @@ the list. For a Short Rest, put Hit Dice, Arcane/Natural Recovery, Song of Rest,
 attunement, and activity choices in the same member records. This one write advances
 the campaign clock once, advances timed effects for every campaign actor and
 world object, applies benefits to only the named members, records completion on
-each card, and for Long Rests enforces the one-benefit-per-24-hours rule. A creature must have at
+each card in canonical ticks, and for Long Rests enforces the
+one-benefit-per-24-hours rule. An anchored calendar is not required. A creature must have at
 least 1 HP at the start. Do not call individual `character_rest` for either rest
 type or advance any rest duration separately before/after the party rest.
 

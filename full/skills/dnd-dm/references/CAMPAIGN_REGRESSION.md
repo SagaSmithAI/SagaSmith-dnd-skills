@@ -560,8 +560,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a concrete
     `decision` and `reason`, and `period`/`count` exactly matching the requested
     clock advance. Always pass
-    `--time-expected-after-json={day,hour,minute,elapsed_minutes}`. Read the
-    current public clock and derive the interval and exact destination; never equate a travel-day
+    `--time-expected-after-ticks=<elapsed_ticks>`, derived from the current
+    service-owned `state.game_time.elapsed_ticks` plus the exact interval. When
+    an optional calendar is anchored, also pass
+    `--time-expected-after-json={day,hour,minute,elapsed_minutes}` as a projection
+    guard. Read the current public state and derive the interval and exact
+    destination; never equate a travel-day
     difference with elapsed days or hand-copy a large minute constant without
     this target. The driver rejects a mismatch before the public write and
     `campaign_change(clock_advance)` verifies it again atomically. The
@@ -592,7 +596,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     one transaction. If the exact-target clock write committed but response delivery or continuity
     commit was interrupted, retry the identical occurrence and payload. The
     driver recognizes only an exact match with
-    `--time-expected-after-json`, replays the original public idempotency key,
+    the canonical expected tick target (and the calendar target when supplied),
+    replays the original public idempotency key,
     reconstructs the pre-advance instant from the duration, and uses the
     recovered clock response's original campaign revision for continuity. With
     no matching receipt, the service rejects the second advance at its expected
@@ -657,9 +662,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     before/after entity-revision evidence to match the current campaign and
     actors, reconstruct the exact pre-rest request from those before revisions
     and all member choices, and require its hash to match the receipt. Then
-    require the receipt's members, duration, campaign revision, and world clock
-    to equal current public state. Also require every member's `rest_history`
-    completion/start minutes and any prepared-spell receipt to match the
+    require the receipt's members, duration, campaign revision, canonical game
+    time, and optional calendar projection to equal current public state. Also
+    require every member's `rest_history` completion/start ticks and any
+    prepared-spell receipt to match the
     authoritative card. Only after all checks pass may the driver commit the
     missing continuity event and checkpoint. Bind that continuity commit to the
     atomic party-rest response's exact campaign revision; do not re-read and use
@@ -726,7 +732,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     and require its module, scene, chunk, pages, heading, and any
     `current.scene_id` check to reference the active revision. The refresh must
     fail closed on zero or multiple matches and must scope idempotency to the
-    exact refreshed manifest payload.
+    exact refreshed manifest payload. Reimport must retain the old module or
+    rule source as an immutable retired revision so historic snapshots and exact
+    citations still resolve. Default search and current-scene selection must use
+    only the active revision.
 23. Call `verify-ending` without deferral. Require every returned check to pass,
     the selected ending id to be achieved, the manifest and ending state to be
     `completed`, and a verified terminal checkpoint to become the Snapshot DAG
@@ -798,6 +807,14 @@ activity, summary, reason, member choices, or recipient set.
 Run destructive rehearsal steps on a disposable branch created from a verified
 source checkpoint. Carry fresh campaign/actor/scene revisions and idempotency keys
 through every mutation.
+
+Every checkpoint must capture the exact active module revision set. After a
+restore or branch creation, verify those module ids before reading the current
+scene, and require the current scene to belong to one of them. Public
+`branch.is_current` and `snapshot.is_head` are projections of the campaign's
+active-branch pointer and the branch's head pointer; never attempt to repair a
+second boolean. Treat chapter status as import/indexing metadata only—play
+progress and the current scene come from scoped `SceneProgress`.
 
 Use scene-level checkpoint batching on a campaign's main timeline. Pass
 `--defer-checkpoint` only to repeated `prepare-statblock` calls on the main

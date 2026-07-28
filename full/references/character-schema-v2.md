@@ -14,11 +14,16 @@ not change the required sheet shape.
 ## Authority
 
 - `sheet` is the authoritative mechanical state.
-- `notes` is authoritative narrative state: description, important memories,
-  relationships, and goals.
+- `notes` is authoritative actor-authored narrative profile state: description,
+  relationships, and goals. Its legacy `memories` field is import-only.
+- Branch-local `ActorKnowledge` is authoritative for one actor's beliefs,
+  observations, secrets, and misinformation.
 - `derived` is returned by `character_query(view="get")`; it is calculated from the sheet and
   must never be edited directly.
 - `campaign.state.party.inventory` is the authoritative shared wallet and stash.
+- The campaign Rule Profile is authoritative for edition and locale. A
+  campaign-bound sheet's `edition` is a service-owned projection; campaign
+  settings must not copy either field.
 - Every new sheet and notes document has `schema_version: 2`.
 
 ## Actor Cards

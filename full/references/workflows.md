@@ -80,12 +80,15 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `campaign_change(action="clock_set")` before resolving a calendar-dependent branch.
    Advance only source- or DM-established elapsed time with
    `campaign_change(action="clock_advance")`; it updates the tick stream,
-   anchored calendar, and timed effects atomically. Every minute, hour, or day advance must include
-   `payload.expected_world_time={day,hour,minute,elapsed_minutes}`. Derive the
-   exact destination from the current public clock and the reviewed interval,
-   even when no printed calendar names it; never hand-copy a large minute
-   literal without this target. The MCP rejects a missing target or duration that would land
-   anywhere else before changing the clock or any timed effect. Completed
+   optional anchored calendar, and timed effects atomically. Every minute, hour,
+   or day advance should include the canonical target
+   `payload.expected_elapsed_ticks`; derive it from the current public
+   `game_time.elapsed_ticks` plus the reviewed interval. When a calendar is
+   anchored, also include
+   `payload.expected_world_time={day,hour,minute,elapsed_minutes}` as a projection
+   guard. Never hand-copy a large tick or minute literal without deriving both
+   targets. The MCP rejects a missing target or a duration that would land
+   anywhere else before changing the timeline or any timed effect. Completed
    combat/chase rounds and out-of-combat spell/ritual casting use the same tick
    stream; do not add a second narrative clock write for them.
    For a completed Short or Long Rest, use
@@ -135,9 +138,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
 9. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
 10. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
-    When setup or advancement should finish with a completed long rest, establish
-    the campaign clock and use one atomic `campaign_change(action="party_rest")`
-    for all named members; do not call individual long rests.
+    When setup or advancement should finish with a completed long rest, use one
+    atomic `campaign_change(action="party_rest")` for all named members; an
+    anchored calendar is not a prerequisite. Do not call individual long rests.
 11. Only after every campaign resource has activated and all actors have passed
     their completeness checks, record the opening with one `memory_change(action="commit")`:
     include the opening event,
@@ -267,8 +270,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    participant is at 0 HP without Dead or Stable. The server returns the campaign
    to `play`; reopen exposure before further play writes.
 9. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
-   to wait, call `character_state_change(action="stable_recovery")`; the engine
-   rolls the `1d4`-hour delay and restores 1 HP. Do not patch HP or supply the roll.
+   to wait, call `campaign_change(action="stable_recovery")` once with every
+   simultaneously waiting Stable actor; the engine rolls each `1d4`-hour delay,
+   advances the campaign timeline by the longest wait, and restores 1 HP. Do not
+   patch HP, supply a roll, or run separate per-character clocks.
    When conscious and above 0 HP, clear the retained Prone condition only with
    `character_state_change(action="stand")`.
 

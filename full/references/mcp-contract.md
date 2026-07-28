@@ -280,7 +280,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/recharge/consume_ammunition)`, `inventory_transfer` |
-| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(party_rest/advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/level_advance/stable_recovery/stand)` |
+| Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(party_rest/stable_recovery/advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/level_advance/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
@@ -538,6 +538,41 @@ actor re-read and snapshot before returning to `play`. For a 2014 prepared
 caster, `method="class_prepared"` only hydrates legal class-list cards and a
 Wizard's reported choices only enter the spellbook. Do not submit a prepared
 list during advancement; reconcile it through a later completed Long Rest.
+
+### Single-authority state map
+
+Treat the following as authorities and every paired field as a read-only
+projection, receipt, compatibility input, or display label. Never repair a
+projection with a second write.
+
+| Concept | Sole authority | Non-authoritative representation |
+|---|---|---|
+| Rules edition and locale | Core campaign Rule Profile | Bound character `sheet.edition` is projected on every write; legacy campaign settings copies are removed |
+| Elapsed campaign time | `campaign.state.game_time.elapsed_ticks` | `world_time` is an optional anchored calendar projection; wall-clock timestamps and exposure TTLs are operational time |
+| Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | Exposure phase is derived and refreshed; `game_phase="combat"` is invalid legacy input |
+| Active module | Core active `ModuleSource` revision set, captured as exact `module_activations` in a snapshot | Import-job `activated` is a workflow receipt; do not store `module_imports.active` in campaign state |
+| Rule source revision | Immutable `RuleSource` id and chunks | A reimport retires the prior revision; default search selects the active revision, while an exact historic source id/citation remains auditable |
+| Current branch | `campaign.active_branch_id` | Public `is_current` is derived; no independent branch boolean exists |
+| Snapshot head | Each branch's `head_snapshot_id` | Public `snapshot.is_head` is derived; no independent snapshot boolean exists |
+| Current scene | Core scoped `SceneProgress` whose scene belongs to an active module revision | Playthrough manifest chapter/scene is synchronized projection; `ModuleChapter.status` describes indexing only, and `current_room` is a label while `current_location_key` is spatial identity |
+| Subjective belief | Branch-local `ActorKnowledge` revision head per actor | `notes.memories` is import-only legacy data; objective `CampaignMemory` is a different ledger |
+| Actor conditions | Validated character-card condition state plus active effect-source ownership | Encounter combatants are synchronized mirrors; removing one cause must not clear a condition still supplied by another effect, and immunity is checked by the shared condition engine |
+| HP and expendable resources | Validated character sheet, mutated through shared HP/resource functions | Encounter combatants mirror condition/position state only; CLI or generic campaign patches cannot create a second combat/HP/resource ledger |
+| Playthrough ending | Coupled manifest `status` and `ending` verification | A campaign row's administrative `status` is not a module ending |
+| Audited mutations | One state transaction containing entity changes, revision group, rule receipts, random position, and idempotent response | Never update an entity and append its revision or replay receipt in a later transaction |
+
+When old data contains a compatibility field, read through the authority and let
+the schema/migration path normalize it. Do not make ordinary reads write legacy
+flags, copy profile fields back into campaign settings, or copy actor knowledge
+into notes. Snapshot restore must restore the exact active module revision set
+before restoring the current scene; it must never make a retired module scene
+current merely because that scene id still exists for historical citation.
+An absent Rule Profile is a hard configuration error: combat, character, import,
+and item paths must not select their own 2014/2024 fallback.
+Operational UTC timestamps and exposure expiry are produced by the MCP
+operational wall clock, taking one timestamp per mutation or lease update. They
+must never be copied into, compared with, or used to advance the campaign's
+six-second game-time tick stream.
 
 ## Branch-aware continuity
 
@@ -1262,7 +1297,8 @@ call `character_query(view="rest")` for every member with the exact
 `hit_dice_spends` keys/counts, optional `arcane_recovery` or
 `natural_recovery` allocation, and, for each eligible 2014 Song of Rest recipient,
 `song_of_rest_source_actor_id`. This is a read-only authoritative preflight: it
-validates remaining dice, the actor's current card, campaign day, Arcane
+validates remaining dice, the actor's current card, the service-owned day
+ordinal derived from game-time ticks, Arcane
 Recovery allowance/usage, Natural Recovery's declared meditation and
 once-per-Long-Rest use, automatic level-20 Sorcerous Restoration, the source
 Bard's campaign membership, conscious state, source-bound feature,
@@ -1299,10 +1335,12 @@ can carry a changed list.
 
 A Stable creature at 0 HP cannot benefit from a rest. When the party can safely
 wait for the automatic recovery, call
-`character_state_change(action="stable_recovery")`. The engine rolls `1d4` hours,
-restores exactly 1 HP, clears Stable and Unconscious, preserves unrelated
-conditions such as Prone, and stores the Core rule receipt atomically. Do not
-manually set HP or choose the recovery duration. A recovered, conscious actor
+`campaign_change(action="stable_recovery")` once for the complete simultaneous
+member set. The engine rolls each actor's `1d4` hours, advances the authoritative
+campaign timeline by the longest concurrent wait, restores exactly 1 HP, clears
+Stable and Unconscious, preserves unrelated conditions such as Prone, and stores
+the Core receipts atomically. Do not manually set HP, choose the recovery
+duration, or invoke a per-character recovery clock. A recovered, conscious actor
 above 0 HP may then use `character_state_change(action="stand")`; this narrowly
 clears Prone under the Core movement boundary and does not permit arbitrary
 condition edits.
@@ -1348,12 +1386,14 @@ encounter has no fixed elapsed duration. Game time can advance before a calendar
 is anchored. The calendar cannot be set during active combat, and conversation
 time is never elapsed campaign time. Once anchored, a different `clock_set`
 instant is rejected; use `clock_advance`.
-Every `minute`, `hour`, or `day` `clock_advance.payload` supplies
-`expected_world_time={day,hour,minute,elapsed_minutes}`; omission is rejected.
-Those four
-values must be internally consistent and must equal the server-computed result;
-otherwise the entire mutation is rejected before the clock, actor effects, or
-world effects change. A campaign-specific travel-day index is not an elapsed-day
+Every `minute`, `hour`, or `day` `clock_advance.payload` supplies the canonical
+`expected_elapsed_ticks` target. An older caller may supply only
+`expected_world_time={day,hour,minute,elapsed_minutes}` while a calendar is
+anchored; new full-playthrough calls use ticks and may also supply those four
+calendar fields as a projection guard. Each supplied target must equal the
+server-computed result; otherwise the entire mutation is rejected before game
+time, actor effects, or world effects change. A campaign-specific travel-day
+index is not an elapsed-day
 count: first project all source-defined rest days and calendar offsets, then
 derive the duration from the current public clock and bind the resulting target.
 The public full-playthrough driver additionally accepts branch-current narrative
@@ -1370,10 +1410,11 @@ The state mutation group and the exact public clock response are persisted in
 the same database transaction. When an exact-target `advance-time` committed
 but delivery of its response
 or following continuity write was interrupted, retry the same occurrence and
-payload. If the public clock already equals `--time-expected-after-json`, the
-driver may call the same idempotent `clock_advance` request once to recover its
-atomically stored original response; it reconstructs the pre-advance clock from
-that exact target and duration and binds continuity to the recovered clock
+payload. If `state.game_time.elapsed_ticks` already equals the supplied
+`--time-expected-after-ticks`, the driver may call the same idempotent
+`clock_advance` request once to recover its atomically stored original response;
+it reconstructs the pre-advance game time from that exact target and duration
+and binds continuity to the recovered clock
 mutation's original campaign revision. Older mutation groups without an exact
 response may be recovered only by matching their public request hash, branch,
 entity revisions, and exact current target. An
@@ -1397,9 +1438,9 @@ members may supply Hit Dice spends, Arcane/Natural Recovery, Song of Rest,
 attunement, and activity fields. `duration_minutes` defaults to 480 for a Long
 Rest and must be at least 60 for a Short Rest. The MCP advances time and
 all timed actor/world effects once, then settles the named actors and records
-their completion minute, exact dice receipt, entity revisions, and replay
+their completion tick, exact dice receipt, entity revisions, and replay
 response in the same transaction. It rejects 0-HP/dead starters and a second
-Long Rest benefit less than 1,440 minutes after the previous one. Do not split a
+Long Rest benefit less than 14,400 ticks (24 hours) after the previous one. Do not split a
 Short Rest into a clock advance followed by individual actor writes.
 
 Every completed combat or chase round advances the same tick stream. Ten rounds
@@ -1417,9 +1458,10 @@ an owner or DM may read the stored campaign mutation through
 as recovery evidence only when its branch and before/after entity-revision
 evidence match the current campaign and actors, and its request hash matches the
 exact pre-rest request reconstructed from those before revisions and all member
-choices. Its member ids, duration, campaign revision, and world clock must also
-exactly match current public state, each member's `rest_history` must match the
-implied start/completion minutes, and its prepared-spell receipt must match the
+choices. Its member ids, duration, campaign revision, canonical game time, and
+optional calendar projection must also exactly match current public state. Each
+member's `rest_history` must match the implied start/completion ticks, and its
+prepared-spell receipt must match the
 authoritative cards. For a random-capable Short Rest, require the stored exact
 response, each requested Hit Die roll, and its matching random-stream receipt;
 current HP alone is not enough to reconstruct dice. Then add only the missing occurrence-scoped continuity and
