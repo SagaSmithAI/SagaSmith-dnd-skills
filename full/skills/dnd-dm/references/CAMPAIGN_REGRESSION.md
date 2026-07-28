@@ -336,6 +336,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    If the action returns `pending_ruling`, inspect its payment and latest
    revision before applying any generic public dice/state/continuity writes;
    never pay the action twice or invent a `combat_choice` window.
+   If an encounter requires at least one living prisoner but the source does not
+   preselect an identity, use the driver's minimum hostile-knockout objective.
+   Leave all source-valid hostiles eligible unless the Agent has a grounded
+   reason to narrow the set. The driver may attempt melee knockouts, but it must
+   judge success from the final public character cards and report the actual
+   surviving unconscious ids. Do not fail a legal scene merely because one
+   arbitrarily preselected candidate died when the required minimum still
+   survived; retain exact-id mode for source-identified prisoners.
    A spell or activity pause with no payment is pre-commit: return it to the
    named resolver before rolling healing, applying an effect, starting combat,
    or assuming a charge/slot was consumed. A paid generic-effect pause is

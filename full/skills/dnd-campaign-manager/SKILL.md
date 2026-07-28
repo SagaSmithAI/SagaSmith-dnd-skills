@@ -200,6 +200,15 @@ creature must be at 0 HP, Unconscious, Stable, and not Dead. Keep the captured
 actor and its ActorKnowledge ledger intact, and use the combat result as the
 source for any later interrogation or prisoner quest state.
 
+When the fiction needs a number of prisoners but does not identify which
+combatants survive, express an Agent-selected minimum capture objective instead
+of preselecting exact victims. Every eligible target must still be resolved by a
+real melee knockout through the public combat tools. After combat, count only
+the canonical actor cards that are actually at 0 HP, Unconscious, Stable, and
+not Dead; lethal casualties do not invalidate the scene once the minimum is
+met. Use exact target ids only when the source itself identifies the required
+survivors or every selected target must be captured.
+
 Do not interrogate that creature while it remains Unconscious. Under the 2014
 condition it is incapacitated and unaware of its surroundings, so a social check
 cannot make it answer. Restore consciousness through an actual legal effect such
