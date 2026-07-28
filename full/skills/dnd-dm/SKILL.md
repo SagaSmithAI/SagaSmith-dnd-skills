@@ -1038,6 +1038,11 @@ unknown-topology state. The temporary map enforces only its explicit bounds and
 blocked cells; it never turns
 room prose into inferred walls, cover, line of sight, or terrain. Record a real door, hazard, or similar
 post-combat world change through `combat_map_patch`, not by rewriting the module.
+If indexed prose contains authored numbered areas that the Scene Atlas omits or
+orders differently, stop play, repair the parser's shared heading normalization,
+bump its revision, and refresh the module through the public import facade.
+Verify that Markdown headings, unmarked numbered lines, and OCR-spliced display
+headings yield one source-ordered location list before resuming.
 Player map views intentionally omit blocked cells, difficult terrain, DM
 overrides, checksums, and world patches; do not disclose those fields from a DM
 read or an earlier tool result.

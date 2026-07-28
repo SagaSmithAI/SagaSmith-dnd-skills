@@ -505,7 +505,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    promise chunk but validate the event against the current scene and its actual
    Scene Atlas location. Treat missing named businesses, inns, farms, or other
    authored locations as an import/atlas defect to repair and refresh, not as
-   permission to reuse an unrelated fallback location.
+   permission to reuse an unrelated fallback location. Apply the same gate when
+   OCR preserves numbered areas in scene prose but omits them from the Atlas:
+   the refreshed parser must reconcile Markdown headings, unmarked numbered
+   lines, and OCR-spliced display headings into one source-ordered location
+   list. Verify the actual authored range and order after refresh; never let
+   document-absolute and scene-relative line coordinates reorder the rooms.
 10. Pay source-presented lodging, services, supplies, or other shared expenses
     through the public regression driver's `spend-coins` path. Supply one stable
     spend id, exact positive denominations, the current or explicitly separate
