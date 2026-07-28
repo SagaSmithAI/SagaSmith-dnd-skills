@@ -392,6 +392,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    context applies only to that attack mode. Do not add creature-, room-, or
    phrase-specific engine exceptions, and do not let a melee ruling leak into a
    ranged attack.
+   Do not use that persistent context for a target-owned reaction. When reviewed
+   source text lets the target react to a matching attack and modify its roll,
+   use `--agent-target-reaction-context-json` with the reacting actor, triggering
+   attack mode, immutable source reference, exact excerpt, Agent decision, and
+   reasoning. The encounter driver must open and resolve a public
+   `combat_choice` reaction window before the attack, spend the target's actual
+   reaction budget, and apply the modifier only to that triggering attack.
+   Subsequent attacks receive no modifier until the rules engine refreshes the
+   reaction; never emulate this with a creature-name exception or a static
+   once-per-round counter.
    Apply the same rule to every regression driver, not only encounter attacks.
    Party catalog application, checks, contests, and level-up subclass, feature,
    or spell application must stop with a structured output report carrying
