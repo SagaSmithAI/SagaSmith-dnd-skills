@@ -493,6 +493,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     map or reuse an occurrence id for a later event, even when its scene, event
     type, and summary are identical. Re-read progress after the checkpoint and
     verify that earlier events from the same run and scene remain present.
+    If an exact retry happens after later events changed the same scene row,
+    recover the saved event only when both its complete progress record and its
+    matching public campaign-event entry exist. Return that current recovered
+    state without resubmitting the old occurrence's progress, continuity, or
+    ActorKnowledge writes under their historical idempotency keys. A mismatched
+    saved event is a hard conflict, not permission to overwrite it.
     Every `advance-scene` must cite the exact transition text from the manifest's
     current scene through `--source-scene-id`, `--source-ref-json`, and
     `--source-excerpt`. The driver persists that evidence under the occurrence id
