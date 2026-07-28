@@ -521,6 +521,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     mutation. If transport fails after scene progress commits, retry the same
     stable outcome id and identical outcome/fact payload: matching saved progress
     is a resume boundary, not a reason to rewrite it with a changed state version.
+    If the matching public campaign event and, when requested, the outcome
+    checkpoint also exist, treat the whole outcome as recovered and preserve all
+    later campaign revisions. Do not resubmit its continuity, fact, manifest, or
+    checkpoint calls under historical idempotency keys.
     Narrative event text alone is not a restorable NPC or quest state.
 15. Award one source-defined encounter XP parcel to the exact actors who
     participated in earning it. A participant who dies later in that encounter
