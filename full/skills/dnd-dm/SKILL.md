@@ -57,7 +57,10 @@ the campaign.
    evidence until the exact indexed scene has been read. Carry the exact
    `source_ref` returned by `module_expand`, including its service-owned
    `content_sha256`. If expansion omits it, stop and repair the import/exposure
-   path; never synthesize the hash client-side.
+   path; never synthesize the hash client-side. Copy every runtime excerpt from
+   that exact expanded chunk, not merely from the concatenated scene text. Before
+   any mutation, expand the cited `chunk_id` again and require the returned
+   canonical source metadata, digest, and excerpt to match.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.

@@ -331,6 +331,11 @@ prose while retaining source order, but every retained fragment must occur in
 the cited chunk; runtime event, memory, progress, and ruling excerpts remain
 contiguous exact evidence. A schema-valid but unresolved manifest citation is a
 hard source error, not deferred documentation.
+Before a public regression action mutates state, the driver calls
+`module_expand` for the cited `chunk_id` and compares the complete canonical
+module/scene/chunk/page/heading/hash field set. It then validates the runtime
+excerpt against that expanded chunk. Scene-wide containment is insufficient
+because adjacent chunks are concatenated in the scene view.
 
 Full-playthrough scene transitions replace the snapshot-managed manifest through
 `playthrough_manifest(action="replace")`. The driver requires an explicit stable
@@ -482,6 +487,13 @@ event actually occurs and where scene progress is written; optional
 exact excerpt and match `source_ref`. Continuity retains both ids. This supports
 delayed rescue returns, deliveries, promises, and quest completion without
 rewriting progress in the original scene or fabricating a return there.
+Source, actor, and prospective manifest-schema preflight checks must finish
+before the first mutation. The multi-tool outcome workflow is a resumable saga:
+if delivery stops after matching scene progress commits, retry the identical
+stable outcome payload so the driver resumes the remaining public commits. If
+public progress contains a different partial outcome from a previously defective
+client, preserve that lineage and create a child from the last verified parent
+snapshot; never patch storage or overwrite the conflicting outcome.
 When a module-specific consequence is left to the DM, attach a settled
 `--event-agent-ruling-json` with `default_resolver="agent"`, a concrete decision
 and reason, and `ruling_kind="agent_dm_adjudication"` or

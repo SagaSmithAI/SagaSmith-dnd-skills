@@ -549,7 +549,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     in the continuity event; never move the party back to the source scene merely
     to make a delayed rescue, delivery, promise, or return condition validate.
     The driver must validate the complete prospective manifest before the first
-    mutation. If transport fails after scene progress commits, retry the same
+    mutation. It must also re-expand the exact cited chunk and validate its
+    canonical source metadata, digest, and contiguous excerpt before writing
+    scene progress; containment in the combined scene text is not sufficient.
+    If transport fails after scene progress commits, retry the same
     stable outcome id and identical outcome/fact payload: matching saved progress
     is a resume boundary, not a reason to rewrite it with a changed state version.
     If the matching public campaign event and, when requested, the outcome
@@ -830,7 +833,10 @@ same room name. Before using a DC, participant excerpt, or map location:
 1. select the scene from `module_query(view="index")`;
 2. read it with `module_query(view="scene")`;
 3. verify module id, scene id, page range, and location key;
-4. copy the evidence substring from that returned scene content.
+4. expand the selected chunk and require its canonical module/scene/chunk/page/
+   heading/hash fields to match the retained `source_ref`;
+5. copy the contiguous evidence substring from that expanded chunk, while also
+   requiring it to belong to the selected scene.
 
 The readiness check normalizes PDF control characters, soft hyphens, typographic
 quotes, dash variants, case, and whitespace. This only compensates for extraction
