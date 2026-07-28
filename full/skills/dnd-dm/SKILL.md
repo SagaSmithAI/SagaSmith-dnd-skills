@@ -1019,7 +1019,12 @@ half-success group-check rule, and do not treat satisfying an adventure's
 "careful/no light" prerequisite as guaranteed surprise unless the source says so.
 When the encounter text explicitly states that a particular route surprises a
 named participant, record that exact excerpt and set Surprise only for that
-participant without fabricating a Stealth or scout roll.
+participant without fabricating a Stealth or scout roll. If the exact grant
+belongs to an earlier scene, commit it through public `record-event` or
+`record-outcome` and give that passed report to the encounter driver as
+`--source-surprise-report`; enumerate only the actual surprised participants
+with `--source-surprised-actor-id`. Do not relabel the current room's hostile
+manifest as the source of Surprise.
 An opponent that notices any threat is not surprised; record the comparison and
 set `surprised` per participant. Hidden and surprised are separate facts. A
 contextual observer feature such as Keen Smell changes passive Perception by

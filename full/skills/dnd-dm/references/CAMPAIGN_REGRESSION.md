@@ -294,7 +294,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    When the encounter text itself explicitly says that this route surprises a
    named participant, preserve the exact excerpt and use the driver's
    source-declared-surprise input for only that participant; do not invent a
-   Stealth or scout check. Otherwise, when multiple hostiles hide, call public
+   Stealth or scout check. If that grant is in a predecessor scene, first commit
+   it through public `record-event` or `record-outcome`, then pass the resulting
+   report with `--source-surprise-report` alongside the exact
+   `--source-surprised-actor-id` values. The encounter keeps that report's
+   `source_ref` and excerpt instead of falsely attributing Surprise to the
+   hostile-manifest excerpt in the new scene. Otherwise, when multiple hostiles hide, call public
    `character_check` for each hostile's Dexterity (Stealth), preserving its
    derived skill modifier and automatic armor disadvantage, then compare every
    result with each opponent's passive Perception. An opponent is surprised only

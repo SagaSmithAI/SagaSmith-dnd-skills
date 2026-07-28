@@ -1110,6 +1110,11 @@ campaign event before supplying `participant_config.surprised`.
 If the source itself explicitly declares that a named participant can be
 surprised on the chosen route, the full-playthrough driver may supply that
 per-participant scene fact with the exact excerpt and no invented d20 check.
+When the declaration is in a predecessor scene, the driver must consume a
+passed public source-bound `record-event` or `record-outcome` report through
+`--source-surprise-report`. It verifies the campaign, event, `source_ref`, and
+exact excerpt before applying the separately enumerated surprised actor ids;
+the current encounter's hostile-manifest excerpt remains independent.
 Multiattack is an explicit action choice. `derived.attacks_per_action` represents
 the actor's ordinary Attack action (including a real Extra Attack feature); it is
 not inflated from a monster's Multiattack card. Pass a canonical
