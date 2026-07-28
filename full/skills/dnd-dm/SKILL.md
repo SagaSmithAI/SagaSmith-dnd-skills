@@ -128,6 +128,12 @@ the campaign.
    terminal checkpoint to become the manifest DAG head. Historical final combat
    evidence does not block an ending; only a combat record whose authoritative
    `active` flag is true does.
+   For consecutive published volumes in one campaign line, keep the same
+   campaign, run, branch, party, ActorKnowledge, clocks, random stream, and world
+   state. After verifying the earlier volume, use the driver's
+   `continue-segment` action to archive that terminal evidence and enter the
+   next module through its source-bound authoritative scene transition. Never
+   reset or recreate continuity merely because the current volume ended.
 
 ### Agent adjudication is the default DM ruling
 

@@ -797,6 +797,23 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     public checkpoint before `verify-ending`. Never defer ending verification
     or its terminal checkpoint, and never reuse a final-scene batch key for a
     later retrospective correction.
+25. When two published volumes form one continuous campaign line, do not create
+    a new campaign, run, branch, or party after the first volume's verified
+    ending. Call the public regression driver's `continue-segment` action with
+    that exact achieved condition, the next module's indexed opening scene, its
+    exact opening source evidence, the terminal scene occurrence, and a new
+    stable transition occurrence. The driver archives the complete verified
+    ending, terminal scene, terminal Snapshot DAG head, random-stream position,
+    and canonical game/world clocks under `world_state.completed_segments`;
+    reopens only the current ending as pending; commits the authoritative
+    `SceneProgress` transition; replaces the manifest projection; and creates
+    the first checkpoint in the next volume. Require the same actor ids, levels,
+    XP, hit points, resources, wallets, equipment, ActorKnowledge scopes, random
+    stream, active branch, and inherited world state before and after the
+    handoff. On interrupted delivery, retry the same occurrence: the action may
+    resume only the exact archived transition and must not duplicate the segment
+    record, scene visit, or checkpoint. Configure the next volume's ending
+    conditions only after this handoff succeeds.
 
 ## Exact scene evidence
 
