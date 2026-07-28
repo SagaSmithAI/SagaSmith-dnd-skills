@@ -945,19 +945,23 @@ critical hit, use those exact source thresholds and check them on the retreating
 actor's own turn. These are source procedures adjudicated by the Agent, not
 permission to add a one-module mechanic to Core or fabricate a generic choice
 window.
-When a reviewed descriptive feature or activity is selected as the actor's
-turn, use the encounter driver's generic Agent turn ruling rather than adding a
-creature-name or room-name branch. Bind exactly one reviewed card, its exact
+When a reviewed descriptive feature/activity or unstructured hydrated innate
+spell is selected as the actor's turn, use the encounter driver's generic
+Agent turn ruling rather than adding a creature-name or room-name branch. Bind
+exactly one reviewed `feature_id`, `activity_id`, or `spell_id`, its exact
 actor-card excerpt, the current scene's immutable `source_ref`, the exact
 encounter tactic, and the Agent's decision and reason. The driver must pay the
-real activity action or one generic `improvise` action before applying the
-ruling. Any printed save is rolled through public `combat_check`; its success
-and failure meanings are recorded on the temporary combat map. If a failed
-result directs a later attack, preserve that target across process restart,
-consume it after the actual public attack, and record any source-authored
-termination condition such as the originating actor becoming incapacitated.
-Do not preselect a die result, silently skip the printed tactic, pay the action
-twice, or convert the ruling into a reusable Core mechanic.
+real activity action, one generic `improvise` action, or the innate spell cast
+before applying the ruling. A hydrated innate spell always uses `spell_id`, so
+the runtime—not the Agent—pays its at-will or `N/day` access and starts or
+replaces concentration from the spell card. Any printed save is rolled through
+public `combat_check`; its success and failure meanings are recorded on the
+temporary combat map. If a failed result directs a later attack, preserve that
+target across process restart, consume it after the actual public attack, and
+record any source-authored termination condition such as the originating actor
+becoming incapacitated. Do not preselect a die result, silently skip the
+printed tactic, pay the action twice, or convert the ruling into a reusable
+Core mechanic.
 For a source-bound statblock spell marked with components not repeated in its
 reviewed card, have the Agent acting as DM confirm the components from the exact
 source and pass

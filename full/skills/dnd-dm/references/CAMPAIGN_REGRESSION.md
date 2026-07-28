@@ -407,13 +407,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Subsequent attacks receive no modifier until the rules engine refreshes the
    reaction; never emulate this with a creature-name exception or a static
    once-per-round counter.
-   For a source-authored tactic that selects a reviewed descriptive feature or
-   activity, use `--agent-turn-ruling-json`. It must identify one actor and
-   round, exactly one reviewed `feature_id` or `activity_id`, the current
-   scene's immutable `source_ref`, exact actor-card and encounter excerpts, and
-   the Agent's concrete decision and reason. The driver pays the reviewed
-   activity or a generic `improvise` action, then uses public `combat_check` for
-   any printed save and stores the adjudication on the temporary combat map.
+   For a source-authored tactic that selects a reviewed descriptive
+   feature/activity or an unstructured hydrated innate spell, use
+   `--agent-turn-ruling-json`. It must identify one actor and round, exactly one
+   reviewed `feature_id`, `activity_id`, or `spell_id`, the current scene's
+   immutable `source_ref`, exact actor-card and encounter excerpts, and the
+   Agent's concrete decision and reason. The driver pays the reviewed activity,
+   a generic `improvise` action, or the innate spell's structured at-will or
+   `N/day` resource. It starts concentration from the hydrated spell card,
+   then uses public `combat_check` for any printed save and stores the
+   adjudication on the temporary combat map. Never route a successfully
+   hydrated innate spell through its containing passive feature, because that
+   would bypass use accounting and concentration.
    A failed-save forced target must survive process restart and be consumed by
    the actual later attack. Declare `ends_if_source_incapacitated` only when the
    source rule establishes that termination boundary. This is the common route
