@@ -89,6 +89,18 @@ the campaign.
    without its granted feature cards and traits is an incomplete actor, not a
    usable shortcut. Never patch the raw sheet to bypass selection validation.
 7. Resolve openly with `dnd_dice_roll` or `dnd_check`.
+   Before a module table roll with external modifiers, build a branch-local
+   modifier ledger from the complete expanded procedure. Keep every modifier
+   source in its own entry with a stable id, numeric value, applicability,
+   lifetime, consumption rule, and distinct world-state key. In particular, do
+   not merge a cumulative count, a one-use next-roll bonus, and a static
+   situational modifier merely because all three currently add the same number.
+   Pass every applied entry through the public full-playthrough driver's
+   repeatable `--roll-modifier-json`; its values must sum to the expression's
+   trailing modifier, and independent entries must not share one state key.
+   After the roll, atomically increment persistent counts, consume eligible
+   limited-use entries, and add any newly earned modifier as separate
+   `record-outcome` facts/world state before the next table roll.
 8. Persist resolved scene continuity with one `memory_change(action="commit")`: one event,
    stable-key objective fact changes, exact per-actor knowledge changes, and an
    optional snapshot. Never infer who knows a fact from the fact itself. Mark

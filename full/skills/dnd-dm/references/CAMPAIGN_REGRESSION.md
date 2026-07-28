@@ -475,6 +475,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    name only the actual recipient actor ids. Update the manifest clue's
    `known_by_actor_ids` projection to match the resulting ledgers; never copy
    knowledge merely because the party collectively has it.
+   For a source table with external modifiers, first expand the whole procedure
+   and enumerate every currently applicable modifier in a branch-local ledger.
+   Give each source its own `modifier_id`, `value`, `kind`, `lifetime`,
+   `state_key`, and evidence-bearing `basis`, then pass each object separately
+   with `--roll-modifier-json`. The driver rejects duplicate ids, shared state
+   keys, invalid lifetimes, and a ledger total that differs from the expression's
+   trailing modifier. A cumulative "per previous roll" modifier and a
+   "next qualifying roll" modifier are separate even when both equal `+1`.
+   Commit count increments, use consumption, and newly granted modifiers through
+   `record-outcome` before another table roll. If this audit changes a historical
+   result, preserve the defective branch, restore the last verified parent
+   snapshot, and replay the server random stream instead of editing the outcome.
 9. When the resolved scene yields treasure, select and expand the exact treasure
    chunk and acquire the complete parcel through
    `campaign_change(action="loot_acquire")`. Use one stable acquisition id,
