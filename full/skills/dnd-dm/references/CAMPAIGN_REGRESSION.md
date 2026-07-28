@@ -565,7 +565,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     other public healing path changes it. Never edit the raw sheet, silently
     choose a subclass or feature, advance an ineligible/dead actor, treat the
     level integer alone as a complete advancement, or patch current HP to the
-    new maximum.
+    new maximum. In the resulting HP progression ledger, treat `source` as the
+    short human-readable level label only; the complete normalized citation
+    remains in `source_ref` and the milestone explanation remains in `reason`.
+    Never concatenate or truncate those machine-audit fields to fit the display
+    label.
 17. Advance campaign time through the public regression driver's
     `advance-time` path whenever travel, waiting, or a source-triggered interval
     matters. Give each interval a stable `--occurrence-id` and supply a positive
