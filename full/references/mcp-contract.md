@@ -57,6 +57,16 @@ scene, canonical actor cards, and branch state. This is the default for
 `status="pending_ruling"`, readiness `manual_rulings`, descriptive source
 activities, generic spell effects, Ready releases, environmental facts, and
 module-specific procedures.
+For combat tactics backed only by a reviewed descriptive feature or activity,
+the full-playthrough encounter driver accepts one source-bound Agent turn
+ruling. It binds the reviewed card and current-scene excerpt, pays the real
+activity or generic `improvise` action, sends any printed save through
+`combat_check`, and persists the decision and outcome as a temporary-map world
+patch. A failed-save target directive is recovered from that patch after a
+process restart and is closed only by the actual public attack or a declared
+source-authored termination boundary. This is orchestration of existing public
+tools, not a new creature-specific mechanic or an excuse to bypass action
+economy.
 `server_capabilities.ruling_policy` publishes this split for cold-start Agents;
 use it instead of treating every `pending_ruling` as the same kind of missing
 input. For the fixed 12-tool Agent path, every `exposure_call` result whose live

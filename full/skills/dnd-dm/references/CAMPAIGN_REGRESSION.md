@@ -407,6 +407,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Subsequent attacks receive no modifier until the rules engine refreshes the
    reaction; never emulate this with a creature-name exception or a static
    once-per-round counter.
+   For a source-authored tactic that selects a reviewed descriptive feature or
+   activity, use `--agent-turn-ruling-json`. It must identify one actor and
+   round, exactly one reviewed `feature_id` or `activity_id`, the current
+   scene's immutable `source_ref`, exact actor-card and encounter excerpts, and
+   the Agent's concrete decision and reason. The driver pays the reviewed
+   activity or a generic `improvise` action, then uses public `combat_check` for
+   any printed save and stores the adjudication on the temporary combat map.
+   A failed-save forced target must survive process restart and be consumed by
+   the actual later attack. Declare `ends_if_source_incapacitated` only when the
+   source rule establishes that termination boundary. This is the common route
+   for module-specific monster tactics; never add creature-name branches or
+   silently replace them with an ordinary weapon attack.
    Apply the same rule to every regression driver, not only encounter attacks.
    Party catalog application, checks, contests, and level-up subclass, feature,
    or spell application must stop with a structured output report carrying
