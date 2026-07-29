@@ -82,6 +82,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    only a sample background, use the Core custom-background rule through the
    public content-apply path to create distinct legal backgrounds; do not either
    clone the sample across the whole party or import an inactive setting option.
+   Treat cantrips as known level-zero spell cards, not prepared-list entries.
+   The public party report must separately retain `cantrip_spell_ids`,
+   `known_spell_ids`, `prepared_spell_ids`, and `spellbook_spell_ids`; verify the
+   class cantrip count against the character's level and keep any source-granted
+   species cantrip in addition to that class count. Never infer that cantrips are
+   absent merely because the prepared list or Wizard spellbook contains only
+   level-one-and-higher spells.
 4. Prepare every important named NPC and every NPC/monster required by the
    selected encounter. When the module provides only a narrative identity and no
    combat statblock, use the public driver's `prepare-narrative-npc` path: cite
