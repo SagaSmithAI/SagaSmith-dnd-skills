@@ -32,6 +32,17 @@ names or emulate aliases client-side. The consolidated calls are:
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
 - `combat_choice(action="on_hit_ruling")`.
 
+For `chase(action="start")`, a module-authored contextual speed change belongs
+in that participant's `participant_config` as `speed_adjustment_ft` plus an
+exact `source_excerpt` contained in the reviewed chase excerpt. The server
+applies it only to the chase snapshot. For every
+`chase(action="take_turn")`, callers must explicitly send `turn_action`,
+`complication_choice` (the empty string is meaningful when no choice applies),
+`stand_from_prone`, and an exact boolean `quarry_visibility` map covering every
+quarry. Initiative, movement, Dash limits, checks, damage, time, and random
+receipts remain engine settlements; choosing actions, legal alternatives, and
+current theater-of-the-mind visibility remains an Agent/DM decision.
+
 Every action uses only its documented payload fields. Unknown fields are an
 error, and a facade action retains the original role, phase, revision,
 idempotency, source-evidence, and random-stream boundary. In particular,

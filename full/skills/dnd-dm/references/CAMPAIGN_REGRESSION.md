@@ -259,9 +259,19 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `scripts.regression_chase` through the public stdio MCP exposure. Bind
    `chase(action="start")` to the exact expanded scene `source_ref`, excerpt, quarry,
    pursuers, and printed starting distance. Require `mode="theater_of_the_mind"`
-   and the absence of a battle map. Let `chase(action="take_turn")` own initiative,
-   distance, Dash counts, extra-Dash Constitution checks, chase exhaustion,
-   Urban Chase Complications, damage, and the server random stream. A module
+   and the absence of a battle map. The Agent must explicitly rule the
+   theater-of-the-mind starting distance, provide every participant's
+   `turn_action`, `stand_from_prone`, and legal choice for each possible
+   complication result, and state the current boolean visibility of every
+   quarry. Never let the driver choose Dash, select the actor's numerically best
+   skill, stand automatically, or assume a quarry remains visible. A printed
+   contextual speed modifier, such as dragging a heavy sack, must be supplied
+   as a signed `speed_adjustment_ft` with an exact excerpt inside the reviewed
+   chase source. It applies only to the chase snapshot and must not patch the
+   canonical character sheet. Let `chase(action="take_turn")` own initiative,
+   distance, movement from the declared action, Dash counts, extra-Dash
+   Constitution checks, chase exhaustion, Urban Chase Complications, damage,
+   and the server random stream. A module
    transition such as a quarry ducking into a destination is legal only when
    the `close_transition` carries its own exact same-scene `source_ref` and
    `source_excerpt`; require its `summary` to equal that normalized excerpt,
