@@ -1372,6 +1372,18 @@ weapon with the Thrown property, `attack_mode` defaults to `melee`; send
 `attack_mode: "ranged"` to use its thrown range. The selected mode also determines
 whether melee-only modifiers apply.
 
+An Owner/DM may supply a current-scene Agent ruling in `action.context` for
+terrain- or position-dependent attack facts. Relative cover uses
+`cover.degree="half" | "three_quarters" | "total"` plus an `agent_ruling`
+containing a stable application id, `default_resolver="agent"`,
+`ruling_kind="source_or_scene_fact"`, decision, reason, the exact active-scene
+`source_ref`, and an excerpt verified against that chunk. Cover is specific to
+the declared attacker, target, and attack mode. The server rejects player-supplied
+tactical context, stale or foreign citations, missing Agent evidence, arbitrary
+numeric cover bonuses, and unknown degrees. The D&D engine derives +2 AC, +5 AC,
+or the total-cover targeting prohibition; callers must never calculate or inject
+those numbers.
+
 A successful attack may return `status: pending_reaction` with no damage. The
 engine has committed its attack roll, Action/attack payment, ammunition use, Help
 consumption, and hidden-attacker reveal, while blocking further actions. The

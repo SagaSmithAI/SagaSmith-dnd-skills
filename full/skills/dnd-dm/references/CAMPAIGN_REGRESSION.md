@@ -405,14 +405,19 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `--source-on-hit-ruling-json` settlement. Never substitute one boundary for
    the other.
    When module prose makes the current terrain, tactic, or fictional position
-   grant advantage or disadvantage without defining a new rule procedure, have
-   the Agent settle that fact with `--agent-attack-context-json`. Bind one exact
-   participant and `melee` or `ranged` mode to the current scene's immutable
-   `source_ref`, an exact excerpt contained in the encounter evidence, one
-   unambiguous advantage state, a concrete decision, and its ruling reason. The
-   context applies only to that attack mode. Do not add creature-, room-, or
-   phrase-specific engine exceptions, and do not let a melee ruling leak into a
-   ranged attack.
+   grant advantage, disadvantage, or relative cover without defining a new rule
+   procedure, have the Agent settle that fact with
+   `--agent-attack-context-json`. Bind one exact acting participant and `melee`
+   or `ranged` mode to the current scene's immutable `source_ref`, an exact
+   excerpt contained in the encounter evidence, a concrete decision, and its
+   ruling reason. Advantage/disadvantage may apply actor-wide for that attack
+   mode. Cover must additionally name the distinct target because it is relative
+   to one attacker-target relationship, and its degree is strictly `half`,
+   `three_quarters`, or `total`. The public MCP validates the exact active-scene
+   evidence; the rules engine alone converts those degrees to +2 AC, +5 AC, or
+   an untargetable result. Never provide a numeric `cover.ac_bonus`. Do not add
+   creature-, room-, or phrase-specific engine exceptions, and do not let a
+   melee or target-specific ruling leak into another attack.
    Do not use that persistent context for a target-owned reaction. When reviewed
    source text lets the target react to a matching attack and modify its roll,
    use `--agent-target-reaction-context-json` with the reacting actor, triggering

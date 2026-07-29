@@ -229,6 +229,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    weapons, rounds, and a bounded application count. Do not apply the rider
    later with `combat_hp_change`: all damage dice must resolve simultaneously,
    double together on a critical hit, and share one target-state mutation.
+   When exact scene evidence and current relative position give the target Half,
+   Three-Quarters, or Total Cover, the Agent supplies the attacker, distinct
+   target, attack mode, exact source reference/excerpt, decision, and reason.
+   Send only the cover degree; the server verifies the current-scene evidence
+   and the D&D engine derives +2 AC, +5 AC, or an untargetable target. Never
+   calculate a numeric cover bonus in the Agent or encounter driver.
 3. When an attack returns `pending_reaction`, read the target's
    `combat_query(view="reactions")`, then use
    `combat_choice(action="resolve_defense")`. Do not roll or apply damage twice.
