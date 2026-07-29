@@ -360,8 +360,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Petrified, Stunned, or Unconscious—ends concentration. Bind a printed
    first attack to that actor's reviewed weapon rather than allowing generic
    weapon preference to override it. When an effect-only weapon hit opens an
-   on-hit ruling, settle its printed condition and escape terms through
-   `combat_choice(action="on_hit_ruling")`; a restrained target uses
+   on-hit ruling with `semantic_solution.status="compilation_required"`, have
+   the Agent compile the reusable source-bound plan through
+   `combat_choice(action="compile_solution")` and execute the same paid window
+   through `combat_choice(action="execute_plan")`. Use `on_hit_ruling` only when
+   the occurrence cannot be represented by the generic primitives. A restrained target uses
    `combat_check(action="escape")`, spends its action, and clears the condition
    only on success. Do not use that action escape for a save-gated condition.
    When the complete reviewed action instead prints an immediate saving throw,

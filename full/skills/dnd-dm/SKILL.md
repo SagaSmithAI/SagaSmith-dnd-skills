@@ -247,7 +247,8 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
-| Owned pending combat windows | `combat_choice(resolve/resolve_defense/on_hit_ruling)` |
+| Owned pending combat windows | `combat_choice(resolve/resolve_defense/on_hit_ruling/compile_solution/execute_plan)` |
+| Reusable custom-content solutions | `content_solution(query/compile)` |
 | Agent DM adjudication without an owned window | Relevant public dice, check, map, state, memory, and manifest tools |
 
 ## Actor Cards and Party State
@@ -858,9 +859,19 @@ damage dice. Effect-only attacks such as a giant spider's Web retain an empty
 damage expression plus the exact `on_hit_effect`; resolve the attack roll
 normally, apply no fabricated HP damage, and send the printed condition and
 escape/destruction procedure to explicit Agent-as-DM settlement. A hit that returns
-`pending_on_hit_ruling_id` blocks the turn: call public
-`combat_choice(action="on_hit_ruling")` with the target as `actor_id` and the
-pending `choice_id` plus printed condition, escape DC, permitted
+`pending_on_hit_ruling_id` blocks the turn. When the result reports
+`semantic_solution.status="compilation_required"`, read the complete recorded
+card and exact managed source, call
+`combat_choice(action="compile_solution")`, then execute that same paid window
+with `combat_choice(action="execute_plan")`. Later hits reuse the stored solution.
+If a locked standard card instead reports
+`semantic_solution.status="engine_implementation_required"`, stop before
+payment and implement the missing standard mechanic in the engine; do not send
+it through custom-content compilation.
+Use `combat_choice(action="on_hit_ruling")` only for a genuinely
+occurrence-specific boundary that cannot become a reusable source recipe. In
+that fallback, pass the target as `actor_id` and the pending `choice_id` plus
+printed condition, escape DC, permitted
 abilities, and an exact excerpt. If applied, keep the resulting ongoing effect
 on the target. On that target's turn, use
 `combat_check(action="escape")`; it must spend the action, roll the effect's

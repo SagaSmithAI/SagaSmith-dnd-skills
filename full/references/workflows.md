@@ -250,8 +250,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    tactics use the lowest offered slot only when +5 AC changes the hit to a miss;
    otherwise decline. Available Shield should block Magic Missile.
    When a committed hit instead returns `pending_on_hit_ruling_id`, the Agent
-   reviews the complete card and exact excerpt and settles that owned window
-   through `combat_choice(action="on_hit_ruling")`. Use `apply_condition` only
+   reviews the complete card and exact excerpt. When the result also reports
+   `semantic_solution.status="compilation_required"`, compile the reusable
+   schema-v2 recipe through `combat_choice(action="compile_solution")`, then
+   settle that same paid window through `combat_choice(action="execute_plan")`.
+   Use `on_hit_ruling` only for an occurrence-specific effect that the generic
+   primitives cannot express. In that fallback, use `apply_condition` only
    for printed action/check escape terms. Use `saving_throw_condition` for an
    immediate save-gated timed condition with printed turn-end repeat saves; pass
    the exact condition, ability, DC, repeat timing, duration, and excerpt.
@@ -264,9 +268,16 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.
-   A descriptive activity, unstructured spell, or scene procedure with printed
-   save damage is a two-call recoverable transaction with one immutable semantic
-   identity. Before paying, place the complete canonical
+   A locked standard card that reports
+   `semantic_solution.status="engine_implementation_required"` must stop before
+   payment and be implemented in the engine; do not reinterpret it as custom
+   prose. A repeatable custom activity or spell first returns
+   `semantic_solution.status="compilation_required"` without payment. Compile it
+   once with `content_solution(action="compile")`, using exact managed evidence,
+   then retry the action with the stored plan contract. A genuinely one-off
+   descriptive activity, unstructured spell, or scene procedure with printed
+   save damage remains a two-call recoverable transaction with one immutable
+   semantic identity. Before paying, place the complete canonical
    `agent_ruling_commitment` in that action's declaration/payload. Settle it with
    `combat_hp_change(action="save_damage")` using the identical target order,
    source card, save/DC, damage terms, exact mechanics excerpt, and active-scene

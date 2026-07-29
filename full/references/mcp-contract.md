@@ -12,7 +12,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply` |
+| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
@@ -20,8 +20,8 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
 
-The compact public contract contains exactly 82 tools, with 12 core discovery
-tools and phase ceilings of Lobby 61, Play 46, and Combat 44. Do not call retired
+The compact public contract contains exactly 83 tools, with 12 core discovery
+tools and phase ceilings of Lobby 62, Play 47, and Combat 45. Do not call retired
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
@@ -30,7 +30,8 @@ names or emulate aliases client-side. The consolidated calls are:
 - `rule_import(action="render_page" | "recover_statblock")`;
 - `module_review(action="render_page" | "submit_content")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
-- `combat_choice(action="on_hit_ruling")`.
+- `combat_choice(action="on_hit_ruling" | "compile_solution" | "execute_plan")`;
+- `content_solution(action="query" | "compile")`.
 
 For `chase(action="start")`, a module-authored contextual speed change belongs
 in that participant's `participant_config` as `speed_adjustment_ft` plus an
@@ -1182,6 +1183,29 @@ A nonempty
 `on_hit_ruling` means damage is committed while the quoted secondary condition
 or choice still requires explicit Agent-as-DM settlement; it is not permission
 to repeat the hit.
+
+Standard D&D mechanic references registered in the campaign's active rule lock
+remain server implementations; a core-looking string alone is not executable.
+Accounting, phase, or transaction mechanics also do not prove that a card's
+authored outcome is implemented. If a locked standard card lacks an outcome
+implementation, the pre-payment result is
+`semantic_solution.status="engine_implementation_required"`; fix and test the
+engine rather than compiling that standard rule as homebrew.
+For imported or homebrew content without such an implementation,
+the first real use returns `semantic_solution.status="compilation_required"`.
+The Agent reads the complete recorded card and an exact managed module/rule
+chunk, then submits a schema-v2 source-bound plan through
+`content_solution(action="compile")`. A paid item hit instead uses
+`combat_choice(action="compile_solution")`, which stores the solution and upgrades
+that same pending hit atomically. The stored solution locks the card identity,
+immutable card semantics, plan and source-evidence fingerprints, compilation
+version, and bounded Agent reason.
+Later combat uses call the primitive executor through
+`combat_choice(action="execute_plan")`; they do not reinterpret the prose.
+Never put arbitrary Python names or state patches in a plan. If an occurrence is
+genuinely unique, cannot be expressed by available primitives, or depends on
+unstructured scene judgment, keep it in the explicit Agent/DM ruling boundary
+instead of inventing a reusable recipe.
 For 2014 surprise, first satisfy any imported scene prerequisites that merely
 avoid automatic detection, then resolve each hiding actor's canonical Stealth
 check and compare the individual results with each opposing creature's passive
@@ -1368,12 +1392,14 @@ one `resource_key` resource when present, otherwise one limited card use, and
 pay the card's action/bonus-action/reaction timing in combat. Card prose,
 choices, targeting, and any non-deterministic result are returned for an
 explicit Agent-performed DM ruling rather than automatically materialized.
-A reviewed descriptive statblock action records
-`choices.manual_ruling.kind="descriptive_activity"` with its source excerpt.
-Calling it pays the recorded timing and returns `pending_ruling`; adjudicate
-the prose from that excerpt and do not repeat the payment.
-When that ruling contains a printed saving throw plus damage, commit the entire
-semantic settlement before paying the action. The activity declaration,
+A reviewed descriptive statblock action records its complete source excerpt.
+On first use, an unimplemented custom activity returns
+`semantic_solution.status="compilation_required"` without paying its timing or
+spending a use. Compile and persist its reusable plan first, then retry with the
+returned plan contract and pay exactly once. Do not use a transient ruling merely
+to avoid compilation for repeatable custom content.
+For a genuinely one-off ruling containing a printed saving throw plus damage,
+commit the entire semantic settlement before paying the action. The activity declaration,
 unstructured spell declaration, or scene-procedure `improvise` payload carries
 one canonical `agent_ruling_commitment`: stable application id, exact card kind
 and id, ordered targets, save/DC, advantage state, damage expression/type,
