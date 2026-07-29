@@ -583,16 +583,19 @@ pass `multiattack_option_id` on its first `combat_preflight_attack` and
 recorded by that option. Omit the id to choose one ordinary Attack. A descriptive
 Multiattack without options remains an Agent-as-DM boundary only when selected and does not
 block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
-override. Before any reviewed module or rulebook monster enters combat, inspect
-its `agent_fill_requirements`. Every exact reviewed Multiattack must return to
-Lobby and have the Agent submit the immutable content or rule-statblock review
-with `payload.agent_fill.multiattack_options`. Cite the activity id and exact source
+override. Before any reviewed monster enters combat, inspect
+its `agent_fill_requirements`. Standard rulebook cards must report
+`parser_authoritative=true` and `default_resolver="engine"`; Agent semantic
+fills are rejected, and an unparsed standard mechanic must be implemented and
+tested in the engine before play. Module-authored and homebrew cards instead
+return to Lobby so the Agent can submit the immutable content review with
+`payload.agent_fill.multiattack_options`. Cite the activity id and exact source
 excerpt and use only existing parsed weapon ids, legal modes, and explicit
-counts. A parser-produced composition remains only a candidate and cannot bypass
-this gate. If the exact procedure mixes a special activity or another unsupported
-semantic, submit `resolution="agent_ruling"` with the exact excerpt and reason
-instead of `options`; the actor remains usable and selecting that action returns
-to Agent DM adjudication. When a managed module or rule source assigns a complete
+counts. For custom content, a parser-produced composition remains only a
+candidate. If its exact procedure mixes a special activity or another
+unsupported semantic, submit `resolution="agent_ruling"` with the exact excerpt
+and reason instead of `options`; the actor remains usable and selecting that
+action returns to Agent DM adjudication. When a managed module source assigns a complete
 numeric weapon action outside the selected base statblock, use
 `payload.agent_fill.additional_actions` with the action name, its exact managed
 `source_ref`, exact excerpt, and Agent reason. The ordinary statblock parser must
@@ -695,9 +698,12 @@ Shield reaction; resolve it normally before attempting the next attack. The
 pending spell resolution blocks the caster's turn end and encounter end until its
 remaining count reaches zero.
 
-Declare 2014 Sneak Attack with `use_sneak_attack: true`; the engine checks the
-recorded Rogue feature, finesse/ranged weapon, advantage or adjacent active enemy,
-disadvantage, once-per-turn token, and critical dice. The canonical 2014 Fighter
+Declare 2014 Sneak Attack with `use_sneak_attack: true`; for a player Rogue the
+engine checks the recorded feature, finesse/ranged weapon, advantage or adjacent
+active enemy, disadvantage, once-per-turn token, and critical dice. A standard
+monster statblock such as Spy instead uses its exact source trait and recorded
+damage formula; do not add the player feature's weapon restriction when the
+monster text omits it. The canonical 2014 Fighter
 Second Wind card is engine-owned: call `combat_use_activity` with its exact
 feature id. One atomic transaction consumes the card use and bonus action, rolls
 `1d10 + fighter level`, applies the clamped healing, and returns the roll,
@@ -726,6 +732,17 @@ Agent acting as DM decides whether the circumstances permit hiding and resolves
 the Stealth/observer boundary by default. Never spend
 a second main action for the same declaration, and never mark the actor Hidden
 merely because the bonus action was paid.
+
+Standard Orc `Aggressive` and Orc War Chief `Battle Cry` cards are also
+engine-owned. Pay `Aggressive` with `combat_use_activity`, naming one recorded
+visible hostile target, then spend that distinct movement grant with
+`combat_movement(action="move", payload.movement_mode="aggressive")`; every
+submitted path segment must move toward that target, while ordinary movement
+remains a separate pool. For `Battle Cry (1/Day)`, submit
+`declaration.targets=[{actor_id,can_hear,reason}]`. The Agent decides the current
+hearing fact; the engine consumes the card's daily use and action, enforces 30
+feet and Deafened, maintains advantage until the war chief's next turn, and
+offers exactly one bonus-action attack when the bonus action remains.
 
 The canonical 2014 Cleric Channel Divinity card's `Turn Undead` option is
 engine-owned. Call `combat_use_activity` with activity id
@@ -1156,8 +1173,10 @@ hostile's recorded reach opens an owned opportunity window; read it through
 `combat_choice(action="resolve")`, or settle it
 atomically with `combat_reaction_attack`. Do not claim other map collision, terrain,
 forced movement, line of sight, or a trigger not represented in encounter state.
-Use `combat_movement(action="move")` with `payload.path` for bent grid routes. Set `movement_mode` to `forced` or
-`teleport` when the scene establishes that the move does not provoke a normal
+Use `combat_movement(action="move")` with `payload.path` for bent grid routes.
+Set `movement_mode` to `aggressive` only after the engine-owned Aggressive
+activity has created that separate grant. Set it to `forced` or `teleport` when
+the scene establishes that the move does not provoke a normal
 opportunity attack; do not encode terrain cost or collision unless it is part of
 the supplied scene facts.
 When the temporary battle map records `difficult_cells`, provide a cell-by-cell

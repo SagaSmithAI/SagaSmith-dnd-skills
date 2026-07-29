@@ -49,13 +49,12 @@ and `source_bound_rule_packs` to be true. Consume the published
    the exact `source_id` to its retained import `job_id`; this also works when
    the source was indexed in an earlier process. Then call
    `rule_import(action="recover_statblock")` with that `job_id`, exact printed
-   creature heading as `name`, and a fresh idempotency key. If the exact card
-   contains Multiattack, include `payload.agent_fill` in this same recovery
-   call; local OCR remains authoritative for card facts, while the Agent maps
-   only the returned/diagnosed activity id and exact action prose to canonical
-   weapon ids, modes, and counts. A mismatched submission reports both expected
-   and received activity ids; correct the generic fill rather than adding a
-   creature-specific parser rule. Do not use a
+   creature heading as `name`, and a fresh idempotency key. Standard rulebook
+   mechanics are engine-authoritative: do not include `payload.agent_fill`.
+   A parsed standard Multiattack is used directly; an unparsed standard
+   Multiattack or other mechanical card is an engine implementation gap that
+   must be fixed and tested before retrying. Do not add a creature-name special
+   case or ask the Agent to redefine the printed rule. Do not use a
    campaign instance name such as a named dragon in place of
    `Adult Blue Dragon`. Supply `page_number` only when it is already
    source-established; otherwise let the server read the printed-page index hint
@@ -64,8 +63,7 @@ and `source_bound_rule_packs` to be true. Consume the published
    creature name by the adjacent size/type/alignment core, rejects
    low-confidence critical fields, and requires either
    target-segment embedded-text corroboration or agreement from an independent
-   OCR scale. The result is a checksum-bound reviewed statblock with any
-   validated Agent action fill retained atomically; retry actor
+   OCR scale. The result is a checksum-bound reviewed statblock; retry actor
    creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
 8. If layout OCR cannot isolate a card but the already-indexed chunks still contain
    the complete card as one ordered, contiguous segment on an exact page, a
@@ -82,15 +80,18 @@ and `source_bound_rule_packs` to be true. Consume the published
    ordinals; it rejects both facts absent from the evidence and selected evidence
    omitted from the normalized card. Use the returned `review_id` with
    `character_create_from(mode="reviewed_rule_statblock")`.
-   Any reviewed passive that is not one of the engine's structured source traits
-   must remain on the actor card as
-   `choices.manual_ruling.kind="descriptive_passive"` with
-   `default_resolver="agent"` and its exact description as `source_excerpt`.
-   A warning without this typed entry is an importer defect: repair and recreate
-   the actor through the public review path rather than adding a creature-name or
-   phrase-specific settlement exception.
+   Any mechanical passive or action that is not one of the engine's structured
+   standard traits must reject the standard-rule review as
+   `engine_implementation_required`. Implement the generic printed rule and add
+   a source-backed regression test before recreating the actor. Agent semantic
+   fills and manual-ruling cards are reserved for module-authored or homebrew
+   content, not canonical rulebook mechanics.
    This is layout normalization, not model-memory reconstruction. If the indexed
    facts themselves are missing or conflicting, stop at explicit source review.
+   Bounded text-layer repair may accept `l/I` for `1`, `o` for `0`, and `f`
+   between two numeric range components for `/`, but only at the matching
+   numeric positions. Changed DCs, bonuses, dice, damage types, and other
+   numeric facts remain rejected.
    An image-capable reviewer may instead render the exact page and transcribe only
    observed fields through the same action with `review_mode="visual"` (the
    default). A text-only Agent must not claim visual review, repair tokens from

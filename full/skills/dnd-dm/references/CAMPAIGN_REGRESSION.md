@@ -139,13 +139,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `--source-page`: chunks remain the first text-layout attempt and the page is
    the bounded OCR fallback. A single-field ambiguity such as
    `statblock INT score is ambiguous` must enter this generic fallback just as a
-   missing six-score table does. If the OCR-recovered card has Multiattack,
-   supply `--agent-statblock-fill` and `--review-observation` on that same
-   `prepare-rule-statblock` invocation. The driver passes the strict fill into
-   `rule_import(action="recover_statblock")`, so the checksum-bound OCR review
-   and Agent action composition are retained atomically without host-model image
-   capability. If an activity id is wrong, use the expected and received ids in
-   the server error to correct the fill; never add a named-monster special case.
+   missing six-score table does. Standard rulebook Multiattack and other
+   mechanical cards must be parsed and executed by the D&D engine; never supply
+   `--agent-statblock-fill`. If the parser cannot structure the printed rule,
+   add a generic engine implementation and source-backed test, relock the
+   campaign's built-in Core pack explicitly, and retry. Never add a
+   named-monster special case.
    Repeated decorative/narrative copies of a creature
    heading are valid when exactly one copy is immediately bound to a complete
    creature core. If OCR still cannot isolate the card but those exact indexed
@@ -158,9 +157,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    identities differ, review them and pass the intended `--source-job-id`.
    The driver sends `review_mode="agent_text"`; the MCP rechecks page ownership,
    ordinal continuity, full evidence coverage, and absence of invented facts.
-   It may repair at most bounded OCR glyph errors while preserving every
-   numeric token; it must still reject changed DCs, bonuses, dice, damage types,
-   and rule terms. When a continuous PDF segment interleaves a preceding or
+   It may repair only numeric-position OCR confusables (`l/I↔1`, `o↔0`) and a
+   digit-bounded range separator (`f↔/`); it must still reject changed DCs,
+   bonuses, dice, damage types, and rule terms. When a continuous PDF segment
+   interleaves a preceding or
    adjacent creature column, submit
    `--agent-evidence-exclusions <exclusions.json>`. Each entry must name a
    selected `chunk_id`, quote one exact source substring, and give a reason.
@@ -202,26 +202,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    inside a generic action signature; any remaining mismatch must trigger the
    bounded OCR/review path. Never approve a partial card merely because
    `attack_count >= 1`, and never add a creature-name-specific parser exception.
-   Before any prepared
-   monster enters combat, compare every printed Multiattack with
-   `derived.multiattack_options`. For every module or reviewed-rulebook
-   Multiattack, inspect `agent_fill_requirements`; even a parser-recognized
-   composition is only a proposal and cannot be used to create the actor until
-   the Agent confirms it. If a deterministic printed composition is missing, stop at the
-   quality gate; do not silently run one ordinary attack in place of the
-   source-defined action. Do not grow phrase-by-phrase parser exceptions. Have
-   the Agent read the exact reviewed source and resubmit either
-   `module_review(action="submit_content")` or
-   `rule_import(action="review_statblock")` with
-   `payload.agent_fill.multiattack_options`: the activity id, exact source
-   excerpt, a short reason, and canonical options containing only parsed weapon
-   ids, attack modes, and counts. The server validates and stores that semantic
-   fill in the immutable review and requires exact coverage of every
-   Multiattack activity. The regression driver accepts the same object through
-   `--agent-statblock-fill`. If a composition includes a special activity or
-   unsupported module procedure, submit `resolution="agent_ruling"` without
-   `options`; this removes any parser proposal while preserving the action for
-   Agent adjudication at selection time. If an exact managed source assigns the
+   Before any prepared monster enters combat, compare every printed
+   Multiattack with `derived.multiattack_options`. For reviewed standard
+   rulebooks, the parser result is authoritative and `agent_fill_requirements`
+   reports `parser_authoritative=true`; any missing composition is an engine
+   implementation gap. For module-authored or homebrew cards, the parser remains
+   transcription support only: have the Agent read the exact reviewed source
+   and submit `module_review(action="submit_content")` with
+   `payload.agent_fill.multiattack_options`. If a composition includes a
+   special activity or unsupported module procedure, submit
+   `resolution="agent_ruling"` without `options`; this preserves the custom
+   action for Agent adjudication at selection time. If an exact managed source assigns the
    creature a complete numeric weapon action outside the base card, add
    `additional_actions` to the same fill. Each entry supplies only the action
    name, exact managed `source_ref`, exact action excerpt, and Agent reason.
@@ -235,16 +226,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    compatible weapon for that mode. When multiple compatible weapons remain,
    the Agent performs the DM review from the exact statblock and current
    loadout; missing or conflicting source evidence remains external review.
-   If a retained, checksum-bound rule-statblock review already contains the
-   correct complete transcription but predates a required Agent semantic fill,
-   do not re-import the managed PDF, rerun OCR, or require the host model to
-   inspect an image. Call `prepare-rule-statblock` with the retained
-   `--source-id`, its exact `--source-job-id`, `--base-rule-review-id`, a new
-   `--review-observation`, and `--agent-statblock-fill`. The facade derives a
-   new immutable review only after rechecking review ownership, source and
-   artifact checksums, normalized-text checksum, page render, original review
-   mode, and original text evidence. The derived review records
-   `derived_from_review_id`; it cannot replace or mutate the base review.
+   A retained standard-rule review never receives a later Agent semantic fill.
+   If a newly enforced standard mechanic is missing, implement it in the engine,
+   relock Core explicitly, and recreate the actor from the same checksum-bound
+   transcription.
 5. In `play`, select one source-printed non-combat check. Read the exact scene,
    preserve its ability/skill and DC, resolve it through `character_check`, and
    commit the event, stable facts, per-witness ActorKnowledge, and snapshot with

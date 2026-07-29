@@ -802,13 +802,12 @@ Successful exclusion of trailing creature prose or page furniture is returned
 separately as `normalization_notes`. These notes preserve the audit trail but are
 not executable uncertainty: they must not create `ruling_requirements`, change
 `settlement` away from `automatic` on their own, or block a readiness group.
-When recovered text includes Multiattack, `agent_fill` is required in the same
-call. OCR owns the transcription and critical facts; the Agent owns only the
-semantic composition of the exact action prose into parsed weapon ids, modes,
-and counts. The server requires every recovered Multiattack activity exactly
-once and reports expected and received activity ids on mismatch. This closes the
-text-only path without making the lexical parser authoritative or requiring a
-second image-capable model.
+When recovered rulebook text includes Multiattack, the standard D&D parser and
+engine own its composition. `agent_fill` is rejected. A composition the engine
+cannot structure returns `engine_implementation_required`; fix the generic
+standard-rule implementation and its tests before retrying. The Agent owns only
+the checksum-bound transcription and evidence segmentation, not canonical rule
+semantics.
 Text-layout recovery also compares every explicit
 `Melee/Ranged [Weapon|Spell] Attack:` source marker with the parsed weapon and
 identified statblock-spell actions. One successfully parsed attack cannot hide
@@ -828,43 +827,18 @@ different artifact identities require explicit source review and
 the staged PDF checksum and page render checksum, verifies source/page/ordinal
 membership, parses the normalized card, rejects every normalized fact absent
 from the selected text, and rejects omission of any selected statblock evidence.
-If that reviewed card contains Multiattack,
-`rule_import(action="review_statblock")` also requires
-`payload.agent_fill.multiattack_options`; the Agent must cite the exact parsed
-activity id and excerpt and select only parsed weapon ids, modes, and explicit
-counts. The immutable rule review stores and applies the fill when
-`character_create_from(mode="reviewed_rule_statblock")` creates the actor. A
-parser-produced composition is only a proposal here as well.
-The same strict fill may contain `additional_actions` when an exact managed
-rule/module chunk or review assigns the creature a complete numeric weapon
-action that lies outside the selected base statblock transcription. Each entry
-contains only `name`, `source_ref`, `source_excerpt`, and `reason` on input.
-The service proves that the excerpt belongs to the same rule source or module
-and, when known, the reviewed page; the canonical attack parser derives the
-stable id and every mechanic. A supplied normalized `id` is accepted only when
-it equals that parser-derived id. The Agent cannot submit arbitrary attack,
-damage, condition, or resource fields. The immutable review retains checksummed
-fill evidence, and later actor creation replays the normalized declaration.
-Any unresolved on-hit clause remains a typed Agent ruling after the structured
-attack and damage settle.
-When a checksum-bound retained review already has a complete transcription but
-needs a newly required Agent semantic fill, the same action accepts the strict
-alternative payload `{job_id, base_review_id, observation, agent_fill}`. It
-does not accept replacement content, a new page, or new evidence ids in that
-form. The server revalidates the base review's job ownership, source and PDF
-checksums, normalized-content checksum, page render, review mode, and original
-text evidence, then retains a derived immutable review with
-`derived_from_review_id`. This lets a text-only Agent add structured
-Multiattack choices or a source-cited adjacent variant action to trusted OCR
-output without re-importing the managed PDF
-or pretending to have inspected an image.
-Every other unstructured reviewed passive is preserved on the created actor as
-`choices.manual_ruling.kind="descriptive_passive"` with the Agent as default
-resolver and the exact passive description as its source excerpt. Read that
-typed card entry before supplying any situational ruling. A parser warning with
-no corresponding structured source trait or typed manual-ruling entry is an
-importer defect; do not compensate with creature-name checks, ad hoc `once`
-flags, or post-damage HP edits.
+If that reviewed rulebook card contains Multiattack or another standard
+mechanical card, `rule_import(action="review_statblock")` accepts it only when
+the engine produces a complete structured implementation. It rejects
+`payload.agent_fill`, including `additional_actions` and derived-review fills.
+An unresolved standard passive/action is an importer or engine defect; do not
+preserve it as an Agent manual ruling, add creature-name checks, ad hoc `once`
+flags, or post-damage HP edits. In contrast, module-authored and homebrew cards
+continue to require an Agent semantic fill on first use and store that
+source-bound solution for deterministic reuse.
+The indexed-text validator permits only position-bound OCR confusables
+`l/I↔1`, `o↔0`, and digit-bounded `f↔/` in a numeric range. All other numeric
+tokens, DCs, bonuses, dice, damage types, and rule terms must remain exact.
 The stored review uses `confidence="reviewed_text"` and retains per-chunk
 checksums. Visual review remains `review_mode="visual"` and
 `confidence="reviewed_image"`. Missing or conflicting indexed facts remain an
@@ -1433,7 +1407,22 @@ engine pays the Action once, stores the remaining source-defined weapon/mode
 entries in turn state, and rejects substitutions or excess attacks. For a melee
 weapon with the Thrown property, `attack_mode` defaults to `melee`; send
 `attack_mode: "ranged"` to use its thrown range. The selected mode also determines
-whether melee-only modifiers apply.
+whether melee-only modifiers apply. For a Two-Handed or Versatile weapon, the
+attack plan also records `weapon_grip`. Send `weapon_grip: "two_handed"` to
+select a printed Versatile alternate; the engine uses that complete alternate
+damage expression exactly once and rejects the mode while a shield is wielded.
+Omit it for the legal default (`two_handed` for a Two-Handed weapon, otherwise
+`one_handed`). Never add a Versatile die to ordinary damage or repeat additional
+dice already folded into the printed alternate.
+
+Standard monster activities remain engine-owned. `Aggressive` is paid through
+`combat_use_activity`; spend only its separate grant with
+`combat_movement(action="move", payload.movement_mode="aggressive")`, which
+must move every submitted path segment toward the recorded visible hostile.
+`Battle Cry (1/Day)` consumes its card-local daily use and main action. Its
+declaration uses `targets=[{actor_id,can_hear,reason}]`; the Agent supplies the
+current hearing fact, while the engine enforces range, Deafened, duration,
+attack advantage, and the source's optional bonus-action attack.
 
 An Owner/DM may supply a current-scene Agent ruling in `action.context` for
 terrain- or position-dependent attack facts. Relative cover uses

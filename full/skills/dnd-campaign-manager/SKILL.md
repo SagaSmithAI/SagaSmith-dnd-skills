@@ -82,13 +82,14 @@ replaces the earlier exposure, so discard every older exposure id.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
    `module_review(action="submit_content")`; `blocked` candidates require a rendered managed page
    and literal visual transcription. Never fill OCR gaps from memory. For a
-   module- or reviewed-rulebook-authored Multiattack, inspect
+   module-authored or homebrew Multiattack, inspect
    `agent_fill_requirements` and have the Agent attach a source-bound
-   `payload.agent_fill.multiattack_options` to the immutable module or
-   rule-statblock review, using only
-   parsed weapon ids, modes, and explicit counts. This is required even when the
-   parser proposed a composition: parser wording recognition is not semantic
-   authority for a reviewed creature. When the procedure cannot be represented by
+   `payload.agent_fill.multiattack_options` to the immutable module review,
+   using only parsed weapon ids, modes, and explicit counts. This is required
+   even when the parser proposed a composition. For standard rulebooks, the
+   parser and engine are authoritative, Agent fills are rejected, and any
+   unparsed mechanic must be implemented and tested before play. When a custom
+   procedure cannot be represented by
    weapon/count options, submit `resolution="agent_ruling"` with no options so
    the parser proposal is removed and the action remains an Agent DM boundary.
    If the same managed source gives the creature a complete numeric weapon
