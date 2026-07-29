@@ -393,6 +393,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    retry contract; supply Agent-owned facts and retry at the same revision.
    Missing/conflicting source review and player-owned choices must not be
    relabelled as Agent adjudication.
+   Before unattended turn execution, make every tactical choice explicit.
+   `--agent-target-priority-json` may cover either side, must enumerate every
+   opposing participant exactly once, and preserves the Agent's exact order,
+   decision, and reason. When source prose already constrains target priority,
+   the Agent declaration may refine ties but cannot reverse the source order.
+   Use `--agent-spell-priority-json` for ordered spell, targeting, and
+   lowest-available-slot policies, and `--agent-weapon-priority-json` for
+   ordered weapon, attack-mode, and optional structured Multiattack choices.
+   A source-authored opening action may take precedence once. When no legal
+   declared spell remains and no source opening or Agent weapon policy exists,
+   stop with `pending_ruling`; never choose from inventory order, actor index,
+   class name, or a hard-coded spell list.
    The encounter driver must preserve that same classification. It must not
    interpret every `pending_ruling` from attack preflight or resolution as an
    on-hit choice. A stopped auto-run reports `status`, resolver, missing facts,
@@ -443,8 +455,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Agent's concrete decision and reason. The driver pays the reviewed activity,
    a generic `improvise` action, or the innate spell's structured at-will or
    `N/day` resource. It starts concentration from the hydrated spell card,
-   then uses public `combat_check` for any printed save and stores the
-   adjudication on the temporary combat map. Never route a successfully
+   then uses public `combat_check` only for a printed save with no damage and
+   stores the adjudication on the temporary combat map. For printed save damage,
+   the driver must bind the complete canonical `agent_ruling_commitment` to that
+   paid action and call `combat_hp_change(action="save_damage")` once with the
+   identical card, ordered targets, save/DC, damage terms, exact mechanics
+   excerpt, and current-scene ruling. The MCP verifies the payment and source;
+   Core rolls shared damage once, rolls each target's save, rounds half damage
+   down, and updates all sheets atomically. Never roll or divide damage in the
+   driver, mutate targets individually, reuse the payment with a changed
+   contract, or settle the same application twice. Never route a successfully
    hydrated innate spell through its containing passive feature, because that
    would bypass use accounting and concentration.
    A failed-save forced target must survive process restart and be consumed by

@@ -212,6 +212,14 @@ own exposure. Loading a group for one Agent must not expose it to another.
 1. Read `combat_query(view="status")` and
    `combat_query(view="available_actions", actor_id=...)`. Use the returned current
    actor, revision, budgets, conditions, positions, and derived attacks.
+   For automated execution, the Agent must also declare the actor's tactics.
+   `--agent-target-priority-json` lists every opponent in exact order and works
+   for PCs, allies, and hostiles. `--agent-spell-priority-json` orders supported
+   structured spells and their target policies.
+   `--agent-weapon-priority-json` orders exact weapon/mode pairs and any selected
+   structured Multiattack. These are Agent decisions retained in the report,
+   not driver defaults. If none applies, return `pending_ruling` instead of
+   selecting an inventory entry or spell by hidden code order.
 2. For every attack, use `combat_preflight_attack` immediately before
    `combat_resolve_attack`. Never supply replacement attack bonuses or damage
    formulas. Multiattack is a distinct action choice, not a passive increase to
@@ -256,6 +264,16 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.
+   A descriptive activity, unstructured spell, or scene procedure with printed
+   save damage is a two-call recoverable transaction with one immutable semantic
+   identity. Before paying, place the complete canonical
+   `agent_ruling_commitment` in that action's declaration/payload. Settle it with
+   `combat_hp_change(action="save_damage")` using the identical target order,
+   source card, save/DC, damage terms, exact mechanics excerpt, and active-scene
+   Agent ruling. The server alone rolls one shared damage result, rolls every
+   target save, rounds half damage down, and applies all sheets atomically.
+   Never roll the damage in the driver, divide it there, or follow the paid
+   activity with separate per-target damage calls.
    When a predeclared Agent object interaction ends an exact encounter-source
    condition, execute it before choosing the actor's action, re-read combat and
    character state, then continue the same turn with the remaining main-action

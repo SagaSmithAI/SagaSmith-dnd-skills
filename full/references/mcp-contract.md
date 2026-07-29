@@ -1241,6 +1241,17 @@ the Agent's DM ordering, never a caller-supplied initiative. Safe pre-commit
 Agent ruling boundaries rewind only their unpersisted random suffix, so a retry
 at the same campaign revision reproduces the original roll after the missing
 ruling is supplied.
+The full-playthrough encounter driver has no implicit combat AI.
+`--agent-target-priority-json` declares a same-side actor set and an exact
+complete order of opposing participants; it can refine but never contradict an
+authored source priority. `--agent-spell-priority-json` declares ordered
+supported structured spells, target policy, and lowest-available-slot policy.
+`--agent-weapon-priority-json` declares ordered weapon/mode pairs and an
+optional compatible structured Multiattack. Each declaration retains a bounded
+Agent decision and reason. A turn with no applicable source action or explicit
+Agent action policy returns a pre-commit `pending_ruling`; actor index,
+inventory order, creature/class name, and hard-coded spell preferences are not
+valid fallbacks.
 `combat_end` accepts an optional structured outcome with a bounded public
 `summary` and a status of victory, defeat, withdrawal, surrender, truce, or
 interrupted.
@@ -1350,6 +1361,21 @@ A reviewed descriptive statblock action records
 `choices.manual_ruling.kind="descriptive_activity"` with its source excerpt.
 Calling it pays the recorded timing and returns `pending_ruling`; adjudicate
 the prose from that excerpt and do not repeat the payment.
+When that ruling contains a printed saving throw plus damage, commit the entire
+semantic settlement before paying the action. The activity declaration,
+unstructured spell declaration, or scene-procedure `improvise` payload carries
+one canonical `agent_ruling_commitment`: stable application id, exact card kind
+and id, ordered targets, save/DC, advantage state, damage expression/type,
+success reduction, exact mechanics excerpt, and the current-scene Agent ruling.
+Then call `combat_hp_change(action="save_damage")` with the same fields. This is
+DM-only. The server requires the exact commitment in the current actor's
+current-turn action log, verifies the actor card or active module source, rolls
+shared damage once and each target save separately, applies full/half/zero
+damage through Core, and commits every HP/concentration/condition mutation
+atomically. A different target list or contract cannot reuse the payment; one
+application cannot settle twice, while the same idempotency key replays without
+another random draw. The Agent and encounter driver must never calculate
+`damage // 2` or issue one independent damage mutation per target.
 Do not seed a second `sheet.resources` counter for a feature whose structured
 card has an empty `resource_key`: that card-local `uses` counter is
 authoritative. If a legacy/imported actor already contains both
