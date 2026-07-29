@@ -82,7 +82,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   source-bound chunks, validation, and explicit campaign-owner activation. The
   Agent acting as DM reviews inspection warnings from exact text or page evidence
   before acknowledging ingest; missing/conflicting evidence remains an external
-  review boundary. Never bypass either gate.
+  review boundary. A returned `normalization_notes` entry records source text or
+  page furniture that the parser safely excluded; retain it for audit, but never
+  turn it into a ruling requirement or source-review blocker. Never bypass either
+  gate.
 - For module maps or diagrams, follow `references/module-visual-atlas.md`.
   Text parsing remains fail-closed; only an inspected page image may support a
   `reviewed_image` connection.

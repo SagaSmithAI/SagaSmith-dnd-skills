@@ -826,8 +826,11 @@ normalized `source_excerpt`. Required combatants must be in the initial particip
 list; reinforcements must not be. Treat missing cards, 0 HP/Dead actors, and
 unresolved executable rules as blockers. Surface manual rulings without silently
 marking them resolved. Read the returned `settlement`, `manual_rulings`,
-structured `ruling_requirements`, `automatic_spell_ids`, `ruling_spell_ids`, and
-`unavailable_attack_ids`. Every ordinary DM adjudication requirement names
+`normalization_notes`, structured `ruling_requirements`, `automatic_spell_ids`,
+`ruling_spell_ids`, and `unavailable_attack_ids`. A normalization note proves that
+non-mechanical source text or page furniture was safely excluded and is audit-only;
+it must not appear in `manual_rulings`, `ruling_requirements`, or group blocking.
+Every ordinary DM adjudication requirement names
 `default_resolver="agent"`; a player-owned choice or missing/conflicting source
 names its distinct external boundary instead. Also inspect
 `default_dm_resolver`, `agent_rulings`, and `external_input_requirements`;

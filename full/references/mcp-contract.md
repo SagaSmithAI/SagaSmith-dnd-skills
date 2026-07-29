@@ -786,6 +786,10 @@ returned checksum-bound `review_id` with
 image understanding by the Agent. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
 warnings do not authorize repair from model memory.
+Successful exclusion of trailing creature prose or page furniture is returned
+separately as `normalization_notes`. These notes preserve the audit trail but are
+not executable uncertainty: they must not create `ruling_requirements`, change
+`settlement` away from `automatic` on their own, or block a readiness group.
 When recovered text includes Multiattack, `agent_fill` is required in the same
 call. OCR owns the transcription and critical facts; the Agent owns only the
 semantic composition of the exact action prose into parsed weapon ids, modes,

@@ -1124,7 +1124,9 @@ final read-only audit. A corpus is complete only when all campaigns satisfy:
 - the final branch is the expected source branch in `play`, with no active combat
   and a valid head snapshot.
 
-Keep parser warnings and review-only candidates in the report. A warning that
+Keep parser warnings, normalization notes, and review-only candidates in the
+report. A normalization note records text the parser safely excluded and must not
+be counted as a ruling or blocker. A warning that
 demotes source-printed Spellcasting to a descriptive passive blocks that
 spellcaster from combat until the importer is repaired and the actor is recreated
 from a clean parent snapshot. Warnings are evidence of fail-closed behavior, not
