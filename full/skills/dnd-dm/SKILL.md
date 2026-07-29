@@ -940,6 +940,14 @@ They enter only at their queued round boundary and cannot be targeted or act
 before then. If the source states an exact later round, pass
 `--reinforcement-round`; otherwise the default is the next round. Never
 approximate the delay by placing them on the initial temporary map.
+Use `--reinforcement-hostile-report` for enemies and
+`--reinforcement-ally-report` for source-authored helpers; neither kind becomes
+a registered party member. If their arrival depends on semantic prose such as
+"in danger of being overwhelmed", do not invent a numeric Core rule. Inspect
+the live combat, let the Agent decide when that exact source condition is met,
+and pass `--agent-reinforcement-trigger-json` with the exact excerpt, future
+entry round, decision, and concrete observed facts. The driver records that
+Agent ruling while `combat_join` remains the only settlement path.
 When the statblock prints a complete numeric action for a known spell, its
 creature-specific range, damage, and effect override the base spell for that actor.
 After creation, verify that the spell card's displayed definition and structured
@@ -978,6 +986,10 @@ critical hit, use those exact source thresholds and check them on the retreating
 actor's own turn. These are source procedures adjudicated by the Agent, not
 permission to add a one-module mechanic to Core or fabricate a generic choice
 window.
+An actual defeat is also a valid simulated outcome, but it must not create a
+caller-named success checkpoint. Preserve it only through an explicitly named
+defeat snapshot or restore the last valid parent snapshot before trying a
+source-supported branch such as conditional reinforcements.
 Give each repeated procedure one stable `procedure_id` and require that id in
 the action payload, Agent ruling receipt, and temporary-map world patch.
 Round-by-round ritual/counter totals and ending checks must be reconstructed

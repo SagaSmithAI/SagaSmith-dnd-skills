@@ -310,6 +310,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    boundary. For a printed later round, pass `--reinforcement-round`; otherwise
    queue after the trigger for next-round entry. Do not place them on the initial
    map or let the auto-runner target them before they enter.
+   Keep their side explicit: hostile reports use
+   `--reinforcement-hostile-report`, while printed rescuers and other friendly
+   NPCs use `--reinforcement-ally-report` and never join the registered party.
+   For a semantic condition such as "in danger of being overwhelmed", inspect
+   the live combat and pass `--agent-reinforcement-trigger-json` with the exact
+   excerpt, a future `trigger_round`, the Agent decision, and current-state
+   reasoning. Do not turn that module phrase into a new universal threshold.
 7. Start combat from `play` and require the automatic transition to `combat` plus
    an encounter-local temporary map whose encounter, spatial scene, module, and
    location provenance agree. Exercise at least one structured automatic path
@@ -320,6 +327,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    attack separately, and do not end that actor's turn while its Multiattack
    attack budget/remaining sequence is nonempty.
    Resolve Surprise from the source positioning and the authoritative actor cards.
+   A defeat may end combat normally, but the encounter driver must not write a
+   caller-named success checkpoint for it. Either preserve it under an explicit
+   defeat label or restore the previous valid snapshot before exercising a
+   different source-supported route.
    When the encounter text itself explicitly says that this route surprises a
    named participant, preserve the exact excerpt and use the driver's
    source-declared-surprise input for only that participant; do not invent a

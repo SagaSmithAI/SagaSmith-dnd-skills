@@ -174,6 +174,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    source names a later round, pass `--reinforcement-round`; otherwise they enter
    at the next round boundary. They are neither targetable nor acting before
    their queued round.
+   Use separate hostile and ally reinforcement reports so source-authored
+   rescuers remain friendly without becoming party members. When the source
+   uses a semantic arrival condition, have the Agent inspect the live combat and
+   submit `--agent-reinforcement-trigger-json` with the exact excerpt, future
+   round, decision, and observed-state reason. Keep the semantic judgment at
+   the Agent boundary and the actual entry in generic `combat_join`.
 4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
    combat map from the recorded spatial scene and location. Load the owner/DM
    `play.combat_control` group for this transition. If it falls back to a
