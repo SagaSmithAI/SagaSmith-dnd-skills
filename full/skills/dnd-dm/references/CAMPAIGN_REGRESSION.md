@@ -403,7 +403,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    fact, exact trait excerpt, and explicit `ruling_reason`. An actual on-hit
    window instead requires its returned `choice_id` and a typed
    `--source-on-hit-ruling-json` settlement. Never substitute one boundary for
-   the other.
+   the other. The driver must not parse the pending effect prose and manufacture
+   that settlement; the Agent supplies every semantic field explicitly.
+   When a hidden caster's perceivable spell components require an observer
+   matrix, do not infer perception merely because no sound-blocking or
+   total-cover fact was recorded. Retry with
+   `--agent-casting-perception-json`, naming every adjudicated observer, its
+   boolean result and reason, plus the Agent's overall decision and reasoning.
+   The first call remains pre-commit and must not spend the action or spell slot.
    When module prose makes the current terrain, tactic, or fictional position
    grant advantage, disadvantage, or relative cover without defining a new rule
    procedure, have the Agent settle that fact with

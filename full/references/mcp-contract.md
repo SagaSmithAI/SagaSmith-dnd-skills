@@ -1500,6 +1500,14 @@ before it pays an action, slot, or concentration. Confirm this only from an
 explicit Agent-performed DM ruling or an active exact spell rule; the later
 `pending_ruling`
 still covers targets and effects.
+When a hidden caster has perceivable components,
+`combat_cast_spell` may instead return the pre-commit missing fact
+`spell_casting_perception`. The encounter driver must preserve that boundary and
+accept an explicit `--agent-casting-perception-json` observer matrix. Each entry
+names the observer, a boolean `perceived` result, and its reason; the enclosing
+declaration retains the Agent decision and reasoning in the regression report.
+Absence of a recorded wall, silence, or total-cover fact is not proof of
+perception. The driver must not generate the matrix from missing evidence.
 
 `module_set_progress` requires the current `expected_state_version` for that
 scene/scope row (`0` for its first write) and a fresh idempotency key.
