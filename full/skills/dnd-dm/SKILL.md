@@ -1061,6 +1061,13 @@ action payment and tactical state; it deliberately does not fabricate the
 outcome of a Hide, Search, or Help declaration. At encounter start, provide
 DM-authored `participant_config` positions, disposition, reach, initiative, and
 visibility (`hidden` and `visible_to_actor_ids`) when those facts are known. A
+source condition caused by an ordinary removable object may end through
+`combat_common_action(action="interact_object")` only after the Agent acting as
+DM supplies the exact stored source reference/excerpt and a bounded
+`agent_dm_adjudication`. The server consumes the object interaction, preserves
+the main action, and removes only the matching owned condition. Never patch the
+sheet, let a player self-declare the ruling, or add object/monster phrase
+heuristics to the encounter driver. A
 2014 surprise decision must compare every hiding creature's canonical Stealth
 result against each opponent's passive Perception. Do not substitute the general
 half-success group-check rule, and do not treat satisfying an adventure's

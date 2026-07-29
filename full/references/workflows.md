@@ -184,6 +184,15 @@ own exposure. Loading a group for one Agent must not expose it to another.
    exact excerpt. Apply the group in this one start mutation; do not issue
    per-actor sheet replacements. The server retains the condition through combat
    synchronization and removes the encounter-added condition on `combat_end`.
+   If an ordinary removable object is the exact authored cause of that condition,
+   the Agent acting as DM may later declare
+   `combat_common_action(action="interact_object")` with the object, `interaction`
+   `"remove"`, the exact active condition, unchanged `source_ref` and excerpt, and
+   a bounded `agent_dm_adjudication` decision and reason. This spends that actor's
+   one object interaction for the turn rather than its main action. The server,
+   not the driver, verifies ownership and deactivates only the matching source
+   condition; the Agent must not patch the sheet or infer that unrelated owners
+   of the same condition also ended.
 5. Resolve surprise before `combat_start`, but do not turn an adventure's approach
    prerequisite into automatic surprise. A requirement such as "approach carefully
    and without light" only avoids the adventure's automatic alert unless its text
@@ -240,6 +249,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.
+   When a predeclared Agent object interaction ends an exact encounter-source
+   condition, execute it before choosing the actor's action, re-read combat and
+   character state, then continue the same turn with the remaining main-action
+   budget. Do not encode the object, creature, or source phrase as driver logic.
    After movement, settle every returned opportunity-reaction window before the
    next action. A rescue move can damage or incapacitate the rescuer before a
    Medicine attempt, so re-read both actor cards after the reaction.

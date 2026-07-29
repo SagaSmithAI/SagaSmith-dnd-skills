@@ -1142,6 +1142,17 @@ conditions atomically with `combat_start`, keeps the canonical cards synchronize
 during combat, and removes only conditions added by that encounter at
 `combat_end`. Never use a complete character-sheet replacement to inject or clear
 an authored opening condition.
+An owner/DM Agent may end one of these conditions before combat end through
+`combat_common_action(action="interact_object")` only when an ordinary removable
+object is its exact authored cause. The payload must name the object and
+`interaction="remove"`, identify `remove_source_condition`, reproduce the exact
+stored `source_ref` and `source_excerpt`, and carry a settled
+`default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"` decision and
+reason. The server requires the condition to be active, encounter-added, and
+owned by that actor, consumes only the current turn's object-interaction budget,
+marks that one source record inactive, and removes the character condition only
+when no other active effect still owns it. Players cannot self-author this ruling,
+and neither the Agent nor the regression driver may patch the sheet directly.
 When a source-bound weapon records additional typed damage, one successful hit
 rolls all parts and applies per-type defenses as one simultaneous damage instance.
 The result's `damage.roll_parts` preserves every roll and the recorded source of
@@ -1205,8 +1216,8 @@ Use the relevant public map, check, dice, state, memory, and manifest tools;
 use `combat_choice` only when an owned pending window already exists, and never
 fabricate a window merely to store the ruling.
 `combat_common_action` settles the action payment for Dash, Disengage, Dodge,
-Help, Hide, Search, Influence, Study, Utilize/Use an Object, and non-spell Ready
-without inventing their narrative result;
+Help, Hide, Search, Influence, Study, Utilize/Use an Object, one ordinary object
+interaction, and non-spell Ready without inventing their narrative result;
 `combat_query(view="reactions")` exposes an eligible actor's pending reaction windows.
 For a scene-defined skill use that consumes an action, `combat_check` accepts the
 skill name as `ability` and one matching `action` payment. A 2014 improvised
