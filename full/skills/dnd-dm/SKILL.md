@@ -591,7 +591,15 @@ counts. A parser-produced composition remains only a candidate and cannot bypass
 this gate. If the exact procedure mixes a special activity or another unsupported
 semantic, submit `resolution="agent_ruling"` with the exact excerpt and reason
 instead of `options`; the actor remains usable and selecting that action returns
-to Agent DM adjudication. Do not encode that one creature as another parser
+to Agent DM adjudication. When a managed module or rule source assigns a complete
+numeric weapon action outside the selected base statblock, use
+`payload.agent_fill.additional_actions` with the action name, its exact managed
+`source_ref`, exact excerpt, and Agent reason. The ordinary statblock parser must
+derive the id, attack, damage, and on-hit text, and the MCP must revalidate the
+evidence against the same source. A Multiattack may reference the new derived
+weapon id in the same fill. Never use this path to provide arbitrary mechanical
+fields or to copy an action from a different creature without source authority.
+Do not encode that one creature as another parser
 phrase exception or patch the actor sheet. A melee weapon with the Thrown property remains a
 melee attack by default; pass `attack_mode: "ranged"` when it is actually thrown.
 This distinction controls reach, range, disadvantage, and melee-only modifiers.
@@ -654,6 +662,11 @@ window; it cannot call `combat_end_turn` first. Spend Shield at the lowest
 offered slot only when its projected +5 AC changes the triggering attack from a
 hit to a miss; otherwise decline. Against Magic Missile, use available Shield
 because it blocks that target's darts rather than comparing an attack roll.
+
+For a structured area spell, declare the complete map-derived target set and
+cover. Include every combatant in the area that lacks the Dead condition,
+including a Stable or Unconscious creature at 0 HP; do not use "active turn
+available" as the target filter. The server rejects both omissions and additions.
 
 A source-bound Core `Magic Missile` is the exception to generic spell
 `pending_ruling`. Call `combat_cast_spell` with `target_allocations`, where every
@@ -951,6 +964,10 @@ critical hit, use those exact source thresholds and check them on the retreating
 actor's own turn. These are source procedures adjudicated by the Agent, not
 permission to add a one-module mechanic to Core or fabricate a generic choice
 window.
+Give each repeated procedure one stable `procedure_id` and require that id in
+the action payload, Agent ruling receipt, and temporary-map world patch.
+Round-by-round ritual/counter totals and ending checks must be reconstructed
+from those receipts, not from narration or a client-only counter.
 When a reviewed descriptive feature/activity or unstructured hydrated innate
 spell is selected as the actor's turn, use the encounter driver's generic
 Agent turn ruling rather than adding a creature-name or room-name branch. Bind

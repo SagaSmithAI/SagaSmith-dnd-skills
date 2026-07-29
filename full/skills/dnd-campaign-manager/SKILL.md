@@ -71,6 +71,13 @@ replaces the earlier exposure, so discard every older exposure id.
    `../../references/module-image-content-review.md`: render and inspect the page,
    submit `module_review(action="submit_content")`, re-read `module_query(view="content")`, and
    create the actor with `mode="module_statblock"` before play or combat.
+   When the host Agent has no image capability, first use deterministic text-layout
+   recovery, then the service-owned bounded OCR path for rule statblocks. The
+   service renders and recognizes the managed page, checks critical facts against
+   indexed text or a second OCR scale, and returns a checksum-bound review; the
+   Agent reasons only over that exact returned text. If neither path yields
+   reliable evidence, keep the gate in explicit source review rather than asking
+   the text-only model to infer pixels.
    Inspect `module_query(view="candidates")` as a separate evidence gate.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
    `module_review(action="submit_content")`; `blocked` candidates require a rendered managed page
@@ -84,6 +91,14 @@ replaces the earlier exposure, so discard every older exposure id.
    authority for a reviewed creature. When the procedure cannot be represented by
    weapon/count options, submit `resolution="agent_ruling"` with no options so
    the parser proposal is removed and the action remains an Agent DM boundary.
+   If the same managed source gives the creature a complete numeric weapon
+   action outside the selected base card (for example, an adjacent printed
+   variant), attach it through `payload.agent_fill.additional_actions` with its
+   name, exact managed `source_ref`, exact action excerpt, and Agent reason.
+   The canonical parser derives the weapon id and mechanics; the Agent cannot
+   supply a sheet patch, attack bonus, damage, or condition fields separately.
+   A Multiattack fill may then cite that parser-derived weapon id. Preserve any
+   returned on-hit ruling for public combat settlement.
    Do not solve individual monster prose by adding phrase-specific parser cases
    or by patching the resulting actor sheet.
    Then choose a scene and use `module_set_progress` with an explicit
@@ -250,6 +265,11 @@ only through a later completed Long Rest. Re-read the actor and create a
 post-advancement snapshot. Current 2014
 single-class support is explicit; unsupported multiclass or 2024 advancement
 stops for review.
+Any user-imported `selection_ready` spell must pass the same canonical spell
+definition schema during pack compilation that actor hydration later uses.
+Reject the pack before activation when OCR leaves an invalid range, duration,
+component, class-list, level, unknown field, or structured resolution; never
+wait for party preparation or statblock creation to discover the mismatch.
 
 After each actor or party mutation call `character_query(view="get")` or
 `campaign_query(view="party")`. Use their

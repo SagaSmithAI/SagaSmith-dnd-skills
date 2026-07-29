@@ -70,6 +70,11 @@ from that patch after a process restart and is closed only by the actual public
 attack or a declared source-authored termination boundary. This is
 orchestration of existing public tools, not a new creature-specific mechanic
 or an excuse to bypass action economy.
+When the ruling performs a module encounter procedure, the request, paid action
+result, returned ruling receipt, and temporary-map world patch all retain the
+same nonempty `procedure_id`. Procedure progress and ending checks must consume
+those receipts; prose summaries are not evidence that a ritual, countdown, or
+other repeated procedure occurred.
 `server_capabilities.ruling_policy` publishes this split for cold-start Agents;
 use it instead of treating every `pending_ruling` as the same kind of missing
 input. For the fixed 12-tool Agent path, every `exposure_call` result whose live
@@ -362,6 +367,11 @@ occurrence id for the transition; the complete normalized target manifest is
 request payload, not identity. Replaying the same transition therefore submits
 the same key and payload, while any later visit to a town, hub, or headquarters
 uses a new id even when the payload is identical.
+`record-outcome` treats its `world_state` argument as an additive object patch:
+nested objects merge recursively and retain omitted siblings, while arrays and
+scalars are complete replacement values. Do not resend one nested episode object
+as though it were the whole world state, and do not infer an ending from a
+previously overwritten sibling.
 
 Source-defined conclusions use the public full-playthrough driver's
 `configure-ending` action to store exact source evidence and machine checks
@@ -809,6 +819,18 @@ activity id and excerpt and select only parsed weapon ids, modes, and explicit
 counts. The immutable rule review stores and applies the fill when
 `character_create_from(mode="reviewed_rule_statblock")` creates the actor. A
 parser-produced composition is only a proposal here as well.
+The same strict fill may contain `additional_actions` when an exact managed
+rule/module chunk or review assigns the creature a complete numeric weapon
+action that lies outside the selected base statblock transcription. Each entry
+contains only `name`, `source_ref`, `source_excerpt`, and `reason` on input.
+The service proves that the excerpt belongs to the same rule source or module
+and, when known, the reviewed page; the canonical attack parser derives the
+stable id and every mechanic. A supplied normalized `id` is accepted only when
+it equals that parser-derived id. The Agent cannot submit arbitrary attack,
+damage, condition, or resource fields. The immutable review retains checksummed
+fill evidence, and later actor creation replays the normalized declaration.
+Any unresolved on-hit clause remains a typed Agent ruling after the structured
+attack and damage settle.
 When a checksum-bound retained review already has a complete transcription but
 needs a newly required Agent semantic fill, the same action accepts the strict
 alternative payload `{job_id, base_review_id, observation, agent_fill}`. It
@@ -817,7 +839,8 @@ form. The server revalidates the base review's job ownership, source and PDF
 checksums, normalized-content checksum, page render, review mode, and original
 text evidence, then retains a derived immutable review with
 `derived_from_review_id`. This lets a text-only Agent add structured
-Multiattack choices to trusted OCR output without re-importing the managed PDF
+Multiattack choices or a source-cited adjacent variant action to trusted OCR
+output without re-importing the managed PDF
 or pretending to have inspected an image.
 Every other unstructured reviewed passive is preserved on the created actor as
 `choices.manual_ruling.kind="descriptive_passive"` with the Agent as default
@@ -968,6 +991,15 @@ newer version. Use `campaign_rules(action="explain")` to audit applied mechanic
 ids, citations, and the deterministic fingerprint. Use
 `campaign_rules(action="receipts")` for the fingerprint and citations stored
 atomically with historical settlements.
+Every `selection_ready` spell artifact is compiled through the same canonical
+definition validator used when that spell is hydrated onto an actor. Range,
+duration, components, unknown fields, level, class eligibility, and any
+structured resolution must therefore fail before pack activation, not later
+during character or statblock creation. OCR repair may join only bounded
+mechanically identifiable split tokens from the managed text; the Agent must
+review the exact candidate and source chunk rather than reconstruct a spell from
+memory. This import path is text-only and does not require host-model image
+understanding.
 For a user-imported executable rule, use
 `rule_pack_compile(action="from_source")`: citations
 must be imported chunk ids and are resolved server-side to the exact source id,
@@ -1012,6 +1044,11 @@ snapshot before resuming settlement. This tool changes only the built-in Core
 lock; edition, locale, publications, user options, and optional pack activations
 remain unchanged. Never use `campaign_rules(action="set_profile")` to bypass this
 checkpointed combat path.
+The public regression driver's relock identity includes both the prior Core
+fingerprint and verified checkpoint head. A replay is valid only at that same
+boundary; after a restore, new head, or another Core change, re-read the profile
+and use the newly derived request identity instead of replaying an earlier
+maintenance mutation.
 
 The public campaign and full-playthrough regression drivers both require
 `--core-relock-reason`. Supply a concise reason specific to the active campaign,
@@ -1348,6 +1385,12 @@ are settled. Active or newly cast Shield negates every dart allocated to that
 target. Remaining darts are rolled and applied as separate force-damage instances,
 so concentration and 0-HP consequences are per dart. Never merge them into one
 damage packet or manually patch HP.
+
+For a structured area spell, provide one `target_contexts` entry, including
+cover, for every non-Dead combatant whose recorded position lies in the declared
+area. This complete set includes Stable, Unconscious, or otherwise living actors
+at 0 HP; only the Dead condition removes a creature from enumeration. The server
+derives the affected set from the map and rejects omitted or injected targets.
 
 A source-bound structured spell attack uses a two-stage contract. Call
 `combat_cast_spell` once without a target declaration. A successful cast pays its

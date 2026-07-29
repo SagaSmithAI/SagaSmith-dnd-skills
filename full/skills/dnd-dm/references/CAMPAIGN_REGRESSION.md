@@ -182,6 +182,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    card, and require the prepared spell ids to cover that executable set. OCR
    tokens such as a broken ordinal are an importer regression to fix and refresh,
    not permission to accept an empty spell list or patch the actor manually.
+   A reviewed `selection_ready` spell must pass the same canonical definition
+   validation during rule-pack compilation that actor hydration later uses;
+   invalid duration/range/components, unknown fields, class lists, levels, or
+   structured resolution block activation before the encounter is prepared.
    Apply the same completeness rule to actions: count every explicit
    `Melee/Ranged [Weapon|Spell] Attack:` marker in the normalized source and
    require it to belong to a parsed weapon action or an identified statblock
@@ -210,7 +214,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `--agent-statblock-fill`. If a composition includes a special activity or
    unsupported module procedure, submit `resolution="agent_ruling"` without
    `options`; this removes any parser proposal while preserving the action for
-   Agent adjudication at selection time. A generic
+   Agent adjudication at selection time. If an exact managed source assigns the
+   creature a complete numeric weapon action outside the base card, add
+   `additional_actions` to the same fill. Each entry supplies only the action
+   name, exact managed `source_ref`, exact action excerpt, and Agent reason.
+   The server validates same-source/page evidence and lets the canonical parser
+   derive all mechanics and the stable weapon id; Multiattack options may then
+   cite that derived id. Do not use a free-text source, submit mechanical fields,
+   or patch the created sheet. Unresolved on-hit prose must still be settled
+   through the public Agent ruling path. A generic
    “N melee/ranged [weapon] attacks” composition (where “weapon” may be omitted
    in the source) is deterministic only when the actor card has exactly one
    compatible weapon for that mode. When multiple compatible weapons remain,
@@ -359,6 +371,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    If the action returns `pending_ruling`, inspect its payment and latest
    revision before applying any generic public dice/state/continuity writes;
    never pay the action twice or invent a `combat_choice` window.
+   Assign a stable `procedure_id` and require it to survive in the paid action,
+   Agent ruling receipt, and temporary combat-map patch. Reconstruct repeated
+   procedure counts and ending predicates from those receipts; a narration-only
+   ritual action is not regression evidence.
    If an encounter requires at least one living prisoner but the source does not
    preselect an identity, use the driver's minimum hostile-knockout objective.
    Leave all source-valid hostiles eligible unless the Agent has a grounded
@@ -491,6 +507,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Choose the lowest available legal slot at or above the spell's level; when
    lower slots are empty, preserve the public higher-slot cast and its scaling
    rather than falling back to a weapon while usable slots remain.
+   For a structured area spell, submit a target context and cover for every
+   map-positioned combatant in its area that is not Dead. Stable, Unconscious,
+   and other living 0-HP actors remain in that complete set even though they
+   cannot take turns. Never trim them with the ordinary active-target filter.
    If an attack returns a defensive reaction window, stop before ending the
    attacker's turn. For automated Shield tactics, use the lowest offered slot
    only when the candidate's projected AC changes the hit to a miss; decline an
@@ -516,6 +536,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    name only the actual recipient actor ids. Update the manifest clue's
    `known_by_actor_ids` projection to match the resulting ledgers; never copy
    knowledge merely because the party collectively has it.
+   Treat `record-outcome --world-state-json` as a recursive object patch:
+   nested objects preserve siblings omitted by the new outcome, while lists and
+   scalars replace their prior value. Re-read the complete manifest after every
+   patch and verify that earlier episode, prisoner, ritual, item, and ending
+   siblings remain intact.
    For every named non-combat skill check or contest side, pass the skill name
    as `ability` and omit client proficiency/bonus overrides. The Play facade and
    regression driver must derive the complete modifier from the current actor
@@ -985,6 +1010,11 @@ scene, and require the current scene to belong to one of them. Public
 active-branch pointer and the branch's head pointer; never attempt to repair a
 second boolean. Treat chapter status as import/indexing metadata only—play
 progress and the current scene come from scoped `SceneProgress`.
+The restored snapshot also defines the exact optional rule-pack lock and actor
+revisions at that point. If a pack activation, spell hydration, or actor
+replacement occurred only after the restored parent, repeat those changes
+through their public MCP workflows on the child branch before resuming; do not
+assume later branch state leaked backward and do not patch storage.
 
 Use scene-level checkpoint batching on a campaign's main timeline. Pass
 `--defer-checkpoint` only to repeated `prepare-statblock` calls on the main
@@ -1021,6 +1051,10 @@ manifest, current branch, random-stream position, and snapshot head through
 public queries. If the committed state is no longer a legal retry point, preserve
 that lineage and create a disposable child from the last verified parent
 snapshot through `branch_change`; never rewind or patch the active database.
+Recovered automatic movement uses an idempotency identity that includes actor,
+target, sequence, destination, distance, and full path. An exact retry must
+replay; a pathfinder replan at the same turn sequence must produce a distinct
+movement request so the earlier destination cannot be replayed accidentally.
 
 Never defer a combat-end checkpoint, PC death or stable recovery, replacement
 handoff, standalone level advance, Short or Long Rest, major branch point,
