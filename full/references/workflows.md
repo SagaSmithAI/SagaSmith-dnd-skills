@@ -320,6 +320,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.
+   For a structured monster point-radius, line, or Wing Attack area, include
+   every living actor geometrically inside it in `target_contexts`, with the
+   Agent-reviewed cover degree. Let the runtime apply Dexterity-save cover
+   bonuses or Total Cover; never default all targets to no cover.
    A locked standard card that reports
    `semantic_solution.status="engine_implementation_required"` must stop before
    payment and be implemented in the engine; do not reinterpret it as custom
@@ -340,6 +344,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    target save, rounds half damage down, and applies all sheets atomically.
    Never roll the damage in the driver, divide it there, or follow the paid
    activity with separate per-target damage calls.
+   Do not promote parseable prose to a standard engine rule without its complete
+   timing transaction. False Appearance remains a descriptive Agent ruling;
+   Legendary Resistance remains an Agent decision until a failed-save window
+   can both replace the outcome and spend the limited use atomically.
    When a predeclared Agent object interaction ends an exact encounter-source
    condition, execute it before choosing the actor's action, re-read combat and
    character state, then continue the same turn with the remaining main-action

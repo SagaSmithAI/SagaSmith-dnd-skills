@@ -739,6 +739,11 @@ For a structured area spell, declare the complete map-derived target set and
 cover. Include every combatant in the area that lacks the Dead condition,
 including a Stable or Unconscious creature at 0 HP; do not use "active turn
 available" as the target filter. The server rejects both omissions and additions.
+Use the same complete `target_contexts=[{target_id,cover}]` contract for a
+structured monster area activity such as Lightning Strike, a line breath
+weapon, or Wing Attack. The Agent supplies the current cover degree; the engine
+derives +2/+5 on Dexterity saves, excludes Total Cover, and rolls/applies the
+standard save and damage. Never silently assume no cover.
 
 A source-bound 2014 Core `Hypnotic Pattern` uses its own complete cube
 declaration rather than generic area `target_contexts`. Call
@@ -1104,6 +1109,13 @@ critical hit, use those exact source thresholds and check them on the retreating
 actor's own turn. These are source procedures adjudicated by the Agent, not
 permission to add a one-module mechanic to Core or fabricate a generic choice
 window.
+The same boundary applies when exact standard prose still depends on a
+post-result choice or an unrecorded descriptive fact that the runtime cannot
+settle atomically. For example, keep False Appearance as a descriptive passive,
+and keep Legendary Resistance at the Agent boundary until a failed-save choice
+window can replace the result and spend the daily use in one transaction.
+Preserve the exact card and warning; do not mark either rule engine-owned merely
+because its sentence can be parsed.
 An actual defeat is also a valid simulated outcome, but it must not create a
 caller-named success checkpoint. Preserve it only through an explicitly named
 defeat snapshot or restore the last valid parent snapshot before trying a

@@ -1465,6 +1465,21 @@ must move every submitted path segment toward the recorded visible hostile.
 declaration uses `targets=[{actor_id,can_hear,reason}]`; the Agent supplies the
 current hearing fact, while the engine enforces range, Deafened, duration,
 attack advantage, and the source's optional bonus-action attack.
+For engine-owned point-radius, self-line, and Wing Attack save areas,
+`combat_use_activity.declaration` includes the exact `origin` or `endpoint`,
+optional Wing Attack `destination`, and a complete
+`target_contexts=[{target_id,cover}]` list for every living actor in the
+geometric area. Cover is `none`, `half`, `three_quarters`, or `total`; the
+runtime applies +0/+2/+5 to the Dexterity save and excludes Total Cover. The
+Agent supplies this scene fact and must not calculate the numeric bonus.
+
+Parsing a sentence is not proof that its transaction exists. False Appearance
+remains `manual_ruling.kind="descriptive_passive"` because motionlessness and
+identification are descriptive encounter facts. Legendary Resistance likewise
+remains at the Agent boundary until the runtime owns a post-failure choice
+window that can replace the failed save and spend the card use atomically.
+Clients must not activate it after an already-applied save effect or treat a
+parsed `N/Day` label as evidence that the override is implemented.
 
 An Owner/DM may supply a current-scene Agent ruling in `action.context` for
 terrain- or position-dependent attack facts. Relative cover uses
