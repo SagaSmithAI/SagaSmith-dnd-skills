@@ -235,12 +235,19 @@ own exposure. Loading a group for one Agent must not expose it to another.
    An unstructured/descriptive Multiattack remains an Agent-as-DM adjudication
    boundary but never blocks that ordinary single weapon attack.
    If an exact reviewed passive makes the triggering attack deal conditional
-   extra damage, keep the condition decision with that attack: the owner/DM
+   extra damage, first query its source card with
+   `content_solution(action="query")`. On the first use, the Agent must read the
+   complete card and exact managed source, then persist one schema-v2
+   `attack.after_hit` solution containing the printed `damage.apply` expression
+   through `content_solution(action="compile")`. Keep the occurrence-specific
+   condition decision with the attack: the owner/DM
    Agent supplies one `source_conditional_extra_damage` ruling containing the
-   reviewed feature id, its exact stored excerpt and printed dice expression,
-   typed trigger facts, decision, and reason. The encounter driver uses
+   reviewed feature id, persisted plan fingerprint, explicit eligible target ids,
+   its exact stored excerpt and printed dice expression, typed trigger facts,
+   decision, and reason. The encounter driver uses
    `--source-extra-damage-ruling-json` to bind the same evidence to eligible
-   weapons, rounds, and a bounded application count. Do not apply the rider
+   melee or ranged weapons, eligible targets, rounds, and a bounded application
+   count. Do not apply the rider
    later with `combat_hp_change`: all damage dice must resolve simultaneously,
    double together on a critical hit, and share one target-state mutation.
    When exact scene evidence and current relative position give the target Half,

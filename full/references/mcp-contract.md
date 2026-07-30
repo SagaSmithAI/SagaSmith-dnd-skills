@@ -1147,10 +1147,15 @@ owner/DM `action.rulings` entry with
 `kind="source_conditional_extra_damage"`, `source="dm_ruling"`,
 `default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a unique
 application id, the exact passive feature id/excerpt/printed dice expression,
-typed nonempty trigger facts, and a recorded decision and reason. The server
-must verify the excerpt against the immutable actor card and append the dice to
-the preflight plan before resolving the attack. A player cannot self-declare
-this ruling. The conditional dice, critical doubling, typed defenses, 0-HP
+typed nonempty trigger facts, explicit eligible target ids, the persisted
+first-use plan fingerprint, and a recorded decision and reason. Before this
+ruling can be used, the Agent must compile one exact-source schema-v2
+`attack.after_hit` solution whose `damage.apply` step records the printed dice.
+The server verifies the excerpt and solution fingerprint against the immutable
+actor card, rejects targets outside the Agent-declared eligible set, and appends
+the dice to the preflight plan before resolving either a melee or ranged weapon
+attack. A player cannot self-declare this ruling. The conditional dice, critical
+doubling, typed defenses, 0-HP
 effects, concentration consequences, and target revision settle in the same
 attack transaction; never emulate the feature with a later `combat_hp_change`.
 A nonempty
