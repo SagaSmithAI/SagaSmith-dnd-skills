@@ -206,9 +206,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    with its canonical card, including armor disadvantage, and compare those results
    against each opposing creature's passive Perception. An opponent that notices
    any approaching threat is not surprised. Determine `surprised` separately for
-   every participant; never replace these comparisons with the general "at least
-   half succeed" group-check rule unless the imported source explicitly calls for
-   a group check. Record the comparisons and source condition in a campaign event.
+   every participant; surprise never uses the general group-check rule. Outside
+   surprise, when the party is making one collective attempt whose consequence
+   applies to everyone, the Agent acting as DM may explicitly call a 2014 group
+   ability check. Resolve all participants atomically with
+   `character_check(action="group")`; the engine, not the Agent, applies each
+   actor card and the "at least half succeed" threshold. Record the comparisons
+   and source condition in a campaign event.
 6. After `combat_start`, reopen exposure. The server phase is now `combat`; load
    `combat.observe`, `combat.turn`, or `combat.actions` for an acting player.
    Load `combat.control`, `combat.save`, or `combat.map` only for an owner/DM.
@@ -272,8 +276,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `semantic_solution.status="compilation_required"`, compile the reusable
    schema-v2 recipe through `combat_choice(action="compile_solution")`, then
    settle that same paid window through `combat_choice(action="execute_plan")`.
-   Use `on_hit_ruling` only for an occurrence-specific effect that the generic
-   primitives cannot express. In that fallback, use `apply_condition` only
+   Use `on_hit_ruling` only for an occurrence-specific effect that the registered
+   engine calls cannot express. In that fallback, use `apply_condition` only
    for printed action/check escape terms. Use `saving_throw_condition` for an
    immediate save-gated timed condition with printed turn-end repeat saves; pass
    the exact condition, ability, DC, repeat timing, duration, and excerpt.
@@ -289,10 +293,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    A locked standard card that reports
    `semantic_solution.status="engine_implementation_required"` must stop before
    payment and be implemented in the engine; do not reinterpret it as custom
-   prose. A repeatable custom activity or spell first returns
+   prose. Do not require import to translate every custom card. A repeatable
+   custom activity or spell first returns
    `semantic_solution.status="compilation_required"` without payment. Compile it
-   once with `content_solution(action="compile")`, using exact managed evidence,
-   then retry the action with the stored plan contract. A genuinely one-off
+   once with `content_solution(action="compile")`, using exact managed evidence.
+   The persisted solution is a strictly typed recipe of allowlisted engine
+   function calls, not a second rules engine; then retry the action with that
+   stored contract. A genuinely one-off
    descriptive activity, unstructured spell, or scene procedure with printed
    save damage remains a two-call recoverable transaction with one immutable
    semantic identity. Before paying, place the complete canonical

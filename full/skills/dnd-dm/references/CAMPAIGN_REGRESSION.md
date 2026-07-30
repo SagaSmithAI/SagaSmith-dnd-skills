@@ -240,6 +240,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    advantage/disadvantage, and exact source chunk are immutable retry payload,
    not identity. Separate rolls must never reuse progress, dice, continuity,
    knowledge, or manifest-sync keys even when every payload field is identical.
+   When all participating characters are attempting one task and the outcome
+   applies to the party as a whole, use
+   `character_check(action="group")` (or the driver's
+   `resolve-group-check`) with every actor id. Core rolls each actor using the
+   canonical card and succeeds when at least half succeed. An individual
+   failure must not be promoted to an automatic group failure. This procedure
+   does not apply to surprise, which compares each hidden creature against
+   each observer.
    If the 2014 source directly opposes two creatures' efforts, use
    `character_check(action="contest")` (or the driver's `resolve-contest`) with both actors and
    both abilities/skills. Never replace the contest with an invented fixed DC.

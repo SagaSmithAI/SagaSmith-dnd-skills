@@ -96,6 +96,12 @@ the campaign.
    associated ability from the authoritative actor card. The same rule applies
    independently to both sides of `character_check(action="contest")`; a
    boolean facade must never collapse expertise into ordinary proficiency.
+   When the whole party succeeds or fails as one group, explicitly use
+   `character_check(action="group")` or full-playthrough
+   `resolve-group-check` with every participant. Do not precompute the
+   threshold: the 2014 Core engine rolls every actor and succeeds the group
+   when at least half succeed. Do not use a group check for surprise, where
+   each observer and hidden creature must be compared separately.
    Before a module table roll with external modifiers, build a branch-local
    modifier ledger from the complete expanded procedure. Keep every modifier
    source in its own entry with a stable id, numeric value, applicability,

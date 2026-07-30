@@ -13,7 +13,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
 | Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
-| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
+| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
@@ -25,7 +25,7 @@ tools and phase ceilings of Lobby 62, Play 47, and Combat 45. Do not call retire
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
-- `character_check(action="check" | "contest")`;
+- `character_check(action="check" | "group" | "contest")`;
 - `campaign_rules(action="core_relock")`;
 - `rule_import(action="render_page" | "recover_statblock")`;
 - `module_review(action="render_page" | "submit_content")`;
@@ -642,9 +642,9 @@ six-second game-time tick stream.
 
 Facade maintenance follows the same rule: a compact action may keep a strict
 schema, permission check, phase guard, revision, and idempotency boundary, but
-its deterministic D&D result must delegate to the owning engine primitive.
+its deterministic D&D result must delegate to the owning engine function.
 Regression drivers may derive expected values with those public library
-primitives and must still perform every state mutation and die roll through the
+functions and must still perform every state mutation and die roll through the
 public MCP tools. A new local formula is a contract regression even when its
 current result happens to match.
 
@@ -1179,16 +1179,16 @@ engine rather than compiling that standard rule as homebrew.
 For imported or homebrew content without such an implementation,
 the first real use returns `semantic_solution.status="compilation_required"`.
 The Agent reads the complete recorded card and an exact managed module/rule
-chunk, then submits a schema-v2 source-bound plan through
+chunk, then submits a schema-v2 source-bound, typed engine-call recipe through
 `content_solution(action="compile")`. A paid item hit instead uses
 `combat_choice(action="compile_solution")`, which stores the solution and upgrades
 that same pending hit atomically. The stored solution locks the card identity,
 immutable card semantics, plan and source-evidence fingerprints, compilation
 version, and bounded Agent reason.
-Later combat uses call the primitive executor through
+Later combat uses replay that validated engine-call recipe through
 `combat_choice(action="execute_plan")`; they do not reinterpret the prose.
 Never put arbitrary Python names or state patches in a plan. If an occurrence is
-genuinely unique, cannot be expressed by available primitives, or depends on
+genuinely unique, cannot be expressed by available engine calls, or depends on
 unstructured scene judgment, keep it in the explicit Agent/DM ruling boundary
 instead of inventing a reusable recipe.
 For 2014 surprise, first satisfy any imported scene prerequisites that merely
