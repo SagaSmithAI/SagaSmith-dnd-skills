@@ -173,9 +173,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    A gap, unexplained exclusion, missing retained source fact, or conflict
    remains blocked and cannot be filled from model memory. Never inspect the
    database or re-import a managed artifact from outside the configured roots.
-   For encounter
-   participants, use exact rule statblocks or reviewed module image cards and
-   retain all warnings. A module candidate's parser output
+   For encounter participants, use exact rule statblocks or reviewed module
+   cards and retain all warnings. When a module candidate is blocked by damaged
+   page layout, `prepare-statblock` must call
+   `module_review(action="recover_statblock")` against its exact managed PDF
+   page before any visual override. The server performs and corroborates OCR, so
+   a text-only Agent can consume the returned immutable review. Only a failed or
+   ambiguous recovery may enter the image-capable `--review-override` path. A
+   module candidate's parser output
    is transcription support, not final semantic authority. When one reviewed statblock must
    create several source-identical actors, create every actor separately with an
    idempotency identity scoped by the run, review, actor name, actor type, and

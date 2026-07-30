@@ -75,9 +75,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `module-visual-atlas.md`: `module_query(view="assets")` ->
    `module_review(action="render_page")` -> visual inspection ->
    `module_set_progress(spatial_review=...)`. Never infer an edge from room order.
-   If an appendix statblock is image-only, use `module-image-content-review.md`:
-   render and inspect the page, submit `module_review(action="submit_content")`, re-read the
-   immutable evidence, then use `character_create_from(mode="module_statblock")`.
+   If an appendix statblock is image-only, use `module-image-content-review.md`.
+   First call `module_review(action="recover_statblock")`; the server performs
+   layout OCR and independent critical-fact corroboration without requiring model
+   vision. Re-read the immutable review, then use
+   `character_create_from(mode="module_statblock")`. Only when recovery remains
+   ambiguous may an image-capable reviewer render, inspect, and submit the page
+   manually.
     Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
     be submitted to `module_review(action="submit_content")` only with its exact
      `source_chunk_ids`. Read its structured `ruling_requirement`: complete-text
@@ -86,8 +90,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
      Agent must cover every listed Multiattack as `structured` or
      `agent_ruling`; parser-produced options are never authoritative for module
      creatures. A `blocked` candidate whose requirement names
-    `missing_or_conflicting_source_review` is a stop condition: first use the
-    server's text/layout OCR recovery. If ambiguity remains, an image-capable
+    `missing_or_conflicting_source_review` is a stop condition: first use
+    `module_review(action="recover_statblock")` with its managed PDF page. If
+    ambiguity remains, an image-capable
     reviewer may transcribe only observed fields, or leave it unresolved. A
     text-only Agent cannot claim to have inspected a returned image. Never repair
     OCR from rules memory or silently relabel blocked evidence as reviewed text.

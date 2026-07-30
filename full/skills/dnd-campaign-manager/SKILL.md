@@ -68,11 +68,13 @@ replaces the earlier exposure, so discard every older exposure id.
    `module_set_progress(spatial_review=...)`. The returned review is scoped,
    branch-aware, and snapshot-restorable; do not edit immutable import metadata.
    If a required creature card exists only as a PDF image, follow
-   `../../references/module-image-content-review.md`: render and inspect the page,
-   submit `module_review(action="submit_content")`, re-read `module_query(view="content")`, and
-   create the actor with `mode="module_statblock"` before play or combat.
-   When the host Agent has no image capability, first use deterministic text-layout
-   recovery, then the service-owned bounded OCR path for rule statblocks. The
+   `../../references/module-image-content-review.md`: first call the
+   service-owned `module_review(action="recover_statblock")`, re-read
+   `module_query(view="content")`, and create the actor with
+   `mode="module_statblock"` before play or combat. Only if recovery remains
+   ambiguous may an image-capable reviewer render, inspect, and submit the page.
+   When the host Agent has no image capability, use this deterministic text-layout
+   recovery for module cards and the equivalent bounded OCR path for rule statblocks. The
    service renders and recognizes the managed page, checks critical facts against
    indexed text or a second OCR scale, and returns a checksum-bound review; the
    Agent reasons only over that exact returned text. If neither path yields
@@ -80,8 +82,10 @@ replaces the earlier exposure, so discard every older exposure id.
    the text-only model to infer pixels.
    Inspect `module_query(view="candidates")` as a separate evidence gate.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
-   `module_review(action="submit_content")`; `blocked` candidates require a rendered managed page
-   and literal visual transcription. Never fill OCR gaps from memory. For a
+   `module_review(action="submit_content")`; `blocked` candidates require
+   `module_review(action="recover_statblock")` first. A rendered managed page
+   and literal visual transcription is only the image-capable fallback. Never
+   fill OCR gaps from memory. For a
    module-authored or homebrew Multiattack, inspect
    `agent_fill_requirements` and have the Agent attach a source-bound
    `payload.agent_fill.multiattack_options` to the immutable module review,

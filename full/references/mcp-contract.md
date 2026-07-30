@@ -15,7 +15,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
@@ -28,7 +28,7 @@ names or emulate aliases client-side. The consolidated calls are:
 - `character_check(action="check" | "group" | "contest")`;
 - `campaign_rules(action="core_relock")`;
 - `rule_import(action="render_page" | "recover_statblock")`;
-- `module_review(action="render_page" | "submit_content")`;
+- `module_review(action="render_page" | "recover_statblock" | "submit_content")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
 - `combat_choice(action="on_hit_ruling" | "compile_solution" | "execute_plan")`;
 - `content_solution(action="query" | "compile")`.
@@ -48,8 +48,8 @@ Every action uses only its documented payload fields. Unknown fields are an
 error, and a facade action retains the original role, phase, revision,
 idempotency, source-evidence, and random-stream boundary. In particular,
 `rule_import(render_page|recover_statblock)` is Lobby-only and DM-only;
-`module_review(submit_content)` is Lobby-only and DM-only; rendering may also be
-used by a DM during Play. Chase and contests are Play-only. On-hit rulings are
+`module_review(recover_statblock|submit_content)` is Lobby-only and DM-only;
+rendering may also be used by a DM during Play. Chase and contests are Play-only. On-hit rulings are
 Combat-only. Loading a facade through a lower-risk group does not authorize its
 other actions outside those action-level boundaries. `playthrough_manifest` and
 `combat_join` remain separate tools because their save/audit and turn-boundary
@@ -261,9 +261,14 @@ restore it without mutating immutable imported metadata. A review-only write may
 omit `status` and `progress`; existing values are preserved. See
 `module-visual-atlas.md` for the full sequence and schema.
 
-When a creature card exists only in the PDF image layer, render and inspect its
-managed page, then call `module_review(action="submit_content")`. The MCP validates the normalized
-2014 statblock before Core stores immutable module/scene/page/asset evidence.
+When a creature card exists only in the PDF image layer, first call
+`module_review(action="recover_statblock")` with the exact managed PDF page. The
+server performs checksum-bound layout OCR and requires the embedded text or a
+second OCR scale to corroborate the complete critical fingerprint. This requires
+no model vision. If it remains ambiguous, an image-capable DM may render and
+inspect its managed page, then call `module_review(action="submit_content")`.
+The MCP validates the normalized 2014 statblock before Core stores immutable
+module/scene/page/asset evidence.
 Re-read it with `module_query(view="content")` and create campaign actors with
 `character_create_from(mode="module_statblock")`. See
 `module-image-content-review.md`; missing text extraction is not evidence that a

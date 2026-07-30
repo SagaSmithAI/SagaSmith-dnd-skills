@@ -245,7 +245,7 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page")`, `module_review(action="submit_content")` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
 | Chases | `chase(action="start")`, `chase(action="query")`, `chase(action="take_turn")`, `chase(action="end")` |

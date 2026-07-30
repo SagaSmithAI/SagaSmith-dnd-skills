@@ -13,30 +13,39 @@ returned `execution_state`:
   source chunk. Submit that exact normalized text to `module_review(action="submit_content")` with
   the returned `scene_id` and `source_chunk_ids`; do not replace text evidence
   with a page-memory reconstruction.
-- For `blocked`, do not submit the candidate as text evidence. Use the managed
-  asset/page workflow below and transcribe only what is actually visible. If the
-  cited page cannot establish a complete card, leave the actor unresolved.
+- For `blocked`, do not submit the candidate as text evidence. First call
+  `module_review(action="recover_statblock")` with its exact module, scene,
+  stable content key, printed name, managed page, and optional asset id. The
+  service performs local layout OCR, verifies the imported PDF checksum, and
+  independently corroborates all critical facts. This route works for a
+  text-only Agent. If it cannot establish one unambiguous complete card, use the
+  visual workflow below only with an image-capable reviewer, or leave the actor
+  unresolved.
 
 ## Ordered workflow
 
 1. Use `module_query(view="index" | "scene")` to locate the appendix scene and
    confirm that the normalized text does not contain an executable statblock, or
    that the candidate was explicitly blocked by the evidence gate.
-2. Use `module_query(view="assets")`, select the managed PDF, and call
-   `module_review(action="render_page")` for the cited page. Inspect the returned image itself.
-3. Transcribe only visible card facts into canonical English 2014 statblock
+2. Use `module_query(view="assets")`, select the managed PDF, and first call
+   `module_review(action="recover_statblock")`. On success, re-read its immutable
+   review and continue at step 5; do not re-transcribe it.
+3. If recovery fails and the Agent can inspect images, call
+   `module_review(action="render_page")` for the cited page and inspect the
+   returned image itself. A text-only Agent must stop here.
+4. Transcribe only visible card facts into canonical English 2014 statblock
    Markdown. Preserve the exact name, size/type/alignment, AC, HP formula, speed,
    six abilities, listed saves/skills/defenses/senses/languages, CR/XP, headings,
    attack bonus, reach/range, damage dice, damage bonus, and damage type. Do not
    fill an absent field from memory or a similar creature.
-4. Call `module_review(action="submit_content")` with the appendix `scene_id`, stable
+5. Call `module_review(action="submit_content")` with the appendix `scene_id`, stable
    `content_key`, normalized Markdown, managed PDF or rendered-image asset,
    1-based page, a literal visual observation, and a fresh idempotency key. If
    the card contains any module-authored Multiattack, inspect the returned
    `agent_fill_requirements` and include the source-bound semantic fill described
    below in `payload.agent_fill`. This is mandatory even when the parser proposed
    executable options; do not add another phrase-specific parser rule.
-5. Stop if validation rejects the card. If it returns `mixed`, review every
+6. Stop if validation rejects the card. If it returns `mixed`, review every
    warning and keep unresolved mechanics visible. `automatic` means only that
    the transcribed mechanics represented by the current engine are executable.
 6. Re-read the immutable record with `module_query(view="content",
