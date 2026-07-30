@@ -257,6 +257,65 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Reusable custom-content solutions | `content_solution(query/compile)` |
 | Agent DM adjudication without an owned window | Relevant public dice, check, map, state, memory, and manifest tools |
 
+## Module Narrative Context
+
+Do not compile module-authored motives, bargains, retreats, deceptions, or scene
+consequences into mechanical cards or a narrative trigger DSL. Before the first
+live use, create or update a stable DM-only world fact with
+`memory_change(action="upsert")`:
+
+```json
+{
+  "fact_key": "context:actor:<actor-id>:<module-scope>",
+  "kind": "context_anchor",
+  "subject_ref": "actor:<actor-id>",
+  "predicate": "",
+  "content": "Retrieval anchor only.",
+  "metadata": {
+    "schema_version": 1,
+    "purpose": "Short retrieval label",
+    "related_refs": [
+      "scene:<scene-id>",
+      "quest:<quest-id>",
+      "item:<item-id>"
+    ],
+    "source_bindings": [
+      {
+        "source_ref": {
+          "module_id": "...",
+          "scene_id": "...",
+          "chunk_id": "...",
+          "page_start": 1,
+          "page_end": 1,
+          "heading_path": ["..."],
+          "content_sha256": "..."
+        },
+        "source_excerpt": "Exact normalized module text."
+      }
+    ]
+  },
+  "importance": 5,
+  "disclosure_scope": "dm"
+}
+```
+
+Only the listed metadata fields are legal. `source_excerpt` must be present in
+the cited immutable chunk. Never add `trigger`, `condition`, `action`, `result`,
+Agent instructions, translations, or paraphrases. The anchor is a branch-scoped
+index into source, not authority beyond the returned original text.
+
+Before deciding the behavior of an active module NPC or the result of a
+source-authored negotiation, call `continuity_context` as DM and pass
+`related_refs` for every relevant current actor, scene/location, active quest,
+and key item. Read `module_evidence` as non-executable source context. Combine it
+with current HP, conditions, position, ownership, and committed events; the Agent
+chooses intent and adjudicates the situation. Then use ordinary public movement,
+check, combat, item, event, knowledge, and manifest tools. Server rules and RNG
+remain authoritative. Save only the actual choice and outcome in the normal
+event/fact/ActorKnowledge ledgers; do not save unchosen source branches as if
+they happened. Module evidence is DM-only and must not enter a player's context
+or ActorKnowledge until the character reasonably learns it.
+
 ## Actor Cards and Party State
 
 When a module invokes the 2014 DMG chase procedure, keep the campaign in

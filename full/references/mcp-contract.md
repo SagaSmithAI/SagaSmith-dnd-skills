@@ -666,6 +666,27 @@ Pass `branch_id` for an explicit historical branch. For player-safe narration,
 use `continuity_context` with the acting `actor_id`, `scope_id`, and audience;
 never substitute a broad `memory_query(view="search")` result for that context.
 
+For owner/DM calls, `continuity_context.related_refs` accepts explicit
+`actor|faction|item|location|module|quest|scene:<id>` links. The MCP also adds
+current combat actors plus current manifest scene, module, and active quests.
+Matching active `context_anchor` facts return `module_evidence` before lexical
+facts, events, and actor knowledge. Identical chunk/excerpt bindings are
+deduplicated, source hashes and campaign ownership are revalidated, and pinned
+evidence is never silently evicted by the shared budget. The response reports a
+pinned overflow; more than the safety cap fails with a request to narrow
+`related_refs`. Player calls always receive an empty `module_evidence` list.
+
+A `context_anchor` is a non-executable, DM-only source index. It has an empty
+predicate and metadata containing exactly `schema_version=1`, a short `purpose`,
+`related_refs`, and one or more `{source_ref, source_excerpt}` bindings. The
+excerpt is exact normalized text from the immutable managed chunk. Fields such
+as `trigger`, `condition`, `action`, `result`, guidance, paraphrase, or a
+narrative expression are invalid. The returned purpose is not Agent evidence;
+only the cited source excerpt is. Use the Agent to interpret that text against
+live state, then invoke standard engine operations. Persist only the actual
+result through the ordinary event, fact, knowledge, inventory, character, and
+manifest contracts.
+
 Use the three ledgers deliberately:
 
 - `campaign_event` records what happened. For a witnessed subset, set

@@ -318,3 +318,10 @@ For player-safe retrieval, call `continuity_context` with `actor_id`, `scope_id`
 audience, and optionally `branch_id`. Do not substitute broad
 `memory_query(view="search")` for
 that context; it can expose DM facts or sibling-branch history.
+
+For DM adjudication of module-specific narrative behavior, also pass
+`related_refs` for the current actors, scene/location, active quests, and key
+items. `module_evidence` contains exact, pinned, branch-scoped source selected by
+DM-only `context_anchor` facts. It is evidence for Agent reasoning, never an
+executable trigger or a player-visible fact. A restore or branch checkout
+invalidates cached context; reread it before continuing.

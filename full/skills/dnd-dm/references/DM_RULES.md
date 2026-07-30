@@ -147,6 +147,15 @@ HP、状态和资源以 `character_query` 为准。
 `source_excerpt` 必须是同一模组场景中精确的规范化子串，不是模糊搜索提示；不得改写、翻译或
 拿另一个同名房间的文字代替。`automatic_spell_ids` 只说明法术效果已有结构化结算，不会消除
 法术成分、目标合法性、被动效果或命中附带效果中的 DM 裁决。
+
+模组专属的动机、撤退、欺骗、谈判和叙事后果不得编译成 `if/then` 触发规则。首次使用前，
+通过 `memory_change(action="upsert")` 建立 DM-only `context_anchor`，其中只保存实体
+`related_refs` 与不可变 chunk 的精确 `source_ref`/`source_excerpt`。裁定前以当前
+NPC、scene/location、quest 和关键 item 引用调用 `continuity_context`；Agent 结合返回的
+`module_evidence` 与当前 HP、状态、位置、物品归属及已发生事件思考判定，再用公开 MCP
+工具执行。标准规则与随机数仍由引擎结算，只保存实际发生的结果，不保存未选择的叙事分支。
+DM 原文证据不得直接进入玩家上下文或 ActorKnowledge。
+
 `module_search`/`module_expand` 返回的文档 chunk 可能没有 `scene_id` 或跨越相邻标题；用于 DC、
 战斗参与者或地图之前，必须先从 index 选择 scene，再读取 `module_query(view="scene")` 并从该
 scene 内容复制证据。PDF 控制字符、软连字符和弯引号的规范化只修复抽取差异，不会让跨 scene

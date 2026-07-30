@@ -17,13 +17,35 @@ name copied from an old prompt.
    exactly like a native call.
 5. In `play`, read `module_query(view="current")`, expand the exact scene with
    `module_query(view="scene")`, read recent `campaign_event(action="list")`, and
-   call `continuity_context` separately for each acting PC or NPC.
+   call `continuity_context` separately for each acting PC or NPC. For a DM
+   deciding module-authored behavior, pass `related_refs` for every relevant
+   actor, scene/location, active quest, and key item, then read the returned
+   exact `module_evidence`.
 6. Refresh `campaign_query(view="party")` and relevant
    `character_query(view="get")` cards. Never carry a card or revision across a
    write, phase transition, branch checkout, or restore.
 
 An exposure belongs to one MCP session and principal. Every other Agent opens its
 own exposure. Loading a group for one Agent must not expose it to another.
+
+## Module-authored narrative behavior
+
+1. Search and expand the authoritative module chunks. Keep exact excerpts for
+   the whole nearby narrative sequence, not just the first sentence that happens
+   to match the current query.
+2. Upsert a stable, DM-only `context_anchor` whose subject and `related_refs`
+   point to the NPC, scene/location, quest, faction, and key item. Store only the
+   exact managed source bindings. Do not encode conditions or actions.
+3. Immediately before adjudication, refresh actor cards, current scene,
+   inventory/ownership, events, and `continuity_context`. The Agent interprets
+   `module_evidence` against that live state.
+4. Carry out the decision through existing public checks, movement, combat,
+   inventory, time, event, fact, knowledge, and playthrough tools. Standard
+   mechanics and random outcomes remain server-owned.
+5. Commit only the path that happened. Do not copy DM source into player context,
+   transfer one actor's knowledge to another, or persist hypothetical branches.
+   After snapshot restore or branch checkout, discard the prior assembled context
+   and retrieve it again.
 
 ## New campaign and module PDF
 

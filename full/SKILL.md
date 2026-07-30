@@ -113,6 +113,12 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   reviewed reason and both old/new fingerprints.
 - Keep each PC/NPC's `actor_id` explicit when reading or writing ActorKnowledge;
   never merge one actor's memories into another actor's context.
+- Keep module-authored narrative behavior as exact DM context, not an executable
+  trigger language. Link the verbatim source through a DM-only
+  `kind="context_anchor"` fact, retrieve it with `continuity_context.related_refs`,
+  let the Agent adjudicate from the live actor/scene/quest/item state, and execute
+  only the resulting standard public operations. Persist only what actually
+  happened; never encode hypothetical `if/then` behavior in memory metadata.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use
   `branch_query(view="compare")` before explaining divergent timelines.
 

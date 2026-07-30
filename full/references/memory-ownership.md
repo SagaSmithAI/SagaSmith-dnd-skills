@@ -48,6 +48,9 @@ whole unit; never finish only the remaining calls from a partially imagined save
 
 - DM administration may query facts and inactive revision history directly.
 - Player narration uses `continuity_context` with the exact actor and scene scope.
+- DM narrative adjudication supplies the relevant actor/scene/location/quest/item
+  `related_refs`; exact `module_evidence` selected by `context_anchor` facts is
+  source context for Agent reasoning, not a trigger, world fact, or player belief.
 - Never replace actor-scoped context with broad fact search.
 - After branch checkout or snapshot restore, discard cached cards and context,
   then reread campaign, actors, module progress, events, and each actor's context.
