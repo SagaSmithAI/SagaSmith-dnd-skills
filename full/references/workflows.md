@@ -247,7 +247,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    decision, and reason. The encounter driver uses
    `--source-extra-damage-ruling-json` to bind the same evidence to eligible
    melee or ranged weapons, eligible targets, rounds, and a bounded application
-   count. Do not apply the rider
+   count. For a printed advantage-or-adjacent-ally condition, declare the
+   reusable applicability mode rather than predicting later map state. At each
+   attack the driver derives the current branch (attack advantage, or no
+   disadvantage plus an adjacent non-incapacitated ally), records the exact
+   qualifying ally ids, and the server verifies those positions and conditions.
+   Do not apply the rider
    later with `combat_hp_change`: all damage dice must resolve simultaneously,
    double together on a critical hit, and share one target-state mutation.
    When exact scene evidence and current relative position give the target Half,

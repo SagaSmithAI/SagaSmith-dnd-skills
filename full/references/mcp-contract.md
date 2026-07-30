@@ -1158,6 +1158,12 @@ attack. A player cannot self-declare this ruling. The conditional dice, critical
 doubling, typed defenses, 0-HP
 effects, concentration consequences, and target revision settle in the same
 attack transaction; never emulate the feature with a later `combat_hp_change`.
+When the stored source condition is “attack advantage, or an adjacent
+non-incapacitated ally while the attack has no disadvantage,” use the typed
+applicability mode. The driver supplies the actual branch and exact qualifying
+ally ids from the current temporary map; the server independently verifies
+advantage/disadvantage, disposition, distance, departure, and incapacitation.
+Never predeclare that condition as true for an entire future round sequence.
 A nonempty
 `on_hit_ruling` means damage is committed while the quoted secondary condition
 or choice still requires explicit Agent-as-DM settlement; it is not permission
