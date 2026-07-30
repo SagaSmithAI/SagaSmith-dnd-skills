@@ -754,6 +754,20 @@ adjacent creature wakes one affected target with
 spends its action. Never supply a hand-picked target list, roll the saves,
 patch conditions/speed, or model these endings as Agent narrative rulings.
 
+A source-bound 2014 Core `Fly` is also engine-owned. Outside combat call
+`character_action(action="cast_spell")` with equal explicit
+`target_character_ids` and `willing_target_ids`; in combat call
+`combat_cast_spell` with
+`declaration={target_ids:[...],willing_target_ids:[...]}`. The Agent may decide
+only the creature-owned fact that each target is willing. The Runtime enforces
+touch range in combat, one target at 3rd level plus one per higher slot, the
+60-foot flying speed, the 10-minute duration, the caster's single
+concentration, and every target effect's dependency on that exact
+concentration. Never patch a target's base speed or treat willingness as
+permission to supply the spell's numeric rules. A combat map without an
+elevation model records flying capability but must not invent an altitude or
+falling damage.
+
 A source-bound Core `Magic Missile` is the exception to generic spell
 `pending_ruling`. Call `combat_cast_spell` with `target_allocations`, where every
 entry supplies `target_id` and a positive `darts` count; the total must be three
@@ -1062,7 +1076,9 @@ when the encounter text calls for one group roll and the selected actors have
 identical Stealth profiles. If the source says an NPC casts a spell before
 combat, call public noncombat `character_action(action="cast_spell")` before
 `combat_start` so the slot and concentration are real, then cite the same source
-when declaring its initial condition. If the NPC is present but joins the fray
+when declaring its initial condition. For Core Fly, include the exact target
+actor ids and the matching willing-target ids; do not replace them with an
+Agent-written speed effect. If the NPC is present but joins the fray
 in a later round, keep it on the initial map and explicitly delay its actions;
 do not mislabel it as an off-map reinforcement. Bind every printed first-attack
 choice to that actor and weapon. In 2014, the Invisibility spell grants the

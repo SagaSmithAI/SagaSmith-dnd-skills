@@ -1587,7 +1587,7 @@ above 0 HP may then use `character_state_change(action="stand")`; this narrowly
 clears Prone under the Core movement boundary and does not permit arbitrary
 condition edits.
 
-Except for source-bound spell workflows such as Core Magic Missile,
+Except for source-bound spell workflows such as Core Fly and Magic Missile,
 `character_action(action="cast_spell")` and `combat_cast_spell` settle only timing, casting
 resources, concentration, and recorded components. Generic spells return
 `pending_ruling` for targets and effects. Cantrips and rituals cannot be upcast; a ritual cannot
@@ -1600,6 +1600,20 @@ before it pays an action, slot, or concentration. Confirm this only from an
 explicit Agent-performed DM ruling or an active exact spell rule; the later
 `pending_ruling`
 still covers targets and effects.
+
+The exact 2014 SRD Fly card is engine-owned. A noncombat cast supplies equal
+`target_character_ids` and `willing_target_ids` in the `character_action`
+payload. A combat cast supplies equal `target_ids` and `willing_target_ids` in
+`declaration`; all targets must be controlled by the caller, alive, recorded in
+the encounter, and within 5 feet. The Runtime validates one willing target at
+3rd level plus one for every higher slot, pays the slot/action, starts the
+caster's unique 10-minute concentration, applies a 60-foot flying speed to each
+target, and binds those target effects to the exact concentration effect. A
+later concentration replacement or failed concentration save ends the bound
+effects. The Agent owns willingness, target choice, and descriptive movement;
+it never supplies the speed, duration, target scaling, or dependency. Without
+recorded elevation, the map must not infer that a token is aloft or fabricate a
+fall.
 When a hidden caster has perceivable components,
 `combat_cast_spell` may instead return the pre-commit missing fact
 `spell_casting_perception`. The encounter driver must preserve that boundary and

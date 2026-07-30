@@ -356,7 +356,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `source_item_id`; never copy the spell into the NPC's ordinary prepared list
    or patch charges. A spell printed as cast before initiative must instead use
    public noncombat `character_action(action="cast_spell")` before
-   `combat_start`, paying its slot and starting concentration. Bind a printed
+   `combat_start`, paying its slot and starting concentration. A printed Core
+   Fly pre-cast must also carry equal exact `target_actor_ids` and
+   `willing_target_ids`; the driver forwards them to the engine and must not
+   synthesize a speed effect. Bind a printed
    Invisibility effect to the exact spell card and condition; it ends after the
    invisible actor makes an attack or casts any spell, when its duration expires,
    or whenever concentration ends, while the triggering attack still receives
