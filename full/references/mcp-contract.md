@@ -1503,6 +1503,22 @@ area. This complete set includes Stable, Unconscious, or otherwise living actors
 at 0 HP; only the Dead condition removes a creature from enumeration. The server
 derives the affected set from the map and rejects omitted or injected targets.
 
+Core 2014 `Hypnotic Pattern` instead accepts exactly
+`declaration={origin:{x,y},cube:{min:{x,y},max:{x,y}}}`. On the normal 5-foot
+grid, `min` and `max` are inclusive bounds for exactly 6 by 6 cells and
+`origin` is a boundary cell on one cube face. The Runtime validates the
+120-foot point-of-origin range and enumerates all living positioned combatants;
+the caller cannot inject or omit targets. A Blinded creature does not see the
+pattern. Charmed immunity prevents the entire effect. All other creatures make
+server-side Wisdom saves. Failed targets receive source-owned Charmed and
+Incapacitated conditions plus speed 0 for up to ten rounds, linked to the
+caster's exact concentration effect. Positive damage ends a target link;
+concentration loss ends all remaining links. An adjacent creature can spend
+its action through
+`combat_common_action(action="shake_hypnotic_pattern", target_id=...)` to end
+all active Hypnotic Pattern effects on that target. These are standard-rule
+transactions, not generic Agent rulings.
+
 A source-bound structured spell attack uses a two-stage contract. Call
 `combat_cast_spell` once without a target declaration. A successful cast pays its
 action and casting resource once and returns `status="pending_resolution"`, an

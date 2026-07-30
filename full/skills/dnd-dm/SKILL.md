@@ -737,6 +737,23 @@ cover. Include every combatant in the area that lacks the Dead condition,
 including a Stable or Unconscious creature at 0 HP; do not use "active turn
 available" as the target filter. The server rejects both omissions and additions.
 
+A source-bound 2014 Core `Hypnotic Pattern` uses its own complete cube
+declaration rather than generic area `target_contexts`. Call
+`combat_cast_spell` with
+`declaration={origin:{x,y},cube:{min:{x,y},max:{x,y}}}`. On a 5-foot grid the
+inclusive bounds must be exactly 6 by 6 cells, the origin must lie on a cube
+face and within 120 feet, and every living combatant must have a recorded
+position. The Runtime enumerates the creatures, excludes a Blinded creature
+from seeing the pattern, applies Charmed immunity, rolls every remaining
+Wisdom save through the campaign random stream, pays the slot/action, starts
+concentration, and records each failed target as Charmed, Incapacitated, and
+speed 0. Damage ends that target's effect automatically. Ending the caster's
+matching concentration ends every remaining dependent target effect. Another
+adjacent creature wakes one affected target with
+`combat_common_action(action="shake_hypnotic_pattern", target_id=...)`, which
+spends its action. Never supply a hand-picked target list, roll the saves,
+patch conditions/speed, or model these endings as Agent narrative rulings.
+
 A source-bound Core `Magic Missile` is the exception to generic spell
 `pending_ruling`. Call `combat_cast_spell` with `target_allocations`, where every
 entry supplies `target_id` and a positive `darts` count; the total must be three
