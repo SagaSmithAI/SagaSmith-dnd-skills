@@ -28,8 +28,17 @@ returned `execution_state`:
    confirm that the normalized text does not contain an executable statblock, or
    that the candidate was explicitly blocked by the evidence gate.
 2. Use `module_query(view="assets")`, select the managed PDF, and first call
-   `module_review(action="recover_statblock")`. On success, re-read its immutable
-   review and continue at step 5; do not re-transcribe it.
+   `module_review(action="recover_statblock")`. If the recovered card has no
+   module-authored Multiattack semantic gap, re-read its immutable review and
+   continue at step 5; do not re-transcribe it. If the response instead has
+   `requires_agent_fill=true` and `review=null`, read only
+   `recovery.normalized_content` plus
+   `validation.agent_fill_requirements`. Have the Agent map every listed exact
+   excerpt to the returned parsed weapon ids, modes, and explicit counts (or
+   `resolution="agent_ruling"` for an unsupported custom procedure), then repeat
+   `recover_statblock` with a fresh idempotency key and that
+   `payload.agent_fill`. The first response is a checksum-bound OCR draft, not
+   an immutable review or permission to infer missing text.
 3. If recovery fails and the Agent can inspect images, call
    `module_review(action="render_page")` for the cited page and inspect the
    returned image itself. A text-only Agent must stop here.
@@ -38,7 +47,8 @@ returned `execution_state`:
    six abilities, listed saves/skills/defenses/senses/languages, CR/XP, headings,
    attack bonus, reach/range, damage dice, damage bonus, and damage type. Do not
    fill an absent field from memory or a similar creature.
-5. Call `module_review(action="submit_content")` with the appendix `scene_id`, stable
+5. For an image-capable manual transcription, call
+   `module_review(action="submit_content")` with the appendix `scene_id`, stable
    `content_key`, normalized Markdown, managed PDF or rendered-image asset,
    1-based page, a literal visual observation, and a fresh idempotency key. If
    the card contains any module-authored Multiattack, inspect the returned

@@ -178,7 +178,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    page layout, `prepare-statblock` must call
    `module_review(action="recover_statblock")` against its exact managed PDF
    page before any visual override. The server performs and corroborates OCR, so
-   a text-only Agent can consume the returned immutable review. Only a failed or
+   a text-only Agent can consume the returned text. If the response reports
+   `requires_agent_fill=true`, the Agent must read the exact OCR draft and
+   requirements, submit a fresh-key retry with `payload.agent_fill`, and wait
+   for that retry's immutable review before actor creation. The regression
+   driver surfaces those exact requirements as
+   `--agent-statblock-fill` guidance. Only a failed or
    ambiguous recovery may enter the image-capable `--review-override` path. A
    module candidate's parser output
    is transcription support, not final semantic authority. When one reviewed statblock must

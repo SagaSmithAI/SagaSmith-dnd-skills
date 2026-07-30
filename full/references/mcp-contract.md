@@ -265,7 +265,12 @@ When a creature card exists only in the PDF image layer, first call
 `module_review(action="recover_statblock")` with the exact managed PDF page. The
 server performs checksum-bound layout OCR and requires the embedded text or a
 second OCR scale to corroborate the complete critical fingerprint. This requires
-no model vision. If it remains ambiguous, an image-capable DM may render and
+no model vision. A custom Multiattack first returns
+`requires_agent_fill=true`, `review=null`, the recovered normalized text, and
+exact `agent_fill_requirements`; the Agent reasons over that returned text and
+retries the same action with a fresh idempotency key plus
+`payload.agent_fill`. Only the filled retry creates the immutable review. If OCR
+remains ambiguous, an image-capable DM may render and
 inspect its managed page, then call `module_review(action="submit_content")`.
 The MCP validates the normalized 2014 statblock before Core stores immutable
 module/scene/page/asset evidence.

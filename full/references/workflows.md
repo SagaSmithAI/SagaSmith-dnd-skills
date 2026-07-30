@@ -78,7 +78,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    If an appendix statblock is image-only, use `module-image-content-review.md`.
    First call `module_review(action="recover_statblock")`; the server performs
    layout OCR and independent critical-fact corroboration without requiring model
-   vision. Re-read the immutable review, then use
+   vision. If it returns `requires_agent_fill=true`, the Agent reads the returned
+   normalized OCR text and exact requirements, supplies the semantic
+   `payload.agent_fill` under a fresh idempotency key, and only then re-reads the
+   immutable review. Then use
    `character_create_from(mode="module_statblock")`. Only when recovery remains
    ambiguous may an image-capable reviewer render, inspect, and submit the page
    manually.

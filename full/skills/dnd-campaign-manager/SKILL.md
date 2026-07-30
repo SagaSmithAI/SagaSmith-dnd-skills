@@ -87,7 +87,10 @@ replaces the earlier exposure, so discard every older exposure id.
    and literal visual transcription is only the image-capable fallback. Never
    fill OCR gaps from memory. For a
    module-authored or homebrew Multiattack, inspect
-   `agent_fill_requirements` and have the Agent attach a source-bound
+   `agent_fill_requirements`. OCR recovery may first return
+   `requires_agent_fill=true` with `review=null`; this is a corroborated text
+   draft, so have the Agent read that returned text and retry the action with a
+   fresh idempotency key plus a source-bound
    `payload.agent_fill.multiattack_options` to the immutable module review,
    using only parsed weapon ids, modes, and explicit counts. This is required
    even when the parser proposed a composition. For standard rulebooks, the

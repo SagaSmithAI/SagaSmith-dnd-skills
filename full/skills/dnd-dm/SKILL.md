@@ -656,7 +656,10 @@ tested in the engine before play. Module-authored and homebrew cards instead
 return to Lobby so the Agent can submit the immutable content review with
 `payload.agent_fill.multiattack_options`. Cite the activity id and exact source
 excerpt and use only existing parsed weapon ids, legal modes, and explicit
-counts. For custom content, a parser-produced composition remains only a
+counts. When OCR recovery returns `requires_agent_fill=true` and `review=null`,
+read the returned normalized text and requirements, then retry that recovery
+with a fresh idempotency key and the fill; only the retry may create the
+immutable review. For custom content, a parser-produced composition remains only a
 candidate. If its exact procedure mixes a special activity or another
 unsupported semantic, submit `resolution="agent_ruling"` with the exact excerpt
 and reason instead of `options`; the actor remains usable and selecting that
