@@ -734,6 +734,47 @@ read-before-source-bound-commit contract without making narrative text
 executable. A response-lost retry of an already committed idempotency key still
 replays the original result.
 
+### Isolated NPC turn contract
+
+During Play or Combat, Owner/DM may call `continuity_context` with
+`purpose="npc_turn"`, one NPC/monster `actor_id`, explicit
+`interlocutor_actor_ids`, and a normalized stimulus. The result is a bounded
+`npc-turn-bundle.v1`: the actor's sanitized card/self-state, its own
+ActorKnowledge, exact actor-state relationship/goal heads, public facts,
+events where it is an indexed participant, immediate outward perception, a
+small scene projection, and DM-only world/module portrayal context. Public
+world facts and module evidence are marked non-epistemic and excluded from
+`allowed_basis_refs`; only ActorKnowledge, self/identity, stimulus, perception,
+and participating past events can support factual speech.
+
+The `bundle_receipt` is process-signed and binds campaign/branch/head Snapshot,
+campaign and actor revisions, latest event sequence, scene id/version, principal,
+interlocutors, stimulus, exact fact and ActorKnowledge heads, allowed basis refs,
+and module source digests. Any intervening relevant write, event, scene change,
+restore, expiry, or principal change invalidates it.
+
+An isolated model returns only `npc-turn-proposal.v1`. This is proposed intent,
+speech, visible cues, possible action, resolution requests, and possible deltas;
+it is not a die result or state mutation. If resolution is requested, use the
+ordinary public engine tools and read another bundle. To commit, submit
+`payload.npc_turn` with the signed receipt, proposal, accepted fact indexes,
+accepted ActorKnowledge indexes, accepted narrative-action flag, and recorded
+isolation level. Accepted actor-state facts are restricted to the speaker's
+DM-only relationships/goals; knowledge is restricted to the speaker/listeners;
+mechanical actions cannot be accepted through this commit.
+
+The server derives an `npc_dialogue_turn` event and participant rows for speaker
+and listeners. Player actor-scoped event visibility uses this participant index
+without inventing ActorKnowledge. The visible payload contains the utterance,
+delivery, language, accepted visible action, and hashes—not private basis refs,
+DM evidence, or decision summary. See `host-integration-npc-turn.md` for native
+and logical isolation requirements.
+
+Consequential writes involving a context-anchored named NPC can return a
+non-blocking `narrative_followup` with actor ids and generic reasons such as HP,
+condition, status, or position change. This does not execute source text. It
+asks the Agent to read a fresh NPC bundle and decide the narrative response.
+
 Use the individual event, memory, knowledge, and snapshot tools only for isolated
 administrative work or when the server does not advertise
 `atomic_continuity_commit`; never present a partially completed fallback as a

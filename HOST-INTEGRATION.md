@@ -52,6 +52,20 @@ the native MCP connection separately. Hermes can process
 `tools/list_changed`; if a particular integration does not refresh, the
 bootstrap explicitly directs it to `exposure_call`.
 
+## Isolated NPC portrayal
+
+Hosts should provide one synchronous, fresh, zero-tool model call for a signed
+`continuity_context(purpose="npc_turn")` bundle. SagaSmith Agent provides the
+built-in `portray_npc` tool. Other hosts must implement the native or logical
+isolation contract in `full/references/host-integration-npc-turn.md`; a generic
+background subagent is unsafe because it may inherit tools, workspace, or
+history and return after the signed receipt becomes stale.
+
+The child returns a proposal only. The parent resolves mechanics through public
+MCP tools, rereads changed context, selects accepted deltas, and commits. Hosts
+without image capability are supported because reviewed OCR/module evidence is
+text before it enters the bundle.
+
 ## Required cold-start smoke test
 
 For every host:
@@ -71,6 +85,8 @@ For every host:
 6. switch Play → Combat → Play and verify phase-only groups change while
    checksum-satisfied Core groups are not reread;
 7. verify a forged `principal_id` cannot change the authenticated identity.
+8. request one NPC bundle, verify the portrayal call has zero exposed tools and
+   no child-session persistence, then reject a stale proposal after an event.
 
 After updating the installed Skills files, call
 `skill_query(action="plan", refresh=true)` once and verify changed fragments

@@ -37,6 +37,9 @@ Campaign state, not the prompt, owns the phase. The MCP refreshes session exposu
 ## Non-negotiable boundaries
 
 - Every PC, NPC, and monster has an independent complete Character card.
+- Named NPC portrayal uses a signed actor-scoped bundle and, when the host can
+  enforce it, a fresh zero-tool non-persistent model call. The proposal still
+  needs public mechanical resolution and an explicit MCP continuity commit.
 - Actor knowledge is explicitly scoped to actor/campaign/branch; players cannot read another player's private scope.
 - Sibling branches never auto-merge; reads and retrieval follow active ancestry.
 - Retriable writes use current revisions and stable idempotency keys.

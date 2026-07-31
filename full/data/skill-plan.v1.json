@@ -116,6 +116,13 @@
       "depends_on": ["continuity.read", "core.transactions", "core.evidence_ruling"],
       "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/shared/continuity-write.md", "action": "read", "max_chars": 2200}]
     },
+    "npc.portrayal": {
+      "load_policy": "operation",
+      "visibility": "dm",
+      "reason": "An NPC turn needs actor-scoped context, tool-free isolated portrayal, public mechanical resolution, and explicit accepted deltas.",
+      "depends_on": ["phase.play", "continuity.read", "continuity.write", "core.evidence_ruling"],
+      "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/play/npc-portrayal.md", "action": "read", "max_chars": 3200}]
+    },
     "snapshot.branch": {
       "load_policy": "tool_group",
       "visibility": "dm",
@@ -230,7 +237,7 @@
     "play.resolution": {"required": ["resolution.checks"], "tools": ["character_check", "dnd_ability_roll", "dnd_check", "dnd_dice_roll", "rule_expand", "rule_search"]},
     "play.combat_control": {"required": ["combat.prepare"], "tools": ["combat_start"]},
     "play.chase": {"required": ["chase.run"], "tools": ["chase"]},
-    "combat.observe": {"required": ["combat.observe"], "tools": ["actor_knowledge_query", "branch_query", "character_query", "combat_query", "module_query", "module_search", "rule_expand", "rule_search"]},
+    "combat.observe": {"required": ["combat.observe"], "tools": ["actor_knowledge_query", "branch_query", "character_query", "combat_query", "continuity_context", "module_query", "module_search", "rule_expand", "rule_search"]},
     "combat.turn": {"required": ["combat.turn"], "tools": ["combat_choice", "combat_end_turn", "combat_ready"]},
     "combat.control": {"required": ["combat.control"], "tools": ["combat_end", "combat_join", "content_solution"]},
     "combat.actions": {"required": ["combat.actions"], "tools": ["combat_cast_spell", "combat_check", "combat_choice", "combat_common_action", "combat_concentration_check", "combat_hp_change", "combat_movement", "combat_preflight_attack", "combat_reaction_attack", "combat_resolve_attack", "combat_use_activity", "dnd_check", "dnd_dice_roll"]},
@@ -240,6 +247,7 @@
   },
   "operation_bindings": {
     "campaign_query:resume": ["continuity.read", "snapshot.branch"],
+    "continuity_context:npc_turn": ["npc.portrayal"],
     "campaign_change:party_rest": ["character.state"],
     "character_create_from:module_statblock": ["source.content_review"],
     "character_create_from:reviewed_rule_statblock": ["source.content_review"],

@@ -150,6 +150,16 @@ The machine-readable phase/tool-group mapping is
   include the current `continuity_context.context_receipt`. A stale, wrong
   branch/principal, unsigned, or source-incomplete receipt is rejected; reread
   context after any revision or restore before committing the ruling.
+- For a live named NPC/monster turn, load the conditional `npc.portrayal` Skill
+  group, request `continuity_context(purpose="npc_turn")`, and use the host's
+  tool-free isolated portrayal capability when available. The proposal is not
+  authoritative: resolve mechanics with public MCP tools, re-read after every
+  state change, accept only explicit delta indexes, and commit through the
+  signed `npc_turn` continuity path. Follow
+  `references/host-integration-npc-turn.md` on hosts without `portray_npc`.
+- A returned `narrative_followup` is a generic Agent review request caused by a
+  consequential named-NPC state change. It is not a hard-coded module trigger
+  and never authorizes movement, speech, surrender, or item transfer by itself.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use
   `branch_query(view="compare")` before explaining divergent timelines.
 

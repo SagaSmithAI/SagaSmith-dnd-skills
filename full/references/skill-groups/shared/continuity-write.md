@@ -13,3 +13,10 @@ re-read, not bypassed.
 Write only durable consequences. Intent, possible future behavior, and DM
 working notes remain context until fiction makes them true. Propagate knowledge
 only to actors who actually learned it.
+
+For an isolated NPC proposal, do not copy proposal facts or knowledge into the
+ordinary payload. Submit the signed `bundle_receipt`, full proposal, and only
+the accepted fact/ActorKnowledge indexes under `payload.npc_turn`. Resolve every
+mechanical request first and reread the bundle. The server derives the dialogue
+event and speaker/listener participant index and removes private basis/reasoning
+from the visible event payload.

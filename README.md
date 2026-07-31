@@ -34,6 +34,7 @@ Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检�
 - 导入规则书，编译/安装扩展规则包并锁定 campaign profile；
 - 生成模组或从白名单暂存 PDF/Markdown/text，经 Core 结构化后检查 scene/spatial index 与 revision diff；
 - 初始化 campaign memory 与每个 PC/NPC 各自的 actor knowledge。
+- 命名 NPC 可使用签名、零工具、无子会话持久化的隔离演绎回合；机械结算与最终写入仍由公开 MCP 事务负责。
 
 ### Play：非战斗带团
 

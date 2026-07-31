@@ -18,3 +18,7 @@ exposure, read its phase plan, and load only relevant groups. Read every
 returned `skill_plan_delta`. Use `exposure_call` when the host
 does not refresh `tools/list_changed`. Never trust a model-authored
 principal. Do not silently switch to `standalone/`.
+
+For a named NPC turn, load the conditional `npc.portrayal` group and follow
+`{baseDir}/../../full/references/host-integration-npc-turn.md`; do not use a
+general background subagent as the actor-isolation boundary.

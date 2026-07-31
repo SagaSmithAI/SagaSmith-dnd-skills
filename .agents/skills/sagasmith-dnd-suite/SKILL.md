@@ -19,3 +19,7 @@ groups. Read every returned `skill_plan_delta`. Use
 `exposure_call` if the host ignores `tools/list_changed`. Never trust a
 model-authored principal; bind identity in the host or with
 `SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`. Do not silently use `standalone/`.
+
+For a named NPC turn, load `npc.portrayal` and follow
+`{baseDir}/../../../full/references/host-integration-npc-turn.md`; a generic
+background subagent is not a safe replacement for the isolated portrayal call.
