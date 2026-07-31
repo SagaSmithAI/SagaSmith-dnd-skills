@@ -762,6 +762,11 @@ accepted ActorKnowledge indexes, accepted narrative-action flag, and recorded
 isolation level. Accepted actor-state facts are restricted to the speaker's
 DM-only relationships/goals; knowledge is restricted to the speaker/listeners;
 mechanical actions cannot be accepted through this commit.
+Only none/gesture/refuse are narrative-only actions. Offer, surrender,
+move/flee, attack, item use/exchange, scene transition, and other actions must
+request public resolution. Factual/deceptive assertion, reveal, or lie acts
+require an allowed basis ref, and every speech target must be a signed actor in
+the bundle.
 
 The server derives an `npc_dialogue_turn` event and participant rows for speaker
 and listeners. Player actor-scoped event visibility uses this participant index

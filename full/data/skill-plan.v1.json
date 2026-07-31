@@ -121,7 +121,7 @@
       "visibility": "dm",
       "reason": "An NPC turn needs actor-scoped context, tool-free isolated portrayal, public mechanical resolution, and explicit accepted deltas.",
       "depends_on": ["phase.play", "continuity.read", "continuity.write", "core.evidence_ruling"],
-      "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/play/npc-portrayal.md", "action": "read", "max_chars": 3200}]
+      "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/play/npc-portrayal.md", "action": "read", "max_chars": 3600}]
     },
     "snapshot.branch": {
       "load_policy": "tool_group",

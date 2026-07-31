@@ -32,6 +32,9 @@ state, permissions, knowledge, chronology, and branch revisions.
 7. Accept only specific fact/ActorKnowledge indexes. Relationship/goal facts may
    belong only to the speaker; ActorKnowledge may belong only to speaker or
    listeners. Mechanical actions must be executed through public tools first.
+   Only `none`, `gesture`, and `refuse` are directly acceptable narrative
+   actions. Offer, surrender, movement/flight, attacks, item use/exchange,
+   scene transitions, and other actions require an explicit resolution request.
 8. Commit with `memory_change(action="commit", payload={"event": {...},
    "npc_turn": {"bundle_receipt": ..., "proposal": ...,
    "accepted_fact_indexes": [...], "accepted_actor_knowledge_indexes": [...],
