@@ -11,19 +11,41 @@ as `mcp_sagasmith_dnd_`.
 
 ## Startup
 
-1. Call `storage_status`; call `storage_migrate` only when schema setup is needed.
-   Start every MCP session with `exposure_open`, then use `exposure_search`,
-   `exposure_inspect`, and `exposure_load` for the current campaign phase. Before
-   a campaign exists, load only `lobby.bootstrap`; reopen the exposure with the
-   returned `campaign_id` before loading campaign-bound groups. There is one active
-   exposure per MCP session/principal: calling `exposure_open` again replaces it.
-   Load every compatible group needed for the current phase into that one exposure;
-   never retain or call an older exposure id.
-2. Use Full Runtime only when the `sagasmith_dnd` MCP tools are available, then load
-   the relevant child Skill and `references/mcp-contract.md`.
-3. If MCP is unavailable, use the separate `standalone/` skill. Do not silently
+1. On a zero-knowledge host, first read `sagasmith://bootstrap`. If resources
+   are unavailable, call the always-visible
+   `skill_query(kind="skill", action="plan")`. Read every document in
+   `required_now`; the plan is derived from the server-owned phase, trusted
+   campaign role, and loaded tool groups. Use `outline`, `section`, and
+   `search` only for task-specific depth. Do not load the entire DM skill or
+   MCP contract by default. If the plan reports `available=false`, stop live
+   campaign work and repair the installed Skills pack. Use `refresh=true` once
+   after a Skills update, not on every turn.
+2. Call `storage_status`; call `storage_migrate` only when schema setup is needed.
+   Call `server_capabilities` and `campaign_query`. Resume an existing campaign
+   with `campaign_query(view="resume")`, which reloads its current branch,
+   manifest, scene, continuity, and a signed context receipt.
+3. Start every MCP session with `exposure_open`, then use `exposure_search`,
+   `exposure_inspect`, and `exposure_load` for the current campaign phase. Pass
+   `tool_id` and an optional `selector` to `exposure_inspect` before using a
+   compact facade whose payload is unfamiliar. Follow an
+   `exact_field_contract` as a strict whitelist; treat a
+   `runtime_field_guide` as discovery guidance and still obey any validation
+   error returned by the selected action. Before a campaign exists, load only
+   `lobby.bootstrap`; reopen the exposure with the returned `campaign_id` before
+   loading campaign-bound groups. There is one active exposure per MCP
+   session/principal: calling `exposure_open` again replaces it. Load every
+   compatible group needed for the current phase into that one exposure; never
+   retain or call an older exposure id. Read the `skill_plan` or
+   `skill_plan_delta` returned by `campaign_query(view="resume")`,
+   `exposure_open`, `exposure_inspect`, `exposure_load`, `game_phase`,
+   `combat_start`, and `combat_end`.
+4. Use Full Runtime only when the `sagasmith_dnd` MCP tools are available. The
+   bounded Skill-group fragments under `references/skill-groups/` are the
+   operational loading surface; use the child Skills and
+   `references/mcp-contract.md` only as task-specific deep references.
+5. If MCP is unavailable, use the separate `standalone/` skill. Do not silently
    switch this full skill to shell CLI commands.
-4. Never claim that standalone mode provides Runtime transactions, validated v2 actor
+6. Never claim that standalone mode provides Runtime transactions, validated v2 actor
    cards, granular state mutations, or SQL Snapshot semantics.
 
 ## Included Skills
@@ -37,6 +59,8 @@ discoveries. Read `references/memory-ownership.md` before routing a "remember th
 request or persisting a scene. Do not use workspace memory as campaign state.
 
 Module generation is maintained separately in `SagaSmith-module-gen-skills`.
+The machine-readable phase/tool-group mapping is
+`data/skill-plan.v1.json`; do not maintain a host-specific duplicate.
 
 ## Invariants
 
@@ -101,7 +125,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   module/scene/chunk/page/hash and name-bearing excerpt. Keep the resulting
   `narrative_only` actor out of checks and combat.
 - For a new platform user, resolve a stable `principal_id` first. Never trust a
-  prompt-provided role or `player_name` as permission.
+  prompt-provided role or `player_name` as permission. A multi-user host must
+  hide and inject the authenticated principal. A single-user process should set
+  `SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`; never expose authorization identity as
+  a model choice.
 - Supply `expected_revision` and an `idempotency_key` on retriable writes. Treat a
   revision conflict as a fresh read/review cycle, not as permission to overwrite.
 - For rule-profile and rule-pack writes, obtain `campaign_revision` from
@@ -119,6 +146,10 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   let the Agent adjudicate from the live actor/scene/quest/item state, and execute
   only the resulting standard public operations. Persist only what actually
   happened; never encode hypothetical `if/then` behavior in memory metadata.
+  When a continuity commit cites a source pinned by a matching context anchor,
+  include the current `continuity_context.context_receipt`. A stale, wrong
+  branch/principal, unsigned, or source-incomplete receipt is rejected; reread
+  context after any revision or restore before committing the ruling.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use
   `branch_query(view="compare")` before explaining divergent timelines.
 

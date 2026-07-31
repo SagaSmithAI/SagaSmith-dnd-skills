@@ -1,0 +1,21 @@
+---
+name: sagasmith-dnd-suite
+description: Run persistent D&D 5e 2014/2024 campaigns through SagaSmith's source-bound MCP runtime. Use for setup, live play, combat, module/rule import, continuity, actor knowledge, branches, snapshots, and restores.
+---
+
+# SagaSmith D&D Full Runtime
+
+This is a discovery wrapper. Require the `sagasmith_dnd` MCP server, read
+`sagasmith://bootstrap`, then call
+`skill_query(kind="skill", action="plan")` and read every `required_now`
+document. Read the canonical workflow at `{baseDir}/../../../full/SKILL.md`
+and use bounded section/search reads only for additional depth.
+Stop if the plan reports `available=false`; repair the installed Skills/MCP
+pairing before live play.
+
+For an existing campaign call `campaign_query(view="resume")`, open one
+campaign-bound exposure, read its phase plan, and load only task-relevant
+groups. Read every returned `skill_plan_delta`. Use
+`exposure_call` if the host ignores `tools/list_changed`. Never trust a
+model-authored principal; bind identity in the host or with
+`SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`. Do not silently use `standalone/`.

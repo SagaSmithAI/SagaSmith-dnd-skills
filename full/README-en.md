@@ -8,11 +8,12 @@ This directory contains agent orchestration only. It never writes SQLite/ChromaD
 
 ## Startup
 
-1. Call `server_capabilities` and `storage_status`.
-2. Open a session exposure with `exposure_open`; do not model-supply a principal when the Host injects identity. One session/principal has one current exposure, reopening replaces the old id, and same-phase groups belong in that one exposure.
-3. For lobby work, use `exposure_search` → `exposure_inspect` → `exposure_load`.
-4. Read [`references/mcp-contract.md`](references/mcp-contract.md) and the relevant child skill.
-5. On fresh storage, verify core-rule seed state. For an existing campaign, read campaign, branch, and continuity context first.
+1. Call `skill_query(kind="skill", action="plan")` and read every `required_now` fragment.
+2. Call `server_capabilities` and `storage_status`.
+3. Open a session exposure with `exposure_open`; do not model-supply a principal when the Host injects identity. One session/principal has one current exposure, reopening replaces the old id, and same-phase groups belong in that one exposure.
+4. For lobby work, use `exposure_search` → `exposure_inspect` → `exposure_load` and read each returned `skill_plan_delta`.
+5. Search or bounded-read [`references/mcp-contract.md`](references/mcp-contract.md) and child Skills only for task-specific depth; do not load them in full by default.
+6. On fresh storage, verify core-rule seed state. For an existing campaign, call `campaign_query(view="resume")` first and read its phase plan, campaign, branch, and continuity context.
 
 ## Phase surfaces
 

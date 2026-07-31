@@ -344,7 +344,11 @@ DM 调用 `continuity_context` 时，服务端把调用方显式提供的 `relat
 - 对 player audience 永远返回空列表。
 
 这仍然是 pull-based 工作流：只有调用了 `continuity_context` 才会组装上下文。
-当前服务端不会在每个 NPC 回合开始时自动替 Agent 调用它。
+当前服务端不会在每个 NPC 回合开始时自动替 Agent 调用它。但对于提交内容引用了
+匹配的 active `context_anchor` 来源的情况，`continuity_context` 返回当前
+campaign revision、branch、principal 与实际 module evidence 绑定的签名
+`context_receipt`；`memory_change(action="commit")` 强制验证该凭证。这样既不把
+叙事原文变成自动触发器，又能阻止 Agent 跳过当前上下文直接提交这一类来源绑定裁定。
 
 ## Zaltember 端到端示例
 
@@ -409,19 +413,21 @@ item:fire-giant-conch
 Agent 每次 session 都应假定自己“刚醒来”，不能靠旧对话继续操作：
 
 1. `storage_status`；
-2. `campaign_query(view="list/get")`；
-3. 当前 branch 与 snapshot head；
-4. 根据有效 phase 打开新的 exposure；
-5. `playthrough_manifest(action="get")`；
-6. `module_query(view="current/scene/progress")`；
-7. 最近 Campaign Event；
-8. 对每个实际行动 actor 单独调用 `continuity_context`；
-9. DM 行为裁定加入相关 actor/scene/location/quest/item refs；
-10. 重读 party 和所有相关 Character；
-11. 丢弃跨 write、phase、branch、restore 留下的旧 revision 和缓存卡。
+2. `campaign_query(view="resume", payload={"campaign_id": ...})`，一次取得 campaign、
+   当前 branch/head、manifest、current scene、continuity、当前 context receipt
+   与 phase/role Skill plan；
+3. 根据有效 phase 打开新的 campaign exposure；
+4. 用 `skill_query(action="plan")` 读取所有 `required_now` fragment；随后读取
+   `exposure_inspect` / `exposure_load` 返回的 `skill_plan_delta`；
+5. 用 `exposure_inspect(group_id, tool_id, selector)` 读取不熟悉 facade action 的字段契约；
+6. 对每个实际行动 actor 单独调用 `continuity_context`；
+7. DM 行为裁定加入相关 actor/scene/location/quest/item refs；
+8. 重读 party 和所有相关 Character；
+9. 丢弃跨 write、phase、branch、restore 留下的旧 revision、context receipt 和缓存卡。
 
 Branch checkout 或 Snapshot restore 后必须完整重复该流程。旧上下文不能安全地
-跨时间线使用。
+跨时间线使用。Skill fragment 只有 checksum 未变化时可以在同一 MCP session
+复用；这不代表 campaign state 或 continuity context 可以复用。
 
 ## 场景生命周期
 
@@ -769,7 +775,7 @@ Dream 只保存：
 - Combat：回合、动作、反应、地图和战斗结算。
 
 当前 compact public contract 为 83 个工具，其中冷启动 Core discovery
-固定为 12 个；Lobby、Play、Combat 的暴露上限分别是 62、47、45。工具数量
+固定为 13 个；Lobby、Play、Combat 的暴露上限分别是 62、48、46。工具数量
 预算不改变 action 级别的权限和事务边界。
 
 角色和 campaign membership 决定：
@@ -810,7 +816,9 @@ Agent 可以继续：
 1. 模组 narrative anchor 不在 import 时自动全量生成；当前由 Agent 在首次实际
    使用前惰性创建。
 2. `continuity_context` 是显式 pull；服务端会扩充 refs，但不会在每个 NPC 回合
-   自动调用。
+   自动调用。对命中 active context-anchor 来源的 continuity commit，服务端会通过
+   签名、revision-bound `context_receipt` 强制发生过正确的当前读取；其他纯描述性
+   回合仍由 Agent 按工作流主动读取。
 3. 模组叙事条件不会自动监听 HP、位置、custody 或对话并执行剧情。
 4. Agent 必须把实时状态和 source evidence 一起读取后才可裁定。
 5. 未实现完整原子事务的标准规则仍保持显式边界，不能靠近似实现隐藏缺口。

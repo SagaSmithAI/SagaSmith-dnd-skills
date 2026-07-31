@@ -11,7 +11,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Intent | MCP tool |
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
-| Campaign | `campaign_create`, `campaign_query(list/get/party)`, `campaign_change`, `access_grant(campaign/actor)` |
+| Campaign | `campaign_create`, `campaign_query(list/get/party/resume)`, `campaign_change`, `access_grant(campaign/actor)` |
 | Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
@@ -20,8 +20,8 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
 
-The compact public contract contains exactly 83 tools, with 12 core discovery
-tools and phase ceilings of Lobby 62, Play 47, and Combat 45. Do not call retired
+The compact public contract contains exactly 83 tools, with 13 core discovery
+tools and phase ceilings of Lobby 62, Play 48, and Combat 46. Do not call retired
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
@@ -89,7 +89,7 @@ those receipts; prose summaries are not evidence that a ritual, countdown, or
 other repeated procedure occurred.
 `server_capabilities.ruling_policy` publishes this split for cold-start Agents;
 use it instead of treating every `pending_ruling` as the same kind of missing
-input. For the fixed 12-tool Agent path, every `exposure_call` result whose live
+input. For the fixed 13-tool Agent path, every `exposure_call` result whose live
 status is `pending_ruling` also carries `ruling_resolution` and a policy
 reference. Its default resolver is `agent`; a result explicitly classified as
 one of the external-input exceptions instead names `external_input`. This
@@ -722,6 +722,18 @@ revisions require their current `expected_revision_id`. The MCP adds the install
 D&D and module-generation Skill SHA-256 manifest to the event payload, and the
 snapshot captures that provenance.
 
+`continuity_context` also returns a process-signed `context_receipt` bound to
+the campaign, checked-out/read branch, authenticated principal, campaign
+revision, requested refs, and the exact pinned module sources that were
+returned. If a continuity commit cites a module source that is also pinned by
+an active matching `context_anchor`, put this receipt in
+`payload.context_receipt`. The MCP rejects a missing, forged, expired,
+wrong-principal, wrong-branch, stale-revision, or source-incomplete receipt.
+This turns the important anchored narrative boundary into an enforced
+read-before-source-bound-commit contract without making narrative text
+executable. A response-lost retry of an already committed idempotency key still
+replays the original result.
+
 Use the individual event, memory, knowledge, and snapshot tools only for isolated
 administrative work or when the server does not advertise
 `atomic_continuity_commit`; never present a partially completed fallback as a
@@ -747,13 +759,49 @@ operational signal, not permission to rewrite history automatically.
 The MCP, not an agent configuration, owns tool exposure. Every connection starts
 with a compact core: `exposure_open`, `exposure_status`, `exposure_search`,
 `exposure_inspect`, `exposure_load`, `exposure_unload`, `exposure_call`,
-`campaign_query`, `game_phase`, and server diagnostics. Start or resume with
-`exposure_open(campaign_id, principal_id)`, search/inspect a group, then load it.
+`campaign_query`, `game_phase`, `skill_query`, and server diagnostics. Read
+`sagasmith://bootstrap` or call `skill_query(action="plan")` on a cold start
+and read every `required_now` document. The plan expands the Core groups,
+server-owned phase baseline, authorized loaded tool groups, and an optional
+operation binding through the dependency DAG in
+`dnd:full/data/skill-plan.v1.json`. Resume with
+`campaign_query(view="resume")`, then call
+`exposure_open(campaign_id, principal_id)`, search/inspect a group, and load it.
 Loaded groups are scoped to that MCP session and principal; another connected
 agent must open and load its own exposure. A session/principal has exactly one
 active exposure. Calling `exposure_open` again replaces the previous exposure;
 load multiple compatible same-phase groups into the current exposure and discard
 older exposure ids.
+
+`campaign_query(view="resume")`, `exposure_open`, `exposure_status`,
+`exposure_inspect`, `exposure_load`, `exposure_unload`, `game_phase`,
+`combat_start`, and `combat_end` return a `skill_plan` or
+`skill_plan_delta`. Read its `required_now` documents before unfamiliar work.
+Successful planned `skill_query(read/section)` calls return a
+`skill_read_receipt`; later plans report the group in `already_satisfied` while
+the document checksum is unchanged. A changed checksum appears under
+`invalidated`. Skill read state reduces repeated context only: it is never a
+permission or transaction bypass. Use bounded `outline/section/search` for
+task-specific depth after the planned fragments.
+
+If `available=false`, stop live campaign work and repair the installed Skills
+pack; a Full Runtime installation rejects domain-group loading in this state,
+so do not silently fall back to an unplanned full-document load. Call
+`skill_query(action="plan", refresh=true)` only after an installed Skills
+update. That explicit refresh rebuilds the file index, revalidates the manifest
+against the public tool-group contract, and exposes changed checksums for
+rereading.
+
+`exposure_inspect(group_id, tool_id?, selector?)` returns the ordinary group
+catalog. When `tool_id` is provided, it additionally returns the actual
+top-level input schema, selector values, and a machine-readable payload contract
+for every public facade action. Strict actions report
+`contract_kind="exact_field_contract"` with an exact allowed/required field
+set. Compatibility actions report `contract_kind="runtime_field_guide"` and
+`additional_properties=true`; those fields document the stable inputs but do
+not weaken the action's runtime validator. It also returns bounded MCP-contract
+excerpts when installed. Treat runtime validation as authoritative and never
+use an arbitrary payload field as a schema escape hatch.
 
 | Phase | Intended state | Example groups |
 |---|---|---|
@@ -771,6 +819,12 @@ session and phase check. For image-producing tools, the fallback keeps the JSON
 envelope in the first text/structured-content block and forwards each MCP image
 block separately. Read the envelope for provenance and inspect the image block;
 never expect base64 image data inside `result` or discard non-text content.
+
+The server initialization capability advertises `tools.listChanged=true`.
+Single-user hosts should set `SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`; the server
+then overwrites model-authored principal fields. Multi-user hosts must instead
+hide and inject the authenticated principal per request. `system:local` is only
+safe inside an explicitly trusted local process.
 
 An exposure without `campaign_id` may load only `lobby.bootstrap` (system list
 and campaign creation), plus the `system:local`-only storage administration

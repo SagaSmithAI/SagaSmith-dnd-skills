@@ -8,11 +8,12 @@ Full 模式是 SagaSmithAI 的 D&D 5e 2014/2024 带团工作流。它要求 `sag
 
 ## 启动顺序
 
-1. 调用 `server_capabilities` 与 `storage_status`，确认服务和存储。
-2. 为当前 MCP session 调用 `exposure_open`；身份由 Host 注入时不要让模型填写 principal。同一 session/principal 只有一个当前 exposure，再次 open 会替换旧 id；同阶段所需 group 应加载进同一个 exposure。
-3. lobby 任务先 `exposure_search` → `exposure_inspect` → `exposure_load`。
-4. 读取 [`references/mcp-contract.md`](references/mcp-contract.md) 与当前 child skill。
-5. fresh storage 检查 core rules seed；进入既有团先读取 campaign、branch 与 continuity context。
+1. 调用 `skill_query(kind="skill", action="plan")`，读取全部 `required_now` fragment。
+2. 调用 `server_capabilities` 与 `storage_status`，确认服务和存储。
+3. 为当前 MCP session 调用 `exposure_open`；身份由 Host 注入时不要让模型填写 principal。同一 session/principal 只有一个当前 exposure，再次 open 会替换旧 id；同阶段所需 group 应加载进同一个 exposure。
+4. lobby 任务先 `exposure_search` → `exposure_inspect` → `exposure_load`，并读取每次返回的 `skill_plan_delta`。
+5. 仅在任务需要时搜索或有界读取 [`references/mcp-contract.md`](references/mcp-contract.md) 与 child skill；不要默认加载全文。
+6. fresh storage 检查 core rules seed；进入既有团先调用 `campaign_query(view="resume")`，读取其 phase plan、campaign、branch 与 continuity context。
 
 ## 三阶段工具面
 
