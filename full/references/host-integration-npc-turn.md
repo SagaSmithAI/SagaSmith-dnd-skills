@@ -36,7 +36,8 @@ unvalidated answer asynchronously.
    JSON repair that guesses fields. One fresh repair request is allowed with the
    validation error and prior output as quoted data. Reject a second failure.
    Factual/deceptive assert/reveal/lie speech acts require a bundle basis ref;
-   speech targets must be signed interlocutors. Any action other than
+   speech and resolution targets must be the signed actor or an interlocutor;
+   action targets use the matching `actor:<id>` ref. Any action other than
    none/gesture/refuse must include a resolution request.
 5. Optionally run a separate zero-tool guardian request in strict campaigns.
    Local schema, actor, target, and basis-ref validation remains mandatory even
