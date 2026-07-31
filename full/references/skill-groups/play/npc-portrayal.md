@@ -40,6 +40,7 @@ state, permissions, knowledge, chronology, and branch revisions.
    "npc_turn": {"bundle_receipt": ..., "proposal": ...,
    "accepted_fact_indexes": [...], "accepted_actor_knowledge_indexes": [...],
    "accepted_action": false, "isolation_level": "isolated|logical"}})`.
+   Keep `event.summary` observable; never copy private intent/decision text.
    The server derives the dialogue event and participant index, strips private
    reasoning/basis refs from visible payload, and rejects stale or tampered data.
 
