@@ -122,5 +122,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
 - Use `rule_seed_status` before the first rules lookup on a fresh server. Use
   `branch_query(view="compare")` before explaining divergent timelines.
 
-See `references/mcp-contract.md` and `references/workflows.md`. The CLI contract is
-legacy compatibility documentation only.
+For the complete cross-repository ownership, persistence, adjudication, retrieval,
+time, knowledge, manifest, and restore model, read
+`references/long-form-narrative-architecture.md`. See
+`references/mcp-contract.md` and `references/workflows.md` for the exact public
+contract and ordered operations. The CLI contract is legacy compatibility
+documentation only.

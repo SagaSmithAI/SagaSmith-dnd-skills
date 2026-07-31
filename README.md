@@ -58,7 +58,9 @@ Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检�
 | `dnd-campaign-manager` | lobby 生命周期、角色/权限、规则/模组导入、分支与 Snapshot |
 | `module-generator`（由 MCP 暴露） | 生成结构化、可检查、可导入的冒险 artifact |
 
-Full 包还包含 MCP contract、workflow、rule boundary、combat 与内容导入参考，以及 `SOUL.md` / `IDENTITY.md` / memory workspace 模板。
+Full 包还包含[长线叙事架构](full/references/long-form-narrative-architecture.md)、
+MCP contract、workflow、rule boundary、combat 与内容导入参考，以及
+`SOUL.md` / `IDENTITY.md` / memory workspace 模板。
 
 ## 安装
 

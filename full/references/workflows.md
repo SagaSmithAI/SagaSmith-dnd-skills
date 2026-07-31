@@ -4,6 +4,10 @@ Full Runtime uses the `sagasmith_dnd` MCP server. See `mcp-contract.md` for the
 complete public facade and mutation contract. Never call an internal/retired tool
 name copied from an old prompt.
 
+Read `long-form-narrative-architecture.md` for the complete cross-layer ownership
+model and the distinction between immutable source, Agent adjudication, engine
+settlement, continuity ledgers, the playthrough manifest, and Snapshot recovery.
+
 ## Exposure and session start
 
 1. Call `storage_status`, then `campaign_query(view="list")` and select a campaign.
