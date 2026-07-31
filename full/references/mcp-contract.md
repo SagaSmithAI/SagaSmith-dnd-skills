@@ -744,8 +744,9 @@ ActorKnowledge, exact actor-state relationship/goal heads, public facts,
 events where it is an indexed participant, immediate outward perception, a
 small scene projection, and DM-only world/module portrayal context. Public
 world facts and module evidence are marked non-epistemic and excluded from
-`allowed_basis_refs`; only ActorKnowledge, self/identity, stimulus, perception,
-and participating past events can support factual speech.
+`allowed_basis_refs`; only ActorKnowledge, the actor's own relationship/goal
+state, self/identity, stimulus, perception, and participating past events can
+support factual speech.
 
 The `bundle_receipt` is process-signed and binds campaign/branch/head Snapshot,
 campaign and actor revisions, latest event sequence, scene id/version, principal,
