@@ -16,6 +16,7 @@ state, permissions, knowledge, chronology, and branch revisions.
    context, immediate perception, current scene projection, and DM-only
    `portrayal_context`. Public world context is safe for DM reasoning but does
    not prove this NPC knows it.
+   The NPC's own relationship/goal fact refs are valid internal bases.
    `portrayal_context` guides characterization but is not actor knowledge and is
    not speakable unless the claim also cites a value in `allowed_basis_refs`.
 4. If the host provides `portray_npc`, pass the unmodified bundle to it. It runs
