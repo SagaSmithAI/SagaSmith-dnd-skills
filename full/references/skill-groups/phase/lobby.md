@@ -11,3 +11,7 @@ encounters unless the module supplies an applicable rule.
 
 Do not start play while source identity, party legality, advancement mode,
 module readiness, or required DM review remains unresolved.
+
+Use bounded `source_interpretation` or `bounded_ruling` only when exact managed
+evidence exists. A proposal cannot activate a source, approve a conflicting
+review, or replace a missing standard engine implementation.

@@ -25,7 +25,9 @@ It is not the portable standalone runtime.
 5. Read the canonical workflow at `{baseDir}/full/SKILL.md`. Follow
    `skill_query(action="plan")`; use bounded
    `skill_query(action="section"|"search")` reads only for additional depth.
-   For an NPC turn, load the conditional `npc.portrayal` group and follow
+   For any isolated semantic decision, follow the returned operation group and
+   `{baseDir}/full/references/host-integration-bounded-context.md`. For a rich
+   named-NPC dialogue turn, additionally load `npc.portrayal` and follow
    `{baseDir}/full/references/host-integration-npc-turn.md`.
 6. Do not silently switch to `{baseDir}/standalone/`. Ask before accepting
    that explicit loss of MCP persistence, permissions, rule locks, combat

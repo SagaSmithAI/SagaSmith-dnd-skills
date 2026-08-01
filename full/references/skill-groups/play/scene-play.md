@@ -9,6 +9,11 @@ module-specific narrative behavior from current world state and exact context.
 The engine changes only validated state primitives. A narrative instruction is
 context for reasoning, not a hidden trigger engine.
 
+Use `actor_turn` or the richer `npc_turn` for autonomous actors,
+`faction_turn` for faction decisions, and `audience_render` before publishing a
+player-safe view. Validate each generic proposal with `bounded_evaluation`; a
+validated proposal is still not a state change.
+
 Advance module progress and the playthrough manifest only after the fiction
 actually reaches that state. At scene close, record durable consequences and a
 checkpoint only when the recovery value justifies it.

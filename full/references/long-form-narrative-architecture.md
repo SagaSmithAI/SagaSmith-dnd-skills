@@ -25,7 +25,8 @@ SagaSmith Agent
 1. 不可变的规则书和模组证据；
 2. 当前分支上的角色、世界、时间和场景状态；
 3. 按 actor 隔离的主观知识；
-4. Agent 根据证据与当前状态作出的当次决定，以及由引擎提交的实际结果。
+4. Agent 在有界上下文中根据证据与当前状态作出的当次提案；
+5. 经 MCP 校验后，由引擎提交的实际结果。
 
 Agent 不把“可能发生的剧情”写成已经发生的事实。引擎不猜 NPC 动机。
 聊天记录、Dream、向量检索和 recap 都不是战役状态的最终权威。
@@ -70,7 +71,7 @@ flowchart TB
 
 | 层 | 当前职责 | 不负责 |
 |---|---|---|
-| SagaSmith Agent | 理解自然语言、询问玩家选择、扮演默认 DM、选择工具、解释结果、生成受众安全叙述 | 不作为战役数据库；不自行伪造工具成功；不保存权威 HP、知识或任务状态 |
+| SagaSmith Agent | 理解自然语言、询问玩家选择、扮演默认 DM、选择工具、执行零工具有界语义评估、解释结果、生成受众安全叙述 | 不作为战役数据库；不自行伪造工具成功；不保存权威 HP、知识或任务状态；不替人类 PC 作决定 |
 | Agent Dream / workspace memory | 用户偏好、无障碍需求、桌面风格、Agent 身份和通用项目经验 | 不保存战役事件、角色秘密、HP、物品、任务或分支状态 |
 | Full D&D Skills | 规定启动、导入、检索、角色准备、场景、战斗、连续性、分支和恢复流程 | 不执行 D&D 算术；不直接写数据库 |
 | D&D MCP exposure | 按 session、principal、角色和 Lobby/Play/Combat 阶段暴露工具 | 不授予底层实现中不存在的权限 |
@@ -107,6 +108,7 @@ flowchart TB
 | 可恢复状态 | Snapshot 全量 payload 与 Branch head | `snapshot_query`、`branch_query` | continuity commit 内的 snapshot 或行政 checkpoint |
 | 玩家 recap | Snapshot 的确定性 delta recap 与可选展示层 | `snapshot_query(view="recap")` | checkpoint 时生成或审查展示 |
 | 事务审计 | revision group、idempotency receipt、rule/random receipts | `state_revision`、规则 receipt 查询 | 与实际状态变更在同一事务中写入 |
+| 宿主上下文边界 | MCP 返回的 `host_context_binding` 与派生 `context_epoch` | campaign resume / continuity bundle | 宿主只保存绑定元数据；变化时重建模型上下文 |
 
 ### 不应成为第二权威的表示
 
@@ -117,6 +119,7 @@ flowchart TB
 - `world_time` 不是第二个推进时钟。
 - `notes.memories` 只用于旧数据迁移，不接收新的角色知识。
 - recap、搜索命中、Agent 聊天上下文和回归报告都不是恢复权威。
+- bounded evaluation proposal 不是事实、知识、角色行动或机械结果。
 - Campaign 行政 `status` 不等于模组正式结局。
 
 ## 内容进入长线叙事的过程
@@ -258,6 +261,29 @@ solution。
 
 系统只确保完整原文在相关 actor、场景、任务或物品参与时进入 DM Agent
 上下文。Agent 结合实时状态作决定，再调用普通公开工具。
+
+### 有界语义评估
+
+当角色、受众、阵营、来源或裁定需要模型理解时，MCP 生成签名、只读、最小化的
+bundle，宿主在全新零工具上下文中只返回固定 proposal：
+
+```text
+continuity_context(actor_turn | audience_render | faction_turn |
+                   source_interpretation | bounded_ruling)
+→ host isolated evaluation
+→ bounded_evaluation(validate)
+→ ordinary public engine tools
+→ accepted event/fact/knowledge write
+```
+
+- `actor_turn` 只允许 NPC/monster 的意图与行动；人类 PC 的意图归玩家，任何台词改走 `npc_turn` 的结构化 speech acts。
+- `audience_render` 强制 `audience="player"`，只使用服务端已过滤的受众投影，并原样发布验证后的文本。
+- `faction_turn` 只读取该 faction 的 state/knowledge，不自动知道客观世界事实。
+- `source_interpretation` 只解释精确来源，不激活或执行内容；问题必须原样绑定签名上下文，至少给出一条证据 claim，存在歧义或 uncertain claim 时必须转入 DM review。
+- `bounded_ruling` 只决定 Agent-owned 语义，不接管玩家/owner/source-review 边界。
+
+proposal 不能掷骰、付费、移动、攻击、改 HP/物品/时间/条件或写知识。它引用的
+机械请求必须由公开引擎工具执行；任何写入都会使旧 bundle 失效。
 
 ## `context_anchor` 与 `continuity_context`
 
@@ -428,6 +454,12 @@ Agent 每次 session 都应假定自己“刚醒来”，不能靠旧对话继�
 Branch checkout 或 Snapshot restore 后必须完整重复该流程。旧上下文不能安全地
 跨时间线使用。Skill fragment 只有 checksum 未变化时可以在同一 MCP session
 复用；这不代表 campaign state 或 continuity context 可以复用。
+
+`campaign_query(view="resume")` 和 continuity bundle 返回精确
+`host_context_binding`。首次绑定或 campaign、principal、role、audience、branch、
+restore 变化时，宿主必须停止同一模型回复中后续工具，丢弃旧消息、摘要、
+workspace/Dream memory、缓存检索、receipt 与工具结果，并从当前用户请求和可信
+MCP 结果重建。相同 `context_epoch` 不重复切换。
 
 ## 场景生命周期
 
@@ -774,8 +806,8 @@ Dream 只保存：
 - Play：场景、检定、时间、连续性、追逐和非战斗状态；
 - Combat：回合、动作、反应、地图和战斗结算。
 
-当前 compact public contract 为 83 个工具，其中冷启动 Core discovery
-固定为 13 个；Lobby、Play、Combat 的暴露上限分别是 62、48、46。工具数量
+当前 compact public contract 为 84 个工具，其中冷启动 Core discovery
+固定为 13 个；Lobby、Play、Combat 的暴露上限分别是 63、49、48。工具数量
 预算不改变 action 级别的权限和事务边界。
 
 角色和 campaign membership 决定：
@@ -855,6 +887,7 @@ Agent 可以继续：
 | 主题 | 当前实现或参考 |
 |---|---|
 | Agent 与 domain memory 所有权 | `SagaSmith-agent/nanobot/templates/AGENTS.md`、`nanobot/templates/agent/recap_generation.md` |
+| 宿主有界上下文协议 | `full/references/host-integration-bounded-context.md` |
 | Full Runtime 总入口 | `SagaSmith-dnd-skills/full/SKILL.md` |
 | 运行流程 | `full/references/workflows.md` |
 | MCP 工具和单一权威表 | `full/references/mcp-contract.md` |

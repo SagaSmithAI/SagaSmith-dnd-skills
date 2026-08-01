@@ -20,6 +20,10 @@ groups. Read every returned `skill_plan_delta`. Use
 model-authored principal; bind identity in the host or with
 `SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`. Do not silently use `standalone/`.
 
-For a named NPC turn, load `npc.portrayal` and follow
+Treat the `host_context_binding` returned by resume/continuity as a hard model
+context boundary. For any bounded semantic decision, load the returned
+operation group and follow
+`{baseDir}/../../../full/references/host-integration-bounded-context.md`. For a
+named NPC dialogue turn, additionally load `npc.portrayal` and follow
 `{baseDir}/../../../full/references/host-integration-npc-turn.md`; a generic
-background subagent is not a safe replacement for the isolated portrayal call.
+background subagent is not a safe isolation boundary.

@@ -4,6 +4,9 @@ Play is live non-combat scene resolution. At each turn:
 
 1. Query the current scene, branch, campaign revision, relevant continuity, and
    actor knowledge for the intended audience.
+   Cross a changed `host_context_binding` before continuing. Use the matching
+   bounded purpose for autonomous actors, factions, source interpretation,
+   rulings, or player-facing rendering; never reuse a DM bundle for a player.
 2. Retrieve exact module/rule evidence before factual narration or settlement.
 3. Resolve automatic standard mechanics with the engine; use Agent DM reasoning
    only at the declared ruling boundary.

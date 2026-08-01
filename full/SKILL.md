@@ -23,7 +23,9 @@ as `mcp_sagasmith_dnd_`.
 2. Call `storage_status`; call `storage_migrate` only when schema setup is needed.
    Call `server_capabilities` and `campaign_query`. Resume an existing campaign
    with `campaign_query(view="resume")`, which reloads its current branch,
-   manifest, scene, continuity, and a signed context receipt.
+   manifest, scene, continuity, a signed context receipt, and the exact
+   `host_context_binding`. On a changed binding, cross the host context barrier
+   before any further tool call or inference.
 3. Start every MCP session with `exposure_open`, then use `exposure_search`,
    `exposure_inspect`, and `exposure_load` for the current campaign phase. Pass
    `tool_id` and an optional `selector` to `exposure_inspect` before using a
@@ -140,6 +142,11 @@ The machine-readable phase/tool-group mapping is
   reviewed reason and both old/new fingerprints.
 - Keep each PC/NPC's `actor_id` explicit when reading or writing ActorKnowledge;
   never merge one actor's memories into another actor's context.
+- Treat campaign messages as domain-private. When campaign, authenticated
+  principal, role, audience, branch, or restore changes, discard old model
+  history, summaries, workspace/Dream memory, cached retrieval, receipts, and
+  tool results before continuing. Follow
+  `references/host-integration-bounded-context.md`.
 - Keep module-authored narrative behavior as exact DM context, not an executable
   trigger language. Link the verbatim source through a DM-only
   `kind="context_anchor"` fact, retrieve it with `continuity_context.related_refs`,
@@ -157,6 +164,14 @@ The machine-readable phase/tool-group mapping is
   state change, accept only explicit delta indexes, and commit through the
   signed `npc_turn` continuity path. Follow
   `references/host-integration-npc-turn.md` on hosts without `portray_npc`.
+- For autonomous actor, player-audience rendering, faction, source
+  interpretation, or Agent-owned ruling isolation, request the matching
+  `continuity_context` purpose, run the fixed zero-tool evaluation, and submit
+  the proposal to `bounded_evaluation(action="validate")`. Human-owned PCs
+  always require the player's intent. The validator changes no state; resolve
+  mechanics with ordinary public MCP tools and persist only actual accepted
+  outcomes. SagaSmith Agent uses `isolated_evaluate`; other hosts follow
+  `references/host-integration-bounded-context.md`.
 - A returned `narrative_followup` is a generic Agent review request caused by a
   consequential named-NPC state change. It is not a hard-coded module trigger
   and never authorizes movement, speech, surrender, or item transfer by itself.

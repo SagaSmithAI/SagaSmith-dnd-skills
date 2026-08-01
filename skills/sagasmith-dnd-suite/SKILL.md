@@ -19,6 +19,10 @@ returned `skill_plan_delta`. Use `exposure_call` when the host
 does not refresh `tools/list_changed`. Never trust a model-authored
 principal. Do not silently switch to `standalone/`.
 
-For a named NPC turn, load the conditional `npc.portrayal` group and follow
-`{baseDir}/../../full/references/host-integration-npc-turn.md`; do not use a
-general background subagent as the actor-isolation boundary.
+Treat the `host_context_binding` returned by resume/continuity as a hard model
+context boundary. For any bounded semantic decision, load the returned
+operation group and follow
+`{baseDir}/../../full/references/host-integration-bounded-context.md`. For a
+named NPC dialogue turn, additionally load `npc.portrayal` and follow
+`{baseDir}/../../full/references/host-integration-npc-turn.md`; never use a
+general background subagent as the isolation boundary.

@@ -16,12 +16,12 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
-| Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context` |
+| Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
 
-The compact public contract contains exactly 83 tools, with 13 core discovery
-tools and phase ceilings of Lobby 62, Play 48, and Combat 46. Do not call retired
+The compact public contract contains exactly 84 tools, with 13 core discovery
+tools and phase ceilings of Lobby 63, Play 49, and Combat 48. Do not call retired
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
@@ -734,6 +734,50 @@ read-before-source-bound-commit contract without making narrative text
 executable. A response-lost retry of an already committed idempotency key still
 replays the original result.
 
+Every campaign continuity response also carries an exact
+`host_context_binding`: domain, campaign, authenticated-principal fingerprint,
+role, audience, branch, `memory_policy="domain_authoritative"`, and their
+derived `context_epoch`. A host must cross a hard context barrier on first bind
+or any change before further inference or tools. Old model messages, summaries,
+workspace/Dream memory, cached retrieval, receipts, and tool results cannot
+enter the rebuilt domain prompt. See
+`host-integration-bounded-context.md`.
+
+### Generic bounded semantic evaluations
+
+`continuity_context` supports five proposal-only purposes in addition to the
+specialized NPC contract:
+
+| Purpose | Boundary |
+|---|---|
+| `actor_turn` | NPC/monster intent/action only; rejects PCs and dialogue |
+| `audience_render` | requires `audience="player"`; renders an already filtered projection |
+| `faction_turn` | one faction's `faction_state` and `faction_knowledge` only |
+| `source_interpretation` | interpretation of current exact managed evidence |
+| `bounded_ruling` | one Agent-owned semantic ruling question |
+
+Each response is `bounded-evaluation-bundle.v1` with a fixed purpose-specific
+output contract, signed receipt, allowed claim/decision bases and targets, and
+explicit `may_call_tools=false`, `may_roll_dice=false`, and
+`may_write_state=false`. Context, NPC, bounded-evaluation, and validation
+receipts bind the authenticated principal by SHA-256 fingerprint and never
+return its raw host identifier. Module evidence may be decision-only and therefore may
+not support a proposal claim. Actor state is scoped to `actor:<id>`; faction
+state and knowledge are scoped to `faction:<id>` and do not include objective
+world truth merely because it names that faction.
+
+The host evaluates only that bundle in a fresh zero-tool context and submits
+the result to `bounded_evaluation(action="validate")`. The facade validates
+signature, TTL, campaign/branch/head/revision/event sequence, principal,
+subject, bases, targets, and the exact output schema. It never writes state or
+settles mechanics. A source interpretation must copy the signed question,
+provide at least one evidence-bound claim, and require DM review for any
+ambiguity or uncertain claim. Actor/faction actions that need dice, checks, attacks,
+movement, items, time, resources, or other state changes return explicit
+resolution requests for ordinary public tools. After such a write, the bundle
+is stale and must be reread. `audience_render` returns the exact safe
+`publication.text`; publish that value unchanged.
+
 ### Isolated NPC turn contract
 
 During Play or Combat, Owner/DM may call `continuity_context` with
@@ -872,6 +916,13 @@ Single-user hosts should set `SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`; the server
 then overwrites model-authored principal fields. Multi-user hosts must instead
 hide and inject the authenticated principal per request. `system:local` is only
 safe inside an explicitly trusted local process.
+
+`campaign_query(view="resume")` is the recommended first campaign-bound call
+because its continuity projection includes the exact `host_context_binding`.
+Hosts must stop later tool calls emitted in the same model response when that
+binding establishes or changes a context epoch. A repeated identical binding
+does not loop. Audience, role, principal, campaign, branch, checkout, and
+restore transitions intentionally establish a new epoch.
 
 An exposure without `campaign_id` may load only `lobby.bootstrap` (system list
 and campaign creation), plus the `system:local`-only storage administration

@@ -52,19 +52,30 @@ the native MCP connection separately. Hermes can process
 `tools/list_changed`; if a particular integration does not refresh, the
 bootstrap explicitly directs it to `exposure_call`.
 
-## Isolated NPC portrayal
+## Bounded context isolation
 
-Hosts should provide one synchronous, fresh, zero-tool model call for a signed
-`continuity_context(purpose="npc_turn")` bundle. SagaSmith Agent provides the
-built-in `portray_npc` tool. Other hosts must implement the native or logical
-isolation contract in `full/references/host-integration-npc-turn.md`; a generic
-background subagent is unsafe because it may inherit tools, workspace, or
-history and return after the signed receipt becomes stale.
+On `campaign_query(view="resume")`, store the returned
+`host_context_binding`. If campaign, authenticated principal, role, audience,
+branch, restore state, or its derived `context_epoch` changes, stop later calls
+from that model response and rebuild without old messages, summaries,
+workspace/Dream memory, retrieval, receipts, or tool results.
 
-The child returns a proposal only. The parent resolves mechanics through public
-MCP tools, rereads changed context, selects accepted deltas, and commits. Hosts
-without image capability are supported because reviewed OCR/module evidence is
-text before it enters the bundle.
+Hosts should provide one synchronous, fresh, zero-tool model call for each
+signed bounded semantic bundle: actor turn, audience render, faction turn,
+source interpretation, or bounded DM ruling. SagaSmith Agent provides
+`isolated_evaluate` and retains `portray_npc` for rich NPC dialogue. Other hosts
+must implement the native or logical contract in
+`full/references/host-integration-bounded-context.md`; a generic background
+subagent is unsafe because it may inherit tools, workspace, or history and
+return after the signed receipt becomes stale.
+
+The evaluator returns a proposal only. The parent validates it through
+`bounded_evaluation(action="validate")`, resolves mechanics through public MCP
+tools, rereads changed context, selects accepted deltas, and commits. For player
+audiences, publish only the validator's exact `publication.text`. Hosts without
+image capability are supported because reviewed OCR/module evidence is text
+before it enters the bundle. See `full/references/host-integration-npc-turn.md`
+for the additional NPC-dialogue commit contract.
 
 ## Required cold-start smoke test
 
@@ -85,8 +96,13 @@ For every host:
 6. switch Play → Combat → Play and verify phase-only groups change while
    checksum-satisfied Core groups are not reread;
 7. verify a forged `principal_id` cannot change the authenticated identity.
-8. request one NPC bundle, verify the portrayal call has zero exposed tools and
-   no child-session persistence, then reject a stale proposal after an event.
+8. verify the first campaign binding causes a host context reset and the same
+   binding does not loop; then change branch or audience and verify another reset;
+9. request one bounded bundle, verify the evaluator has zero exposed tools and
+   no child-session persistence, validate its proposal through MCP, then reject
+   the same receipt after an event;
+10. request one NPC bundle and verify its actor knowledge cannot be supplemented
+   by public world truth or parent history.
 
 After updating the installed Skills files, call
 `skill_query(action="plan", refresh=true)` once and verify changed fragments
