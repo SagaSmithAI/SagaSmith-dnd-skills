@@ -14,3 +14,9 @@ than duplicate optimization.
 A dead, missing, or departed character remains stored with independent
 knowledge. A replacement follows normal creation and joining; only knowledge
 reasonably transmitted in the fiction may be added to it.
+
+For sharing or migration, use the common portable actor-card workflow. PC, NPC,
+and monster differ only by `actor_type`; never maintain a separate monster
+registry or host-side constructor. Import always creates a fresh identity and
+never transfers ActorKnowledge. Use bundled or shared `preset_pack` cards before
+building a replacement when an applicable reviewed preset exists.

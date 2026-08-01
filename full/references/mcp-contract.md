@@ -12,10 +12,10 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party/resume)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
+| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks/actor_presets)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
-| Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
+| Module artifact | `module_import(stage/inspect/validate/ingest/activate/bind_actor/import_package)`, `import_query` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness/actors/package)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
@@ -348,14 +348,64 @@ difficult terrain, world patches, checksums, and DM overrides.
 
 | Intent | MCP tool |
 |---|---|
-| Create from direct/build/template/statblock or exact narrative identity evidence | `character_create_from(mode=...)` |
-| Read campaign actors, reusable library, or classify a support document | `character_query(get/list/library/document)` |
+| Create from direct/build/template/statblock, portable card, or exact narrative identity evidence | `character_create_from(mode=...)` |
+| Read campaign actors, reusable library, classify a support document, or export a portable card | `character_query(get/list/library/document/portable_card)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/recharge/consume_ammunition)`, `inventory_transfer` |
 | Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(party_rest/stable_recovery/advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/level_advance/stand)` |
 | Ability scores | `dnd_ability_roll`, `character_ability_apply` |
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
+
+### Portable actor, preset, and module packages
+
+`sagasmith.portable` schema v1 is the cross-installation sharing boundary. PC,
+NPC, and monster use the same `kind="actor_card"` envelope and distinguish their
+role with `payload.actor_type`. A card contains the complete validated sheet,
+notes, provenance, dependencies, and semantic bindings. It never contains the
+database Character id, campaign id, revision, membership, or ActorKnowledge.
+The exporting principal must be authorized to read the full card; sharing is an
+explicit publication step, so review sheet and notes for private material.
+
+Export one runtime actor with `character_query(view="portable_card")`. Import
+with `character_create_from(mode="portable_card")`, providing exactly one
+inline `card`, managed `artifact`, or allowlisted `source_path`. Import validates
+the D&D sheet and campaign edition, creates a fresh Character identity, and
+returns `actor_knowledge_imported=false`. A replacement or copy therefore starts
+with an empty subjective ledger; transmit only knowledge established in play.
+
+The installed edition's standard actors are ordinary cards in a bundled
+`preset_pack`, not engine constructors or name lookups. Use
+`rule_pack_query(view="content_catalog", kind="actor_card")` to browse the
+campaign-compatible catalog and pass one installed `artifact_id` to portable
+creation. Use `rule_pack_query(view="actor_presets", payload={edition,
+include_package:true})` to export the whole SRD package, or add `artifact_id` to
+export one card. When importing from an inline/managed/allowlisted preset pack,
+provide the pack source and the exact nested `artifact_id`. The 2014 package
+contains 317 parsed actor cards and the 2024 package contains 330; source text,
+checksums, normalization notes, edition dependency, license, and attribution are
+retained.
+
+A `kind="module_pack"` is a self-contained structured-source distribution, not
+a campaign save. Before export, bind cast members, encounter creatures, and
+pregenerated PCs through `module_import(action="bind_actor")`, using stable
+portable actor ids and Scene Atlas keys; inspect them through
+`module_query(view="actors")`. Export with `module_query(view="package")`.
+The package contains the normalized source document, signed Scene Atlas scene
+text and retrieval chunks, embedded checksum-bound assets, reviewed content,
+portable actor cards, and stable scene/card bindings. Import replays the stored
+Scene Atlas instead of rerunning the receiver's current parser heuristics. It
+excludes scoped progress, world state, events, memory,
+ActorKnowledge, random position, branches, and Snapshots.
+
+Import a module package in Lobby with
+`module_import(action="import_package")`. The MCP validates every envelope and
+D&D card before mutation, checks the campaign's locked edition, re-ingests via
+Core, materializes assets in managed storage, creates fresh actor identities,
+and restores actor/scene bindings. Pregenerated PCs become reusable library
+templates; NPCs and monsters become campaign actors. Re-read index, actors,
+assets, content reviews, and readiness. A checksum-valid package does not enable
+optional rule dependencies or make descriptive prose executable.
 
 The campaign instance is authoritative. After any actor or party mutation, read
 `character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use

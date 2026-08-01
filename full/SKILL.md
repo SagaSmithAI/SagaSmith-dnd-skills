@@ -79,6 +79,11 @@ The machine-readable phase/tool-group mapping is
 - Runtime character state uses `sheet v2` / `notes v2`; load
   `references/character-schema-v2.md` before creating or mutating a PC, NPC, or
   monster. All three are full `Character` records, not abbreviated stat blocks.
+- PC, NPC, and monster sharing uses one checksum-bound portable `actor_card`
+  schema. Import creates a fresh runtime identity and never copies ActorKnowledge.
+  Standard SRD monsters/NPCs are bundled `preset_pack` cards, not host-side
+  creature definitions. Structured module sharing uses `module_pack`; read the
+  `portable.content` Skill group before importing or exporting either format.
 - Use granular character / party MCP tools for inventory, wallet, equipment,
   prepared spells, effects, resources, and actor adventure state. Legacy
   `notes.memories` is import-only; new subjective information belongs to

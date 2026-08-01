@@ -176,6 +176,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    never fill the card from memory or substitute a similar creature.
    Read `module-image-content-review.md` for the distinction between an image-only
    full card and a standard card with module instance changes.
+   For an already reviewed shared actor, use
+   `character_create_from(mode="portable_card")`. PC, NPC, and monster share one
+   card format; import creates a new runtime identity and an empty ActorKnowledge
+   ledger. Browse bundled standard monsters/NPCs as `actor_card` catalog entries,
+   or export/import a complete `preset_pack` through
+   `rule_pack_query(view="actor_presets")`. Never choose a creature by a
+   host-maintained name table.
 9. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
 10. Prepare legal spells with `character_spell_prepare(mode="replace_all")`.
@@ -189,6 +196,30 @@ own exposure. Loading a group for one Agent must not expose it to another.
     witnesses, and the initial snapshot. Supply a fresh `idempotency_key` and the
     current campaign revision. This requires the owner/DM `lobby.memory_control`
     and `lobby.campaign` groups.
+
+## Share or migrate structured content
+
+1. Enter Lobby and load `lobby.characters`, `lobby.modules`, and, for preset
+   libraries, `lobby.rules`. Export a PC/NPC/monster with
+   `character_query(view="portable_card")`; review its sheet and notes before
+   distributing the managed `.sagasmith.json` artifact.
+2. Before module export, call `module_import(action="bind_actor")` for every cast
+   NPC, encounter monster, and pregenerated PC. Use stable portable actor ids,
+   binding kinds, roles, and actual Scene Atlas keys. Verify
+   `module_query(view="actors")`.
+3. Call `module_query(view="package", include_package=true)` for an inline
+   transfer or use its managed artifact. Do not package progress, continuity,
+   ActorKnowledge, branches, random state, or Snapshots as source content.
+4. On the target installation, call
+   `module_import(action="import_package")` with exactly one inline package,
+   managed artifact, or allowlisted source path. Treat returned actor ids as new
+   identities. Re-read the imported index, actor bindings, assets, reviews, and
+   readiness before play.
+5. For a default actor library, export
+   `rule_pack_query(view="actor_presets", edition=..., include_package=true)`.
+   Import one nested card through portable character creation with the same pack
+   plus its exact `artifact_id`. Optional rule dependencies still need normal
+   reviewed installation and campaign activation.
 
 ## Scene readiness and temporary combat map
 

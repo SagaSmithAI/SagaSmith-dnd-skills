@@ -27,12 +27,20 @@ flowchart LR
 
 Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检查并加载能力组。MCP 端根据战役阶段、principal、role、campaign 和 TTL 控制工具；Skill 不复制一份工具白名单，也不允许模型越过 exposure 直接写状态。
 
+### 可分享内容
+
+- PC、NPC、怪物统一使用 `sagasmith.portable` actor card；导入会创建新身份，不复制 actor knowledge。
+- 2014/2024 SRD 怪物与 NPC 以默认 preset pack 随运行时提供，不依赖 Host 中的怪物名称硬编码。
+- 结构化模组可打包 Scene Atlas、原始索引、地图/资产、审核内容、NPC/怪物/预设 PC 卡及稳定关联；战役进度、记忆、分支与 Snapshot 不混入内容包。
+- 完整流程由 Lobby 的 `portable.content` Skill group 按需加载；详情见 [Full MCP contract](full/references/mcp-contract.md#portable-actor-preset-and-module-packages)。
+
 ### Lobby：游戏外准备
 
 - 建团、成员与权限、分支、Snapshot；
 - 车卡、装备、法术准备与初始资源；
 - 导入规则书，编译/安装扩展规则包并锁定 campaign profile；
 - 生成模组或从白名单暂存 PDF/Markdown/text，经 Core 结构化后检查 scene/spatial index 与 revision diff；
+- 导入/导出统一角色卡、SRD 预设包与结构化模组包；
 - 初始化 campaign memory 与每个 PC/NPC 各自的 actor knowledge。
 - 命名 NPC 可使用签名、零工具、无子会话持久化的隔离演绎回合；机械结算与最终写入仍由公开 MCP 事务负责。
 

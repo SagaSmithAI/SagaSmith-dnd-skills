@@ -25,6 +25,24 @@ This directory contains agent orchestration only. It never writes SQLite/ChromaD
 
 Campaign state, not the prompt, owns the phase. The MCP refreshes session exposure when the phase changes.
 
+## Shareable actors and modules
+
+PCs, NPCs, and monsters use one checksum-validated portable actor-card format.
+Export with `character_query(view="portable_card")` and import with
+`character_create_from(mode="portable_card")`. The target always receives a new
+Character identity and no ActorKnowledge. The 2014 and 2024 SRD creatures are
+ordinary cards in bundled preset packs, not host- or driver-side name tables.
+
+Bind module NPCs, monsters, and pregenerated PCs with
+`module_import(action="bind_actor")`, then export with
+`module_query(view="package")`. The package carries a signed Scene Atlas with
+exact scene text and retrieval chunks, the source
+index, embedded assets, reviewed content, cards, and stable scene bindings.
+`module_import(action="import_package")` replays it through Core and creates
+fresh actor ids. Progress, world state, memory, branches, and Snapshots are not
+content-package data. Load the Lobby `portable.content` Skill group for the
+complete procedure.
+
 ## Minimal turn loop
 
 1. Read the active branch, continuity context, current scene, and caller-visible actor knowledge.
@@ -37,6 +55,7 @@ Campaign state, not the prompt, owns the phase. The MCP refreshes session exposu
 ## Non-negotiable boundaries
 
 - Every PC, NPC, and monster has an independent complete Character card.
+- Sharing never transfers database ids, permissions, or ActorKnowledge.
 - Named NPC portrayal uses a signed actor-scoped bundle and, when the host can
   enforce it, a fresh zero-tool non-persistent model call. The proposal still
   needs public mechanical resolution and an explicit MCP continuity commit.
