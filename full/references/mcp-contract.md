@@ -710,7 +710,9 @@ Use the three ledgers deliberately:
   same deterministic key when the same fact is independently established on a
   sibling branch: Core reuses the stable fact identity but creates or advances
   only that branch's fact head. Do not append a branch suffix to evade
-  visibility checks.
+  visibility checks. A `fact_key` permanently identifies the same `kind`,
+  `subject`, `subject_ref`, and `predicate`; changing any of those fields under
+  an existing key is an identity conflict, not a revision.
 - `actor_knowledge_change` records one PC or NPC's belief, inference, secret, or
   misinformation. Revising one actor must never revise another actor's ledger.
 

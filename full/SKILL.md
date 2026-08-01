@@ -26,6 +26,9 @@ as `mcp_sagasmith_dnd_`.
    manifest, scene, continuity, a signed context receipt, and the exact
    `host_context_binding`. On a changed binding, cross the host context barrier
    before any further tool call or inference.
+   Hosts that retain conversation history must also perform the out-of-band
+   `campaign_query(view="binding")` check before every later inference; if it
+   cannot be verified, do not replay the prior campaign context.
 3. Start every MCP session with `exposure_open`, then use `exposure_search`,
    `exposure_inspect`, and `exposure_load` for the current campaign phase. Pass
    `tool_id` and an optional `selector` to `exposure_inspect` before using a

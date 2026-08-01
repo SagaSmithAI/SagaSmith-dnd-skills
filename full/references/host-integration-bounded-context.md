@@ -23,6 +23,15 @@ request, the trusted MCP result that established the binding, and the current
 bounded Skill fragments. Campaign/branch/principal/role/audience changes and
 restores therefore cannot inherit another context.
 
+Before replaying an already bound session into a new model turn, the host must
+call `campaign_query(view="binding", payload={"campaign_id": ...})` out of band
+with the transport-authenticated principal. Compare that server-owned binding
+before loading history. If the sync capability is missing, access is revoked,
+or the response is invalid, fail closed and do not replay the previous campaign
+context. Calling `campaign_query(view="resume")` remains required when the host
+also needs scene, manifest, and continuity data; `binding` is the small pre-turn
+authorization/branch check, not a replacement for resume.
+
 Mark campaign messages `campaign_private`. Exclude them from global memory,
 Dream, training notes, and prompts for other campaigns. A summary is reusable
 only inside the exact same `context_epoch`.
@@ -80,13 +89,13 @@ The host adapter, never the calling model, fixes these required top-level fields
 ```text
 actor_turn:
   schema_version, bundle_id, purpose, actor_id, intent, proposed_action,
-  claims, resolution_requests, proposed_deltas, decision_summary
+  claims, resolution_requests, decision_summary
 audience_render:
   schema_version, bundle_id, purpose, text, cited_basis_refs,
   omitted_sensitive_refs, decision_summary
 faction_turn:
   schema_version, bundle_id, purpose, faction_id, intent, proposed_actions,
-  claims, resolution_requests, proposed_deltas, decision_summary
+  claims, resolution_requests, decision_summary
 source_interpretation:
   schema_version, bundle_id, purpose, question (copy the signed question exactly),
   interpretation, claims,

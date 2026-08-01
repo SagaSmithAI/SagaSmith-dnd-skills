@@ -543,6 +543,8 @@ faction:duke-zalto:relationship-to-party
 
 同一事实变化时 revise 现有 head，不创建近似重复。旧 revision 保留审计历史。
 同一个稳定 fact identity 可以在兄弟分支上拥有不同 head。
+`fact_key` 一旦建立，其 `kind`、`subject`、`subject_ref`、`predicate` 不可改写；
+需要表达另一个主体或谓词时必须使用另一个确定性 key。
 
 `context_anchor` 也存放在该 ledger，但它的 kind、DM-only scope 和空 predicate
 保证它只是来源索引，不表示该叙事分支已经发生。
