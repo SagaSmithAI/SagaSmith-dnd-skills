@@ -42,9 +42,13 @@ monster, the module supplies identity, role, disposition, and scene-specific
 possessions while an inspected rule source supplies the mechanical statblock.
 Record both sources. Fixed treasure may be placed on the card during lobby setup;
 dice-denominated treasure stays unresolved until the real roll occurs.
-Statblock import currently accepts reviewed English 2014 SRD-style weapon
-statblocks. If the exact creature is absent, spell-only, 2024, ambiguous, or
-unsupported, keep it unresolved instead of substituting a similar creature.
+Statblock import accepts reviewed English 2014 SRD-style and 2024 SRD
+5.2.1-style cards when the complete required core and executable numeric actions
+are present. The parser, content kind, source, and campaign edition must match.
+If the exact creature is absent, spell-only without numeric attack facts,
+ambiguous, or otherwise unsupported, keep it unresolved instead of substituting
+a similar creature. Bounded layout OCR recovery remains 2014-only; use complete
+indexed text or capable visual review for 2024.
 
 Do not equate a missing module party-size range with four PCs. After complete
 text search and visual review prove that the module is silent, a regression may
@@ -120,6 +124,30 @@ without double-counting numeric grants. When only the printed ability scores or
 only HP already includes the grant, use the narrower
 `ability_scores_include_species_grants` or
 `hit_points_include_species_grants` flag and let the other value settle normally.
+
+For a 2024 background, apply the background's ability increases rather than
+putting them into species grants: choose [2,1] on two different listed
+abilities or [1,1,1] on all three, never above 20. Supply its listed tool choice
+and `equipment_package="A"` or `"B"`; the same public write materializes the
+source package's exact item stacks and remaining GP (or 50 GP for B). Do not
+pre-create approximate items and attach their ids; a missing inventory template
+is a rule-pack defect. Acolyte and Sage also require the player's
+Magic Initiate spellcasting ability, two source-list cantrip artifact ids, and
+one source-list level-1 spell artifact id in `origin_feat_selection`; verify the
+resulting feat, three spell cards, always-prepared level-1 spell, and free-cast
+Long-Rest resource. Criminal and Soldier materialize their fixed Origin feat in
+the same background write.
+
+At advancement, do not apply a `* Subclass` marker feature; it is catalog-only,
+and the selected subclass artifact is authoritative. Process every
+`repeatable_selection_levels` entry separately. ASI and Epic Boon choose a feat
+artifact with nested feat choices; Expertise selects only proficiencies already
+owned and not already expert. For 2024 Warlocks, apply the level 1 invocation
+grant before later grants. Each repeatable blast invocation identifies a
+different known Warlock cantrip, while Lessons of the First Ones identifies a
+different Origin feat and its required feat choices. Re-read the actor and
+confirm the chosen invocation option cards—not merely the parent count—are
+present with exact source refs.
 
 Before combat, audit at least: class and subclass features, species/subspecies
 features, background customization and characteristics, proficiencies and
@@ -212,9 +240,9 @@ limits by hand:
    revision, verify that the milestone is earned or XP returns `eligible=true`,
    and call
    `character_state_change(action="level_advance", payload={class_name,
-   hp_method, reason, source_ref})`. The current implementation advances
-   an existing 2014 single class by exactly one level; multiclass and 2024
-   advancement are stop conditions, not permissions to replace the sheet.
+   hp_method, reason, source_ref})`. The current implementation advances an
+   existing 2014 or 2024 single class by exactly one level. Multiclass
+   advancement remains a stop condition, not permission to replace the sheet.
 3. Use `hp_method="fixed"` for the class fixed value, or use `"rolled"` only with
    an explicit player/DM choice to roll; the engine performs and returns the Hit
    Die roll after all guards pass. Never provide a roll value. The transaction
@@ -245,7 +273,7 @@ limits by hand:
    caster, also apply each newly chosen class spell not yet present on the card
    with `method="class_prepared"`; these card-hydration selections do not consume
    a reported known/spellbook choice and must leave `access.prepared=false`.
-   Do not change a 2014 prepared list during level advancement. Reconcile any
+   Do not change a prepared list during level advancement. Reconcile any
    revised complete list through the next completed Long Rest, excluding
    automatically always-prepared subclass spells from the caller-selected list
    and its maximum.

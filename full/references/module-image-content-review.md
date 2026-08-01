@@ -11,24 +11,28 @@ returned `execution_state`:
 
 - For `review_ready`, inspect `normalized_content`, validation, scene, and every
   source chunk. Submit that exact normalized text to `module_review(action="submit_content")` with
-  the returned `scene_id` and `source_chunk_ids`; do not replace text evidence
-  with a page-memory reconstruction.
-- For `blocked`, do not submit the candidate as text evidence. First call
+  the returned `scene_id`, `source_chunk_ids`, and edition-matching
+  `content_kind` (`dnd5e_2014_statblock` or `dnd5e_2024_statblock`); do not
+  replace text evidence with a page-memory reconstruction.
+- For a blocked 2014 card, do not submit the candidate as text evidence. First call
   `module_review(action="recover_statblock")` with its exact module, scene,
   stable content key, printed name, managed page, and optional asset id. The
   service performs local layout OCR, verifies the imported PDF checksum, and
   independently corroborates all critical facts. This route works for a
   text-only Agent. If it cannot establish one unambiguous complete card, use the
   visual workflow below only with an image-capable reviewer, or leave the actor
-  unresolved.
+  unresolved. `recover_statblock` is intentionally 2014-only. A blocked 2024
+  card must instead use complete exact indexed text through `submit_content`, or
+  the visual workflow with an image-capable reviewer; never coerce it through
+  the 2014 OCR normalizer.
 
 ## Ordered workflow
 
 1. Use `module_query(view="index" | "scene")` to locate the appendix scene and
    confirm that the normalized text does not contain an executable statblock, or
    that the candidate was explicitly blocked by the evidence gate.
-2. Use `module_query(view="assets")`, select the managed PDF, and first call
-   `module_review(action="recover_statblock")`. If the recovered card has no
+2. For a 2014 card, use `module_query(view="assets")`, select the managed PDF,
+   and first call `module_review(action="recover_statblock")`. If the recovered card has no
    module-authored Multiattack semantic gap, re-read its immutable review and
    continue at step 5; do not re-transcribe it. If the response instead has
    `requires_agent_fill=true` and `review=null`, read only
@@ -39,11 +43,14 @@ returned `execution_state`:
    `recover_statblock` with a fresh idempotency key and that
    `payload.agent_fill`. The first response is a checksum-bound OCR draft, not
    an immutable review or permission to infer missing text.
-3. If recovery fails and the Agent can inspect images, call
+   For a 2024 card, skip this step and retain its edition-matching text evidence.
+3. If 2014 recovery fails, or a 2024 card lacks complete indexed text, and the
+   Agent can inspect images, call
    `module_review(action="render_page")` for the cited page and inspect the
    returned image itself. A text-only Agent must stop here.
-4. Transcribe only visible card facts into canonical English 2014 statblock
-   Markdown. Preserve the exact name, size/type/alignment, AC, HP formula, speed,
+4. Transcribe only visible card facts into canonical English statblock Markdown
+   for the campaign's locked 2014 or 2024 edition. Preserve the exact name,
+   size/type/alignment, AC, HP formula, speed,
    six abilities, listed saves/skills/defenses/senses/languages, CR/XP, headings,
    attack bonus, reach/range, damage dice, damage bonus, and damage type. Do not
    fill an absent field from memory or a similar creature.
@@ -122,6 +129,10 @@ in actor provenance.
   "idempotency_key": "review-necromite-page-181-v1"
 }
 ```
+
+For a 2024 campaign the same request must use
+`"content_kind": "dnd5e_2024_statblock"`; the MCP rejects a content kind that
+does not match the campaign edition.
 
 Numeric melee, ranged, weapon, and spell attacks with explicit to-hit, range or
 reach, dice, bonus, and type can settle automatically. For every exact

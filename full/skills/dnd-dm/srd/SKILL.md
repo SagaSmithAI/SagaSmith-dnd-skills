@@ -29,3 +29,9 @@ same path explicitly if it relocates the corpus.
 The campaign rule profile controls search isolation. Do not search both editions
 unless the user asks for a comparison. For a consequential 2014 ruling, use the
 English corpus as the final reference when the Chinese translation is ambiguous.
+The bundled content catalog and statblock parser are also edition-pinned. Use
+`dnd5e_2014_statblock` only with 2014 and `dnd5e_2024_statblock` only with 2024.
+Bounded layout-OCR recovery currently supports 2014 only; 2024 requires complete
+indexed text or literal review by an image-capable Agent. Never borrow a 2014
+artifact id, formula, recovery rule, or citation for a 2024 settlement merely
+because both editions use the same internal function.

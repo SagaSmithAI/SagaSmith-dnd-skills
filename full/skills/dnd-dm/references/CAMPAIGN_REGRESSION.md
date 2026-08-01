@@ -174,7 +174,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    remains blocked and cannot be filled from model memory. Never inspect the
    database or re-import a managed artifact from outside the configured roots.
    For encounter participants, use exact rule statblocks or reviewed module
-   cards and retain all warnings. When a module candidate is blocked by damaged
+   cards and retain all warnings. When a 2014 module candidate is blocked by damaged
    page layout, `prepare-statblock` must call
    `module_review(action="recover_statblock")` against its exact managed PDF
    page before any visual override. The server performs and corroborates OCR, so
@@ -185,6 +185,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    driver surfaces those exact requirements as
    `--agent-statblock-fill` guidance. Only a failed or
    ambiguous recovery may enter the image-capable `--review-override` path. A
+   2024 candidate must skip the 2014 OCR facade and use complete
+   edition-matching indexed text or the image-capable review override; if neither
+   is available, skip that module or keep its encounter blocked. A
    module candidate's parser output
    is transcription support, not final semantic authority. When one reviewed statblock must
    create several source-identical actors, create every actor separately with an
@@ -844,7 +847,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     and optional Arcane Recovery or Natural Recovery allocation. Natural
     Recovery also requires declared meditation in `rest_activity_minutes`; it
     resets on a Long Rest rather than on a campaign-day boundary. A source-bound
-    level-20 Sorcerer's four-point Sorcerous Restoration is automatic. When a
+    2014 level-20 Sorcerer's four-point Sorcerous Restoration is automatic. A
+    2024 level-5+ Sorcerer instead supplies optional
+    `sorcerous_restoration_points`, capped by half Sorcerer level rounded down
+    and actually missing points; using it spends the feature's once-per-Long-Rest
+    allowance. When a
     conscious source-bound 2014
     Bard performs Song of Rest, include that participating Bard's actor id as
     `song_of_rest_source_actor_id` only for members who spend at least one Hit
@@ -864,7 +871,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     actor card; never derive a class-prefixed key from an older fixture or another
     actor. The server rolls spent Hit Dice, applies Constitution, checks remaining
     dice, Arcane Recovery's once-per-day allowance, Natural Recovery's
-    once-per-Long-Rest allowance, Sorcerous Restoration's capped four points,
+    once-per-Long-Rest allowance, the edition-specific Sorcerous Restoration
+    amount and use,
     and the level-scaled single Song of Rest die per eligible creature, and
     records the random receipt. A
     failed preflight or settlement must leave both clock and actors unchanged. Give

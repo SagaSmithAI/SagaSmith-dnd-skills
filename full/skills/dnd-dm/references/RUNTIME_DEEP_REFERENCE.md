@@ -265,7 +265,7 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
 | Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
-| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check`, `character_check(action="contest")` |
+| Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Chases | `chase(action="start")`, `chase(action="query")`, `chase(action="take_turn")`, `chase(action="end")` |
 | World continuity | `memory_change(action="commit")`, `campaign_event`, `memory_change`, `memory_query` |
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
@@ -575,8 +575,15 @@ engine enforces the source-bound subclass feature, the half-Druid-level
 rounded-up limit, the level-6 exclusion, missing slots, and once-per-Long-Rest
 use. A level-20 2014 Sorcerer's source-bound Sorcerous Restoration is automatic:
 the same Short Rest restores exactly 4 missing Sorcery Points, capped at the
-resource maximum. Never use Arcane Recovery's once-per-campaign-day timing for
-Natural Recovery or restore all Sorcery Points.
+resource maximum. A level-5+ 2024 Sorcerer instead makes an explicit optional
+choice: put `sorcerous_restoration_points=<positive integer>` on that member's
+Short Rest record. The value cannot exceed half the Sorcerer level rounded down
+or the actually missing Sorcery Points, and the source-bound feature use is then
+unavailable until a Long Rest. Omit the field to decline the recovery; never
+apply the 2014 automatic four-point rule to a 2024 card. Include the same field
+in `character_query(view="rest")` preflight before the party write. Never use
+Arcane Recovery's once-per-campaign-day timing for Natural Recovery or restore
+all Sorcery Points.
 
 For a 2014 Bard's Song of Rest, include
 `song_of_rest_source_actor_id=<bard actor id>` in each same-rest member call
@@ -681,7 +688,7 @@ tested in the engine before play. Module-authored and homebrew cards instead
 return to Lobby so the Agent can submit the immutable content review with
 `payload.agent_fill.multiattack_options`. Cite the activity id and exact source
 excerpt and use only existing parsed weapon ids, legal modes, and explicit
-counts. When OCR recovery returns `requires_agent_fill=true` and `review=null`,
+counts. When 2014 OCR recovery returns `requires_agent_fill=true` and `review=null`,
 read the returned normalized text and requirements, then retry that recovery
 with a fresh idempotency key and the fill; only the retry may create the
 immutable review. For custom content, a parser-produced composition remains only a
@@ -716,6 +723,13 @@ temporary-map positions satisfy the printed restriction; otherwise choose a lega
 recorded mode such as melee or unarmed. If the source provides neither a range nor
 a complete positional restriction, keep the attack blocked. Never invent a
 generic distance or skip distance enforcement.
+
+The bounded `recover_statblock` OCR grammar is 2014-only and must reject 2024
+content. For a 2024 module or rule card, use complete edition-matching indexed
+text with `content_kind="dnd5e_2024_statblock"` or
+`review_mode="agent_text"`; otherwise an image-capable reviewer must transcribe
+the exact managed page through the edition-matching visual review. Never use a
+2014 normalization to make a 2024 card appear executable.
 
 A reviewed monster action may replace an attack with a structured source
 activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws
@@ -832,27 +846,36 @@ engine checks the recorded feature, finesse/ranged weapon, advantage or adjacent
 active enemy, disadvantage, once-per-turn token, and critical dice. A standard
 monster statblock such as Spy instead uses its exact source trait and recorded
 damage formula; do not add the player feature's weapon restriction when the
-monster text omits it. The canonical 2014 Fighter
-Second Wind card is engine-owned: call `combat_use_activity` with its exact
+monster text omits it. The canonical 2014 and 2024 Fighter Second Wind base
+cards are engine-owned: call `combat_use_activity` with the exact edition-bound
 feature id. One atomic transaction consumes the card use and bonus action, rolls
-`1d10 + fighter level`, applies the clamped healing, and returns the roll,
-before/after HP, applied amount, and Core receipt. Never roll it externally or
-follow it with `combat_hp_change`; that would double-settle the feature. For
+`1d10 + Fighter level`, applies the clamped healing, and returns the roll,
+before/after HP, applied amount, and Core receipt. The card itself supplies the
+edition-specific use maximum and recovery schedule. Never roll it externally,
+copy a 2014 resource onto a 2024 Fighter, or follow it with
+`combat_hp_change`; that would double-settle the feature. Tactical Mind and
+Tactical Shift are separate 2024 features and remain engine-implementation
+gates until their check and movement transactions are available. For
 levelled spell healing, pass `source_actor_id`, `spell_id`, and the
 actual `spell_level`; this lets the engine validate the actor card and settle
 source-linked features such as 2014 Life Domain's Disciple of Life. Never fold
 that feature bonus into the base amount yourself. Halfling Lucky is
 resolved automatically for attacks, checks, saves, death saves, and initiative;
 retain its `rerolls` audit instead of rolling a second untracked check.
-The canonical 2014 Fighter Action Surge card is engine-owned: call
-`combat_use_activity` with its exact feature id on the Fighter's turn. The same
+For 2024 Heroic Inspiration, immediately after a Play check call
+`character_check(action="reroll")` with its exact `resolution_id`, one
+`roll_index`, and `expected_original_roll`. It spends the single resource and
+requires the replacement die. Never replay the whole check, reroll both
+Advantage/Disadvantage dice, apply it to a death save, or keep the older result.
+The canonical 2014 and 2024 Fighter Action Surge cards are engine-owned: call
+`combat_use_activity` with the exact edition-bound feature id on the Fighter's turn. The same
 transaction consumes one use and grants one `extra_action`; it returns
 `committed`, not `pending_ruling`. Use the returned action normally. An unused
 extra action expires at the next turn and Action Surge cannot be activated twice
 on the same turn. Do not patch `turn_budget` or invent another Attack.
 
-The canonical 2014 Rogue Cunning Action card is also engine-owned. Call
-`combat_use_activity` with its exact feature id and a declaration whose `action`
+The canonical 2014 and 2024 Rogue Cunning Action cards are also engine-owned. Call
+`combat_use_activity` with the exact edition-bound feature id and a declaration whose `action`
 is `dash`, `disengage`, or `hide`. Dash spends the bonus action and adds the
 actor's recorded Speed to remaining movement; Disengage spends it and records
 the no-opportunity-attack turn flag. Hide spends the bonus action and records a
@@ -873,25 +896,38 @@ hearing fact; the engine consumes the card's daily use and action, enforces 30
 feet and Deafened, maintains advantage until the war chief's next turn, and
 offers exactly one bonus-action attack when the bonus action remains.
 
-The canonical 2014 Cleric Channel Divinity card's `Turn Undead` option is
-engine-owned. Call `combat_use_activity` with activity id
-`dnd5e.content.srd2014.feature.cleric-channel-divinity` and declaration
-`{option: "turn_undead", perception: [...]}`. The SagaSmith Agent acting as DM
-must include exactly one
-perception entry for every living Undead whose recorded battle-map position is
-within 30 feet: `{target_id, can_see_or_hear, reason?}`. Use `reason` whenever an
-Undead is excluded because it can neither see nor hear the cleric. Do not omit a
-hidden, blinded, deafened, silenced, or obscured target instead of making that
-explicit sensory ruling. The server derives the cleric spell save DC, rolls each
-included target's Wisdom save, spends the main action and Channel Divinity, and
-atomically updates every failed target. A turned creature cannot react, must try
-to move away, and may use its action only to Dash, escape an effect preventing
-movement, or Dodge when the Agent acting as DM confirms it has nowhere to move.
-Damage ends the
-effect immediately; otherwise the combat duration clock ends it after one minute
-(ten rounds). Use the returned target saves, effects, combat state, and Core
-receipt. Never roll the saves separately, patch `turned`, edit target reactions,
-or spend Channel Divinity before this call.
+The canonical 2014 and 2024 Cleric Channel Divinity cards' `Turn Undead`
+options are engine-owned. Call `combat_use_activity` with the exact
+edition-bound activity id and declaration
+`{option: "turn_undead", perception: [...], sear_undead?: true}`. The SagaSmith
+Agent acting as DM must include exactly one perception entry for every living
+Undead whose recorded battle-map position is within 30 feet:
+`{target_id, can_see_or_hear, reason?}`. Use `reason` whenever an Undead is
+excluded because it can neither see nor hear the cleric. Do not omit a hidden,
+blinded, deafened, silenced, or obscured target instead of making that explicit
+sensory ruling. The server derives the Cleric spell save DC, rolls every included
+Wisdom save, spends the Magic Action and Channel Divinity, and atomically updates
+all failed targets.
+
+Under 2014, a failed target follows the Turned movement/action/reaction procedure;
+damage or one minute ends it. Under 2024, a failed target gains Frightened and
+Incapacitated, tries to move as far from the source as possible, and the effect
+ends on target damage, source Incapacitation, source death, or one minute. The
+runtime records that source-capability dependency rather than relying on Agent
+memory. A source-bound level 5 2024 Cleric may set `sear_undead=true`; the engine
+rolls one shared number of d8s equal to the Wisdom modifier (minimum one), applies
+that Radiant damage only to failed-save targets, and deliberately does not end
+the newly created Turn effect. Never roll saves or Sear damage separately, patch
+conditions or reactions, or spend Channel Divinity before this call.
+
+The 2024 card's other option, Divine Spark, is also engine-owned. Use
+`{option:"divine_spark",target_id,mode:"heal"|"damage",
+damage_type?:"necrotic"|"radiant"}`. Combat derives sight and 30-foot range from
+the encounter; Play additionally requires the target's revision and explicit
+Agent-as-DM `can_see=true` and `within_30_ft=true`. One transaction pays the
+Magic Action/resource, rolls the Cleric-level d8 scaling plus Wisdom, and either
+heals or rolls the target's Constitution save for full/half damage. The source
+cannot target itself, and a failed preflight consumes nothing.
 
 At the start of a current combatant's turn, treat `HP == 0`, that combatant's
 `death_saves: true`, and the absence of Dead/Stable as the complete death-save
@@ -1363,9 +1399,19 @@ Core Preserve Life is an exception with a complete deterministic contract. In
 noncombat play, its `declaration.allocations` must contain every target's id,
 current character revision, positive healing amount, and Agent-as-DM-confirmed
 `within_30_ft: true`. Submit the whole allocation once. The MCP enforces the
-five-times-Cleric-level pool, the half-maximum-HP ceiling, and the Undead/Construct
-exclusion, then atomically spends Channel Divinity and updates all target cards.
+five-times-Cleric-level pool and half-maximum-HP ceiling, then atomically spends
+Channel Divinity and updates all target cards. Apply the Undead/Construct
+exclusion only to the 2014 Life Domain card; the 2024 card has no such exclusion
+and the engine must not import one from the older edition.
 Never pay the activity first and heal targets through separate calls.
+
+The 2024 Rogue Cunning Strike, Improved Cunning Strike, Devious Strikes, and the
+Thief's Stealth Attack rider are currently explicit engine-implementation gates.
+They require Sneak Attack dice reduction before the damage roll plus save,
+condition, duration, movement, and post-hit windows. Do not approximate them by
+editing the Sneak Attack result, calling a raw save afterward, or patching target
+conditions; stop until the generic attack-rider transaction is implemented and
+source-tested.
 
 Reaction spells and activities require an owned pending reaction window. Do not
 call them solely because it is another actor's turn. Do not hide a spell inside

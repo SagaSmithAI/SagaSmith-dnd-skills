@@ -84,27 +84,32 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    inspect the exact page, then submit only visually observed edges through
    `module_set_progress(spatial_review=...)`. The returned review is scoped,
    branch-aware, and snapshot-restorable; do not edit immutable import metadata.
-   If a required creature card exists only as a PDF image, follow
+   If a required 2014 creature card exists only as a PDF image, follow
    `../../references/module-image-content-review.md`: first call the
    service-owned `module_review(action="recover_statblock")`, re-read
    `module_query(view="content")`, and create the actor with
    `mode="module_statblock"` before play or combat. Only if recovery remains
    ambiguous may an image-capable reviewer render, inspect, and submit the page.
-   When the host Agent has no image capability, use this deterministic text-layout
-   recovery for module cards and the equivalent bounded OCR path for rule statblocks. The
+   When the host Agent has no image capability, use this deterministic 2014
+   text-layout recovery for module cards and the equivalent bounded 2014 OCR
+   path for rule statblocks. The
    service renders and recognizes the managed page, checks critical facts against
    indexed text or a second OCR scale, and returns a checksum-bound review; the
-   Agent reasons only over that exact returned text. If neither path yields
+   Agent reasons only over that exact returned text. A 2024 card bypasses the
+   2014 OCR facade: use complete edition-matching indexed text with
+   `dnd5e_2024_statblock`/`review_mode="agent_text"`, or capable visual review.
+   If neither path yields
    reliable evidence, keep the gate in explicit source review rather than asking
    the text-only model to infer pixels.
    Inspect `module_query(view="candidates")` as a separate evidence gate.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
-   `module_review(action="submit_content")`; `blocked` candidates require
-   `module_review(action="recover_statblock")` first. A rendered managed page
+   `module_review(action="submit_content")`. A blocked 2014 candidate requires
+   `module_review(action="recover_statblock")` first; a blocked 2024 candidate
+   requires complete edition-matching indexed text or capable visual review. A rendered managed page
    and literal visual transcription is only the image-capable fallback. Never
    fill OCR gaps from memory. For a
    module-authored or homebrew Multiattack, inspect
-   `agent_fill_requirements`. OCR recovery may first return
+   `agent_fill_requirements`. 2014 OCR recovery may first return
    `requires_agent_fill=true` with `review=null`; this is a corroborated text
    draft, so have the Agent read that returned text and retry the action with a
    fresh idempotency key plus a source-bound
@@ -209,8 +214,10 @@ pregenerated PCs, label separately built PCs as player or regression fixtures
 instead of claiming module provenance. Use statblock mode only with an exact
 imported source and retain its source/chunk provenance. If the exact creature is
 present only as a PDF image, use the reviewed module-content workflow and retain
-its asset/page/review provenance. If it is absent, ambiguous, 2024, or unsupported
-by the current parser, keep it unresolved; never substitute a similar SRD creature.
+its asset/page/review provenance. Exact 2024 SRD 5.2.1-style cards are supported
+through the edition-matching parser. If the card is absent, ambiguous,
+edition-mismatched, spell-only without numeric attack facts, or otherwise
+unsupported, keep it unresolved; never substitute a similar SRD creature.
 Do not pre-resolve random treasure.
 
 If an important named NPC has an authored identity but no combat statblock, bind
@@ -284,12 +291,11 @@ Once a milestone is earned or XP reports `eligible=true`, end combat, switch to
 the call below the next cumulative threshold. Never patch the actor sheet.
 Treat the returned `advancement.follow_up` as a blocking checklist: all eligible
 features, subclass/player choices, and spell gains must be reconciled from the
-active catalog before returning to `play`. A 2014 prepared-class spell
+active catalog before returning to `play`. A prepared-class spell in either edition
 application hydrates a legal unprepared card; the prepared list itself changes
 only through a later completed Long Rest. Re-read the actor and create a
-post-advancement snapshot. Current 2014
-single-class support is explicit; unsupported multiclass or 2024 advancement
-stops for review.
+post-advancement snapshot. Current 2014 and 2024 single-class support is
+explicit; unsupported multiclass advancement stops for review.
 Any user-imported `selection_ready` spell must pass the same canonical spell
 definition schema during pack compilation that actor hydration later uses.
 Reject the pack before activation when OCR leaves an invalid range, duration,

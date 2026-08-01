@@ -4,6 +4,14 @@ Use text reconstruction and bounded local OCR before requiring an image-capable
 model. Keep the managed file checksum, exact page/chunk, printed heading, raw
 text, normalized text, warnings, and corroboration evidence together.
 
+Route statblocks by the campaign's locked edition. The bounded layout-OCR
+`recover_statblock` facade currently recognizes only 2014 statblock grammar and
+must fail closed for 2024. A complete 2024 indexed candidate uses
+`content_kind="dnd5e_2024_statblock"` and the 2024 parser through text review;
+an image-only 2024 card needs literal review by an image-capable Agent. Never
+reinterpret one edition's headings, defenses, Challenge fields, or activities
+with the other edition's parser.
+
 When a custom card still needs semantic completion, let the Agent fill only the
 facade's constrained fields from the returned evidence. Retry with a fresh
 idempotency key; the server validates and stores the immutable review or

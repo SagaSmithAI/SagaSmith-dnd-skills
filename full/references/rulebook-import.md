@@ -47,7 +47,7 @@ and `source_bound_rule_packs` to be true. Consume the published
    nor image understanding. If the indexed text still omits or conflicts on a
    required fact, call `import_query(view="list", kind="rulebook")` and match
    the exact `source_id` to its retained import `job_id`; this also works when
-   the source was indexed in an earlier process. Then call
+   the source was indexed in an earlier process. For a 2014 source, then call
    `rule_import(action="recover_statblock")` with that `job_id`, exact printed
    creature heading as `name`, and a fresh idempotency key. Standard rulebook
    mechanics are engine-authoritative: do not include `payload.agent_fill`.
@@ -63,9 +63,14 @@ and `source_bound_rule_packs` to be true. Consume the published
    creature name by the adjacent size/type/alignment core, rejects
    low-confidence critical fields, and requires either
    target-segment embedded-text corroboration or agreement from an independent
-   OCR scale. The result is a checksum-bound reviewed statblock; retry actor
+   OCR scale. The result is a checksum-bound reviewed 2014 statblock; retry actor
    creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
-8. If layout OCR cannot isolate a card but the already-indexed chunks still contain
+   `recover_statblock` must reject a 2024 source instead of applying 2014 layout
+   grammar. For 2024, use a complete exact-page indexed segment with the
+   edition-matching `review_statblock` text path below, or an image-capable
+   edition-matching visual review.
+8. If 2014 layout OCR cannot isolate a card, or a 2024 card bypasses OCR, but the
+   already-indexed chunks still contain
    the complete card as one ordered, contiguous segment on an exact page, a
    text-only Agent acting as DM may normalize only that segment. Require
    `server_capabilities.features.indexed_text_statblock_review` and one
@@ -78,7 +83,8 @@ and `source_bound_rule_packs` to be true. Consume the published
    observation, and ordered `evidence_chunk_ids`. The MCP independently requires
    every chunk to belong to that source, cover the page, and have contiguous
    ordinals; it rejects both facts absent from the evidence and selected evidence
-   omitted from the normalized card. Use the returned `review_id` with
+   omitted from the normalized card. The source and campaign must agree on 2014
+   or 2024, and that edition selects the statblock parser. Use the returned `review_id` with
    `character_create_from(mode="reviewed_rule_statblock")`.
    Any mechanical passive or action that is not one of the engine's structured
    standard traits must reject the standard-rule review as

@@ -79,8 +79,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `module-visual-atlas.md`: `module_query(view="assets")` ->
    `module_review(action="render_page")` -> visual inspection ->
    `module_set_progress(spatial_review=...)`. Never infer an edge from room order.
-   If an appendix statblock is image-only, use `module-image-content-review.md`.
-   First call `module_review(action="recover_statblock")`; the server performs
+   If a 2014 appendix statblock is image-only, use
+   `module-image-content-review.md`. First call
+   `module_review(action="recover_statblock")`; the server performs
    layout OCR and independent critical-fact corroboration without requiring model
    vision. If it returns `requires_agent_fill=true`, the Agent reads the returned
    normalized OCR text and exact requirements, supplies the semantic
@@ -88,7 +89,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
    immutable review. Then use
    `character_create_from(mode="module_statblock")`. Only when recovery remains
    ambiguous may an image-capable reviewer render, inspect, and submit the page
-   manually.
+   manually. Do not send a 2024 card through this 2014 OCR grammar. Submit a
+   complete indexed 2024 candidate with
+   `content_kind="dnd5e_2024_statblock"`, or use an image-capable literal visual
+   transcription; otherwise leave the card unresolved.
     Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
     be submitted to `module_review(action="submit_content")` only with its exact
      `source_chunk_ids`. Read its structured `ruling_requirement`: complete-text
@@ -97,9 +101,10 @@ own exposure. Loading a group for one Agent must not expose it to another.
      Agent must cover every listed Multiattack as `structured` or
      `agent_ruling`; parser-produced options are never authoritative for module
      creatures. A `blocked` candidate whose requirement names
-    `missing_or_conflicting_source_review` is a stop condition: first use
-    `module_review(action="recover_statblock")` with its managed PDF page. If
-    ambiguity remains, an image-capable
+    `missing_or_conflicting_source_review` is a stop condition. For 2014, first
+    use `module_review(action="recover_statblock")` with its managed PDF page.
+    For 2024, require complete edition-matching indexed text or capable visual
+    review. If ambiguity remains, an image-capable
     reviewer may transcribe only observed fields, or leave it unresolved. A
     text-only Agent cannot claim to have inspected a returned image. Never repair
     OCR from rules memory or silently relabel blocked evidence as reviewed text.
@@ -147,17 +152,19 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `payload.name`. The deterministic text-layout result must cite only chunks
    from that heading through the next creature core and report
    `source.text_layout_recovery`; it does not require Agent vision. If required
-   facts are still absent or conflicting, use
+   facts are still absent or conflicting on a 2014 card, use
    `import_query(view="list", kind="rulebook")` to find the retained `job_id`
    whose `source_id` exactly matches the selected source, then call
    `rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
    `name` is the exact printed creature heading, not a differently named campaign
    instance.
-   The server performs local layout OCR, uses the adjacent creature core to
+   The server performs 2014 local layout OCR, uses the adjacent creature core to
    disambiguate repeated decorative/narrative copies of the same heading, and
    corroborates critical facts without asking the Agent to inspect an image. Retry with
    `mode="reviewed_rule_statblock"` and the returned `review_id`. Stop for explicit
-   source review on low confidence or disagreement. If OCR is structurally
+   source review on low confidence or disagreement. A 2024 card instead uses
+   exact edition-matching indexed text with `review_mode="agent_text"`, or an
+   edition-matching visual review; `recover_statblock` must reject it. If OCR is structurally
    ambiguous but one exact indexed page still contains the complete card as an
    ordered contiguous chunk segment, a text-only Agent may normalize that segment
    through `rule_import(action="review_statblock",
@@ -403,38 +410,57 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `eligible` status. Add a campaign event with the same exact source reference.
 2. Settle the trigger before entering a later sourced scene. End combat, switch
    to `lobby`, re-read the actor revision, and call
-   `character_state_change(action="level_advance")`. Use the fixed HP value unless
+   `character_state_change(action="level_advance")`. This advances an exact
+   2014 or 2024 single-class actor by one level; multiclass remains a stop
+   condition. Use the fixed HP value unless
    the table selected rolled HP; the engine owns that roll, so never supply a roll
    value. XP mode rejects advancement below its cumulative threshold.
 3. Inspect `advancement.follow_up`. Apply its base-class and existing-subclass
    feature ids through `character_content_apply`. Resolve a listed subclass choice
    with the player, apply it, then query the catalog again for subclass features.
-4. Select only the reported number of legal cantrips/known/spellbook spells from
-   the active catalog. Apply Wizard additions as `method: spellbook`. A 2014
-   prepared-class `method: class_prepared` selection hydrates a legal card only
-   and must remain unprepared.
-5. Do not change a 2014 prepared list during advancement. Re-read the actor and
+4. Select only the reported number of legal cantrips, prepared-list additions,
+   known spells, or spellbook spells from the active edition's catalog. Apply
+   Wizard additions as `method: spellbook`. A prepared-class
+   `method: class_prepared` selection hydrates a legal card only and must remain
+   unprepared until selected through the rest workflow.
+5. Do not change a prepared list during advancement. Re-read the actor and
    verify all resources and derived values; submit any revised complete list
    through the next completed `campaign_change(action="party_rest")`.
 6. Create a snapshot, switch back to `play`, and reopen phase exposure. Stop if
-   the runtime reports unsupported edition/multiclass state or any catalog item
+   the runtime reports unsupported multiclass state or any catalog item
    remains unresolved.
 
 ## Feature settlement examples
 
-- For 2014 Sneak Attack, declare `use_sneak_attack: true` in preflight and resolve;
+- For 2014 or 2024 Sneak Attack, declare `use_sneak_attack: true` in preflight and resolve;
   let the engine validate eligibility and its once-per-turn token.
-- For the canonical 2014 Action Surge feature id, call `combat_use_activity` on
+- For the canonical 2014 or 2024 Action Surge feature id, call `combat_use_activity` on
   the Fighter's turn. The committed result consumes its card use and grants one
   current-turn `extra_action`; never patch the turn budget, and never carry an
   unused extra action into a later turn.
-- For Second Wind, call `combat_use_activity` with its exact feature id. The same
+- For 2014 or 2024 Second Wind, call `combat_use_activity` with its exact
+  edition-bound feature id. The same
   transaction pays its bonus action and use, rolls the source formula, and applies
   clamped healing. Never roll it externally or follow it with `combat_hp_change`.
 - For healing from a levelled spell, send rolled base `amount`, `source_actor_id`,
   `spell_id`, and actual `spell_level`; do not pre-add source-linked modifiers.
 - Halfling Lucky needs no extra write. Preserve returned reroll evidence and
   narrate only the selected final d20.
+- For 2024 Heroic Inspiration, immediately reroll exactly one recorded die with
+  `character_check(action="reroll", resolution_id=..., roll_index=...,
+  expected_original_roll=...)`. The replacement is mandatory; never replay the
+  whole check or keep the better result.
+- For 2024 Divine Spark, select heal or damage in one Channel Divinity activity
+  call. The engine owns level scaling, Wisdom, the Constitution save, half
+  damage, target HP, and the resource receipt.
+- For Turn Undead, use the edition-bound Channel Divinity card. In 2024 a failed
+  save produces Frightened plus Incapacitated and depends on the source remaining
+  alive and capable; `sear_undead=true` is legal only with the source-bound level
+  5 feature. In 2014 use the Turned action/movement procedure instead.
+- Preserve Life uses one complete allocation. Apply the Undead/Construct
+  exclusion only to the 2014 card; the 2024 text has no such exclusion.
+- Cunning Strike is currently an explicit engine-implementation gate, not an
+  Agent permission to subtract Sneak Attack dice or patch post-hit conditions.
 
 ## Rulebook to executable optional pack
 

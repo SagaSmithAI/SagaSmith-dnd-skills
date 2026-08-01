@@ -13,7 +13,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party/resume)`, `campaign_change`, `access_grant(campaign/actor)` |
 | Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
-| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest")` |
+| Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
@@ -25,7 +25,7 @@ tools and phase ceilings of Lobby 63, Play 49, and Combat 48. Do not call retire
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
-- `character_check(action="check" | "group" | "contest")`;
+- `character_check(action="check" | "group" | "contest" | "reroll")`;
 - `campaign_rules(action="core_relock")`;
 - `rule_import(action="render_page" | "recover_statblock")`;
 - `module_review(action="render_page" | "recover_statblock" | "submit_content")`;
@@ -49,7 +49,8 @@ error, and a facade action retains the original role, phase, revision,
 idempotency, source-evidence, and random-stream boundary. In particular,
 `rule_import(render_page|recover_statblock)` is Lobby-only and DM-only;
 `module_review(recover_statblock|submit_content)` is Lobby-only and DM-only;
-rendering may also be used by a DM during Play. Chase and contests are Play-only. On-hit rulings are
+rendering may also be used by a DM during Play. Chase, contests, and Heroic
+Inspiration rerolls are Play-only. On-hit rulings are
 Combat-only. Loading a facade through a lower-risk group does not authorize its
 other actions outside those action-level boundaries. `playthrough_manifest` and
 `combat_join` remain separate tools because their save/audit and turn-boundary
@@ -207,6 +208,26 @@ subclass choice, and all required background choices. The runtime rejects a
 spell outside the selected class list or class-level limit and never silently
 assigns a subclass to the first class on a multiclass card.
 
+For a 2024 background, "all required choices" includes a legal [2,1] or
+[1,1,1] `ability_score_increases` distribution among the three listed
+abilities, its tool choice, and `equipment_package="A"|"B"`. Package A
+materializes the exact source-listed stacks plus its remaining GP; package B
+materializes 50 GP. Do not pre-create those items or substitute caller-supplied
+inventory ids. A Magic Initiate background additionally sends
+`origin_feat_selection={spellcasting_ability, cantrip_artifact_ids,
+level_1_spell_artifact_id}`; the background's fixed Cleric/Druid/Wizard list is
+catalog evidence and cannot be replaced by the caller. The write is atomic
+across abilities, Constitution-derived HP, proficiencies, equipment and wallet,
+the feat card, spell cards, and its once-per-Long-Rest free-cast resource.
+
+Repeated 2024 class choices must include `grant_level`. ASI/Epic Boon grants
+send `feat_choice={artifact_id, selection}`. Eldritch Invocations send the
+exact number of entries for that level; a repeatable blast entry carries its
+known cantrip `target_artifact_id`, and Lessons of the First Ones carries an
+Origin feat target plus nested `option_selection`. The service validates level,
+required invocations, non-repeatability, distinct repeat targets, feat
+prerequisites, and exact option source cards before committing any part.
+
 A discovered physical spellbook is a party or character inventory item, not a
 free content grant. Store its resolved `spell_ids` and preserve catalog misses in
 `unresolved_spell_names`; unresolved names remain non-executable. During `play`,
@@ -261,7 +282,7 @@ restore it without mutating immutable imported metadata. A review-only write may
 omit `status` and `progress`; existing values are preserved. See
 `module-visual-atlas.md` for the full sequence and schema.
 
-When a creature card exists only in the PDF image layer, first call
+For a 2014 creature card that exists only in the PDF image layer, first call
 `module_review(action="recover_statblock")` with the exact managed PDF page. The
 server performs checksum-bound layout OCR and requires the embedded text or a
 second OCR scale to corroborate the complete critical fingerprint. This requires
@@ -273,7 +294,12 @@ retries the same action with a fresh idempotency key plus
 remains ambiguous, an image-capable DM may render and
 inspect its managed page, then call `module_review(action="submit_content")`.
 The MCP validates the normalized 2014 statblock before Core stores immutable
-module/scene/page/asset evidence.
+module/scene/page/asset evidence. Never route a 2024 campaign through this 2014
+OCR grammar. For a 2024 card, submit complete indexed text with
+`content_kind="dnd5e_2024_statblock"`, or have an image-capable reviewer
+transcribe the managed page through `submit_content`; both paths are parsed by
+the edition-matching 2024 statblock parser. If neither exact text nor capable
+visual review is available, leave the card unresolved.
 Re-read it with `module_query(view="content")` and create campaign actors with
 `character_create_from(mode="module_statblock")`. See
 `module-image-content-review.md`; missing text extraction is not evidence that a
@@ -596,8 +622,9 @@ in `lobby`, outside active combat. It requires the current actor revision, a fre
 idempotency key, the exact existing `class_name`, `hp_method` (`fixed` or
 `rolled`; never provide `hp_roll`), and nonempty `reason` and `source_ref`. In XP
 mode it requires the actor's current cumulative XP to meet the next-level
-threshold; milestone mode relies on the cited trigger. It currently
-advances a 2014 single-class actor exactly one level. The atomic mutation raises
+threshold; milestone mode relies on the cited trigger. It currently advances a
+2014 or 2024 single-class actor exactly one level; multiclass advancement remains
+an explicit stop condition. The atomic mutation raises
 maximum HP without healing current damage, adds the new Hit Die, adds only newly
 gained spell-slot capacity to available slots, recalculates preparation maximum,
 and applies source-bound per-level HP modifiers from installed content to both
@@ -605,9 +632,9 @@ maximum HP and the matching HP-growth ledger entry. Its
 `advancement.follow_up` lists eligible feature artifacts, subclass options, and
 spell-choice counts. Those are mandatory subsequent catalog operations; after a
 subclass choice, query again for its features. Finish with a complete
-actor re-read and snapshot before returning to `play`. For a 2014 prepared
-caster, `method="class_prepared"` only hydrates legal class-list cards and a
-Wizard's reported choices only enter the spellbook. Do not submit a prepared
+actor re-read and snapshot before returning to `play`. For a prepared caster in
+either edition, `method="class_prepared"` only hydrates legal class-list cards;
+a Wizard's reported level choices enter the spellbook. Do not submit a prepared
 list during advancement; reconcile it through a later completed Long Rest.
 
 ### Single-authority state map
@@ -968,7 +995,7 @@ selects that named creature core, stops before the next creature core,
 reconstructs the card from deterministic text chunks, and narrows provenance to
 the retained `source.text_layout_recovery.chunk_ids`. This first recovery path
 does not render a page and works for an Agent without image capability.
-If required source facts remain absent or conflicting, call DM-only Lobby
+If required source facts remain absent or conflicting for a 2014 card, call DM-only Lobby
 `rule_import(action="recover_statblock",
 payload={job_id, name, page_number?, agent_fill?})`.
 Use the exact printed heading for `name`; keep a differently named campaign
@@ -979,8 +1006,11 @@ corroborates identity, AC, HP, Speed, all six ability scores, and Challenge
 against the target embedded-text segment. If that segment is unavailable, a
 second OCR scale must agree on the complete critical fingerprint. Use the
 returned checksum-bound `review_id` with
-`character_create_from(mode="reviewed_rule_statblock")`. This route requires no
-image understanding by the Agent. Ambiguous headings, missing page hints,
+`character_create_from(mode="reviewed_rule_statblock")`. This 2014 OCR route
+requires no image understanding by the Agent and rejects a 2024 import rather
+than coercing it through 2014 syntax. For 2024, use exact edition-matching
+indexed text with `review_mode="agent_text"`, or an image-capable
+edition-matching visual review. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
 warnings do not authorize repair from model memory.
 Successful exclusion of trailing creature prose or page furniture is returned
@@ -1012,6 +1042,7 @@ different artifact identities require explicit source review and
 the staged PDF checksum and page render checksum, verifies source/page/ordinal
 membership, parses the normalized card, rejects every normalized fact absent
 from the selected text, and rejects omission of any selected statblock evidence.
+The review content kind and parser must match the locked 2014 or 2024 edition.
 If that reviewed rulebook card contains Multiattack or another standard
 mechanical card, `rule_import(action="review_statblock")` accepts it only when
 the engine produces a complete structured implementation. It rejects
@@ -1038,9 +1069,10 @@ once. This remains true when phrase matching happened to produce the correct
 candidate. Each requirement allows `structured` or `agent_ruling`: the latter
 accepts an exact excerpt and reason without options, removes any executable
 parser proposal, and preserves the source procedure as an Agent-owned ruling
-when selected. Current automatic import supports reviewed
-English 2014 SRD-style numeric weapon and spell attacks. A spell-only card without
-numeric attack facts, 2024, ambiguous, or otherwise unsupported block must
+when selected. Current automatic import supports reviewed English 2014
+SRD-style and 2024 SRD 5.2.1-style statblocks with complete numeric weapon or
+spell attacks. A spell-only card without numeric attack facts, an edition
+mismatch, an ambiguous card, or another unsupported block must
 remain unresolved; do not replace it with a similar SRD creature or invent a card.
 An attack roll whose `Hit` clause applies only a condition or other effect is
 still an executable attack even when it prints no damage dice (for example, a
@@ -1189,6 +1221,16 @@ advantage/disadvantage. The server rolls both sides in one branch-scoped
 transaction, compares totals, and records a tie as `tie_no_change`, as required
 by the 2014 contest procedure. Use the full-playthrough driver's
 `resolve-contest` action when the contest is part of campaign regression.
+
+For a 2024 PC that has Heroic Inspiration, an ordinary Play check records a
+`resolution_id`, every original d20 in roll order, and its random-stream
+position. Immediately after that roll, call
+`character_check(action="reroll")` with the exact `resolution_id`,
+`roll_index`, and `expected_original_roll`. The server rejects stale or changed
+rolls, death saves, non-PCs, non-2024 actors, combat use, and a second spend; it
+consumes Heroic Inspiration, rolls exactly one replacement die, and requires the
+new result. Never rerun the whole check, choose between old and new dice, or
+reroll both dice from Advantage or Disadvantage.
 
 For source-cited playthrough checks, an idempotent retry means the exact same run,
 scene, Scene Atlas location, actor, kind, ability/skill, DC, proficiency,
@@ -1591,11 +1633,43 @@ representations, switch to Lobby and call
 server recomputes level/ability scaling and removes only an unreferenced
 top-level counter whose label and class source exactly shadow one local-use
 card; it must preserve any counter referenced by another card or spell.
-The canonical 2014 Fighter Action Surge id is a narrow Core exception:
-`combat_use_activity` consumes its use and atomically grants one current-turn
+The canonical 2014 and 2024 Fighter Action Surge ids are narrow Core exceptions:
+`combat_use_activity` consumes the edition-bound card use and atomically grants one current-turn
 `extra_action`. It rejects off-turn or twice-on-one-turn activation, and any
 unused extra action is cleared when the actor's next turn begins. Its Core receipt
 is `dnd5e.core.activity.action_surge`; clients must not edit the turn budget.
+
+The exact 2014 and 2024 Fighter Second Wind cards share one engine-owned base
+activation: `combat_use_activity` pays the Bonus Action and card use, rolls
+`1d10 + Fighter level`, applies clamped healing, and returns a Core receipt.
+Their use counts and Short/Long Rest recovery remain edition-bound card state;
+do not copy the 2014 counter onto a 2024 Fighter. Later 2024 features such as
+Tactical Mind and Tactical Shift are separate cards and are not proof that
+their additional settlement is implemented.
+
+The 2024 Channel Divinity card exposes two engine-owned options. Divine Spark
+uses `declaration={option:"divine_spark",target_id,mode:"heal"|"damage",
+damage_type?:"necrotic"|"radiant"}`. Combat derives visibility and 30-foot
+range from the map; Play additionally requires the target revision plus
+Agent-as-DM `can_see=true` and `within_30_ft=true`. The same atomic mutation
+spends Channel Divinity, rolls the level-scaled d8s plus Wisdom, and either
+heals or rolls the target's Constitution save for full/half damage. Turn Undead
+uses one explicit perception entry for every living Undead within 30 feet. Its
+2014 result is the Turned procedure; its 2024 result is Frightened plus
+Incapacitated and ends on target damage or when the source dies or becomes
+Incapacitated. A source-bound level 5 2024 Cleric may set
+`sear_undead=true`; the engine rolls one shared Wisdom-modifier number of d8s,
+damages only failed-save targets, and does not end the newly applied Turn.
+
+Preserve Life also remains edition-bound. Submit all target allocations in one
+call; the engine enforces the five-times-Cleric-level pool, 30-foot range, and
+the half-maximum-HP ceiling. The 2014 card excludes Undead and Constructs. The
+2024 Life Domain card does not contain that exclusion, so the engine must not
+reintroduce it from 2014 memory. Never spend Channel Divinity first and then
+patch target HP. The 2024 Rogue Cunning Strike family is not yet an executable
+attack rider: do not reduce Sneak Attack dice, apply its conditions, or invent a
+manual post-hit mutation until the generic attack-window implementation and
+Core tests exist.
 
 `combat_preflight_attack` and `combat_resolve_attack` accept
 `multiattack_option_id` for the first attack of a structured Multiattack. The
@@ -1716,12 +1790,14 @@ patch HP.
 the atomic Short Rest write,
 call `character_query(view="rest")` for every member with the exact
 `hit_dice_spends` keys/counts, optional `arcane_recovery` or
-`natural_recovery` allocation, and, for each eligible 2014 Song of Rest recipient,
+`natural_recovery` allocation, optional 2024
+`sorcerous_restoration_points`, and, for each eligible 2014 Song of Rest recipient,
 `song_of_rest_source_actor_id`. This is a read-only authoritative preflight: it
 validates remaining dice, the actor's current card, the service-owned day
 ordinal derived from game-time ticks, Arcane
 Recovery allowance/usage, Natural Recovery's declared meditation and
-once-per-Long-Rest use, automatic level-20 Sorcerous Restoration, the source
+once-per-Long-Rest use, automatic 2014 level-20 Sorcerous Restoration, the
+2024 level-5+ declared half-class-level recovery and once-per-Long-Rest use, the source
 Bard's campaign membership, conscious state, source-bound feature,
 level-scaled die, and rule readiness.
 Only after every member reports `ready=true` may orchestration call one
