@@ -6,6 +6,29 @@ Before starting, require `server_capabilities.features.structured_rulebook_impor
 and `source_bound_rule_packs` to be true. Consume the published
 `rulebook_import.stages` contract instead of guessing tool names.
 
+## Portable package path
+
+If the owner already has a reviewed `sagasmith.portable` `rule_pack`, do not
+repeat PDF normalization, OCR, candidate extraction, or semantic review. Call
+`rule_import(action="import_package")` with exactly one inline package, managed
+artifact, or allowlisted source path and a stable idempotency key. Confirm that
+the package system and source editions match the campaign and inspect every
+exact dependency status. Import reconstructs source/chunk ids and citations but
+only creates a validated inactive draft. Continue with explicit install and
+Owner/DM activation; never infer either from package validity.
+
+Rule dependencies are locked by the dependency package's
+`metadata.definition_checksum`, not its installation-local rule-pack checksum
+or its full distribution-envelope checksum. The full envelope checksum is used
+when that package appears as a component of a thin release manifest.
+
+Export a locally reviewed version through `rule_pack_query(view="package")`.
+Default to private distribution; shareable output requires owner-confirmed
+license and attribution. Keep rule, preset, and module packages independent and
+compose them through `rule_pack_query(view="release")`. The receiver may inspect
+that thin manifest with `rule_import(action="inspect_release")`; it has no fetch,
+import, install, activation, or access authority.
+
 ## End-to-end workflow
 
 1. Read `storage_status.rules.import_roots`, then call
@@ -35,6 +58,15 @@ and `source_bound_rule_packs` to be true. Consume the published
 6. Use `rule_search` with `source_ids=[<exact source_id>]`, select a hit from that
    source, and call
    `rule_expand`. Check the chunk text, heading path, page range, and source checksum.
+   For whole-book compilation, call
+   `rule_import(action="recover_statblocks")` once after indexing. It first accepts
+   deterministic complete cards assembled from checksum-bound indexed chunks, then
+   uses cached local layout OCR only for the remaining 2014 pages. One malformed
+   card must become an itemized failure and must not abort the rest of the book.
+   Treat out-of-range ability scores, ambiguous identities, and incomplete
+   multi-page cards as unresolved evidence, never as values to clamp or recall from
+   model knowledge. The internal `indexed_text` review mode is reserved for this
+   server batch action and is not a caller-selectable shortcut.
 7. If `character_create_from(mode="statblock")` fails because the indexed text
    split one card across columns or attached its headings to an adjacent
    creature, retry it with the source-established page/neighborhood `chunk_ids`
@@ -86,18 +118,35 @@ and `source_bound_rule_packs` to be true. Consume the published
    omitted from the normalized card. The source and campaign must agree on 2014
    or 2024, and that edition selects the statblock parser. Use the returned `review_id` with
    `character_create_from(mode="reviewed_rule_statblock")`.
-   Any mechanical passive or action that is not one of the engine's structured
-   standard traits must reject the standard-rule review as
-   `engine_implementation_required`. Implement the generic printed rule and add
-   a source-backed regression test before recreating the actor. Agent semantic
-   fills and manual-ruling cards are reserved for module-authored or homebrew
-   content, not canonical rulebook mechanics.
+   The engine continues to own generic D&D transactions: action economy,
+   attacks, saves, damage, resource payment, timing windows, and structured
+   Multiattack composition. Missing or conflicting source facts, or a generic
+   printed mechanic that the engine cannot execute, must reject the review as
+   `engine_implementation_required`; implement it with a source-backed
+   regression test before recreating the actor. Exact creature-, spell-, item-,
+   or feature-specific prose may instead carry a persisted exact-source direct
+   Agent-ruling clause created during import/review. That clause settles only
+   the authored content outcome and cannot replace the engine-owned transaction.
    This is layout normalization, not model-memory reconstruction. If the indexed
    facts themselves are missing or conflicting, stop at explicit source review.
    Bounded text-layer repair may accept `l/I` for `1`, `o` for `0`, and `f`
    between two numeric range components for `/`, but only at the matching
    numeric positions. Changed DCs, bonuses, dice, damage types, and other
    numeric facts remain rejected.
+   The bounded 2014 layout path may recompute a damaged redundant ability
+   modifier only from a clearly printed score. It may restore one missing
+   ability label only when all six source scores are present and the remaining
+   five labels uniquely establish the canonical column order; it never supplies
+   a missing score or clamps an illegal value. Explicit `Actions for Type ...`
+   sections are source-defined variants and must become separate actor cards,
+   each with only its own action set.
+   During a private Monster Manual build, an exact bundled SRD actor may be
+   reused only when edition is 2014, publication id is exactly `mm2014`, and one
+   unique OCR-confusable identity matches. The private card is rebuilt in the
+   target preset namespace and records the source card version/checksum. Never
+   apply this optimization to supplements or same-name variants. A visibly
+   damaged heading may be superseded only by one reviewed actor on the same
+   source page.
    An image-capable reviewer may instead render the exact page and transcribe only
    observed fields through the same action with `review_mode="visual"` (the
    default). A text-only Agent must not claim visual review, repair tokens from
@@ -109,6 +158,21 @@ and `source_bound_rule_packs` to be true. Consume the published
    the safe declarative IR. Start from
    `examples/rule-packs/xanathar-tools-skills.template.json` when applicable.
    Replace `$SOURCE_ID` and `$CHUNK_ID` with the import/search results.
+   Every otherwise-unclaimed mechanically signaled chunk must remain represented
+   during extraction by an `agent_resolution_required` catalog candidate with
+   exact citations. This is a transient Lobby review state and must never appear
+   in a compiled pack or addon. It is not descriptive merely because no parser
+   handled it. Accepting that candidate immediately stores a direct exact-source
+   Agent-ruling clause unless the reviewer supplies a native mechanic or typed
+   plan. The compiled artifact must be `ruling_ready` (or
+   `descriptive_ready` for proven descriptive material). Missing identity, core
+   statistics, or source text may not be relabeled as semantic deferral.
+   Dice procedures, numbered random-effect tables, and adjudication guidance
+   count as mechanical signals even when no specialized entity parser matches.
+   They require one exact-source build-time Agent-ruling artifact per retained
+   chunk. A no-candidate whole-book regression applies the same conservative
+   per-chunk fallback; it must never publish one descriptive sample as coverage
+   for the rest of a mechanical source.
 10. Call `rule_import(action="compile")` for the reviewed import job, or
    `rule_pack_compile(action="from_source")` for a separately authored mechanic.
    Do not use an unbound draft for a
@@ -117,6 +181,10 @@ and `source_bound_rule_packs` to be true. Consume the published
 11. Call `rule_pack_query(view="test" | "inspect")`. The Agent acting as DM
    reviews failures and parser warnings from exact evidence. Install only a validated exact version with
    `rule_import(action="install")` or `rule_pack_change(action="install")`.
+   Standalone package export/import/install and composed-addon export/import
+   must all report and independently recompute
+   `resolution_readiness.complete=true`, an empty `unresolved` list, and
+   `first_use_compilation_required=false`.
 12. After explicit campaign-owner/DM approval, read
    `campaign_rules(action="get_profile")` and
    activate the reviewed import with `rule_import(action="activate")`, or pin a

@@ -32,6 +32,8 @@ PC、NPC、怪物共用一个校验并带 checksum 的 portable actor card。通
 `character_create_from(mode="portable_card")` 导入；目标端总是创建新的
 Character identity，而且不会携带 actor knowledge。2014/2024 SRD 怪物和
 NPC 是随附 preset pack 中的普通卡，不是 Host/驱动器里的名称硬编码。
+导入器必须在发布前固定 resolution；来源显式区分的动作变体分别成卡，OCR 仅做
+结构可证明的恢复，运行时不再首次补义。
 
 结构化模组先用 `module_import(action="bind_actor")` 绑定 NPC、怪物和预设
 PC，再由 `module_query(view="package")` 导出。包中包括带场景正文与检索 chunks 的签名 Scene Atlas、源索引、
@@ -52,7 +54,7 @@ PC，再由 `module_query(view="package")` 导出。包中包括带场景正文�
 ## 不可破坏的边界
 
 - 每个 PC、NPC、monster 使用独立完整 Character card；不要把所有人塞入 party JSON。
-- 分享包只迁移内容与显式卡片状态；永不迁移数据库 id、权限或 actor knowledge。
+- 分享包只迁移内容与显式卡片状态；永不迁移数据库 id、权限或 actor knowledge。规则包导入只生成未安装、未启用 draft，release manifest 也不授予权限。
 - actor knowledge 每次显式关联 actor/campaign/branch；玩家不能读取其他玩家私有 scope。
 - 不自动合并兄弟分支；读取与检索只沿当前分支祖先链。
 - 可重试写入使用最新 revision 与稳定 idempotency key。

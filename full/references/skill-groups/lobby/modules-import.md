@@ -11,8 +11,9 @@ NPCs, monsters, items, maps, and source references. Unresolved recommended
 party size or content critical to play enters explicit DM review.
 
 Module prose is not automatically executable. Preserve exact narrative
-evidence for Agent adjudication and compile only first-use custom mechanical
-solutions through the source-bound content facade.
+evidence for Agent adjudication. Before activation or export, every mechanical
+card must already carry a native mechanic, a reviewed typed plan, or an
+exact-source direct Agent-ruling contract; never defer authoring to live use.
 
 Bind imported cast, encounter actors, and pregenerated PCs to stable Scene Atlas
 keys before export. Use `module_query(view="package")` for a self-contained

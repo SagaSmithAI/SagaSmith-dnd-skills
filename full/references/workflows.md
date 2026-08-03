@@ -220,6 +220,22 @@ own exposure. Loading a group for one Agent must not expose it to another.
    Import one nested card through portable character creation with the same pack
    plus its exact `artifact_id`. Optional rule dependencies still need normal
    reviewed installation and campaign activation.
+6. For a reviewed extension rule pack, call
+   `rule_pack_query(view="package", payload={campaign_id, pack_id, version,
+   metadata, include_package?})`. The exporter replaces local source/chunk ids
+   with stable keys and embeds the complete indexed sources. Keep distribution
+   private unless the owner supplies an explicit license and attribution.
+7. On the target installation, call
+   `rule_import(action="import_package")` with exactly one inline package,
+   managed artifact, or allowlisted path and a stable idempotency key. Verify the
+   returned edition and exact dependency statuses. The result is only a
+   validated inactive draft; install and campaign Owner/DM activation remain
+   separate explicit steps.
+8. If an extension also ships presets or a module, keep them as independent
+   packages and create a checksum-pinned thin manifest through
+   `rule_pack_query(view="release")`. Inspect it with
+   `rule_import(action="inspect_release")`. Never treat a release manifest as
+   authority to fetch, import, install, activate, or expose a component.
 
 ## Scene readiness and temporary combat map
 
@@ -311,14 +327,13 @@ own exposure. Loading a group for one Agent must not expose it to another.
    An unstructured/descriptive Multiattack remains an Agent-as-DM adjudication
    boundary but never blocks that ordinary single weapon attack.
    If an exact reviewed passive makes the triggering attack deal conditional
-   extra damage, first query its source card with
-   `content_solution(action="query")`. On the first use, the Agent must read the
-   complete card and exact managed source, then persist one schema-v2
-   `attack.after_hit` solution containing the printed `damage.apply` expression
-   through `content_solution(action="compile")`. Keep the occurrence-specific
-   condition decision with the attack: the owner/DM
+   extra damage, the exported/imported actor card must already contain either a
+   reviewed schema-v2 `attack.after_hit` plan or an exact-source Agent-ruling
+   requirement. Missing build-time resolution is a Lobby authoring blocker, not
+   a live-combat prompt. Keep the occurrence-specific condition decision with
+   the attack: the owner/DM
    Agent supplies one `source_conditional_extra_damage` ruling containing the
-   reviewed feature id, persisted plan fingerprint, explicit eligible target ids,
+   reviewed feature id, its plan fingerprint when the card has a plan, explicit eligible target ids,
    its exact stored excerpt and printed dice expression, typed trigger facts,
    decision, and reason. The encounter driver uses
    `--source-extra-damage-ruling-json` to bind the same evidence to eligible
@@ -344,10 +359,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
    tactics use the lowest offered slot only when +5 AC changes the hit to a miss;
    otherwise decline. Available Shield should block Magic Missile.
    When a committed hit instead returns `pending_on_hit_ruling_id`, the Agent
-   reviews the complete card and exact excerpt. When the result also reports
-   `semantic_solution.status="compilation_required"`, compile the reusable
-   schema-v2 recipe through `combat_choice(action="compile_solution")`, then
-   settle that same paid window through `combat_choice(action="execute_plan")`.
+   reads the complete card and exact excerpt, then settles that paid window from
+   the card's existing build-time plan or direct ruling contract. Execute an
+   existing plan through `combat_choice(action="execute_plan")`.
    Use `on_hit_ruling` only for an occurrence-specific effect that the registered
    engine calls cannot express. In that fallback, use `apply_condition` only
    for printed action/check escape terms. Use `saving_throw_condition` for an
@@ -366,16 +380,21 @@ own exposure. Loading a group for one Agent must not expose it to another.
    every living actor geometrically inside it in `target_contexts`, with the
    Agent-reviewed cover degree. Let the runtime apply Dexterity-save cover
    bonuses or Total Cover; never default all targets to no cover.
-   A locked standard card that reports
-   `semantic_solution.status="engine_implementation_required"` must stop before
-   payment and be implemented in the engine; do not reinterpret it as custom
-   prose. Do not require import to translate every custom card. A repeatable
-   custom activity or spell first returns
-   `semantic_solution.status="compilation_required"` without payment. Compile it
-   once with `content_solution(action="compile")`, using exact managed evidence.
-   The persisted solution is a strictly typed recipe of allowlisted engine
-   function calls, not a second rules engine; then retry the action with that
-   stored contract. A genuinely one-off
+   A locked standard card that lacks both a registered generic mechanic and a
+   persisted exact-source content clause, and therefore reports
+   `semantic_solution.status="engine_implementation_required"`, must stop before
+   payment and be implemented in the engine. A build-time clause may settle only
+   exact spell/item/creature-specific prose; it cannot replace action economy,
+   payment, rolls, damage, or timing. Do not require every card-specific outcome
+   to become an automatic plan. Import or review must nevertheless attach an
+   exact-source direct Agent-ruling contract when a typed plan is unavailable.
+   Every public actor-card write path performs
+   this settlement before persistence, including direct creation, build,
+   template instantiation, sheet replacement, and inventory changes. Therefore
+   `semantic_solution.status="content_authoring_required"` is a legacy/corrupt
+   data invariant failure, not a normal workflow or a prompt: stop, return to
+   Lobby, migrate or reimport the card, and re-run readiness. Runtime never
+   authors that contract. A genuinely one-off
    descriptive activity, unstructured spell, or scene procedure with printed
    save damage remains a two-call recoverable transaction with one immutable
    semantic identity. Before paying, place the complete canonical

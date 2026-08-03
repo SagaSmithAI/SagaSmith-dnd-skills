@@ -97,6 +97,14 @@ the campaign.
    source page range. A parser profile/version change is a new normalized module
    revision even if the PDF checksum is unchanged; rerun the full staged import
    lifecycle and review the resulting index before play.
+   If a reviewed portable rule package already exists, use
+   `rule_import(action="import_package")` instead of repeating source/OCR review.
+   It must return a validated inactive draft with exact dependency status and
+   fresh source/chunk ids; install and Owner/DM activation remain separate.
+   Export with `rule_pack_query(view="package")`. A release created with
+   `rule_pack_query(view="release")` and inspected through
+   `rule_import(action="inspect_release")` is only a checksum-pinned component
+   list and grants no import, install, activation, or access authority.
 6. For character options, call `rule_pack_query(view="content_catalog")` and present only entries
    available to the campaign's locked Core edition and enabled branch packs.
    Apply only a returned id through `character_content_apply`; respect a
@@ -262,7 +270,7 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Workflow | MCP tools |
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
-| Rules | `rule_import`, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query`, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
+| Rules | `rule_import` including portable package import/release inspection, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query` including package/release export, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
 | Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
@@ -271,8 +279,8 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Actor continuity | `actor_knowledge_change`, `actor_knowledge_query`, `continuity_context` |
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
-| Owned pending combat windows | `combat_choice(resolve/resolve_defense/on_hit_ruling/compile_solution/execute_plan)` |
-| Reusable custom-content solutions | `content_solution(query/compile)` |
+| Owned pending combat windows | `combat_choice(resolve/resolve_defense/on_hit_ruling/execute_plan)` |
+| Pre-play custom-content authoring/migration | Lobby-only `content_solution(query/compile)` |
 | Agent DM adjudication without an owned window | Relevant public dice, check, map, state, memory, and manifest tools |
 
 ## Module Narrative Context
@@ -681,10 +689,12 @@ recorded by that option. Omit the id to choose one ordinary Attack. A descriptiv
 Multiattack without options remains an Agent-as-DM boundary only when selected and does not
 block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
 override. Before any reviewed monster enters combat, inspect
-its `agent_fill_requirements`. Standard rulebook cards must report
-`parser_authoritative=true` and `default_resolver="engine"`; Agent semantic
-fills are rejected, and an unparsed standard mechanic must be implemented and
-tested in the engine before play. Module-authored and homebrew cards instead
+its `agent_fill_requirements`. Standard rulebook Multiattack composition must
+report `parser_authoritative=true` and `default_resolver="engine"`; Agent
+Multiattack fills are rejected, and a generic unparsed composition mechanic
+must be implemented and tested in the engine before play. Other exact
+creature-specific prose may already carry an immutable source-bound Agent
+ruling created during import. Module-authored and homebrew cards likewise
 return to Lobby so the Agent can submit the immutable content review with
 `payload.agent_fill.multiattack_options`. Cite the activity id and exact source
 excerpt and use only existing parsed weapon ids, legal modes, and explicit
@@ -1041,15 +1051,20 @@ damage dice. Effect-only attacks such as a giant spider's Web retain an empty
 damage expression plus the exact `on_hit_effect`; resolve the attack roll
 normally, apply no fabricated HP damage, and send the printed condition and
 escape/destruction procedure to explicit Agent-as-DM settlement. A hit that returns
-`pending_on_hit_ruling_id` blocks the turn. When the result reports
-`semantic_solution.status="compilation_required"`, read the complete recorded
-card and exact managed source, call
-`combat_choice(action="compile_solution")`, then execute that same paid window
-with `combat_choice(action="execute_plan")`. Later hits reuse the stored solution.
-If a locked standard card instead reports
+`pending_on_hit_ruling_id` blocks the turn. Read the complete recorded card and
+exact managed source, then use its existing build-time direct ruling contract or
+call `combat_choice(action="execute_plan")` for its existing typed plan. If the
+card instead reports `semantic_solution.status="content_authoring_required"`,
+treat it as a legacy/corrupt card invariant failure: return to Lobby and migrate
+or reimport it. All current public actor-card write paths prefill the direct
+source-bound ruling, and runtime never creates that contract.
+If a locked standard card has neither a registered engine mechanic nor a
+persisted exact-source content clause and therefore reports
 `semantic_solution.status="engine_implementation_required"`, stop before
-payment and implement the missing standard mechanic in the engine; do not send
-it through custom-content compilation.
+payment and implement the missing generic standard mechanic in the engine; do
+not send it through live custom-content compilation. A persisted clause may
+cover only that exact card's authored outcome; engine action economy, payment,
+rolls, damage, and timing remain authoritative.
 Use `combat_choice(action="on_hit_ruling")` only for a genuinely
 occurrence-specific boundary that cannot become a reusable source recipe. In
 that fallback, pass the target as `actor_id` and the pending `choice_id` plus

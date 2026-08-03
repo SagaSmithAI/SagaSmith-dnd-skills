@@ -12,7 +12,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party/resume)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks/actor_presets)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
+| Rules | `rule_import(discover/import_package/inspect_release/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks/actor_presets/package/release)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate/bind_actor/import_package)`, `import_query` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness/actors/package)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
@@ -21,7 +21,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Audit | `state_revision(history/receipt/undo/redo)` |
 
 The compact public contract contains exactly 84 tools, with 13 core discovery
-tools and phase ceilings of Lobby 63, Play 49, and Combat 48. Do not call retired
+tools and phase ceilings of Lobby 63, Play 48, and Combat 47. Do not call retired
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
@@ -30,8 +30,9 @@ names or emulate aliases client-side. The consolidated calls are:
 - `rule_import(action="render_page" | "recover_statblock")`;
 - `module_review(action="render_page" | "recover_statblock" | "submit_content")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
-- `combat_choice(action="on_hit_ruling" | "compile_solution" | "execute_plan")`;
-- `content_solution(action="query" | "compile")`.
+- `combat_choice(action="on_hit_ruling" | "execute_plan")`;
+- `content_solution(action="query" | "compile")`, with `compile` restricted to
+  pre-play Lobby authoring and migration.
 
 For `chase(action="start")`, a module-authored contextual speed change belongs
 in that participant's `participant_config` as `speed_adjustment_ft` plus an
@@ -357,7 +358,7 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
 
-### Portable actor, preset, and module packages
+### Portable actor, preset, module, and rule packages
 
 `sagasmith.portable` schema v1 is the cross-installation sharing boundary. PC,
 NPC, and monster use the same `kind="actor_card"` envelope and distinguish their
@@ -406,6 +407,40 @@ and restores actor/scene bindings. Pregenerated PCs become reusable library
 templates; NPCs and monsters become campaign actors. Re-read index, actors,
 assets, content reviews, and readiness. A checksum-valid package does not enable
 optional rule dependencies or make descriptive prose executable.
+
+A portable `kind="rule_pack"` carries the rule manifest, selection artifacts,
+safe mechanic IR, provenance, and the complete indexed rule sources required by
+its citations. Export in Lobby as DM with
+`rule_pack_query(view="package", payload={campaign_id, pack_id, version,
+metadata, include_package?})`. Runtime `source_id` and `chunk_id` values are
+replaced by deterministic `source_key` and section-qualified `chunk_key`
+locators. Resolution plans are re-fingerprinted after remapping. A shareable
+export requires explicit `metadata.license` and `metadata.attribution`; the
+default distribution is private.
+
+Import through `rule_import(action="import_package")` with exactly one inline
+`package`, managed `artifact`, or allowlisted `source_path`, plus an idempotency
+key. The MCP verifies envelope and source hashes, system, campaign edition,
+source editions, exact dependency versions/checksums, stable citation ownership,
+and the D&D pack compiler. It rebuilds sources and chunks with fresh local ids
+and re-fingerprints plans. The result is a validated inactive draft only:
+`rule_pack_change(action="install")` and an Owner/DM
+`campaign_rules(action="set_pack")` remain separate. Missing dependencies are
+reported; a local checksum conflict rejects import. No package carries access or
+campaign authority.
+
+Rule-to-rule dependency locks use the imported package's
+`metadata.definition_checksum`. That checksum covers portable rule semantics,
+sources, and dependency locks, but excludes distribution-only metadata and local
+UUIDs. Release-manifest components instead use each complete portable envelope
+checksum. Do not substitute one checksum domain for the other.
+
+Use `rule_pack_query(view="release")` to create a thin
+`kind="release_manifest"` containing exact `rule_pack`, `preset_pack`, and
+`module_pack` component ids, versions, checksums, and optionality. Inspect it on
+the receiver with `rule_import(action="inspect_release")`. Inspection only
+reports component status and the correct import facade. It performs no network
+fetch, import, installation, activation, or permission grant.
 
 The campaign instance is authoritative. After any actor or party mutation, read
 `character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use
@@ -1070,9 +1105,10 @@ not executable uncertainty: they must not create `ruling_requirements`, change
 When recovered rulebook text includes Multiattack, the standard D&D parser and
 engine own its composition. `agent_fill` is rejected. A composition the engine
 cannot structure returns `engine_implementation_required`; fix the generic
-standard-rule implementation and its tests before retrying. The Agent owns only
-the checksum-bound transcription and evidence segmentation, not canonical rule
-semantics.
+standard-rule implementation and its tests before retrying. This does not make
+every creature-specific passive or rider a new generic engine rule: exact
+source prose may carry a build-time direct Agent-ruling clause while the engine
+continues to own payment, rolls, damage, action economy, and timing.
 Text-layout recovery also compares every explicit
 `Melee/Ranged [Weapon|Spell] Attack:` source marker with the parsed weapon and
 identified statblock-spell actions. One successfully parsed attack cannot hide
@@ -1097,14 +1133,21 @@ If that reviewed rulebook card contains Multiattack or another standard
 mechanical card, `rule_import(action="review_statblock")` accepts it only when
 the engine produces a complete structured implementation. It rejects
 `payload.agent_fill`, including `additional_actions` and derived-review fills.
-An unresolved standard passive/action is an importer or engine defect; do not
-preserve it as an Agent manual ruling, add creature-name checks, ad hoc `once`
-flags, or post-damage HP edits. In contrast, module-authored and homebrew cards
-continue to require an Agent semantic fill on first use and store that
-source-bound solution for deterministic reuse.
+A standard passive/action with missing or conflicting facts, or a missing
+generic transaction, is an importer or engine defect; do not hide it with
+creature-name checks, ad hoc `once` flags, or post-damage HP edits. Exact
+creature-specific prose can instead be finalized as a source-bound direct Agent
+ruling during import. Standard, addon, module-authored, and homebrew cards must
+all enter play with a native mechanic, reviewed typed plan, or exact-source
+direct Agent-ruling requirement already persisted.
 The indexed-text validator permits only position-bound OCR confusables
 `l/I↔1`, `o↔0`, and digit-bounded `f↔/` in a numeric range. All other numeric
 tokens, DCs, bonuses, dice, damage types, and rule terms must remain exact.
+The layout recovery may recompute a corrupted redundant ability modifier from
+its visible score and may infer one missing ability label only from a complete
+six-score row plus the other five labels in unique canonical order. It never
+invents a score. Explicit `Actions for Type ...` sections create separate
+portable actors rather than a union of mutually exclusive action sets.
 The stored review uses `confidence="reviewed_text"` and retains per-chunk
 checksums. Visual review remains `review_mode="visual"` and
 `confidence="reviewed_image"`. Missing or conflicting indexed facts remain an
@@ -1424,11 +1467,11 @@ owner/DM `action.rulings` entry with
 `kind="source_conditional_extra_damage"`, `source="dm_ruling"`,
 `default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a unique
 application id, the exact passive feature id/excerpt/printed dice expression,
-typed nonempty trigger facts, explicit eligible target ids, the persisted
-first-use plan fingerprint, and a recorded decision and reason. Before this
-ruling can be used, the Agent must compile one exact-source schema-v2
-`attack.after_hit` solution whose `damage.apply` step records the printed dice.
-The server verifies the excerpt and solution fingerprint against the immutable
+typed nonempty trigger facts, explicit eligible target ids, the build-time plan
+fingerprint when such a plan exists, and a recorded decision and reason. The
+card may instead carry a direct exact-source Agent-ruling requirement when the
+effect should remain a live applicability judgment. The server verifies the
+excerpt and any supplied plan fingerprint against the immutable
 actor card, rejects targets outside the Agent-declared eligible set, and appends
 the dice to the preflight plan before resolving either a melee or ranged weapon
 attack. A player cannot self-declare this ruling. The conditional dice, critical
@@ -1449,21 +1492,29 @@ to repeat the hit.
 Standard D&D mechanic references registered in the campaign's active rule lock
 remain server implementations; a core-looking string alone is not executable.
 Accounting, phase, or transaction mechanics also do not prove that a card's
-authored outcome is implemented. If a locked standard card lacks an outcome
-implementation, the pre-payment result is
+authored outcome is implemented. If a locked standard card lacks both an
+outcome implementation and a persisted exact-source content clause, the
+pre-payment result is
 `semantic_solution.status="engine_implementation_required"`; fix and test the
-engine rather than compiling that standard rule as homebrew.
-For imported or homebrew content without such an implementation,
-the first real use returns `semantic_solution.status="compilation_required"`.
-The Agent reads the complete recorded card and an exact managed module/rule
-chunk, then submits a schema-v2 source-bound, typed engine-call recipe through
-`content_solution(action="compile")`. A paid item hit instead uses
-`combat_choice(action="compile_solution")`, which stores the solution and upgrades
-that same pending hit atomically. The stored solution locks the card identity,
-immutable card semantics, plan and source-evidence fingerprints, compilation
-version, and bounded Agent reason.
-Later combat uses replay that validated engine-call recipe through
-`combat_choice(action="execute_plan")`; they do not reinterpret the prose.
+engine rather than compiling that standard rule as homebrew. A reviewed
+spell/item/creature-specific Agent clause is not a replacement for standard
+action economy or accounting: it is the durable settlement of that exact card
+and is applied only through public engine operations.
+For imported or homebrew content without such an implementation, import/review
+stores either a schema-v2 source-bound typed engine-call recipe or a direct
+exact-source Agent-ruling contract. Direct creation, build, template
+instantiation, whole-sheet replacement, and inventory mutation all run the same
+prefill before persistence. Standalone rule-pack export/import/install and
+composed addon export/import all recompute the same audit; they fail unless the
+stored `build_time_complete` report is exact and complete.
+`semantic_solution.status="content_authoring_required"` can
+therefore only identify legacy/corrupt data that bypassed those boundaries;
+return to Lobby and repair, migrate, or reimport it.
+`content_solution(action="compile")` exists only for explicit pre-play
+authoring/migration. Paid item hits never alter
+their card's execution contract. Combat replays an existing recipe through
+`combat_choice(action="execute_plan")`, or settles the existing direct ruling
+through its bounded on-hit window; neither path reinterprets and persists prose.
 Never put arbitrary Python names or state patches in a plan. If an occurrence is
 genuinely unique, cannot be expressed by available engine calls, or depends on
 unstructured scene judgment, keep it in the explicit Agent/DM ruling boundary
@@ -1654,12 +1705,13 @@ one `resource_key` resource when present, otherwise one limited card use, and
 pay the card's action/bonus-action/reaction timing in combat. Card prose,
 choices, targeting, and any non-deterministic result are returned for an
 explicit Agent-performed DM ruling rather than automatically materialized.
-A reviewed descriptive statblock action records its complete source excerpt.
-On first use, an unimplemented custom activity returns
-`semantic_solution.status="compilation_required"` without paying its timing or
-spending a use. Compile and persist its reusable plan first, then retry with the
-returned plan contract and pay exactly once. Do not use a transient ruling merely
-to avoid compilation for repeatable custom content.
+A reviewed descriptive statblock action records its complete source excerpt and
+a build-time direct Agent-ruling requirement. Public actor-card writes also add
+that contract to otherwise-unsettled custom activities before persistence. A
+`semantic_solution.status="content_authoring_required"` response consequently
+means legacy/corrupt data bypassed the invariant; it still pays no timing or use.
+Return to Lobby and migrate or reimport it. Runtime must never create a durable
+resolution contract as a side effect of use.
 For a genuinely one-off ruling containing a printed saving throw plus damage,
 commit the entire semantic settlement before paying the action. The activity declaration,
 unstructured spell declaration, or scene-procedure `improvise` payload carries

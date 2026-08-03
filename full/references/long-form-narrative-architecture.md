@@ -207,7 +207,7 @@ sheet v2 与 notes v2 结构。
 | 已锁定且已实现的标准 D&D mechanic | 引擎按 mechanic id | 引擎 | 角色/战斗状态、receipt、事件 |
 | 标准规则但缺完整事务实现 | Agent 只能作明确 DM 裁定；不能伪装成完整引擎支持 | 可表达的通用部分由引擎；缺口保持可见 | 当次 ruling 与实际结果 |
 | 扩展包的安全声明式 mechanic | review 后的规则包 | 已安装实现/声明式 IR | Rule Profile、receipt、角色状态 |
-| 自设或模组机械卡首次使用 | Agent 阅读完整卡并填严格 `resolution_plan` | allowlist 内的引擎函数 | source card 上一次性保存 `resolution_solution` |
+| 自设或模组机械卡 | 导入/审核 Agent 在发布前固定 typed plan 或精确来源 direct ruling | allowlist 内的引擎函数或实时有界 DM 裁定 | portable source card 上的 build-time resolution contract |
 | 一次性自设活动 | Agent 提交当前发生的 source-bound ruling | 引擎执行支付、保存、检定、伤害等通用事务 | occurrence-specific ruling 和 outcome |
 | NPC 动机、退却、欺骗、谈判、剧情后果 | Agent | 引擎只执行移动、检定、时间、物品和状态原语 | 只保存实际发生的 event/fact/knowledge |
 | 玩家角色的意图和需要玩家选择的资源 | 玩家 | 引擎 | 提交的选择和结果 |
@@ -232,21 +232,27 @@ sheet v2 与 notes v2 结构。
 
 ### 自设和模组机械内容
 
-自设内容第一次使用时，Agent 阅读完整受管来源，并提交严格、类型化的
-`resolution_plan`。`content_solution(action="compile")` 只允许白名单引擎函数，
-保存 plan fingerprint、source card 和 Agent ruling。之后重复使用复用同一
-solution。
+导入、审核或导出自设内容时，系统必须完成 resolution audit。能够稳定表达的
+内容保存严格、类型化的 `resolution_plan`；不适合自动化但来源完整的内容保存
+精确 `source_ref`/`source_excerpt` 与 direct Agent-ruling requirement。两者都随
+portable card 发布。`content_solution(action="compile")` 仅保留为 Lobby 中显式的
+旧卡迁移/作者化工具，不会由 Play 或 Combat 的首次触发调用。
 
 这不是一套新的通用叙事语言：
 
-- 标准规则包内容禁止用 Agent solution 覆盖；
-- 已经可执行的卡禁止重复编译；
+- 标准规则包的通用事务与已注册 mechanic 禁止被 Agent solution 覆盖；精确的
+  法术、物品、怪物或特性专属文本可以在构建期保存来源绑定的 direct Agent clause，
+  但该 clause 不能替代行动经济、支付、掷骰、伤害或时序；
+- 已经可执行的卡禁止重复作者化；
 - plan 不能包含任意代码；
 - 当前发生条件仍需在每次使用时根据实时状态判断；
 - 支付动作、次数、法术位和随机结果仍由引擎完成。
 
-攻击命中后才出现的首次编译必须通过 owned pending window 完成，使“保存方案”
-与“本次已付费效果的结算”保持原子性。
+付费动作和命中窗口不得改变卡的执行契约。当前所有公开角色卡写入边界——直接
+创建、build、模板实例化、整卡替换、物品新增与更新——都会在持久化前补齐
+build-time direct ruling。若运行时仍遇到 `content_authoring_required`，说明是绕过
+这些入口的旧数据或损坏数据，必须在付款前停止并回到 Lobby 迁移或重新导入；
+不能把已发生的命中当作内容作者化入口。
 
 ### 模组叙事
 
@@ -856,7 +862,8 @@ Agent 可以继续：
 3. 模组叙事条件不会自动监听 HP、位置、custody 或对话并执行剧情。
 4. Agent 必须把实时状态和 source evidence 一起读取后才可裁定。
 5. 未实现完整原子事务的标准规则仍保持显式边界，不能靠近似实现隐藏缺口。
-6. 自设 content solution 只覆盖允许的机械 recipe，不表达完整叙事逻辑。
+6. 自设 content solution 只覆盖允许的机械 recipe；direct ruling 只提供精确来源
+   和实时裁定边界，两者都不表达完整叙事逻辑，也不得推迟到首次触发再创建。
 7. Snapshot branch 当前不自动 merge。
 8. 向量检索只帮助召回，不能替代 exact source 或 ledger authority。
 9. Recap presentation 不能修复底层事实、知识或角色状态。

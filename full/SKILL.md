@@ -81,6 +81,9 @@ The machine-readable phase/tool-group mapping is
   monster. All three are full `Character` records, not abbreviated stat blocks.
 - PC, NPC, and monster sharing uses one checksum-bound portable `actor_card`
   schema. Import creates a fresh runtime identity and never copies ActorKnowledge.
+- Portable extension `rule_pack` import rebuilds stable citations but produces
+  only a validated inactive draft. Installation and Owner/DM campaign activation
+  remain separate; a thin release manifest grants neither authority.
   Standard SRD monsters/NPCs are bundled `preset_pack` cards, not host-side
   creature definitions. Structured module sharing uses `module_pack`; read the
   `portable.content` Skill group before importing or exporting either format.

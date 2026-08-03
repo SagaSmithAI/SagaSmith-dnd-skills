@@ -31,8 +31,10 @@ Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检�
 
 - PC、NPC、怪物统一使用 `sagasmith.portable` actor card；导入会创建新身份，不复制 actor knowledge。
 - 2014/2024 SRD 怪物与 NPC 以默认 preset pack 随运行时提供，不依赖 Host 中的怪物名称硬编码。
+- 规则书构建必须在发布前固定每张卡的 resolution；显式动作变体拆成独立卡，OCR 只允许结构可证的恢复，不把补义延迟到首次触发。
 - 结构化模组可打包 Scene Atlas、原始索引、地图/资产、审核内容、NPC/怪物/预设 PC 卡及稳定关联；战役进度、记忆、分支与 Snapshot 不混入内容包。
-- 完整流程由 Lobby 的 `portable.content` Skill group 按需加载；详情见 [Full MCP contract](full/references/mcp-contract.md#portable-actor-preset-and-module-packages)。
+- 扩展规则书可导出为携带完整来源与稳定引用的 `rule_pack`；导入只生成未安装、未启用 draft。规则、预设和模组用薄 release manifest 按精确 checksum 组合。
+- 完整流程由 Lobby 的 `portable.content` Skill group 按需加载；详情见 [Full MCP contract](full/references/mcp-contract.md#portable-actor-preset-module-and-rule-packages)。
 
 ### Lobby：游戏外准备
 
@@ -40,7 +42,7 @@ Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检�
 - 车卡、装备、法术准备与初始资源；
 - 导入规则书，编译/安装扩展规则包并锁定 campaign profile；
 - 生成模组或从白名单暂存 PDF/Markdown/text，经 Core 结构化后检查 scene/spatial index 与 revision diff；
-- 导入/导出统一角色卡、SRD 预设包与结构化模组包；
+- 导入/导出统一角色卡、SRD 预设包、结构化模组包与扩展规则包；
 - 初始化 campaign memory 与每个 PC/NPC 各自的 actor knowledge。
 - 命名 NPC 可使用签名、零工具、无子会话持久化的隔离演绎回合；机械结算与最终写入仍由公开 MCP 事务负责。
 
