@@ -1,21 +1,21 @@
 # Rule import and packs
 
-Discover and stage the exact rule source, inspect normalization, render or
-recover damaged pages only when needed, ingest candidates, review uncertainty,
-compile, test, install, and activate in order.
+Stage the exact rule source, inspect, repair only damaged pages, ingest, review
+candidates, compile, test, install, and activate in order.
 
-OCR recovery may repair bounded mechanical layout corruption but must not
-invent altered numbers, omitted abilities, or unsupported rules. A standard
-mechanic without an engine implementation blocks settlement until the standard
-provider is fixed; it does not become an Agent homebrew ruling.
+OCR may repair bounded layout corruption, never altered numbers, omitted
+abilities, or unsupported rules. A missing standard implementation blocks until
+the provider is fixed; it does not become an Agent homebrew ruling.
 
-Campaign profiles lock exact pack versions, dependencies, checksums, native
-provider fingerprints, and edition. Search then expand the selected source
-chunk; preserve exact citations in compiled artifacts and receipts.
+For a damaged token or heading, use `rule_import(render_page)` then checksum-bound
+`rule_import(review_text)` before ingest. A visionless Agent needs corroborated
+text or bounded context with unchanged digits and must copy adjacent heading
+depth. The PDF and OCR cache stay immutable.
 
-When a reviewed portable `rule_pack` already exists, do not repeat PDF/OCR or
-candidate extraction. Use `rule_import(import_package)`, inspect its exact
-dependency report, then keep install and Owner/DM campaign activation as two
-separate decisions. Use `rule_pack_query(package)` to export a reviewed local
-pack; a `release_manifest` inspected through `rule_import(inspect_release)` has
-no installation or activation authority.
+Profiles lock exact versions, dependencies, checksums, provider fingerprints,
+and edition. Search, expand, and preserve exact citations and receipts.
+
+For a reviewed portable `rule_pack`, skip PDF/OCR and candidate extraction. Use
+`rule_import(import_package)`, inspect dependencies, and keep install separate
+from Owner/DM activation. Export with `rule_pack_query(package)`; an inspected
+`release_manifest` has no installation or activation authority.

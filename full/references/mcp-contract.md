@@ -12,23 +12,23 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party/resume)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/import_package/inspect_release/stage/inspect/render_page/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks/actor_presets/package/release)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
+| Rules | `rule_import(discover/import_package/inspect_release/stage/inspect/render_page/review_text/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks/actor_presets/package/release)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Module artifact | `module_import(stage/inspect/validate/ingest/activate/bind_actor/import_package)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness/actors/package)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")`, `module_search`, `module_expand`, `module_set_progress` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness/actors/package)`, `module_review(action="render_page" \| "render_transcript" \| "recover_statblock" \| "submit_content" \| "submit_transcript")`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
 
-The compact public contract contains exactly 84 tools, with 13 core discovery
-tools and phase ceilings of Lobby 63, Play 48, and Combat 47. Do not call retired
+The compact public contract contains exactly 85 tools, with 13 core discovery
+tools and phase ceilings of Lobby 64, Play 49, and Combat 48. Do not call retired
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
 - `character_check(action="check" | "group" | "contest" | "reroll")`;
 - `campaign_rules(action="core_relock")`;
-- `rule_import(action="render_page" | "recover_statblock")`;
-- `module_review(action="render_page" | "recover_statblock" | "submit_content")`;
+- `rule_import(action="render_page" | "review_text" | "recover_statblock")`;
+- `module_review(action="render_page" | "render_transcript" | "recover_statblock" | "submit_content" | "submit_transcript")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
 - `combat_choice(action="on_hit_ruling" | "execute_plan")`;
 - `content_solution(action="query" | "compile")`, with `compile` restricted to
@@ -48,8 +48,9 @@ current theater-of-the-mind visibility remains an Agent/DM decision.
 Every action uses only its documented payload fields. Unknown fields are an
 error, and a facade action retains the original role, phase, revision,
 idempotency, source-evidence, and random-stream boundary. In particular,
-`rule_import(render_page|recover_statblock)` is Lobby-only and DM-only;
-`module_review(recover_statblock|submit_content)` is Lobby-only and DM-only;
+`rule_import(render_page|review_text|recover_statblock)` is Lobby-only and DM-only;
+`module_review(render_transcript|submit_transcript|recover_statblock|submit_content)`
+is Lobby-only and DM-only;
 rendering may also be used by a DM during Play. Chase, contests, and Heroic
 Inspiration rerolls are Play-only. On-hit rulings are
 Combat-only. Loading a facade through a lower-risk group does not authorize its
@@ -282,6 +283,33 @@ id. The review lives in scoped scene progress, so snapshots and branch checkout
 restore it without mutating immutable imported metadata. A review-only write may
 omit `status` and `progress`; existing values are preserved. See
 `module-visual-atlas.md` for the full sequence and schema.
+
+Staged rulebooks and modules also expose a pre-ingest transcription-review path.
+`rule_import(action="render_page")` returns `transcription.normalized`,
+`transcription.native_text`, and two local `ocr.variants` beside the image;
+`module_review(action="render_transcript")` returns the equivalent bundle for a
+module import job. A text-only Agent may consume these textual fields without
+claiming visual inspection. After the job is `inspected`, submit a batch of
+unique exact replacements for that physical page with
+`rule_import(action="review_text")` or
+`module_review(action="submit_transcript")`, the normalized page SHA-256, current
+import revision, rationale, fresh idempotency key, and one evidence basis:
+
+- `cross_text`: the proposed text occurs in at least two returned text sources;
+- `agent_context`: only a bounded spelling, case, spacing, or Markdown heading
+  repair; the before/after digit sequences must be identical;
+- `rendered_page`: the reviewer really inspected the image and supplies its exact
+  checksum.
+
+The server constructs the evidence record, applies revisions only to the
+normalized in-memory view, and reruns inspection. The managed source and every
+OCR cache entry stay immutable. Include all known repairs in each call and copy
+heading depth from adjacent entries of the same kind. If reparsing exposes an
+error, an unpublished inspected job may add another version bound to the new
+page hash, up to eight versions per page; refresh the job revision each time.
+An ingested source is immutable and requires a new import job for correction.
+These actions repair transcription/structure, not missing mechanics; unresolved
+or conflicting source facts remain an external review boundary.
 
 For a 2014 creature card that exists only in the PDF image layer, first call
 `module_review(action="recover_statblock")` with the exact managed PDF page. The

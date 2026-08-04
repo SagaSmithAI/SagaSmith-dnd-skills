@@ -44,11 +44,28 @@ import, install, activation, or access authority.
    server-enforced review gate; it is not permission to invent missing headings or
    silently publish mechanics. Scanned or corrupt-text PDFs may make the first
    inspection slow because OCR is selective and page based.
-4. For an inspection warning that genuinely requires page-image evidence, an
-   image-capable Agent or human DM may call
-   `rule_import(action="render_page")` with the exact one-based page. A text-only
-   Agent must not call page rendering and pretend it inspected the image; keep
-   the warning blocked until a capable reviewer records the decision.
+4. For a damaged or structurally ambiguous page, call
+   `rule_import(action="render_page")` with the exact one-based page. The result
+   contains the immutable rendered image plus checksum-bound normalized text,
+   native PDF text, and local OCR variants. A text-only Agent may use those text
+   fields but must not claim it inspected the image. After `inspect`, it may call
+   `rule_import(action="review_text")` for that page, batching every known exact,
+   unique replacement and supplying the returned normalized-text hash, current
+   job revision, rationale, and evidence basis:
+   - `cross_text` requires the replacement text in two returned text sources;
+   - `agent_context` permits only a small spelling/case/Markdown-structure repair
+     and cannot change any digit sequence;
+   - `rendered_page` requires a reviewer that actually inspected the returned
+     image and its exact checksum.
+   The server never edits the PDF or cached OCR. It stores the reviewer,
+   evidence hashes, before/after page hashes, and replacements, then reruns
+   inspection against the revised view. Copy heading depth from adjacent entries
+   of the same content kind; capitalization alone does not establish hierarchy.
+   If reparsing exposes a mistake, an unpublished inspected job may submit a
+   further version bound to the new page hash (at most eight per page). Refresh
+   the job revision after every version. Once ingested, create a new import job
+   instead of mutating history. Missing or conflicting mechanics remain blocked; do not use
+   transcript review to reconstruct them from model memory.
 5. Call `rule_import(action="ingest")`. If and only if the Agent acting as DM
    reviewed all warnings from available exact evidence, pass
    `payload.acknowledge_warnings=true`. This uses the same Core PDF/Markdown

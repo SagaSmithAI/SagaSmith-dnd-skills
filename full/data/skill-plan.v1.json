@@ -106,6 +106,15 @@
         {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Rule packs, releases, and addons", "max_chars": 3800}
       ]
     },
+    "addon.actors": {
+      "load_policy": "tool_group",
+      "visibility": "dm",
+      "reason": "Reviewed addon actor templates require DM-authorized instantiation, exact package locks, fresh campaign identities, and isolated actor knowledge.",
+      "depends_on": ["core.identity", "core.transactions"],
+      "documents": [
+        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Actors and modules", "max_chars": 3000}
+      ]
+    },
     "rules.import": {
       "load_policy": "tool_group",
       "visibility": "dm",
@@ -279,6 +288,7 @@
     "lobby.bootstrap": {"required": ["campaign.bootstrap"], "tools": ["campaign_create", "system_list"]},
     "lobby.campaign": {"required": ["campaign.lifecycle", "snapshot.branch"], "tools": ["access_grant", "branch_change", "branch_query", "campaign_change", "campaign_event", "campaign_rules", "playthrough_manifest", "snapshot_create", "snapshot_query", "snapshot_restore", "state_revision"]},
     "lobby.characters": {"required": ["character.build", "portable.content"], "tools": ["character_ability_apply", "character_action", "character_content_apply", "character_create_from", "character_metadata_update", "character_query", "character_sheet_replace", "character_spell_prepare", "character_state_change", "dnd_ability_roll", "dnd_dice_roll", "inventory_change", "inventory_transfer", "wallet_change"]},
+    "lobby.addon_actors": {"required": ["addon.actors"], "tools": ["addon_actor_instantiate"]},
     "lobby.rules": {"required": ["rules.import", "portable.content"], "tools": ["campaign_rules", "content_solution", "import_query", "rule_expand", "rule_import", "rule_pack_change", "rule_pack_compile", "rule_pack_query", "rule_search", "rule_seed_bundled", "rule_seed_status"]},
     "lobby.modules": {"required": ["modules.import", "portable.content"], "tools": ["module_expand", "module_import", "module_query", "module_review", "module_search", "module_set_progress"]},
     "lobby.memory": {"required": ["continuity.read"], "tools": ["actor_knowledge_query", "bounded_evaluation", "continuity_context"]},
@@ -287,12 +297,13 @@
     "play.scene": {"required": ["scene.play", "continuity.read"], "tools": ["actor_knowledge_query", "bounded_evaluation", "branch_query", "campaign_event", "continuity_context", "module_expand", "module_query", "module_search"]},
     "play.scene_control": {"required": ["scene.play", "continuity.write", "snapshot.branch"], "tools": ["actor_knowledge_change", "campaign_change", "campaign_rules", "memory_change", "memory_query", "module_review", "module_set_progress", "playthrough_manifest", "snapshot_create", "snapshot_query", "state_revision"]},
     "play.characters": {"required": ["character.state"], "tools": ["character_action", "character_content_apply", "character_metadata_update", "character_query", "character_state_change", "inventory_change", "inventory_transfer", "wallet_change"]},
+    "play.addon_actors": {"required": ["addon.actors"], "tools": ["addon_actor_instantiate"]},
     "play.resolution": {"required": ["resolution.checks"], "tools": ["character_check", "dnd_ability_roll", "dnd_check", "dnd_dice_roll", "rule_expand", "rule_search"]},
     "play.combat_control": {"required": ["combat.prepare"], "tools": ["combat_start"]},
     "play.chase": {"required": ["chase.run"], "tools": ["chase"]},
     "combat.observe": {"required": ["combat.observe"], "tools": ["actor_knowledge_query", "bounded_evaluation", "branch_query", "character_query", "combat_query", "continuity_context", "module_query", "module_search", "rule_expand", "rule_search"]},
     "combat.turn": {"required": ["combat.turn"], "tools": ["combat_choice", "combat_end_turn", "combat_ready"]},
-    "combat.control": {"required": ["combat.control"], "tools": ["combat_end", "combat_join"]},
+    "combat.control": {"required": ["combat.control", "addon.actors"], "tools": ["addon_actor_instantiate", "combat_end", "combat_join"]},
     "combat.actions": {"required": ["combat.actions"], "tools": ["combat_cast_spell", "combat_check", "combat_choice", "combat_common_action", "combat_concentration_check", "combat_hp_change", "combat_movement", "combat_preflight_attack", "combat_reaction_attack", "combat_resolve_attack", "combat_use_activity", "dnd_check", "dnd_dice_roll"]},
     "combat.save": {"required": ["snapshot.branch"], "tools": ["branch_change", "playthrough_manifest", "snapshot_create", "snapshot_query", "snapshot_restore"]},
     "combat.maintenance": {"required": ["runtime.maintenance"], "tools": ["campaign_rules"]},
@@ -312,8 +323,12 @@
     "character_create_from:statblock": ["source.content_review"],
     "memory_change:commit": ["continuity.write"],
     "module_review:recover_statblock": ["source.content_review"],
+    "module_review:render_transcript": ["source.content_review"],
     "module_review:submit_content": ["source.content_review"],
+    "module_review:submit_transcript": ["source.content_review"],
     "rule_import:recover_statblock": ["source.content_review"],
+    "rule_import:render_page": ["source.content_review"],
+    "rule_import:review_text": ["source.content_review"],
     "content_solution:compile": ["core.evidence_ruling"],
     "combat_start:started": ["combat.observe"],
     "combat_end:closed": ["scene.play", "continuity.write"],

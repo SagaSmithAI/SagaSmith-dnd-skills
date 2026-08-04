@@ -69,6 +69,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
 4. Load `lobby.modules`. For each module PDF call `module_import` in this exact order:
    `stage` -> `inspect` -> `validate` -> `ingest` -> `activate`. Keep the same
    `job_id`; use a stable, stage-specific idempotency key for each write.
+   Between `inspect` and `validate`, repair a damaged PDF transcript only through
+   `module_review(action="render_transcript")` followed by one checksum-bound
+   `module_review(action="submit_transcript")` batch per page. Text-only Agents
+   use two-source agreement or bounded context with unchanged digit sequences;
+   only a reviewer that actually saw the image may use rendered-page evidence.
+   Re-read the updated inspection and revision before continuing.
 5. Review `module_query(view="index")`. Search only selects candidates; expand the
    chosen scene before using its facts. Verify scene boundaries, keeper/public
    visibility, encounter participants, exact source excerpts, spatial locations,

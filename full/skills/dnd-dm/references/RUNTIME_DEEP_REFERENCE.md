@@ -271,7 +271,7 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
 | Rules | `rule_import` including portable package import/release inspection, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query` including package/release export, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "recover_statblock" \| "submit_content")` |
+| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "render_transcript" \| "recover_statblock" \| "submit_content" \| "submit_transcript")` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Chases | `chase(action="start")`, `chase(action="query")`, `chase(action="take_turn")`, `chase(action="end")` |
