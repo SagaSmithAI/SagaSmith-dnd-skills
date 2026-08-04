@@ -66,6 +66,14 @@ import, install, activation, or access authority.
    the job revision after every version. Once ingested, create a new import job
    instead of mutating history. Missing or conflicting mechanics remain blocked; do not use
    transcript review to reconstruct them from model memory.
+   For a durable whole-book regression, copy every accepted repair into that
+   document's source-review manifest under `text_reviews`. Retain the one-based
+   page, current `base_text_sha256`, exact `old`/`new` replacements, rationale,
+   evidence basis, review method, and (for `rendered_page`) the exact image
+   checksum. `regression_rulebooks.py --catalog-manifest ...` re-renders the
+   evidence, rejects hash drift, and replays each revision through the public
+   `review_text` facade before ingest. Never refresh a stored hash merely to make
+   a stale correction apply; re-review the changed normalized page instead.
 5. Call `rule_import(action="ingest")`. If and only if the Agent acting as DM
    reviewed all warnings from available exact evidence, pass
    `payload.acknowledge_warnings=true`. This uses the same Core PDF/Markdown

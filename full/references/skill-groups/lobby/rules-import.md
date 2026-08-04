@@ -12,6 +12,12 @@ For a damaged token or heading, use `rule_import(render_page)` then checksum-bou
 text or bounded context with unchanged digits and must copy adjacent heading
 depth. The PDF and OCR cache stay immutable.
 
+When the same source is part of a durable regression, preserve each accepted
+page repair in the document's `text_reviews` manifest entry with its current
+normalized-text hash and evidence checksum. The regression driver must replay
+that public transaction before ingest and reject drift instead of silently
+retargeting a stale correction.
+
 Profiles lock exact versions, dependencies, checksums, provider fingerprints,
 and edition. Search, expand, and preserve exact citations and receipts.
 
