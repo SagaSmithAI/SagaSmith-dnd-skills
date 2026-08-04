@@ -41,7 +41,9 @@ card slots. A text-only Agent may retry
 The MCP verifies the replacement against the immutable source, requires the old
 span to occur exactly once inside the selected card, reruns the parser and an
 independent OCR corroboration path, and records the correction in the review
-evidence. An image-capable Agent may instead inspect the checksum-bound render
+evidence. Reuse the same idempotency key only for an exact retry: the MCP must
+return the stored full recovery response without rerunning OCR or asking the
+Agent to review the same evidence again. An image-capable Agent may instead inspect the checksum-bound render
 and submit a complete visual statblock review. If neither page text nor an
 actually inspected image proves the missing fact, stop for external review.
 

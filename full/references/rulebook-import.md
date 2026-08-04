@@ -132,7 +132,8 @@ import, install, activation, or access authority.
    unless the staged page text corroborates the new value, the old span is
    unique inside the selected structural card, and the corrected card passes
    full parsing/corroboration. Use a fresh idempotency key for a changed
-   correction; an exact retry replays the same receipt. This is Agent-reviewed
+   correction; an exact retry replays the complete stored response without
+   rerunning OCR or Agent review. This is Agent-reviewed
    transcription repair, not permission to infer a number or rule from memory.
    `recover_statblock` must reject a 2024 source instead of applying 2014 layout
    grammar. For 2024, use a complete exact-page indexed segment with the

@@ -1137,7 +1137,9 @@ text. Corrections are applied to every OCR model/scale attempt before parsing,
 are included in the recovery evidence, and are bound into idempotency and review
 lineage. Changing a correction requires a new key. This lets a text-only Agent
 repair OCR by comparing server-returned text streams while preventing model
-memory from changing source mechanics. If only the rendered image proves the
+memory from changing source mechanics. An exact retry under the same key returns
+the stored complete recovery/review response before entering any OCR provider;
+it must not repeat model-assisted review. If only the rendered image proves the
 fact, use an actually image-capable `review_mode="visual"` reviewer instead.
 Successful exclusion of trailing creature prose or page furniture is returned
 separately as `normalization_notes`. These notes preserve the audit trail but are
