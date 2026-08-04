@@ -33,8 +33,10 @@ Export with `character_query(view="portable_card")` and import with
 Character identity and no ActorKnowledge. The 2014 and 2024 SRD creatures are
 ordinary cards in bundled preset packs, not host- or driver-side name tables.
 Import must settle every resolution before release. Source-explicit action
-variants become separate cards, OCR performs only structurally proven repairs,
-and runtime never authors semantics on first use.
+variants become separate cards, the engine performs only structurally proven
+OCR repairs, and an Agent may correct a damaged OCR span only through exact
+page/slot evidence corroborated by staged text or an actually inspected render.
+Runtime never authors semantics on first use.
 
 Bind module NPCs, monsters, and pregenerated PCs with
 `module_import(action="bind_actor")`, then export with

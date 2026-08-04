@@ -145,6 +145,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    add a generic engine implementation and source-backed test, relock the
    campaign's built-in Core pack explicitly, and retry. Never add a
    named-monster special case.
+   When the card slot is structurally proven but one OCR cell or action line is
+   damaged, render that exact page and compare its native/normalized/OCR text
+   streams. A text-only Agent may persist an exact page+slot
+   `ocr_corrections.abilities` or `ocr_corrections.text_replacements` entry in
+   the book regression manifest. The new value must be present in staged page
+   text; otherwise only an image-capable reviewer that actually inspected the
+   checksum-bound render may use visual review. Never copy a corrected value
+   from a similar SRD monster or model memory.
    Repeated decorative/narrative copies of a creature
    heading are valid when exactly one copy is immediately bound to a complete
    creature core. If OCR still cannot isolate the card but those exact indexed

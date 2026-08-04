@@ -1126,6 +1126,19 @@ indexed text with `review_mode="agent_text"`, or an image-capable
 edition-matching visual review. Ambiguous headings, missing page hints,
 low-confidence facts, evidence disagreement, unsupported statblocks, or parser
 warnings do not authorize repair from model memory.
+When one structurally selected 2014 card instead contains bounded OCR damage,
+the same `recover_statblock` action accepts `statblock_slot` and
+`ocr_corrections`. Corrections require an exact physical page and slot.
+`ocr_corrections.abilities` maps only `str|dex|con|int|wis|cha` to a complete
+`score (+/-modifier)` cell. `ocr_corrections.text_replacements` contains 1-20
+objects with exactly `old` and `new`; the old normalized span must match once in
+the selected OCR card and the new span must be corroborated by the staged page
+text. Corrections are applied to every OCR model/scale attempt before parsing,
+are included in the recovery evidence, and are bound into idempotency and review
+lineage. Changing a correction requires a new key. This lets a text-only Agent
+repair OCR by comparing server-returned text streams while preventing model
+memory from changing source mechanics. If only the rendered image proves the
+fact, use an actually image-capable `review_mode="visual"` reviewer instead.
 Successful exclusion of trailing creature prose or page furniture is returned
 separately as `normalization_notes`. These notes preserve the audit trail but are
 not executable uncertainty: they must not create `ruling_requirements`, change
@@ -1180,6 +1193,14 @@ The stored review uses `confidence="reviewed_text"` and retains per-chunk
 checksums. Visual review remains `review_mode="visual"` and
 `confidence="reviewed_image"`. Missing or conflicting indexed facts remain an
 explicit external source-review boundary.
+Catalog projection treats `statblock_catalog_recovery.complete_pages` as
+whole-page authority. A later Agent-named review on an incomplete page replaces
+only one same-name or mechanically identical candidate; otherwise it is added
+without deleting sibling cards, and any ambiguous OCR debris must be explicitly
+rejected at catalog review. Preset export is stricter: every source review must
+map to exactly one accepted catalog artifact, and only the strongest review may
+claim that artifact. Unmatched and duplicate historical reviews are audited but
+never exported as actors.
 For an image-only module card, use the reviewed visual workflow and
 `mode="module_statblock"` instead. Every module-authored Multiattack is an
 Agent-review gate. `module_query(view="candidates")` returns

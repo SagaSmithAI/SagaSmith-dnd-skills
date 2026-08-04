@@ -122,6 +122,18 @@ import, install, activation, or access authority.
    target-segment embedded-text corroboration or agreement from an independent
    OCR scale. The result is a checksum-bound reviewed 2014 statblock; retry actor
    creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
+   If the structural card is correct but OCR damaged one exact cell or action
+   line, call `rule_import(action="render_page")` for that page. A text-only
+   Agent compares `transcription.native_text`, `transcription.normalized`, and
+   the returned OCR variants, then retries `recover_statblock` with exact
+   `page_number`, `statblock_slot`, and `ocr_corrections`. An ability correction
+   is a complete `score (+/-modifier)` value. A text correction is one exact
+   `old` OCR span plus its exact `new` source span. The server accepts neither
+   unless the staged page text corroborates the new value, the old span is
+   unique inside the selected structural card, and the corrected card passes
+   full parsing/corroboration. Use a fresh idempotency key for a changed
+   correction; an exact retry replays the same receipt. This is Agent-reviewed
+   transcription repair, not permission to infer a number or rule from memory.
    `recover_statblock` must reject a 2024 source instead of applying 2014 layout
    grammar. For 2024, use a complete exact-page indexed segment with the
    edition-matching `review_statblock` text path below, or an image-capable
@@ -192,6 +204,15 @@ import, install, activation, or access authority.
    plan. The compiled artifact must be `ruling_ready` (or
    `descriptive_ready` for proven descriptive material). Missing identity, core
    statistics, or source text may not be relabeled as semantic deferral.
+   A recovered review on a page with other unresolved cards is projected only
+   into its matching candidate; unrelated cards on that page remain. Reject
+   page numbers, section labels, captions, and narrative fragments explicitly
+   in the replayable catalog manifest. For a whole-book actor catalog, retain
+   each Agent slot review (`page_number`, `statblock_slot`, `name`, and any
+   `ocr_corrections`), the explicit rejection decisions, expected content-kind
+   counts, and either the exact expected actor-name multiset or its canonical
+   SHA-256. The portable round trip must fail on any missing, duplicate, or
+   unexpected actor name.
    Dice procedures, numbered random-effect tables, and adjudication guidance
    count as mechanical signals even when no specialized entity parser matches.
    They require one exact-source build-time Agent-ruling artifact per retained
