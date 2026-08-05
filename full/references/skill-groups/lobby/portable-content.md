@@ -33,51 +33,36 @@ database, preserve foreign Character IDs, or run uninstalled optional rules.
 
 ## Rule packs, releases, and addons
 
-Export a reviewed extension with `rule_pack_query(view="package",
-payload={campaign_id, pack_id, version, metadata, include_package?})`. The
-package uses stable source/chunk keys and carries indexed text for citations.
-Keep `metadata.distribution="private"` unless the owner supplied an explicit
-license and attribution for shareable distribution.
+Export reviewed rules with `rule_pack_query(view="package", ...)`. Packages use
+stable source/chunk keys and carry citation text. Keep distribution `private`
+without an explicit shareable license and attribution.
 
-Import through `rule_import(action="import_package")` using exactly one
-`package`, managed `artifact`, or allowlisted `source_path`, plus a stable
-idempotency key. Verify the edition and exact dependencies. Import creates an
-inactive draft with fresh local source/chunk ids; installation, Owner/DM
-approval, and activation are separate steps.
+Import with `rule_import(action="import_package")` from exactly one inline,
+managed, or allowlisted source. Verify edition and dependencies. Import creates
+an inactive draft with fresh local ids; install and Owner/DM activation remain
+separate.
 
-Every standalone D&D rule package must contain
-`resolution_policy="build_time_complete"` and the exact readiness report
-recomputed from its artifacts and proven mechanic providers. Export, import,
-and install all fail on a missing, stale, or deferred report. An addon repeats
-that audit at the outer envelope and inside every embedded rule component; one
-layer never substitutes for the other.
+Rule packages require `resolution_policy="build_time_complete"` and a readiness
+report recomputed from artifacts and mechanic providers. Export, import, and
+install reject missing, stale, or deferred reports. Addons repeat this audit at
+the envelope and each rule component.
 
-Pin `metadata.definition_checksum` for rule dependencies and the envelope
-`checksum` for release components. Keep rules, presets, and modules separate,
-then compose exact ids, versions, and checksums with
-`rule_pack_query(view="release")`. Inspect with
-`rule_import(action="inspect_release")`; a release manifest never imports,
-installs, activates, or grants access.
+Pin rule `definition_checksum` and release component `checksum`. Compose exact
+ids and versions with `rule_pack_query(view="release")`; inspection never
+imports, installs, activates, or grants access.
 
-For a complete locally owned book, combine its complete source-bound
-`rule_pack` and reviewed `preset_pack` with
-`rule_pack_query(view="addon_package")`; import through
-`rule_import(action="import_addon")`. Components install globally but remain
-inactive until Owner/DM calls `campaign_rules(action="set_addon")` with the
-current revision. Branch locks and snapshot restore retain exact versions.
-Activation policies must match component kinds (`branch` for rules, `library`
-for presets, non-`none` for modules); rule components must support all declared
-editions, and conflict ids must be unique and non-self-referential.
+Build an addon from a complete source-bound rule pack and reviewed preset pack;
+import with `rule_import(import_addon)`. Components install globally but stay
+inactive until revision-safe Owner/DM `campaign_rules(set_addon)`. Branches and
+snapshots retain exact versions. Policies are `branch` for rules, `library` for
+presets, and non-`none` for modules; editions and conflict ids must validate.
 
-`rule_pack_query(view="preset_package", allow_partial=true)` may return proven
-cards plus deferred templates in `summary.failures`. The rule component must
-still contain every source section and candidate. A catalog-only statblock
-advertises `character_create_from(mode="statblock")`; use its rebound
-`source_id`, `chunk_ids`, and exact `source_statblock_name` so the engine performs
-normalization. Parameterized companions remain source templates until supplied
-their required owner/class context, which must be retained in provenance.
+Partial preset export may contain proven cards and deferred templates, but the
+rule component still covers every source section and candidate. Catalog-only
+statblocks use rebound source/chunk ids and exact printed name through
+`character_create_from(mode="statblock")`. Parameterized companions remain
+templates until required owner/class context is provided and retained.
 
-Before distributing detached addons, cold-start a fresh MCP home and run
-`scripts/regression_addons.py`. The audit must publicly import, inspect, enable,
-catalog, disable, and exactly re-export every package. Keep reports containing
-commercial source metadata beside private packages, not in a public repository.
+Before distribution, cold-start a fresh MCP home and run the addon regression:
+publicly import, inspect, enable, catalog, disable, and exactly re-export. Keep
+commercial-source reports private.

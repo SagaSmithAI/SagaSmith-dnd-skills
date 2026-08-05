@@ -1,22 +1,30 @@
 # Rule import and packs
 
-Stage the exact rule source, inspect, repair only damaged pages, ingest, review
-candidates, compile, test, install, and activate in order.
-
-OCR may repair bounded layout corruption, never altered numbers, omitted
+Stage the exact source; inspect, repair damaged pages, ingest, review candidates,
+compile, test, install, and activate in order. OCR repair never invents numbers,
 abilities, or unsupported rules. A missing standard implementation blocks until
-the provider is fixed; it does not become an Agent homebrew ruling.
+fixed; it does not become homebrew.
 
-For a damaged token or heading, use `rule_import(render_page)` then checksum-bound
-`rule_import(review_text)` before ingest. A visionless Agent needs corroborated
-text or bounded context with unchanged digits and must copy adjacent heading
-depth. The PDF and OCR cache stay immutable.
+For damaged text, call `rule_import(render_page)` and then checksum-bound
+`rule_import(review_text)` before ingest. A text-only Agent may use corroborated
+text or bounded context but must preserve digits, written quantities, and
+heading depth. PDF and OCR cache remain immutable.
 
-When the same source is part of a durable regression, preserve each accepted
-page repair in the document's `text_reviews` manifest entry with its current
-normalized-text hash and evidence checksum. The regression driver must replay
-that public transaction before ingest and reject drift instead of silently
-retargeting a stale correction.
+If all extractors omitted a physical page, an image-capable Agent may submit one
+`rendered_page`-bound replacement with `old: ""` and the complete literal page
+transcript as `new`. The server requires the page to be empty, exactly one
+replacement, and a matching image checksum. A visionless Agent may later use
+the reviewed text but cannot claim visual review.
+
+Text visible in the rendered page is a source typo, not OCR damage: preserve it
+and bind structured data to stronger same-page evidence. For a bad field in an
+otherwise proven statblock slot, a text-only Agent may provide `ocr_corrections`
+only from immutable staged text; an image-capable Agent may bind it to the image
+checksum. Do not rewrite the remaining card.
+
+Durable regressions store accepted repairs in `text_reviews` with normalized
+text and evidence checksums. Replay the public transaction before ingest and
+reject drift.
 
 Profiles lock exact versions, dependencies, checksums, provider fingerprints,
 and edition. Search, expand, and preserve exact citations and receipts.

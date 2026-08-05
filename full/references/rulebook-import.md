@@ -54,9 +54,23 @@ import, install, activation, or access authority.
    job revision, rationale, and evidence basis:
    - `cross_text` requires the replacement text in two returned text sources;
    - `agent_context` permits only a small spelling/case/Markdown-structure repair
-     and cannot change any digit sequence;
+     and cannot change digit sequences or written quantities;
    - `rendered_page` requires a reviewer that actually inspected the returned
      image and its exact checksum.
+   If the normalized physical page contains only whitespace because every
+   extractor missed it, `rendered_page` also permits one whole-page recovery:
+   use exactly one replacement with `old=""` and the complete literal page
+   transcription in `new`. The server accepts this only for an actually empty
+   normalized page and the matching rendered-image checksum; a nonempty page,
+   multiple replacements, `cross_text`, and `agent_context` all fail closed.
+   A rendered page that visibly contains the disputed words proves a source
+   typo, not an OCR/transcription error. Preserve that literal source text and
+   resolve the structured card from stronger same-page evidence such as its
+   display heading, table identity, and surrounding section. Do not use
+   `review_text` to silently publish an edited edition of the source.
+   Submission reruns local OCR only for `cross_text`; `agent_context` is checked
+   against the current normalized-page hash and bounded edit, while
+   `rendered_page` is checked against the immutable image checksum.
    The server never edits the PDF or cached OCR. It stores the reviewer,
    evidence hashes, before/after page hashes, and replacements, then reruns
    inspection against the revised view. Copy heading depth from adjacent entries
@@ -71,9 +85,12 @@ import, install, activation, or access authority.
    page, current `base_text_sha256`, exact `old`/`new` replacements, rationale,
    evidence basis, review method, and (for `rendered_page`) the exact image
    checksum. `regression_rulebooks.py --catalog-manifest ...` re-renders the
-   evidence, rejects hash drift, and replays each revision through the public
-   `review_text` facade before ingest. Never refresh a stored hash merely to make
-   a stale correction apply; re-review the changed normalized page instead.
+   evidence and replays each revision through the public `review_text` facade
+   before ingest. On an exact resumed run the public idempotency record may
+   return the already stored revision even though the current page hash is now
+   the revised hash; without that exact replay the server rejects a stale base
+   hash before writing. Never refresh a stored hash merely to make a stale
+   correction apply; re-review the changed normalized page instead.
 5. Call `rule_import(action="ingest")`. If and only if the Agent acting as DM
    reviewed all warnings from available exact evidence, pass
    `payload.acknowledge_warnings=true`. This uses the same Core PDF/Markdown
@@ -128,10 +145,14 @@ import, install, activation, or access authority.
    the returned OCR variants, then retries `recover_statblock` with exact
    `page_number`, `statblock_slot`, and `ocr_corrections`. An ability correction
    is a complete `score (+/-modifier)` value. A text correction is one exact
-   `old` OCR span plus its exact `new` source span. The server accepts neither
-   unless the staged page text corroborates the new value, the old span is
-   unique inside the selected structural card, and the corrected card passes
-   full parsing/corroboration. Use a fresh idempotency key for a changed
+   `old` OCR span plus its exact `new` source span. With
+   `correction_evidence_basis="staged_text"`, the immutable staged page text
+   must contain the new value. If both text extraction and OCR damaged that
+   value, only an Agent or human that actually inspected the returned image may
+   use `correction_evidence_basis="rendered_page"`, together with its exact
+   `rendered_image_checksum`. In both cases the old span must be unique inside
+   the selected structural card, and the corrected card must pass full
+   parsing/corroboration. Use a fresh idempotency key for a changed
    correction; an exact retry replays the complete stored response without
    rerunning OCR or Agent review. This is Agent-reviewed
    transcription repair, not permission to infer a number or rule from memory.
