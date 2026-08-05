@@ -8,9 +8,11 @@ Use `sagasmith.portable` schema v1. PC, NPC, and monster share the same
 `character_create_from(mode="portable_card")`, providing exactly one inline
 `card`, managed `artifact`, or allowlisted `source_path`. Import creates a fresh
 Character identity and never copies campaign membership, revision, or
-ActorKnowledge. Actor-card writes must already contain a source-bound plan or
-direct Agent ruling for unresolved prose; first use is not a content-authoring
-phase.
+ActorKnowledge. Actor-card mechanics may already contain a reviewed
+source-bound plan. When a custom mechanic has no plan, the DM Agent may compile
+one on its first live use through `content_solution`; the plan is persisted
+against the exact card and reused. Never infer mechanics from a creature name
+or prose in host code.
 
 Browse installed standard actors with
 `rule_pack_query(view="content_catalog", kind="actor_card")` and import a

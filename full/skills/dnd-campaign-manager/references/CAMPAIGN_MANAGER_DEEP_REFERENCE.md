@@ -117,7 +117,7 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    using only parsed weapon ids, modes, and explicit counts. This is required
    even when the parser proposed a composition. For standard rulebooks, the
    parser and engine are authoritative, Agent fills are rejected, and any
-   unparsed mechanic must be implemented and tested before play. When a custom
+   unparsed standard mechanic must be implemented and tested before play. When a custom
    procedure cannot be represented by
    weapon/count options, submit `resolution="agent_ruling"` with no options so
    the parser proposal is removed and the action remains an Agent DM boundary.
@@ -128,7 +128,8 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    The canonical parser derives the weapon id and mechanics; the Agent cannot
    supply a sheet patch, attack bonus, damage, or condition fields separately.
    A Multiattack fill may then cite that parser-derived weapon id. Preserve any
-   returned on-hit ruling for public combat settlement.
+   returned source evidence. If the custom rider has no plan, compile one
+   source-bound `content_solution` on first live use and reuse it thereafter.
    Do not solve individual monster prose by adding phrase-specific parser cases
    or by patching the resulting actor sheet.
    Then choose a scene and use `module_set_progress` with an explicit

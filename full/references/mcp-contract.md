@@ -30,9 +30,12 @@ names or emulate aliases client-side. The consolidated calls are:
 - `rule_import(action="render_page" | "review_text" | "recover_statblock")`;
 - `module_review(action="render_page" | "render_transcript" | "recover_statblock" | "submit_content" | "submit_transcript")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
-- `combat_choice(action="on_hit_ruling" | "execute_plan")`;
-- `content_solution(action="query" | "compile")`, with `compile` restricted to
-  pre-play Lobby authoring and migration.
+- `combat_choice(action="on_hit_ruling" | "execute_plan")`; the former only
+  dismisses an exact-source, Agent-reviewed no-op, while executable custom
+  effects use the latter;
+- `content_solution(action="query" | "compile")`; DM-only compilation is
+  available in Lobby, Play, and Combat so a previously unseen custom card can
+  be compiled on first live use and then reused from its persisted card.
 
 For `chase(action="start")`, a module-authored contextual speed change belongs
 in that participant's `participant_config` as `speed_adjustment_ft` plus an
@@ -149,8 +152,10 @@ ownership metadata to the acting Agent. In particular, an attack
 environmental adjudication, not an on-hit choice. The Agent derives the fact
 from current scene and time evidence, records its reasoning, and retries the
 same public attack at the current revision. Only a response with an actual
-pending on-hit `choice_id` may be sent to
-`combat_choice(action="on_hit_ruling")`.
+pending on-hit `choice_id` may be settled. Query or compile the exact card with
+`content_solution`, then send its fingerprinted runtime commitment to
+`combat_choice(action="execute_plan")`. Use `on_hit_ruling` only to dismiss the
+exact quoted effect after Agent review finds that no structured mutation applies.
 This applies to party construction, source checks and contests, level
 advancement, and catalog application as well as encounters. A regression
 driver must write a machine-readable stopped report with top-level
@@ -1145,13 +1150,15 @@ Successful exclusion of trailing creature prose or page furniture is returned
 separately as `normalization_notes`. These notes preserve the audit trail but are
 not executable uncertainty: they must not create `ruling_requirements`, change
 `settlement` away from `automatic` on their own, or block a readiness group.
-When recovered rulebook text includes Multiattack, the standard D&D parser and
-engine own its composition. `agent_fill` is rejected. A composition the engine
-cannot structure returns `engine_implementation_required`; fix the generic
-standard-rule implementation and its tests before retrying. This does not make
+When recovered rulebook text includes an ordinary weapon-only Multiattack, the
+standard D&D parser and engine own its exact composition. `agent_fill` is
+rejected. An open, conditional, or special-action composition instead remains
+an exact-source direct Agent/DM ruling without an executable Multiattack
+mechanic reference. This does not make
 every creature-specific passive or rider a new generic engine rule: exact
-source prose may carry a build-time direct Agent-ruling clause while the engine
-continues to own payment, rolls, damage, action economy, and timing.
+source prose remains evidence on the portable card and may carry a reviewed
+generic plan. Otherwise the DM Agent compiles that plan on first use while the
+engine continues to own payment, rolls, damage, action economy, and timing.
 Text-layout recovery also compares every explicit
 `Melee/Ranged [Weapon|Spell] Attack:` source marker with the parsed weapon and
 identified statblock-spell actions. One successfully parsed attack cannot hide
@@ -1172,9 +1179,11 @@ the staged PDF checksum and page render checksum, verifies source/page/ordinal
 membership, parses the normalized card, rejects every normalized fact absent
 from the selected text, and rejects omission of any selected statblock evidence.
 The review content kind and parser must match the locked 2014 or 2024 edition.
-If that reviewed rulebook card contains Multiattack or another standard
-mechanical card, `rule_import(action="review_statblock")` accepts it only when
-the engine produces a complete structured implementation. It rejects
+If that reviewed rulebook card contains an ordinary weapon-only Multiattack or
+another standard mechanical card, `rule_import(action="review_statblock")`
+accepts it only when the engine produces a complete structured implementation.
+An open/special composition must instead preserve the exact direct Agent-ruling
+boundary described above. The review rejects
 `payload.agent_fill`, including `additional_actions` and derived-review fills.
 A standard passive/action with missing or conflicting facts, or a missing
 generic transaction, is an importer or engine defect; do not hide it with
@@ -1219,33 +1228,25 @@ spell attacks. A spell-only card without numeric attack facts, an edition
 mismatch, an ambiguous card, or another unsupported block must
 remain unresolved; do not replace it with a similar SRD creature or invent a card.
 An attack roll whose `Hit` clause applies only a condition or other effect is
-still an executable attack even when it prints no damage dice (for example, a
-giant spider's Web). Preserve an empty damage expression and the complete
-`on_hit_effect`; never invent zero damage, an ability-modifier damage value, or
-a substitute attack. On a hit, leave HP unchanged and surface the effect and any
-escape/destruction procedure for Agent-as-DM settlement. A candidate blocked solely
-because such an attack lacks damage dice indicates an importer defect that must
-be repaired and refreshed before combat.
-If a reviewed on-hit clause prints a saving throw and additional damage,
-`combat_choice(action="on_hit_ruling")` with
-`payload.selection.id="saving_throw_damage"` validates and rolls the exact
-ability, DC, damage formula/type, and success treatment through the campaign
-random stream. A printed zero-HP rider must be supplied and settled in the same
-mutation. Its structured Stable flag, condition labels, and duration are
-validated against the complete reviewed effect and selected damage type, not a
-creature-name or phrase allowlist. Explicit save-and-damage text cannot be
-dismissed or reduced to a condition-only ruling.
-If the reviewed clause instead gates a timed condition behind an immediate save
-and explicitly grants repeat saves at the end of the target's turns, use
-`payload.selection.id="saving_throw_condition"` with the exact condition,
-ability, DC, `repeat_save_timing="turn_end"`, structured printed duration, and
-full excerpt. The initial save and any failed condition application commit
-atomically. `combat_end_turn` performs later saves through the campaign random
-stream without consuming an action, removes only that effect on success, and
-returns `repeat_saves`; action-consuming `apply_condition` escape terms are not
-interchangeable. The Agent selects this semantic settlement from the complete
-reviewed card and exact source, never from a creature-name allowlist or a
-phrase-specific parser patch.
+still a legal attack even when it prints no damage dice. Preserve an empty
+damage expression and the complete source excerpt; never invent zero damage, an
+ability-modifier damage value, or a substitute attack. At first use, an
+unresolved custom clause opens a source-bound pending window. The DM Agent reads
+the exact card and indexed evidence, authors one generic `resolution_plan`, and
+persists it with `content_solution(action="compile")`. The engine then validates
+its source-card id, actor revision, fingerprint, bindings, random stream, and
+generic opcodes through `combat_choice(action="execute_plan")`. Later uses reuse
+that plan. If the generic vocabulary cannot express the clause, keep the result
+at an explicit Agent/DM ruling boundary; do not add a creature-name switch,
+phrase parser, or monster-specific facade field. A candidate blocked solely
+because an effect-only attack lacks damage dice remains an importer defect.
+A custom AC-changing Reaction uses the same compilation boundary but a contextual
+transaction: the persisted plan has `trigger="attack.after_hit"` and exactly one
+static `attack.ac_bonus` step. The attack then opens `pending_reaction`, and
+`combat_choice(action="resolve_defense")` spends the Reaction/card use, applies
+the reviewed bonus, and completes the stored attack. Raw
+`choices.reaction_defense` data never creates a candidate. Standard `Shield`
+continues to use its locked spell implementation.
 When a complete statblock action repeats a known spell, the action is authoritative
 for that creature. Hydration preserves the Core card's components and provenance
 but overlays the displayed effect/range and structured attack resolution together.
@@ -1510,35 +1511,14 @@ owned by that actor, consumes only the current turn's object-interaction budget,
 marks that one source record inactive, and removes the character condition only
 when no other active effect still owns it. Players cannot self-author this ruling,
 and neither the Agent nor the regression driver may patch the sheet directly.
-When a source-bound weapon records additional typed damage, one successful hit
-rolls all parts and applies per-type defenses as one simultaneous damage instance.
-The result's `damage.roll_parts` preserves every roll and the recorded source of
-each extra part. A reviewed descriptive passive may add damage only through an
-owner/DM `action.rulings` entry with
-`kind="source_conditional_extra_damage"`, `source="dm_ruling"`,
-`default_resolver="agent"`, `ruling_kind="agent_dm_adjudication"`, a unique
-application id, the exact passive feature id/excerpt/printed dice expression,
-typed nonempty trigger facts, explicit eligible target ids, the build-time plan
-fingerprint when such a plan exists, and a recorded decision and reason. The
-card may instead carry a direct exact-source Agent-ruling requirement when the
-effect should remain a live applicability judgment. The server verifies the
-excerpt and any supplied plan fingerprint against the immutable
-actor card, rejects targets outside the Agent-declared eligible set, and appends
-the dice to the preflight plan before resolving either a melee or ranged weapon
-attack. A player cannot self-declare this ruling. The conditional dice, critical
-doubling, typed defenses, 0-HP
-effects, concentration consequences, and target revision settle in the same
-attack transaction; never emulate the feature with a later `combat_hp_change`.
-When the stored source condition is “attack advantage, or an adjacent
-non-incapacitated ally while the attack has no disadvantage,” use the typed
-applicability mode. The driver supplies the actual branch and exact qualifying
-ally ids from the current temporary map; the server independently verifies
-advantage/disadvantage, disposition, distance, departure, and incapacitation.
-Never predeclare that condition as true for an entire future round sequence.
-A nonempty
-`on_hit_ruling` means damage is committed while the quoted secondary condition
-or choice still requires explicit Agent-as-DM settlement; it is not permission
-to repeat the hit.
+When a source-bound weapon records unconditional typed damage parts, one
+successful hit rolls every part and applies per-type defenses as one simultaneous
+damage instance. Conditional custom damage, save riders, persistent conditions,
+and unusual triggers must not enter attack arguments as ad hoc ruling fields.
+They stay on the exact source card, compile once to a persisted generic plan,
+and execute through the owned pending window.
+A nonempty `on_hit_ruling` is legacy source evidence only; it is not an
+executable recipe or permission to repeat the hit.
 
 Standard D&D mechanic references registered in the campaign's active rule lock
 remain server implementations; a core-looking string alone is not executable.
@@ -1552,20 +1532,14 @@ spell/item/creature-specific Agent clause is not a replacement for standard
 action economy or accounting: it is the durable settlement of that exact card
 and is applied only through public engine operations.
 For imported or homebrew content without such an implementation, import/review
-stores either a schema-v2 source-bound typed engine-call recipe or a direct
-exact-source Agent-ruling contract. Direct creation, build, template
-instantiation, whole-sheet replacement, and inventory mutation all run the same
-prefill before persistence. Standalone rule-pack export/import/install and
-composed addon export/import all recompute the same audit; they fail unless the
-stored `build_time_complete` report is exact and complete.
-`semantic_solution.status="content_authoring_required"` can
-therefore only identify legacy/corrupt data that bypassed those boundaries;
-return to Lobby and repair, migrate, or reimport it.
-`content_solution(action="compile")` exists only for explicit pre-play
-authoring/migration. Paid item hits never alter
-their card's execution contract. Combat replays an existing recipe through
-`combat_choice(action="execute_plan")`, or settles the existing direct ruling
-through its bounded on-hit window; neither path reinterprets and persists prose.
+preserves the exact source evidence and may store a reviewed source-bound plan.
+If no plan exists, the first live use returns
+`semantic_solution.status="content_authoring_required"` before the custom rider
+is executed. The DM Agent may call `content_solution(action="compile")` in
+Lobby, Play, or Combat, using the exact actor revision and card identity. The
+plan is persisted on that portable card and the same paid window resumes through
+`combat_choice(action="execute_plan")`; retries and later uses reuse its
+fingerprint and never reinterpret prose.
 Never put arbitrary Python names or state patches in a plan. If an occurrence is
 genuinely unique, cannot be expressed by available engine calls, or depends on
 unstructured scene judgment, keep it in the explicit Agent/DM ruling boundary
@@ -1750,34 +1724,17 @@ stored, retry returns the safe opaque replay `{status: committed,
 response_recovery: read_current_state}` rather than applying the mutation
 again; then read the relevant campaign, character, or combat state.
 
-`character_action(action="use_activity")` and `combat_use_activity` work with the normalized
-`content.activities`, `content.features`, and `content.feats` cards. They spend
-one `resource_key` resource when present, otherwise one limited card use, and
-pay the card's action/bonus-action/reaction timing in combat. Card prose,
-choices, targeting, and any non-deterministic result are returned for an
-explicit Agent-performed DM ruling rather than automatically materialized.
-A reviewed descriptive statblock action records its complete source excerpt and
-a build-time direct Agent-ruling requirement. Public actor-card writes also add
-that contract to otherwise-unsettled custom activities before persistence. A
-`semantic_solution.status="content_authoring_required"` response consequently
-means legacy/corrupt data bypassed the invariant; it still pays no timing or use.
-Return to Lobby and migrate or reimport it. Runtime must never create a durable
-resolution contract as a side effect of use.
-For a genuinely one-off ruling containing a printed saving throw plus damage,
-commit the entire semantic settlement before paying the action. The activity declaration,
-unstructured spell declaration, or scene-procedure `improvise` payload carries
-one canonical `agent_ruling_commitment`: stable application id, exact card kind
-and id, ordered targets, save/DC, advantage state, damage expression/type,
-success reduction, exact mechanics excerpt, and the current-scene Agent ruling.
-Then call `combat_hp_change(action="save_damage")` with the same fields. This is
-DM-only. The server requires the exact commitment in the current actor's
-current-turn action log, verifies the actor card or active module source, rolls
-shared damage once and each target save separately, applies full/half/zero
-damage through Core, and commits every HP/concentration/condition mutation
-atomically. A different target list or contract cannot reuse the payment; one
-application cannot settle twice, while the same idempotency key replays without
-another random draw. The Agent and encounter driver must never calculate
-`damage // 2` or issue one independent damage mutation per target.
+`character_action(action="use_activity")` and `combat_use_activity` work with
+normalized `content.activities`, `content.features`, and `content.feats` cards.
+Locked standard activities use their registered implementation and normal
+resource/action payment. A custom mechanical activity with no plan returns
+`semantic_solution.status="content_authoring_required"` before its custom
+outcome is paid or executed. The DM Agent queries the exact card, compiles one
+source-bound generic plan in the current phase, and retries through public tools;
+the engine validates bindings, spends resources, rolls, and commits mutations.
+A module-only narrative procedure may remain an explicit Agent/DM ruling backed
+by its exact scene evidence, but it must not become a creature-specific action,
+state field, or save/damage shortcut.
 Do not seed a second `sheet.resources` counter for a feature whose structured
 card has an empty `resource_key`: that card-local `uses` counter is
 authoritative. If a legacy/imported actor already contains both

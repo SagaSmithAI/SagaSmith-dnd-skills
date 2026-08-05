@@ -234,9 +234,11 @@ sheet v2 与 notes v2 结构。
 
 导入、审核或导出自设内容时，系统必须完成 resolution audit。能够稳定表达的
 内容保存严格、类型化的 `resolution_plan`；不适合自动化但来源完整的内容保存
-精确 `source_ref`/`source_excerpt` 与 direct Agent-ruling requirement。两者都随
-portable card 发布。`content_solution(action="compile")` 仅保留为 Lobby 中显式的
-旧卡迁移/作者化工具，不会由 Play 或 Combat 的首次触发调用。
+精确 `source_ref`/`source_excerpt` 与 Agent-ruling requirement。两者都随
+portable card 发布。如果某张自设卡尚无方案，DM Agent 可在 Lobby、Play 或 Combat
+第一次实际触发时读取有界来源上下文，调用 `content_solution(action="compile")`
+持久化一次；同一待处理窗口随后用 `combat_choice(action="execute_plan")` 继续，
+之后始终复用指纹，不再次解释原文。
 
 这不是一套新的通用叙事语言：
 
@@ -248,11 +250,11 @@ portable card 发布。`content_solution(action="compile")` 仅保留为 Lobby �
 - 当前发生条件仍需在每次使用时根据实时状态判断；
 - 支付动作、次数、法术位和随机结果仍由引擎完成。
 
-付费动作和命中窗口不得改变卡的执行契约。当前所有公开角色卡写入边界——直接
-创建、build、模板实例化、整卡替换、物品新增与更新——都会在持久化前补齐
-build-time direct ruling。若运行时仍遇到 `content_authoring_required`，说明是绕过
-这些入口的旧数据或损坏数据，必须在付款前停止并回到 Lobby 迁移或重新导入；
-不能把已发生的命中当作内容作者化入口。
+标准规则的执行契约仍只能由引擎提供，Agent 不能覆盖。自设卡则允许在第一次
+实际使用时进入 `content_authoring_required`：DM Agent 读取精确卡片和来源证据，
+在当前 Lobby/Play/Combat 阶段持久化一次通用方案，再从原待处理窗口继续。方案
+绑定卡片、actor revision 与指纹；已发生的命中不会被重掷，也不能借此写入任意
+状态补丁。
 
 ### 模组叙事
 

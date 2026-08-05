@@ -387,31 +387,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    the unseen-attacker benefit. Incapacitated—and therefore Paralyzed,
    Petrified, Stunned, or Unconscious—ends concentration. Bind a printed
    first attack to that actor's reviewed weapon rather than allowing generic
-   weapon preference to override it. When an effect-only weapon hit opens an
-   on-hit ruling, require its source-bound direct ruling or typed plan to have
-   been fixed before combat. Execute an existing typed plan through
-   `combat_choice(action="execute_plan")`. A `content_authoring_required` result
-   identifies legacy/corrupt data that bypassed the current write-time prefill
-   invariant. It is a failed Lobby readiness gate, never a prompt to author
-   after payment. Use
-   `on_hit_ruling` only when
-   the occurrence cannot be represented by the generic primitives. A restrained target uses
-   `combat_check(action="escape")`, spends its action, and clears the condition
-   only on success. Do not use that action escape for a save-gated condition.
-   When the complete reviewed action instead prints an immediate saving throw,
-   a timed condition, and repeat saves at each target turn end, have the Agent
-   submit `payload.selection.id="saving_throw_condition"` with the exact
-   condition, ability, DC, `repeat_save_timing="turn_end"`, duration, and full
-   excerpt. The initial and automatic turn-end saves are server rolls; neither
-   consumes an action. When the reviewed on-hit text instead prints a saving throw
-   plus damage, use `combat_choice(action="on_hit_ruling")` with
-   `payload.selection.id="saving_throw_damage"` and the exact ability, DC, dice,
-   damage type, success treatment, and excerpt. Include
-   a structured zero-HP effect when printed; for a giant spider Bite this keeps
-   a target reduced to 0 HP stable, Poisoned for 1 hour, and Paralyzed while
-   poisoned. Never dismiss that explicit save-and-damage clause or apply only
-   its final condition. Classify the whole action semantically; do not add
-   creature-name allowlists or isolated phrase patches. If a source says a living
+   weapon preference to override it. When an effect-only custom hit opens an
+   on-hit window, query the exact card with `content_solution`. Compile a generic
+   source-bound plan on first use when none exists, then resume the same paid
+   window through `combat_choice(action="execute_plan")`; later occurrences reuse
+   the fingerprint. `on_hit_ruling` only dismisses an exact-source no-op after
+   Agent review. If the generic plan vocabulary cannot represent the mechanic,
+   leave it at the explicit Agent/DM boundary instead of adding a creature-name
+   allowlist, phrase patch, or custom CLI field. If a source says a living
    NPC surrenders at an HP threshold
    only when escape is impossible, confirm both predicates from current state and
    end with `status="surrender"` before another attack. Do not relabel surrender
@@ -459,15 +442,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    The encounter driver must preserve that same classification. It must not
    interpret every `pending_ruling` from attack preflight or resolution as an
    on-hit choice. A stopped auto-run reports `status`, resolver, missing facts,
-   attempted actor/target/action, and retry contract to the Agent. For
-   Sunlight Sensitivity, the Agent determines `direct_sunlight` from the
-   current scene, campaign clock, and rule card, then retries with a typed
-   `--source-attack-environment-json` declaration containing the actor, boolean
-   fact, exact trait excerpt, and explicit `ruling_reason`. An actual on-hit
-   window instead requires its returned `choice_id` and a typed
-   `--source-on-hit-ruling-json` settlement. Never substitute one boundary for
-   the other. The driver must not parse the pending effect prose and manufacture
-   that settlement; the Agent supplies every semantic field explicitly.
+   attempted actor/target/action, and retry contract to the Agent. Scene facts
+   such as lighting remain Agent judgments grounded in current scene, clock, and
+   source evidence, then retry the same generic public action. A real custom
+   on-hit window instead carries exact source-card identity and is settled only
+   by its persisted content solution. Never substitute one boundary for the
+   other or parse pending prose inside the driver.
    When a hidden caster's perceivable spell components require an observer
    matrix, do not infer perception merely because no sound-blocking or
    total-cover fact was recorded. Retry with
@@ -894,8 +874,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     choices must fail rather than create another rest.
     The Short Rest's atomic party-rest write must also advance minute/hour/day actor
     and world effects by the actual elapsed minutes. In particular, an established
-    one-hour Giant Spider poison/paralysis effect expires after a legal 60-minute
-    Short Rest (or two 30-minute advances), while unrelated conditions remain.
+    one-hour source-bound condition expires after a legal 60-minute Short Rest
+    (or two 30-minute advances), while unrelated conditions remain.
 19. Resolve every Long Rest through the atomic public
     `campaign_change(action="party_rest")` surface. Supply one stable
     `--occurrence-id` and use it for party-rest, clock, ActorKnowledge,

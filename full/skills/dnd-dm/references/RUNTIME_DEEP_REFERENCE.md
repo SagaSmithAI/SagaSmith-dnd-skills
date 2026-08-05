@@ -280,7 +280,7 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Saves and audit | `snapshot_create`, `snapshot_query`, `snapshot_restore`, `branch_query`, `branch_change`, `state_revision` |
 | Combat | `combat_start`, `combat_join`, `combat_query`, `combat_preflight_attack`, `combat_resolve_attack`, `combat_movement`, `combat_common_action`, `combat_use_activity`, `combat_cast_spell`, `combat_ready`, `combat_reaction_attack`, `combat_end_turn`, `combat_check`, `combat_concentration_check`, `combat_hp_change`, `combat_map_patch`, `combat_end` |
 | Owned pending combat windows | `combat_choice(resolve/resolve_defense/on_hit_ruling/execute_plan)` |
-| Pre-play custom-content authoring/migration | Lobby-only `content_solution(query/compile)` |
+| Custom-content solution lookup/compilation | DM-only `content_solution(query/compile)` in Lobby, Play, or Combat |
 | Agent DM adjudication without an owned window | Relevant public dice, check, map, state, memory, and manifest tools |
 
 ## Module Narrative Context
@@ -674,13 +674,12 @@ while holding a weapon whose ammunition is exhausted. The Core attack is
 proficient, uses Strength, has 5-foot reach, and deals `1 + Strength modifier`
 bludgeoning damage. Do not require the actor to delete or unequip a weapon first.
 
-A source-bound weapon can carry multiple simultaneous typed damage parts. Let the
-engine roll every recorded part and apply resistance, immunity, and vulnerability
-per type as one hit; never collapse them into one type or manually add the second
-part. If the same hit also returns `on_hit_ruling.required`, the damage is already
-committed but the quoted secondary effect is still an Agent-as-DM boundary. Resolve that
-effect through Agent-as-DM adjudication and do not silently omit it or apply the
-damage again.
+A source-bound weapon can carry multiple unconditional typed damage parts. Let
+the engine roll every recorded part and apply resistance, immunity, and
+vulnerability per type as one hit; never collapse them into one type or manually
+add the second part. A custom conditional rider stays bound to its exact card. On
+first use, compile one persisted `content_solution` and resume the owned window
+with `combat_choice(action="execute_plan")`; do not apply the hit again.
 
 Multiattack is a distinct action choice. For a structured monster Multiattack,
 pass `multiattack_option_id` on its first `combat_preflight_attack` and
@@ -689,14 +688,16 @@ recorded by that option. Omit the id to choose one ordinary Attack. A descriptiv
 Multiattack without options remains an Agent-as-DM boundary only when selected and does not
 block an ordinary weapon attack. Do not declare a raw `attacks_per_action`
 override. Before any reviewed monster enters combat, inspect
-its `agent_fill_requirements`. Standard rulebook Multiattack composition must
-report `parser_authoritative=true` and `default_resolver="engine"`; Agent
-Multiattack fills are rejected, and a generic unparsed composition mechanic
-must be implemented and tested in the engine before play. Other exact
-creature-specific prose may already carry an immutable source-bound Agent
-ruling created during import. Module-authored and homebrew cards likewise
-return to Lobby so the Agent can submit the immutable content review with
-`payload.agent_fill.multiattack_options`. Cite the activity id and exact source
+its `agent_fill_requirements`. A complete ordinary weapon composition is a
+standard engine transaction and must report `parser_authoritative=true` and
+`default_resolver="engine"`. Agent fills are rejected for standard rulebook
+cards. An open, conditional, or special-action composition is creature content,
+not a new action-economy rule: keep its exact excerpt as a non-executable direct
+Agent/DM ruling and attach no Multiattack mechanic reference. Other exact
+creature-specific prose remains evidence on the portable card. Module-authored
+and homebrew ordinary Multiattack composition can still use reviewed
+`payload.agent_fill.multiattack_options`; unresolved mechanical riders use a
+persisted `content_solution` at first live use. Cite the activity id and exact source
 excerpt and use only existing parsed weapon ids, legal modes, and explicit
 counts. When 2014 OCR recovery returns `requires_agent_fill=true` and `review=null`,
 read the returned normalized text and requirements, then retry that recovery
@@ -741,27 +742,14 @@ text with `content_kind="dnd5e_2024_statblock"` or
 the exact managed page through the edition-matching visual review. Never use a
 2014 normalization to make a 2024 card appear executable.
 
-A reviewed monster action may replace an attack with a structured source
-activity. For the 2014 Intellect Devourer's mixed Multiattack, submit the Claws
-attack with its recorded option and then call `combat_use_activity` for Devour
-Intellect with one visible in-range target and the Agent-as-DM-confirmed
-`target_has_brain=true`; do not roll or patch the Intelligence save, psychic
-damage, 3d6 threshold, Intelligence 0 override, or Stunned condition yourself.
-On a later turn, if an in-range living Humanoid is Incapacitated (including by
-Stunned), prefer the separately recorded Body Thief action and pass
-`target_is_humanoid=true`. The public settlement rolls both Intelligence checks;
-a tie has no winner. On a win it preserves the victim actor and its independent
-knowledge, atomically copies all current ActorKnowledge to the devourer, records
-the victim body as hostile and controlled, uses the body's statistics with the
-devourer's mental scores, and gives the devourer total cover inside the host.
-The inside devourer does not take a separate turn and cannot be targeted; the
-host acts for the hostile side. If the host reaches 0 HP, the engine deactivates
-the host override, marks the brainless body Dead, and ejects the devourer to the
-nearest recorded unoccupied adjacent cell. A `protection from evil and good`
-expulsion, a `wish` brain restoration, or voluntary departure remains an
-explicit Agent-as-DM settlement unless the public tool returns a structured
-contract for that trigger. Never transfer the devourer's copied knowledge back to the
-victim, a replacement PC, or another actor.
+A reviewed monster action may replace an attack with a source-card activity,
+but no creature gets a named runtime path, private state shape, or dedicated
+facade fields. If the card has no plan, the DM Agent reads its exact evidence on
+first selection, compiles a generic source-bound plan, and executes that plan
+through the owned window. Knowledge transfer, possession, transformation, or
+other semantics that the generic plan vocabulary cannot express remain an
+explicit Agent/DM ruling plus ordinary public continuity and state operations;
+the engine must not infer them from a monster name or prose fragment.
 
 When an attack returns `status: pending_reaction`, no damage has been rolled or
 applied. The target actor reads its owned window with
@@ -771,7 +759,11 @@ campaign revision. Only that resolution spends the Reaction when used, updates A
 for the stored attack roll, and then resolves damage if the attack still hits.
 Never roll damage early, manually patch HP, or use generic choice resolution for
 this window. The same sequence applies when an opportunity attack opens a
-post-hit defense. A source-bound `Shield` spell appears as a spell candidate only
+post-hit defense. A custom card appears only after the DM Agent has compiled a
+source-bound `attack.after_hit` plan with one static `attack.ac_bonus` primitive;
+legacy `choices.reaction_defense` data is ignored. The result preserves the plan
+fingerprint, source citations, Agent reason, Reaction payment, and card-use
+payment. A source-bound `Shield` spell appears as a spell candidate only
 when it is prepared/available, has a legal casting resource, and is legal under
 the current turn's 2014/2024 spell limit. Select one of its returned
 `cast_levels` by sending both its spell id and `cast_level`; the same transaction
@@ -1047,17 +1039,13 @@ full card, and let the MCP reject invented facts or omissions. Never use this
 route when the indexed source itself is incomplete or conflicting, and never
 describe it as visual review.
 Do not reject or rewrite a source attack merely because its `Hit` clause has no
-damage dice. Effect-only attacks such as a giant spider's Web retain an empty
-damage expression plus the exact `on_hit_effect`; resolve the attack roll
-normally, apply no fabricated HP damage, and send the printed condition and
-escape/destruction procedure to explicit Agent-as-DM settlement. A hit that returns
-`pending_on_hit_ruling_id` blocks the turn. Read the complete recorded card and
-exact managed source, then use its existing build-time direct ruling contract or
-call `combat_choice(action="execute_plan")` for its existing typed plan. If the
-card instead reports `semantic_solution.status="content_authoring_required"`,
-treat it as a legacy/corrupt card invariant failure: return to Lobby and migrate
-or reimport it. All current public actor-card write paths prefill the direct
-source-bound ruling, and runtime never creates that contract.
+damage dice. Preserve an empty damage expression plus the exact source excerpt,
+resolve the attack roll normally, and apply no fabricated HP damage. A hit that
+returns `pending_on_hit_ruling_id` blocks the turn. Query the exact actor/card
+with `content_solution`. If no plan exists, the DM Agent reads the bounded
+source context, authors one generic plan, and compiles it against the current
+actor revision in Lobby, Play, or Combat. Resume the same window with
+`combat_choice(action="execute_plan")`; later occurrences reuse the fingerprint.
 If a locked standard card has neither a registered engine mechanic nor a
 persisted exact-source content clause and therefore reports
 `semantic_solution.status="engine_implementation_required"`, stop before
@@ -1065,38 +1053,13 @@ payment and implement the missing generic standard mechanic in the engine; do
 not send it through live custom-content compilation. A persisted clause may
 cover only that exact card's authored outcome; engine action economy, payment,
 rolls, damage, and timing remain authoritative.
-Use `combat_choice(action="on_hit_ruling")` only for a genuinely
-occurrence-specific boundary that cannot become a reusable source recipe. In
-that fallback, pass the target as `actor_id` and the pending `choice_id` plus
-printed condition, escape DC, permitted
-abilities, and an exact excerpt. If applied, keep the resulting ongoing effect
-on the target. On that target's turn, use
-`combat_check(action="escape")`; it must spend the action, roll the effect's
-recorded ability and DC, and remove the condition only on success. Never narrate
-an escape, patch a condition, or ignore the ruling window. This action-consuming
-escape path is not valid for a condition whose source instead calls for a saving
-throw. For an immediate save-gated condition that repeats at the end of each
-target turn, use `payload.selection.id="saving_throw_condition"` with the exact
-condition, ability, DC, `repeat_save_timing="turn_end"`, printed duration, and
-full on-hit excerpt. The server rolls the initial save immediately, records the
-timed condition only on failure, and rolls each repeat save automatically in
-`combat_end_turn`; it does not spend the target's action. If the reviewed
-`on_hit_effect` instead requires a saving throw and additional damage, call
-`combat_choice(action="on_hit_ruling")` with
-`payload.selection.id="saving_throw_damage"` plus the exact printed
-ability, DC, damage formula/type, success treatment, and source excerpt. Supply
-the exact structured zero-HP effect when present; the giant spider Bite, for
-example, makes a target reduced to 0 HP stable, Poisoned for 1 hour, and
-Paralyzed while poisoned. The structure is not creature-specific: the server
-must match the selected damage type's 0-HP trigger, Stable result, every
-condition, and the printed duration against the complete reviewed effect. Do
-not dismiss an explicit saving-throw damage clause
-or reduce it to condition-only settlement. The Agent must classify the complete
-reviewed action semantically; never infer these branches from a monster name or
-add a creature-specific phrase patch. If the source combines several conditions,
-damage, suppression, or another rider that the selected structured branch cannot
-represent, leave the owned window pending and use the reported Agent-as-DM
-boundary to add the missing generic settlement capability before continuing.
+`combat_choice(action="on_hit_ruling")` now only dismisses an exact-source
+no-op after Agent review; it does not accept condition, save, damage, attachment,
+or creature-specific selections. If the generic plan vocabulary cannot express
+the reviewed outcome, leave the owned window pending and return to explicit
+Agent/DM adjudication rather than adding a named monster rule. Ordinary escape,
+save, damage, duration, and continuity work still uses the corresponding public
+generic tools selected by the persisted plan or DM ruling.
 If candidate validation
 instead reports that this kind of action lacks supported Hit dice, stop in lobby,
 repair and refresh the importer, and recreate the actor.

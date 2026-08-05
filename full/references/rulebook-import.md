@@ -237,9 +237,10 @@ import, install, activation, or access authority.
    unexpected actor name.
    Dice procedures, numbered random-effect tables, and adjudication guidance
    count as mechanical signals even when no specialized entity parser matches.
-   They require one exact-source build-time Agent-ruling artifact per retained
-   chunk. A no-candidate whole-book regression applies the same conservative
-   per-chunk fallback; it must never publish one descriptive sample as coverage
+   Preserve exact source evidence for every retained chunk. A reviewed generic
+   plan may be included at build time; otherwise the first actual custom-card use
+   compiles and persists one through `content_solution`. A no-candidate
+   whole-book regression must never publish one descriptive sample as coverage
    for the rest of a mechanical source.
 10. Call `rule_import(action="compile")` for the reviewed import job, or
    `rule_pack_compile(action="from_source")` for a separately authored mechanic.

@@ -192,14 +192,17 @@ After creation, verify `derived.multiattack_options` against the source and make
 sure every referenced weapon id exists. Preserve the source document and rule
 reference on the activity card just like any other imported mechanic.
 
-An AC-changing defensive reaction must also be structured instead of inferred
-from its description. For example, the 2014 Bandit Captain's Parry activity keeps
-its Reaction activation and records:
+An AC-changing defensive reaction must be compiled from exact evidence instead
+of inferred from its name or description. Keep the imported activity's Reaction
+activation and source text. On first use, the DM Agent persists a
+`content_solution` whose plan has `trigger: "attack.after_hit"` and exactly one
+contextual step:
 
 ```json
 {
-  "reaction_defense": {
-    "kind": "armor_class_bonus",
+  "id": "defend",
+  "op": "attack.ac_bonus",
+  "args": {
     "bonus": 2,
     "attack_modes": ["melee"],
     "requires_visible_attacker": true,
@@ -208,10 +211,11 @@ its Reaction activation and records:
 }
 ```
 
-Put this object under `choices`, and retain the source citation on the activity.
-Do not turn reaction text into an always-on AC bonus. If any source prerequisite
-cannot be represented as a verified field, leave the mechanic unresolved for the
-DM instead of silently weakening it.
+Put this step in the source-cited plan, not under `choices`. The compiled
+solution records the plan/card fingerprints and Agent reason. Do not turn
+reaction text into an always-on AC bonus. If any source prerequisite cannot be
+represented as a verified field, leave the mechanic unresolved for the DM
+instead of silently weakening it.
 
 For a 2014 class-prepared caster, eligible level 1+ class spells use
 `grant.method: "class_prepared"`, identify the recorded class with

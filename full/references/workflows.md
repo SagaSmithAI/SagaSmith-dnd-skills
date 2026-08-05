@@ -332,26 +332,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    remaining source-defined entries. Omit the id to choose one ordinary Attack.
    An unstructured/descriptive Multiattack remains an Agent-as-DM adjudication
    boundary but never blocks that ordinary single weapon attack.
-   If an exact reviewed passive makes the triggering attack deal conditional
-   extra damage, the exported/imported actor card must already contain either a
-   reviewed schema-v2 `attack.after_hit` plan or an exact-source Agent-ruling
-   requirement. Missing build-time resolution is a Lobby authoring blocker, not
-   a live-combat prompt. Keep the occurrence-specific condition decision with
-   the attack: the owner/DM
-   Agent supplies one `source_conditional_extra_damage` ruling containing the
-   reviewed feature id, its plan fingerprint when the card has a plan, explicit eligible target ids,
-   its exact stored excerpt and printed dice expression, typed trigger facts,
-   decision, and reason. The encounter driver uses
-   `--source-extra-damage-ruling-json` to bind the same evidence to eligible
-   melee or ranged weapons, eligible targets, rounds, and a bounded application
-   count. For a printed advantage-or-adjacent-ally condition, declare the
-   reusable applicability mode rather than predicting later map state. At each
-   attack the driver derives the current branch (attack advantage, or no
-   disadvantage plus an adjacent non-incapacitated ally), records the exact
-   qualifying ally ids, and the server verifies those positions and conditions.
-   Do not apply the rider
-   later with `combat_hp_change`: all damage dice must resolve simultaneously,
-   double together on a critical hit, and share one target-state mutation.
+   If an exact reviewed passive adds conditional custom damage or another rider,
+   keep it on the exact portable card. On first use, the DM Agent compiles one
+   source-bound generic plan and persists it with `content_solution`; the driver
+   supplies only generic bindings and the returned fingerprint to
+   `combat_choice(action="execute_plan")`. Do not add a dedicated CLI flag or
+   apply the rider later with `combat_hp_change`.
    When exact scene evidence and current relative position give the target Half,
    Three-Quarters, or Total Cover, the Agent supplies the attacker, distinct
    target, attack mode, exact source reference/excerpt, decision, and reason.
@@ -365,27 +351,17 @@ own exposure. Loading a group for one Agent must not expose it to another.
    tactics use the lowest offered slot only when +5 AC changes the hit to a miss;
    otherwise decline. Available Shield should block Magic Missile.
    When a committed hit instead returns `pending_on_hit_ruling_id`, the Agent
-   reads the complete card and exact excerpt, then settles that paid window from
-   the card's existing build-time plan or direct ruling contract. Execute an
-   existing plan through `combat_choice(action="execute_plan")`.
-   Use `on_hit_ruling` only for an occurrence-specific effect that the registered
-   engine calls cannot express. In that fallback, use `apply_condition` only
-   for printed action/check escape terms. Use `saving_throw_condition` for an
-   immediate save-gated timed condition with printed turn-end repeat saves; pass
-   the exact condition, ability, DC, repeat timing, duration, and excerpt.
-   `combat_end_turn` rolls those repeat saves automatically without spending an
-   action. Use `saving_throw_damage` for printed save-dependent extra damage.
-   Never classify by creature name, parse the prose inside the driver to invent
-   the Agent settlement, silently dismiss a structured rider, repeat the already
-   committed hit, or let the driver mistake a non-escape effect for an action
-   escape.
+   reads the exact card and bounded source context. Query or compile its
+   `content_solution`, then settle the paid window through
+   `combat_choice(action="execute_plan")`. `on_hit_ruling` only dismisses an
+   exact-source no-op after Agent review. Never classify by creature name, parse
+   prose in the driver, silently dismiss a real rider, or repeat the hit.
 4. Resolve movement with `combat_movement`, checks with `combat_check`, common
    actions with `combat_common_action`, spells with `combat_cast_spell`, activities
    with `combat_use_activity`, and damage/healing with `combat_hp_change`.
-   For a structured monster point-radius, line, or Wing Attack area, include
-   every living actor geometrically inside it in `target_contexts`, with the
-   Agent-reviewed cover degree. Let the runtime apply Dexterity-save cover
-   bonuses or Total Cover; never default all targets to no cover.
+   Standard structured areas use their locked standard implementation. A custom
+   creature area uses its persisted source-bound plan with Agent-supplied generic
+   target bindings; do not add a named area action to the driver or server.
    A locked standard card that lacks both a registered generic mechanic and a
    persisted exact-source content clause, and therefore reports
    `semantic_solution.status="engine_implementation_required"`, must stop before
