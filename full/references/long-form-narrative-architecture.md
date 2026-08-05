@@ -207,7 +207,7 @@ sheet v2 与 notes v2 结构。
 | 已锁定且已实现的标准 D&D mechanic | 引擎按 mechanic id | 引擎 | 角色/战斗状态、receipt、事件 |
 | 标准规则但缺完整事务实现 | Agent 只能作明确 DM 裁定；不能伪装成完整引擎支持 | 可表达的通用部分由引擎；缺口保持可见 | 当次 ruling 与实际结果 |
 | 扩展包的安全声明式 mechanic | review 后的规则包 | 已安装实现/声明式 IR | Rule Profile、receipt、角色状态 |
-| 自设或模组机械卡 | 导入/审核 Agent 在发布前固定 typed plan 或精确来源 direct ruling | allowlist 内的引擎函数或实时有界 DM 裁定 | portable source card 上的 build-time resolution contract |
+| 自设或模组机械卡 | 导入/审核保存精确来源与 direct ruling；DM Agent 可预编译或首次使用时编译 typed plan | allowlist 内的引擎函数或实时有界 DM 裁定 | portable source card 上的 source evidence、ruling requirement 与 persisted resolution |
 | 一次性自设活动 | Agent 提交当前发生的 source-bound ruling | 引擎执行支付、保存、检定、伤害等通用事务 | occurrence-specific ruling 和 outcome |
 | NPC 动机、退却、欺骗、谈判、剧情后果 | Agent | 引擎只执行移动、检定、时间、物品和状态原语 | 只保存实际发生的 event/fact/knowledge |
 | 玩家角色的意图和需要玩家选择的资源 | 玩家 | 引擎 | 提交的选择和结果 |

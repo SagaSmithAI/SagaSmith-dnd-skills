@@ -36,7 +36,9 @@ Import must settle every resolution before release. Source-explicit action
 variants become separate cards, the engine performs only structurally proven
 OCR repairs, and an Agent may correct a damaged OCR span only through exact
 page/slot evidence corroborated by staged text or an actually inspected render.
-Runtime never authors semantics on first use.
+The engine never interprets source prose. When an exact-source ruling
+requirement exists but no executable plan does, the DM Agent may compile one
+source-bound plan on first use and persist it on the portable card.
 
 Bind module NPCs, monsters, and pregenerated PCs with
 `module_import(action="bind_actor")`, then export with

@@ -51,9 +51,10 @@ load a whole large document by default.
 - Standard locked mechanics execute in the engine. Do not reinterpret them
   from prose.
 - Module, addon, and homebrew semantics use exact source evidence. Import,
-  review, or card construction must persist a constrained typed plan or direct
-  Agent-ruling clause before the content can be published or used; live play
-  never authors that reusable resolution on first use.
+  review, or card construction must persist an exact-source Agent-ruling
+  boundary before the content can be published or used. A constrained typed
+  plan may be authored then or compiled by the DM Agent on first use in Lobby,
+  Play, or Combat; the engine itself never interprets prose.
 - Unique narrative situations default to Agent DM reasoning, followed by
   ordinary public MCP mutations.
 - Player choices, owner approval, permission changes, and missing/conflicting

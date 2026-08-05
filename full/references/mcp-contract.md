@@ -1188,10 +1188,11 @@ boundary described above. The review rejects
 A standard passive/action with missing or conflicting facts, or a missing
 generic transaction, is an importer or engine defect; do not hide it with
 creature-name checks, ad hoc `once` flags, or post-damage HP edits. Exact
-creature-specific prose can instead be finalized as a source-bound direct Agent
-ruling during import. Standard, addon, module-authored, and homebrew cards must
-all enter play with a native mechanic, reviewed typed plan, or exact-source
-direct Agent-ruling requirement already persisted.
+creature-specific prose must at least retain a source-bound direct Agent-ruling
+requirement during import. A reusable typed plan may be persisted during
+import/review or compiled by the DM Agent on first use. Standard, addon,
+module-authored, and homebrew cards must enter play with a native mechanic or
+that exact-source ruling boundary; they must never enter as unsupported prose.
 The indexed-text validator permits only position-bound OCR confusables
 `l/I↔1`, `o↔0`, and digit-bounded `f↔/` in a numeric range. All other numeric
 tokens, DCs, bonuses, dice, damage types, and rule terms must remain exact.

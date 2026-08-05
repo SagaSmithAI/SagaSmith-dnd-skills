@@ -183,9 +183,11 @@ import, install, activation, or access authority.
    printed mechanic that the engine cannot execute, must reject the review as
    `engine_implementation_required`; implement it with a source-backed
    regression test before recreating the actor. Exact creature-, spell-, item-,
-   or feature-specific prose may instead carry a persisted exact-source direct
-   Agent-ruling clause created during import/review. That clause settles only
-   the authored content outcome and cannot replace the engine-owned transaction.
+   or feature-specific prose must instead carry a persisted exact-source direct
+   Agent-ruling clause created during import/review. A reusable typed plan may
+   be added then or compiled by the DM Agent on first use. The ruling boundary
+   settles only the authored content outcome and cannot replace the engine-owned
+   transaction.
    This is layout normalization, not model-memory reconstruction. If the indexed
    facts themselves are missing or conflicting, stop at explicit source review.
    Bounded text-layer repair may accept `l/I` for `1`, `o` for `0`, and `f`
