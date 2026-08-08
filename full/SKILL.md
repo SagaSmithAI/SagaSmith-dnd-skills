@@ -33,9 +33,7 @@ as `mcp_sagasmith_dnd_`.
    `exposure_inspect`, and `exposure_load` for the current campaign phase. Pass
    `tool_id` and an optional `selector` to `exposure_inspect` before using a
    compact facade whose payload is unfamiliar. Follow an
-   `exact_field_contract` as a strict whitelist; treat a
-   `runtime_field_guide` as discovery guidance and still obey any validation
-   error returned by the selected action. Before a campaign exists, load only
+   `exact_field_contract` as a strict whitelist. Before a campaign exists, load only
    `lobby.bootstrap`; reopen the exposure with the returned `campaign_id` before
    loading campaign-bound groups. There is one active exposure per MCP
    session/principal: calling `exposure_open` again replaces it. Load every
@@ -89,9 +87,8 @@ The machine-readable phase/tool-group mapping is
   `.sagasmith-module` archive; addons never embed or activate modules. Read the
   `portable.content` Skill group before importing or exporting either format.
 - Use granular character / party MCP tools for inventory, wallet, equipment,
-  prepared spells, effects, resources, and actor adventure state. Legacy
-  `notes.memories` is import-only; new subjective information belongs to
-  ActorKnowledge. `character update` is
+  prepared spells, effects, resources, and actor adventure state. Subjective
+  information belongs to ActorKnowledge. `character_sheet_replace` is
   reserved for a reviewed replacement of the complete `sheet` or `notes` document.
 - When one source-defined treasure parcel contains both currency and items, use
   `campaign_change(action="loot_acquire")` with one stable acquisition id and the
@@ -112,7 +109,7 @@ The machine-readable phase/tool-group mapping is
   `campaign_change(action="item_spend")` with a stable spend id, exact item id
   and quantity, and the expanded source chunk reference. Do not leave the item
   in inventory while recording only a narrative outcome.
-- `character build` is the preferred player-character creation workflow: it creates
+- `character_create_from(mode="build")` is the preferred player-character creation workflow: it creates
   a public template and a separate initial campaign instance atomically.
 - Do not load entire rulebooks or modules into context.
 - For user rulebooks, use the staged Core parser workflow in
@@ -147,7 +144,7 @@ The machine-readable phase/tool-group mapping is
   revision conflict as a fresh read/review cycle, not as permission to overwrite.
 - For rule-profile and rule-pack writes, obtain `campaign_revision` from
   `campaign_rules(action="get_profile")` and carry the returned revision forward one write at
-  a time. Never silently relock a legacy snapshot or unavailable Core fingerprint.
+  a time. Never silently relock a snapshot with an unavailable Core fingerprint.
   If a verified snapshot needs an older unavailable Core, inspect it with
   `snapshot_query(view="core")` and use the explicit
   `branch_change(action="create_core_upgrade")` conversion only after recording a
@@ -194,5 +191,4 @@ For the complete cross-repository ownership, persistence, adjudication, retrieva
 time, knowledge, manifest, and restore model, read
 `references/long-form-narrative-architecture.md`. See
 `references/mcp-contract.md` and `references/workflows.md` for the exact public
-contract and ordered operations. The CLI contract is legacy compatibility
-documentation only.
+contract and ordered operations.

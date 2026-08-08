@@ -16,18 +16,20 @@
 3. 判断是否真的需要检定：必须同时存在不确定性、成功与失败的意义、规则允许且
    角色有能力尝试。自动成功和不可能行动不掷骰。
 4. 读取行动者、目标和有关 NPC/怪物的完整角色卡与环境状态，确定能力、熟练、优势/
-   劣势和 DC，再公开调用 CLI。`character list` 只用于定位 ID；裁决前必须 `character show`。
+   劣势和 DC，再调用当前 exposure 中对应的公开 MCP 工具。`character_query(view="list")`
+   只用于定位 ID；裁决前必须使用 `character_query(view="get")` 读取当前角色卡。
 5. 骰子结果确定后叙事；不得先写结局再倒推骰子。
 6. 一次行动造成的 HP、资源、条件、位置、线索、NPC、怪物与世界变化要在同一轮完整
    写入。个人物品、钱包、装备、准备法术、效果和资源使用 `character` v2 子命令；
    共享物资使用 `party` 子命令，不能手改 JSON 或创建另一份简化角色卡。
 7. 场景结算以一次 `memory_change(action="commit")` 原子追加 event、稳定键 CampaignMemory 事实和
    仅属于实际知情 actor 的 ActorKnowledge。NPC 的重要对话结果不能写入已弃用的
-   `character memory add`，也不能把一个 NPC 的认知复制给其他角色。
+   `actor_knowledge_change(action="add")`，也不能把一个 NPC 的认知复制给其他角色。
 8. 新出现、获得、失去或转移的每件实物都必须是有稳定 `id`、名称和简短描述的 inventory
    item；钥匙、任务物、宝石和怪物掉落也不例外。物品归属或数量变化不能只写 event。
 9. 公用 PC/NPC/怪物模板不是活跃游戏状态。战役只读取和修改其 campaign instance；任意
-   模板可 `character instantiate` 成实例。PC 车卡使用 `character build` 创建模板和实例。
+   模板可通过 `character_create_from(mode="template")` 实例化。PC 车卡使用
+   `character_create_from(mode="build")` 创建模板和实例。
 
 准备法术列表必须按版本和职业处理。车卡或升级阶段用
 `character_spell_prepare(mode="replace_all")` 一次提交完整列表；游戏中只能把完整
@@ -55,13 +57,17 @@
 
 - 写入前保留读取到的 revision/state version；冲突时重新读取并重算，不覆盖新状态。
 - 角色卡、战役状态、场景进度、事件和记忆必须表达同一事实。
-- 每次转移物品或货币后重新读取来源和目的地；涉及队伍仓库时还要读取 `party show`。
-- `character show` 返回的 `derived` 只能用于裁定和展示。若 `unresolved_rules` 非空，先
+- 每次转移物品或货币后重新读取来源和目的地；涉及队伍仓库时还要读取
+  `campaign_query(view="party")`。
+- `character_query(view="get")` 返回的 `derived` 只能用于裁定和展示。若
+  `unresolved_rules` 非空，先
   检索规则并保留需要 DM 裁定的效果，不得伪造自动计算结果。
-- 装备护甲、盾牌或防御性魔法物品时先用 `character equipment equip` 写入正确槽位，再读取
+- 装备护甲、盾牌或防御性魔法物品时先用 `inventory_change(action="equip")`
+  写入正确槽位，再读取
   `derived.armor_class_breakdown`。不得手改 `combat.ac.base` 来模拟装备加值；只有无甲、
   天然护甲或明确手工覆写才使用 `combat.ac.base` / `combat.ac.override`。
-- `state undo`/`redo` 只回退受审计变更，不删除 Snapshot。`restore` 后不得尝试 `redo`
+- `state_revision(action="undo"|"redo")` 只回退受审计变更，不删除 Snapshot。
+  `snapshot_restore` 后不得尝试 `state_revision(action="redo")`
   到被快照放弃的未来；恢复的撤销游标才是当前分支的边界。
 - 重要节点创建 Snapshot：开团基线、危险决定前、关键战斗前后、章节转换、升级、
   长休与会话结束。
@@ -77,7 +83,7 @@
   玩家选择和记忆候选；首个存档是基线。
 - `restore` 前先 `verify`，说明目标和分支语义。恢复先保护当前状态，再产生新分支，
   绝不描述为覆盖历史。
-- 恢复后重新读取战役、所有相关 actor、`party show`、场景、events、玩家映射和分支记忆，
+- 恢复后重新读取战役、所有相关 actor、`campaign_query(view="party")`、场景、events、玩家映射和分支记忆，
   不能沿用聊天缓存。恢复前建立的事件、记忆、物品或角色状态不能继续在叙事中引用。
 
 ## 记忆和玩家映射
@@ -96,7 +102,7 @@
 - `knowledge` 记录 `known`、`belief`、`rumor`、`false_belief`、`forgotten`、`modified` 等主观状态。
   `Modify Memory` 只修订目标 actor 的认知；真实 event 和 campaign memory 仍然保留。
 - 私人发现保留在 `player:<id>`/`group:<id>` scope，明确分享后才转成 party 信息或世界事实。
-- `branch create` 与 `branch checkout` 是时间线操作。不得自动合并两条 D&D 世界线；`Wish` 或
+- `branch_change(action="create"|"checkout")` 是时间线操作。不得自动合并两条 D&D 世界线；`Wish` 或
   明确改写历史时创建 retcon 分支并记录原因。
 
 ## 输出前自检
@@ -105,7 +111,7 @@
 重复、长期事实已进入稳定键 CampaignMemory、主观信息已进入对应 ActorKnowledge，
 并在需要时通过同一次 `memory_change(action="commit")` 创建 Snapshot。
 
-常用命令见仓库根目录 `references/cli-contract.md` 和 `references/workflows.md`。
+公开 MCP 流程见仓库根目录 `references/mcp-contract.md` 和 `references/workflows.md`。
 Runtime note: all state, rule, module, memory, and actor operations in Full mode
 go through the `sagasmith_dnd` MCP. Use `continuity_context` for player-safe
 context, keep `actor_id` explicit for every PC/NPC, and never trust a prompt role

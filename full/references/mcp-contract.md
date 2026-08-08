@@ -21,7 +21,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Audit | `state_revision(history/receipt/undo/redo)` |
 
 The compact public contract contains exactly 85 tools, with 13 core discovery
-tools and phase ceilings of Lobby 64, Play 49, and Combat 48. Do not call retired
+tools and phase ceilings of Lobby 64, Play 50, and Combat 49. Do not call retired
 names or emulate aliases client-side. The consolidated calls are:
 
 - `chase(action="start" | "query" | "take_turn" | "end")`;
@@ -768,20 +768,20 @@ list during advancement; reconcile it through a later completed Long Rest.
 ### Single-authority state map
 
 Treat the following as authorities and every paired field as a read-only
-projection, receipt, compatibility input, or display label. Never repair a
+projection, receipt, or display label. Never repair a
 projection with a second write.
 
 | Concept | Sole authority | Non-authoritative representation |
 |---|---|---|
-| Rules edition and locale | Core campaign Rule Profile | Bound character `sheet.edition` is projected on every write; legacy campaign settings copies are removed |
+| Rules edition and locale | Core campaign Rule Profile | Bound character `sheet.edition` is projected on every write |
 | Elapsed campaign time | `campaign.state.game_time.elapsed_ticks` | `world_time` is an optional anchored calendar projection; wall-clock timestamps and exposure TTLs are operational time |
-| Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | The campaign view's `effective_game_phase` is the server-owned derivation consumed by drivers; exposure refreshes from it, and `game_phase="combat"` is invalid legacy input |
+| Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | The campaign view's `effective_game_phase` is the server-owned derivation consumed by drivers; exposure refreshes from it |
 | Active module | Core active `ModuleSource` revision set, captured as exact `module_activations` in a snapshot | Import-job `activated` is a workflow receipt; do not store `module_imports.active` in campaign state |
 | Rule source revision | Immutable `RuleSource` id and chunks | A reimport retires the prior revision; default search selects the active revision, while an exact historic source id/citation remains auditable |
 | Current branch | `campaign.active_branch_id` | Public `is_current` is derived; no independent branch boolean exists |
 | Snapshot head | Each branch's `head_snapshot_id` | Public `snapshot.is_head` is derived; no independent snapshot boolean exists |
 | Current scene | Core scoped `SceneProgress` whose scene belongs to an active module revision | Playthrough manifest chapter/scene is synchronized projection; `ModuleChapter.status` describes indexing only, and `current_room` is a label while `current_location_key` is spatial identity |
-| Subjective belief | Branch-local `ActorKnowledge` revision head per actor | `notes.memories` is import-only legacy data; objective `CampaignMemory` is a different ledger |
+| Subjective belief | Branch-local `ActorKnowledge` revision head per actor | Objective `CampaignMemory` is a different ledger |
 | Actor conditions | Validated character-card condition state plus active effect-source ownership | Encounter combatants are synchronized mirrors; removing one cause must not clear a condition still supplied by another effect, and immunity is checked by the shared condition engine |
 | HP and expendable resources | Validated character sheet, mutated through shared HP/resource functions | Encounter combatants mirror condition/position state only; CLI or generic campaign patches cannot create a second combat/HP/resource ledger |
 | D&D roll, rest, and spell arithmetic | `sagasmith-dnd` attack/check, exhaustion, lifecycle, effective-ability, healing-expression, save-damage reduction, HP, and bounded-resource helpers | MCP facades and regression drivers validate orchestration inputs but must not repeat ability-modifier, exhaustion, rest-duration, healing-scaling, half-damage, or resource-capacity formulas |
@@ -792,10 +792,7 @@ projection with a second write.
 | Integrity encoding | Core canonical JSON plus SHA-256 | Snapshot checksum, rule-pack checksum/fingerprint, map checksum, and idempotency request hash keep their domain names but must not implement separate JSON encoders |
 | Local service identity | Core `system:local` principal identity and campaign membership | CLI, MCP, gateway, and regression-driver defaults are projections of that principal, not separately invented service accounts |
 
-When old data contains a compatibility field, read through the authority and let
-the schema/migration path normalize it. Do not make ordinary reads write legacy
-flags, copy profile fields back into campaign settings, or copy actor knowledge
-into notes. Snapshot restore must restore the exact active module revision set
+Snapshot restore must restore the exact active module revision set
 before restoring the current scene; it must never make a retired module scene
 current merely because that scene id still exists for historical citation.
 An absent Rule Profile is a hard configuration error: combat, character, import,
@@ -1000,7 +997,6 @@ operational signal, not permission to rewrite history automatically.
 
 - `full` uses MCP-owned SQLite, optional ChromaDB, and managed module artifacts.
 - `standalone/` remains a separate portable file workflow; it does not call MCP.
-- `references/cli-contract.md` documents the legacy CLI compatibility path only.
 
 ## Session exposure and game phase
 
@@ -1045,9 +1041,7 @@ catalog. When `tool_id` is provided, it additionally returns the actual
 top-level input schema, selector values, and a machine-readable payload contract
 for every public facade action. Strict actions report
 `contract_kind="exact_field_contract"` with an exact allowed/required field
-set. Compatibility actions report `contract_kind="runtime_field_guide"` and
-`additional_properties=true`; those fields document the stable inputs but do
-not weaken the action's runtime validator. It also returns bounded MCP-contract
+set and `additional_properties=false`. It also returns bounded MCP-contract
 excerpts when installed. Treat runtime validation as authoritative and never
 use an arbitrary payload field as a schema escape hatch.
 
@@ -1430,9 +1424,8 @@ reuse a reason from another module: the exact text is persisted in the relock
 receipt and is part of the campaign audit trail.
 
 Snapshot restore and branch checkout check the saved Core lock before changing
-live state. A legacy save without that lock, or a save requiring an unavailable
-Core fingerprint, needs an explicit conversion path and is never silently
-upgraded. For an unavailable fingerprint, first verify the snapshot and call
+live state. A save requiring an unavailable Core fingerprint needs an explicit
+conversion path and is never silently upgraded. First verify the snapshot and call
 `snapshot_query(view="core")`. After reviewing the runtime change, call
 `branch_change(action="create_core_upgrade")` with the target slot, new branch
 name, exact saved/runtime Core fingerprints, current campaign/branch guards, a
@@ -1440,8 +1433,7 @@ bounded reason, and a fresh key. The transaction preserves the current branch,
 leaves the source snapshot payload/checksum immutable, materializes the target
 only on a new branch, replaces only its Core lock while retaining
 edition/locale/publications/user options/optional activations, and immediately
-captures a converted child snapshot. A missing legacy Core lock still requires a
-separate edition migration; do not guess it.
+captures a converted child snapshot.
 
 ## Integrity and identity contract
 
@@ -1528,7 +1520,7 @@ damage instance. Conditional custom damage, save riders, persistent conditions,
 and unusual triggers must not enter attack arguments as ad hoc ruling fields.
 They stay on the exact source card, compile once to a persisted generic plan,
 and execute through the owned pending window.
-A nonempty `on_hit_ruling` is legacy source evidence only; it is not an
+A nonempty `on_hit_ruling` is source evidence only; it is not an
 executable recipe or permission to repeat the hit.
 
 Standard D&D mechanic references registered in the campaign's active rule lock
@@ -1748,12 +1740,9 @@ by its exact scene evidence, but it must not become a creature-specific action,
 state field, or save/damage shortcut.
 Do not seed a second `sheet.resources` counter for a feature whose structured
 card has an empty `resource_key`: that card-local `uses` counter is
-authoritative. If a legacy/imported actor already contains both
-representations, switch to Lobby and call
-`character_state_change(action="resource_sync")` with an audited reason. The
-server recomputes level/ability scaling and removes only an unreferenced
-top-level counter whose label and class source exactly shadow one local-use
-card; it must preserve any counter referenced by another card or spell.
+authoritative. `character_state_change(action="resource_sync")` recomputes
+declared card-local level/ability scaling but never guesses that a similarly
+labelled top-level resource is a removable duplicate.
 The canonical 2014 and 2024 Fighter Action Surge ids are narrow Core exceptions:
 `combat_use_activity` consumes the edition-bound card use and atomically grants one current-turn
 `extra_action`. It rejects off-turn or twice-on-one-turn activation, and any

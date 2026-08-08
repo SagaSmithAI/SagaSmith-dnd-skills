@@ -1,7 +1,6 @@
 # D&D Character Schema v2
 
-Full Runtime uses MCP tools, not the CLI snippets that appear in the historical
-examples below. Use `character_create_from`, `character_query`,
+Full Runtime uses MCP tools. Use `character_create_from`, `character_query`,
 `character_sheet_replace`, and the granular `inventory_change`,
 `inventory_transfer`, `wallet_change`, `character_state_change`, and
 `character_action` facades. Include `principal_id`, `expected_revision`, and `idempotency_key` on
@@ -15,7 +14,7 @@ not change the required sheet shape.
 
 - `sheet` is the authoritative mechanical state.
 - `notes` is authoritative actor-authored narrative profile state: description,
-  relationships, and goals. Its legacy `memories` field is import-only.
+  relationships, and goals. It never stores actor memory.
 - Branch-local `ActorKnowledge` is authoritative for one actor's beliefs,
   observations, secrets, and misinformation.
 - `derived` is returned by `character_query(view="get")`; it is calculated from the sheet and
@@ -67,16 +66,15 @@ bind a proper display name to exactly that source identity and instance key.
 Such a card also carries `agent_named_source_instance`; its name is narrative
 identity only and does not authorize any mechanical fields.
 
-```powershell
-# Public library templates and direct campaign instances both support pc/npc/monster.
-sagasmith-dnd character create --name "<name>" --type pc|npc|monster --sheet '@<sheet.json>' --notes '@<notes.json>' --json
-sagasmith-dnd character library list --type pc|npc|monster --json
-sagasmith-dnd character instantiate --id <library-character-id> --campaign <campaign-id> --player "<player>" --json
-sagasmith-dnd character create --campaign <campaign-id> --name "<name>" --type pc|npc|monster --sheet '@<sheet.json>' --notes '@<notes.json>' --json
+Use only the public MCP creation facade:
 
-# Preferred character-creation flow: one transaction creates both records.
-sagasmith-dnd character build --campaign <campaign-id> --name "<name>" --type pc --player "<player>" --sheet '@<pc-sheet.json>' --notes '@<pc-notes.json>' --json
-```
+- `character_create_from(mode="direct")` creates a reviewed public template or
+  campaign instance from a complete v2 sheet and notes payload.
+- `character_query(view="library")` lists reusable PC/NPC/monster templates.
+- `character_create_from(mode="template")` creates a fresh campaign instance
+  from a selected template.
+- `character_create_from(mode="build")` is the preferred PC flow: one
+  transaction creates the public template and initial campaign instance.
 
 Instances retain `template_id` for provenance but are independent copies. Gameplay
 mutations and snapshots apply to the campaign instance only; they never alter or
@@ -146,19 +144,14 @@ new 2014 car creation must use one of these code-validated methods:
 | `point_buy` | Uses scores 8-15 and spends exactly 27 points using the 2014 cost table. |
 | `roll_4d6_drop_lowest` | Requires six recorded 4d6 pools, each with its lowest die dropped, and assigns every resulting score once. |
 
-```powershell
-# Roll first, reveal all six pools, then let the player assign them.
-sagasmith-dnd character ability roll --edition 2014 --json
-
-# Apply a method to an existing template or campaign instance.
-sagasmith-dnd character ability apply --id <id> --method manual --assignments '<six-ability-json>' --json
-sagasmith-dnd character ability apply --id <id> --method standard_array --assignments '<six-ability-json>' --json
-sagasmith-dnd character ability apply --id <id> --method point_buy --assignments '<six-ability-json>' --json
-sagasmith-dnd character ability apply --id <id> --method roll_4d6_drop_lowest --rolls '<roll-output-array>' --assignments '<six-ability-json>' --json
-
-# Preferred PC car creation: validate the generation method before the template and instance are created.
-sagasmith-dnd character build --campaign <id> --name "<name>" --type pc --player "<player>" --ability-method point_buy --assignments '<six-ability-json>' --sheet '@<sheet.json>' --notes '@<notes.json>' --json
-```
+For an existing campaign actor, use `character_ability_apply` with the current
+character revision and an idempotency key. For `roll_4d6_drop_lowest`, first
+call it without assignments so the server rolls and records all six pools, then
+call it again with the player's complete assignment. Caller-supplied dice are
+never accepted. `dnd_ability_roll` is available when a separate campaign-bound
+server roll is required. For a new PC, pass the chosen legal generation method
+and assignments through `character_create_from(mode="build")` so validation,
+template creation, and instance creation remain atomic.
 
 The recorded assignments are the creation baseline. Later species adjustments,
 ASI/feat choices, magic, and other legal changes may make the current
@@ -234,8 +227,9 @@ an ID, quantity, ownership, and description, not prose hidden in an event.
 Equipment slots are `armor`, `shield`, `main_hand`, `off_hand`, `head`, `neck`,
 `cloak`, `gloves`, `boots`, `ring_1`, `ring_2`, `shoulders`, `back`, `chest`,
 `wrists`, `waist`, and `legs`. The slot map and each item's
-`equipped` / `equipped_slot` fields must agree. Use `character equipment equip`
-or `unequip`; never set those fields through an inventory patch.
+`equipped` / `equipped_slot` fields must agree. Use
+`inventory_change(action="equip"|"unequip")`; never set those fields through an
+inventory patch.
 
 Armor and shields have strict mechanics:
 
@@ -274,7 +268,7 @@ written through `campaign_change(effect_add/effect_remove)`. Their visibility is
 `public`, `party`, or `dm`; their minute/hour/day/round/encounter duration is
 advanced by the same atomic campaign time paths as actor effects.
 `created_at_elapsed_ticks` binds creation to the one six-second tick stream;
-`created_at_elapsed_minutes` is its floor-divided compatibility projection.
+there is no second minute-based creation clock.
 
 Containers are ordinary `kind: "container"` items. Items reference their parent
 with `container_id`; containers cannot form cycles. Container mechanics record
@@ -314,45 +308,15 @@ states in `dm_notes`.
 
 `notes.profile.summary` is the one-paragraph public description. NPCs and monsters
 both require it; a monster summary is its concise appearance/behavior description.
-`notes.memories` is a deprecated compatibility field. If an imported legacy card
-contains entries there, migrate them to ActorKnowledge with `character memory
-migrate` or the equivalent runtime workflow. New dialogue outcomes go to
+Character-card notes do not contain actor memory. New dialogue outcomes go to
 ActorKnowledge when they describe one actor's belief or knowledge, and to
 CampaignMemory when they are objective world facts. Do not store every line of
 dialogue as memory.
 `notes.profile.backstory` holds the longer character history; it complements, but
 does not replace, the compact public `summary` and `appearance`.
 
-## Mutation Commands
-
-```powershell
-sagasmith-dnd character show --id <id> --json
-sagasmith-dnd character inventory add --id <id> --payload '<item-json>' --json
-sagasmith-dnd character inventory update --id <id> --item <item-id> --payload '<item-json>' --json
-sagasmith-dnd character inventory remove --id <id> --item <item-id> --amount <n> --json
-sagasmith-dnd character inventory use-ammunition --id <id> --item <weapon-item-id> --amount <n> --json
-sagasmith-dnd character inventory transfer --id <source> --target <target> --item <item-id> --amount <n> --json
-sagasmith-dnd character wallet credit --id <id> --denomination gp --amount 10 --json
-sagasmith-dnd character wallet debit --id <id> --denomination gp --amount 5 --json
-sagasmith-dnd character wallet transfer --id <source> --target <target> --denomination gp --amount 5 --json
-sagasmith-dnd character equipment equip --id <id> --item <item-id> --slot-name main_hand --json
-sagasmith-dnd character equipment unequip --id <id> --item <item-id> --json
-sagasmith-dnd character spell prepare --id <id> --spell <spell-id> --json
-sagasmith-dnd character spell unprepare --id <id> --spell <spell-id> --json
-sagasmith-dnd character effect add --id <id> --payload '<effect-json>' --json
-sagasmith-dnd character effect remove --id <id> --effect <effect-id> --json
-sagasmith-dnd character resource set --id <id> --resource <resource-key> --amount <n> --json
-sagasmith-dnd character memory migrate --id <id> --json
-sagasmith-dnd party inventory deposit --campaign <id> --id <character-id> --item <item-id> --json
-sagasmith-dnd party inventory withdraw --campaign <id> --id <character-id> --item <item-id> --json
-sagasmith-dnd party wallet deposit --campaign <id> --id <character-id> --denomination gp --amount 5 --json
-sagasmith-dnd party wallet withdraw --campaign <id> --id <character-id> --denomination gp --amount 5 --json
-```
-
 Use `character_sheet_replace` only for a reviewed complete draft or a
 deliberate full-sheet change. Never hand-edit one inventory entry, wallet balance,
-prepared spell, effect, or memory through a raw sheet replacement during play.
-`character memory migrate` is read-only: review its candidates, then persist
+prepared spell or effect through a raw sheet replacement during play. Persist
 accepted subjective entries with `actor_knowledge_change` or the
-`actor_knowledge` member of `memory_change(action="commit")`. Do not call the deprecated
-character memory add/resolve compatibility commands for new runtime state.
+`actor_knowledge` member of `memory_change(action="commit")`.

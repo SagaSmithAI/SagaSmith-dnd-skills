@@ -373,7 +373,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    Every public actor-card write path performs
    this settlement before persistence, including direct creation, build,
    template instantiation, sheet replacement, and inventory changes. Therefore
-   `semantic_solution.status="content_authoring_required"` is a legacy/corrupt
+   `semantic_solution.status="content_authoring_required"` is an invalid
    data invariant failure, not a normal workflow or a prompt: stop, return to
    Lobby, migrate or reimport the card, and re-run readiness. Runtime never
    authors that contract. A genuinely one-off

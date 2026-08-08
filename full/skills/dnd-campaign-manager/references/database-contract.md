@@ -5,8 +5,7 @@ Chroma、artifact 文件或本地 D&D CLI。
 
 ## 权威状态
 
-- `Character.sheet`：机械状态；`Character.notes`：角色资料。旧
-  `notes.memories` 仅供迁移，不再接收新的长期记忆。
+- `Character.sheet`：机械状态；`Character.notes`：角色资料，不保存角色知识。
 - `derived`：只读计算结果，不能写回。
 - `campaign.state.party.inventory`：队伍共享物品和钱包。
 - `memory`：当前分支的世界事实；`event`：时间顺序证据。
@@ -40,5 +39,4 @@ Chroma、artifact 文件或本地 D&D CLI。
 - `module_search` 只用于候选选择；叙事前必须通过 scene/chunk 读取。
 - scene visibility 使用 `public`、`party`、`keeper`，keeper 内容由服务端过滤。
 
-CLI 旧名称只保留在 `full/references/cli-contract.md` 的历史兼容说明中，
 不属于 Full Runtime 执行路径。

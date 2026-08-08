@@ -117,7 +117,7 @@ flowchart TB
 - Playthrough manifest 中的 party HP、资源、快照和随机流由运行时同步，
   不能手工修成“看起来正确”。
 - `world_time` 不是第二个推进时钟。
-- `notes.memories` 只用于旧数据迁移，不接收新的角色知识。
+- `notes` 不保存角色知识；主观知识只进入 ActorKnowledge。
 - recap、搜索命中、Agent 聊天上下文和回归报告都不是恢复权威。
 - bounded evaluation proposal 不是事实、知识、角色行动或机械结果。
 - Campaign 行政 `status` 不等于模组正式结局。

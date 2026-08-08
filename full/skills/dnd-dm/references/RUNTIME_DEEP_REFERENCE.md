@@ -164,12 +164,9 @@ the campaign.
    checkpoint before entering another sourced scene. Follow
    `references/CAMPAIGN_REGRESSION.md` for the exact supported action list and
    interrupted-batch recovery.
-   Post-advance verification must also reject duplicate representations of one
-   class resource. A feature with empty `resource_key` owns its card-local
-   `uses`; if a legacy actor also has an unreferenced same-label, same-class
-   top-level counter, run the public Lobby-only
-   `sync-character-resources` regression action and verify the conservative
-   removal before the batch checkpoint.
+   Post-advance verification must preserve every independently declared resource.
+   A feature with empty `resource_key` owns its card-local `uses`; the runtime does
+   not guess that a similarly labelled top-level resource is a removable shadow.
    For a multi-action event, validate every source/actor report, manifest event
    predecessor, and public clock before the first mutation. Bind following time
    or rest writes to the current branch with the driver's explicit prerequisite
@@ -760,8 +757,8 @@ for the stored attack roll, and then resolves damage if the attack still hits.
 Never roll damage early, manually patch HP, or use generic choice resolution for
 this window. The same sequence applies when an opportunity attack opens a
 post-hit defense. A custom card appears only after the DM Agent has compiled a
-source-bound `attack.after_hit` plan with one static `attack.ac_bonus` primitive;
-legacy `choices.reaction_defense` data is ignored. The result preserves the plan
+source-bound `attack.after_hit` plan with one static `attack.ac_bonus` primitive.
+The result preserves the plan
 fingerprint, source citations, Agent reason, Reaction payment, and card-use
 payment. A source-bound `Shield` spell appears as a spell candidate only
 when it is prepared/available, has a legal casting resource, and is legal under
@@ -1193,8 +1190,8 @@ combatant that does not already know the caster's position; a negative ruling
 requires `reason`. The Agent acting as DM owns this observer matrix. The MCP rejects an
 incomplete matrix before spending the action or spell resource and then updates
 per-observer visibility atomically with the cast. Do not leave `hidden=true`
-unchanged after audible or visible casting. If an already-recorded legacy or
-interrupted workflow needs correction, use `combat_map_patch` with a
+unchanged after audible or visible casting. If visibility needs correction, use
+`combat_map_patch` with a
 `combatant_visibility` patch containing `actor_id`, `hidden` and/or
 `visible_to_actor_ids`, and an explicit Agent-as-DM `reason`; never edit encounter state
 outside MCP.
