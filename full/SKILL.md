@@ -85,7 +85,8 @@ The machine-readable phase/tool-group mapping is
   only a validated inactive draft. Installation and Owner/DM campaign activation
   remain separate; a thin release manifest grants neither authority.
   Standard SRD monsters/NPCs are bundled `preset_pack` cards, not host-side
-  creature definitions. Structured module sharing uses `module_pack`; read the
+  creature definitions. Structured module sharing uses only the independent v2
+  `.sagasmith-module` archive; addons never embed or activate modules. Read the
   `portable.content` Skill group before importing or exporting either format.
 - Use granular character / party MCP tools for inventory, wallet, equipment,
   prepared spells, effects, resources, and actor adventure state. Legacy

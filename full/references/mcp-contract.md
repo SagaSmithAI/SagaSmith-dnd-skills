@@ -420,26 +420,36 @@ contains 317 parsed actor cards and the 2024 package contains 330; source text,
 checksums, normalization notes, edition dependency, license, and attribution are
 retained.
 
-A `kind="module_pack"` is a self-contained structured-source distribution, not
-a campaign save. Before export, bind cast members, encounter creatures, and
+A `kind="module_pack"` v2 descriptor and its `.sagasmith-module` archive are an
+independent structured-source distribution, not a campaign save. Before export,
+bind cast members, encounter creatures, and
 pregenerated PCs through `module_import(action="bind_actor")`, using stable
 portable actor ids and Scene Atlas keys; inspect them through
 `module_query(view="actors")`. Export with `module_query(view="package")`.
-The package contains the normalized source document, signed Scene Atlas scene
-text and retrieval chunks, embedded checksum-bound assets, reviewed content,
-portable actor cards, and stable scene/card bindings. Import replays the stored
-Scene Atlas instead of rerunning the receiver's current parser heuristics. It
-excludes scoped progress, world state, events, memory,
+The descriptor contains classification, edition compatibility, recommended
+party/level/advancement guidance, continuity, exact dependencies, normalized
+source, signed Scene Atlas text/chunks, catalogs, narrative dossiers,
+relationships/endings, reviewed content, actor cards, component locks, and
+seven-dimensional readiness. Asset bytes use `blobs/sha256/<checksum>` inside
+the archive instead of base64 JSON. Import replays the stored Scene Atlas instead
+of rerunning the receiver's current parser heuristics. It excludes scoped
+progress, world state, events, memory,
 ActorKnowledge, random position, branches, and Snapshots.
 
 Import a module package in Lobby with
-`module_import(action="import_package")`. The MCP validates every envelope and
-D&D card before mutation, checks the campaign's locked edition, re-ingests via
+`module_import(action="import_package")`, providing exactly one managed archive
+artifact or allowlisted `.sagasmith-module` path when assets exist. The MCP
+validates the descriptor, every blob and D&D card before mutation, checks the
+campaign's locked edition and all exact rule/module dependencies, re-ingests via
 Core, materializes assets in managed storage, creates fresh actor identities,
-and restores actor/scene bindings. Pregenerated PCs become reusable library
-templates; NPCs and monsters become campaign actors. Re-read index, actors,
-assets, content reviews, and readiness. A checksum-valid package does not enable
-optional rule dependencies or make descriptive prose executable.
+and restores actor/scene bindings. Activation is the final transaction and is
+allowed only for `playable` or `complete`; import `draft`/`indexed` inactive for
+review. Pregenerated PCs become reusable library templates; NPCs and monsters
+become campaign actors. Re-read index, actors, assets, content reviews, catalogs,
+narrative and readiness. A checksum-valid package does not enable optional rule
+dependencies or make descriptive prose executable. Reject module-pack v1; there
+is no legacy routing or conversion path. Addon activation never accepts module
+receipts and never changes module active state.
 
 A portable `kind="rule_pack"` carries the rule manifest, selection artifacts,
 safe mechanic IR, provenance, and the complete indexed rule sources required by

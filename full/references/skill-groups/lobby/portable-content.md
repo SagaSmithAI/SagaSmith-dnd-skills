@@ -2,7 +2,7 @@
 
 ## Actors and modules
 
-Use `sagasmith.portable` schema v1. PC, NPC, and monster share the same
+The outer `sagasmith.portable` envelope is schema v1. PC, NPC, and monster share the same
 `actor_card` envelope; `payload.actor_type` selects the role. Export with
 `character_query(view="portable_card")`. Import with
 `character_create_from(mode="portable_card")`, providing exactly one inline
@@ -24,14 +24,21 @@ reconstruct a monster by name in host code.
 Before exporting a module, bind every cast member, encounter creature, and
 pregenerated PC with `module_import(action="bind_actor")`, then inspect
 `module_query(view="actors")`. Export through `module_query(view="package")`.
-A `module_pack` contains normalized source, signed Scene Atlas text and chunks,
-checksum-bound assets, reviews, actor cards, and scene bindings. It deliberately
-excludes campaign progress, world state, snapshots, and ActorKnowledge.
+A `module_pack` uses only the v2 descriptor inside a `.sagasmith-module` archive.
+It locks classification, edition compatibility, recommended party/levels/
+advancement, continuity, dependencies, normalized source, Scene Atlas, catalogs,
+narrative dossiers/relationships/endings, reviews, actor cards, component hashes,
+and seven-dimensional readiness. Asset bytes live at content-addressed archive
+paths, not in JSON. It deliberately excludes campaign progress, world state,
+snapshots, random streams, branches, and ActorKnowledge.
 
-Import with `module_import(action="import_package")` in Lobby. The MCP validates
-the edition, re-ingests through Core, creates fresh actors, and restores managed
-assets/bindings. Re-read index and readiness before activation. Never edit the
-database, preserve foreign Character IDs, or run uninstalled optional rules.
+Import with `module_import(action="import_package")` in Lobby from one managed
+archive or allowlisted path. The MCP validates the edition, exact dependencies,
+descriptor and blobs, re-ingests through Core, creates fresh actors, and restores
+managed assets/bindings. Only `playable` or `complete` may activate; keep
+`draft`/`indexed` inactive for review. Re-read index, actors, catalogs, narrative,
+assets and readiness. Reject module-pack v1. Never edit the database, preserve
+foreign Character IDs, or run uninstalled optional rules.
 
 ## Rule packs, releases, and addons
 
@@ -57,7 +64,8 @@ Build an addon from a complete source-bound rule pack and reviewed preset pack;
 import with `rule_import(import_addon)`. Components install globally but stay
 inactive until revision-safe Owner/DM `campaign_rules(set_addon)`. Branches and
 snapshots retain exact versions. Policies are `branch` for rules, `library` for
-presets, and non-`none` for modules; editions and conflict ids must validate.
+presets, and `none` for modules; addons cannot contain module components or own
+module activation. Editions and conflict ids must validate.
 
 Partial preset export may contain proven cards and deferred templates, but the
 rule component still covers every source section and candidate. Catalog-only
