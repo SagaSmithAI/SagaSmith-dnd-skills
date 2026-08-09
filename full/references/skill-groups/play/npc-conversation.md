@@ -3,10 +3,10 @@
 Use this during Play for connected dialogue. It requires a host with genuine,
 isolated subagents; there is no shared-context or MCP-hosted-model fallback.
 
-1. Check `npc_runtime_capabilities`, then call `conversation_open` once with all
-   present actors. MCP creates one private logical runtime per NPC from current
-   campaign, branch, scene, character, ActorKnowledge, relationship, goal, and
-   commitment authority.
+1. Check `server_capabilities.npc_conversations`, then call `conversation_open`
+   once with all present actors. MCP creates one private logical runtime per NPC
+   from current campaign, branch, scene, character, ActorKnowledge,
+   relationship, goal, and commitment authority.
 2. Append each player speech/action with `conversation_ingest`. MCP derives who
    perceived and understood it and returns public activation descriptors. Do
    not let the Director retrieve private actor capsules.

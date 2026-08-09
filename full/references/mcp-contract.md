@@ -16,7 +16,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Module artifact | `module_draft(start/get/evidence/edit/finalize)`, `content_pack(import/export/activate)` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/preflight/actors)`, `module_search`, `module_expand`, `module_set_progress` |
-| NPC conversation | `npc_runtime_capabilities`, `conversation_open`, `conversation_status`, `conversation_ingest`, `conversation_activations`, `npc_activation_checkout`, `npc_activation_submit`, `conversation_close`, `conversation_abort` |
+| NPC conversation | `conversation_open`, `conversation_status`, `conversation_ingest`, `conversation_activations`, `npc_activation_checkout`, `npc_activation_submit`, `conversation_close`, `conversation_abort`; host requirements are advertised by `server_capabilities.npc_conversations` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |

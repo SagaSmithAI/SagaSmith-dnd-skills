@@ -7,8 +7,9 @@ inference and no single-model fallback.
 
 ## Required host capabilities
 
-Before opening a conversation, verify `npc_runtime_capabilities` reports
-`execution_mode="client_subagents_required"`. The host must provide:
+Before opening a conversation, verify
+`server_capabilities.npc_conversations.execution_mode` is
+`"client_subagents_required"`. The host must provide:
 
 - one isolated message context per `conversation_id + actor_runtime_id`;
 - zero tools, workspace, parent history, skills, and durable host memory inside
@@ -89,4 +90,3 @@ Player lines and validated publications enter the draft journal immediately so
 later NPC turns perceive them. They do not mutate campaign authority until
 `conversation_close`. A listener receives a claim with provenance (for example,
 "Mara said X"), not automatic proof that X is objectively true.
-
