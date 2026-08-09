@@ -816,8 +816,8 @@ Dream 只保存：
 - Play：场景、检定、时间、连续性、追逐和非战斗状态；
 - Combat：回合、动作、反应、地图和战斗结算。
 
-当前 compact public contract 为 84 个工具，其中冷启动 Core discovery
-固定为 13 个；Lobby、Play、Combat 的暴露上限分别是 63、49、48。工具数量
+当前 compact public contract 为 89 个工具，其中冷启动 Core discovery
+固定为 13 个；Lobby、Play、Combat 的暴露上限分别是 60、58、49。工具数量
 预算不改变 action 级别的权限和事务边界。
 
 角色和 campaign membership 决定：

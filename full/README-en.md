@@ -19,9 +19,9 @@ This directory contains agent orchestration only. It never writes SQLite/ChromaD
 
 | Phase | Typical work | Forbidden shortcut |
 |---|---|---|
-| `lobby` | campaigns, characters, rules/modules, access, branches, initial knowledge | settling from an uninstalled rule pack |
+| `lobby` | campaigns, characters, rule/module drafts, finalized Packs, access, branches, initial knowledge | using a mutable draft as active content |
 | `play` | scenes, checks, resources, events, memory, actor knowledge | mutating combat state through ordinary character writes |
-| `combat` | preflight, attacks/spells/reactions/movement, choices, temporary map | inventing targets, sight lines, or distance |
+| `combat` | preflight, attacks/spells/reactions/movement, choices, grid or Agent positioning | mixing grid geometry with Agent spatial facts |
 
 Campaign state, not the prompt, owns the phase. The MCP refreshes session exposure when the phase changes.
 
