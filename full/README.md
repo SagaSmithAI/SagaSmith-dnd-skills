@@ -39,7 +39,7 @@ PC，审查并显式定稿后再由 `content_pack(action="export", kind="module"
 内嵌资产、审核内容、角色卡与稳定场景关联；导入通过
 `content_pack(action="import", kind="module")` 通过 Core 重放该结构并生成新 actor id。它不
 包含进度、世界状态、记忆、分支或 Snapshot。加载 Lobby 的
-`portable.content` Skill group 获取完整操作边界。
+`content.packs` Skill group 获取完整操作边界。
 
 ## 每轮主持最小闭环
 

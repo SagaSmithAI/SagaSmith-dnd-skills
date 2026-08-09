@@ -83,7 +83,7 @@ The machine-readable phase/tool-group mapping is
 - Core rules, addons, modules, and presets use the single
   `sagasmith.content-package` v2 `.sagasmith-pack` format while retaining
   different install/activation authority. Stable source/chunk citations are
-  rebound to fresh local ids. Read the `portable.content` Skill group before
+  rebound to fresh local ids. Read the `content.packs` Skill group before
   importing or exporting content.
 - Use granular character / party MCP tools for inventory, wallet, equipment,
   prepared spells, effects, resources, and actor adventure state. Subjective

@@ -34,7 +34,7 @@ Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检�
 - 规则书构建必须在发布前固定每张卡的 resolution；显式动作变体拆成独立卡，OCR 只允许结构可证的恢复，不把补义延迟到首次触发。
 - 结构化模组可打包 Scene Atlas、原始索引、地图/资产、审核内容、NPC/怪物/预设 PC 卡及稳定关联；战役进度、记忆、分支与 Snapshot 不混入内容包。
 - 核心规则、Addon、模组与预设均导出为携带完整来源、稳定引用和内容寻址资产的 `.sagasmith-pack`；规则安装与战役启用保持独立。
-- 完整流程由 Lobby 的 `portable.content` Skill group 按需加载；详情见 [Full MCP contract](full/references/mcp-contract.md#unified-core-rule-addon-module-and-preset-packages)。
+- 完整流程由 Lobby 的 `content.packs` Skill group 按需加载；详情见 [Full MCP contract](full/references/mcp-contract.md#unified-core-rule-addon-module-and-preset-packages)。
 
 ### Lobby：游戏外准备
 

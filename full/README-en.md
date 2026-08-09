@@ -50,7 +50,7 @@ index, embedded assets, reviewed content, cards, and stable scene bindings.
 `content_pack(action="import", kind="module")` replays it through Core and creates
 fresh actor ids. Progress, world state, memory, branches, and Snapshots are not
 content-package data. Every kind uses a `.sagasmith-pack` archive. Load the Lobby
-`portable.content` Skill group for the
+`content.packs` Skill group for the
 complete procedure.
 
 ## Minimal turn loop
