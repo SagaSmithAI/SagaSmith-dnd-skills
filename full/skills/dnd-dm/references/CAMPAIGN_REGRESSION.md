@@ -93,10 +93,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    selected encounter. When the module provides only a narrative identity and no
    combat statblock, use the public driver's `prepare-narrative-npc` path: cite
    the active module/scene/chunk/page/hash and an excerpt containing the exact
-   name, assign the creation a stable `--occurrence-id`, enter `lobby`, create
-   `character_create_from(mode="narrative_npc")`,
+   name, assign the creation a stable `--occurrence-id`, and create
+   `character_create_from(mode="narrative_npc")` directly in Play,
    verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
-   restore `play`, register the actor in the manifest, and verify its checkpoint.
+   register the actor in the manifest, and verify its checkpoint.
    For a source-counted anonymous group, create one actor per actual instance.
    Set `--narrative-npc-source-identity` to the exact printed group label and a
    distinct stable `--narrative-npc-instance-key`. Use
@@ -846,8 +846,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     conscious source-bound 2014
     Bard performs Song of Rest, include that participating Bard's actor id as
     `song_of_rest_source_actor_id` only for members who spend at least one Hit
-    Die and can hear the performance. Include the complete
-    `rest_schedule`, any Ki meditation under `rest_activity_minutes`, and one
+    Die and can hear the performance. Include any Ki meditation under
+    `rest_activity_minutes`, and one
     `attune_item_id` when that rest is devoted to a source-required item. The DM
     must verify the item's exact source prerequisite against the actor card and
     pass `attunement_prerequisite_confirmed=true`; an unproven prerequisite
@@ -909,17 +909,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     all dependent reports before the first time write. Preserve each failed
     attempt under a distinct report path so a successful retry cannot overwrite
     the evidence needed to audit or recover it.
-    Each member needs a schedule whose minutes equal the shared clock advance.
-    The normal 2014 path is at least 480 minutes with at least 360 minutes of
-    sleep, no more than 120 minutes of light activity, and less than 60 minutes
-    of strenuous activity. A 240-minute path is legal only when every included
-    actor using it has a source-bound `Trance` feature and records 240
-    `trance_minutes`; never infer the exception from a race name. For a changed
-    2014 prepared list, put the complete selected list in that member request
-    and reserve `rest_schedule.light_activity_minutes` equal to at least the sum
-    of every selected spell's level. This is the full-list preparation cost, not
-    the levels of only the replacements. A minimal 240-minute Trance therefore
-    cannot also change the list without extending the schedule.
+    The service derives rest timing from the shared duration and each actor's
+    source-bound features; do not submit a sleep/light/Trance schedule or infer
+    Trance from a race name. For a changed 2014 prepared list, put the complete
+    selected list in that member request; the Long Rest validates it atomically.
 20. When a manifest PC is dead or departed, build one replacement through the
     public party driver. Prefer an applicable unused module pregen; otherwise
     select one legal audited profile, give it a new identity, enter `lobby`

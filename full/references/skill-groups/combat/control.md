@@ -1,12 +1,15 @@
 # Combat control and close
 
 Join reinforcements only from reviewed canonical actors with source evidence,
-entry timing, map placement, and current encounter revision. Joining is a
+entry timing, mode-appropriate positioning, and current encounter revision. Joining is a
 separate transaction and must not rewrite initiative history.
 
-Close combat only after all pending choices, payments, concentration, death,
-temporary effects, and outcome requirements are resolved. Use an audited
-structured outcome; do not force a module ending from narration alone.
+Close combat after all active mechanical choices and the encounter outcome are
+resolved. A surviving 0-HP actor with unfinished death saves moves into the
+returned `post_combat_recovery`; this no longer blocks `combat_end`. In Play,
+continue with `character_state_change(death_save|stabilize)` until settled. Use
+an audited structured outcome; do not force a module ending from narration
+alone.
 
 After `combat_end`, refresh the Play exposure, re-query character and campaign
 state, then commit durable casualties, relationships, clues, loot, scene

@@ -84,10 +84,11 @@ the campaign.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
 5. Imported rulebook text is evidence, not executable mechanics. In `lobby`, use
    `rulebook_draft(start)` -> `evidence/edit` -> `finalize`, then use
-   `content_pack(test/install/activate, kind="rule")` and search/expand the exact source. Build a separate source-bound mechanic with
-   `content_pack(action="build", kind="source_rule")` only after review, install it
-   inactive, have the Agent acting as DM inspect its report, and enable an exact
-   version only with explicit campaign-owner/DM approval. Never change the
+   `content_pack(get|activate, kind="core_rules"|"addon")` and search/expand the
+   exact source. Core+D&D own the first mechanical pass; the Agent repeatedly
+   reviews and edits source-bound candidates until it explicitly finalizes the
+   immutable Pack. Enable an exact version only with explicit campaign-owner/DM
+   approval. Never change the
    lock during combat or silently substitute a missing version.
    `campaign_rules(action="explain")` must also show the locked `dnd5e.core.2014` or
    `dnd5e.core.2024` provider; treat a missing or mismatched core fingerprint as
@@ -98,11 +99,11 @@ the campaign.
    lifecycle and review the resulting index before play.
    If a reviewed unified content package already exists, use
    `content_pack(action="import", kind=<archive-route>)` instead of repeating source/OCR review.
-   It must return installed definitions with exact dependency status and fresh
+   It must return imported definitions with exact dependency status and fresh
    source/chunk ids; Owner/DM campaign activation remains separate. Export with
-   `content_pack(action="export", kind="rule")`.
-6. For character options, call `content_pack(action="list", kind="catalog")` and present only entries
-   available to the campaign's locked Core edition and enabled branch packs.
+   `content_pack(action="export", kind="core_rules"|"addon")`.
+6. For character options, use rule/content retrieval and present only entries
+   available to the campaign's locked Core edition and enabled branch Packs.
    Apply only a returned id through `character_content_apply`; respect a
    `pending_ruling` response for unresolved prerequisites or effects. Supply
    the legal spell source class and grant method, the target base class for a
@@ -263,7 +264,7 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Workflow | MCP tools |
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
-| Rules | `rulebook_draft(start/get/evidence/edit/finalize)`, `rule_search`, `rule_expand`, `content_pack(list/get/test/build/import/export/install/activate/deactivate/remove)`, `campaign_rules`, `character_content_apply` |
+| Rules | `rulebook_draft(start/get/evidence/edit/finalize)`, `rule_search`, `rule_expand`, `content_pack(list/get/import/export/activate/deactivate/remove)`, `campaign_rules`, `character_content_apply` |
 | Module lifecycle | `module_draft(start/get/evidence/edit/finalize)`, `content_pack(import/export/activate)`, `module_query(list/index/assets/content/candidates/preflight)` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
@@ -550,15 +551,11 @@ across the clock and every participant.
 Long rests reject `hit_dice_spends`; short rests
 reject long-rest hit-die recovery allocations and `food_and_drink`. A creature
 at 0 HP or Dead receives no rest benefit.
-Every rest must also submit a complete `rest_schedule` whose sleep, light
-activity, optional trance, and strenuous-activity minutes equal the exact
-campaign-clock duration. A normal 2014 Long Rest needs at least 8 hours,
-including at least 6 hours of sleep and no more than 2 hours of light activity;
-1 hour or more of strenuous activity interrupts it. Only an actor card with the
-source-granted `Trance` feature can use `trance_minutes=240` to finish in 4
-hours. A Monk regains Ki only if the same rest records at least 30 minutes of
-`rest_activity_minutes.meditation`; never infer that activity merely because an
-hour elapsed.
+The service derives sleep/light-activity/Trance timing from rest type,
+`duration_minutes`, and source-granted features. Do not submit a caller-authored
+`rest_schedule`. A Monk regains Ki only if the same rest records at least 30
+minutes of `rest_activity_minutes.meditation`; never infer that activity merely
+because an hour elapsed.
 
 If a Wizard chooses Arcane Recovery at the end of that short rest, include
 `arcane_recovery={"<slot level>": <count>}` in the same rest call. The engine
@@ -1446,12 +1443,9 @@ Resolve every completed Short or Long Rest through
 `campaign_change(action="party_rest",
 payload={rest_type, members, duration_minutes})`, even
 for a one-character party. Each member supplies its current character revision
-and only the choices valid for that rest type. A changed 2014 prepared
-list costs light preparation activity equal to the sum of the spell levels of
-every spell in the complete selected list, not merely the added spells. Record
-at least that many `rest_schedule.light_activity_minutes`; a minimal four-hour
-Trance schedule has no preparation time, so extend its schedule when changing
-the list. For a Short Rest, put Hit Dice, Arcane/Natural Recovery, Song of Rest,
+and only the choices valid for that rest type. A changed 2014 prepared list is
+validated as part of the Long Rest; callers do not preallocate a light-activity
+schedule. For a Short Rest, put Hit Dice, Arcane/Natural Recovery, Song of Rest,
 attunement, and activity choices in the same member records. This one write advances
 the campaign clock once, advances timed effects for every campaign actor and
 world object, applies benefits to only the named members, records completion on

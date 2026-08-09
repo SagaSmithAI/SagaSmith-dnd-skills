@@ -28,12 +28,12 @@ Runtime character rows and snapshots never store that image. Import always
 creates a fresh runtime identity and never transfers ActorKnowledge, branches,
 random streams, or campaign state.
 
-Export one actor with `character_query(view="content_package")`. Import either
-an installed exact `artifact_id`, or an `artifact_id` from exactly one managed
-or allowlisted archive, with `character_create_from(mode="content_actor")`.
-Browse installed standard cards through
-`content_pack(action="list", kind="catalog", content_kind="actor_card")`; never reconstruct
-a creature by name.
+Actor-card exchange happens only through finalized `preset` or `module` Packs.
+Use `content_pack(action="list"|"get", kind="preset")` to inspect reusable
+cards, and import an archive with `content_pack(action="import",
+kind="preset")`. Create a runtime actor from the returned exact artifact/card
+identity; never reconstruct a creature by name or use a character-query export
+side door.
 
 Image extraction is conservative. A source page must contain the actor heading
 (exact or a bounded letter-spacing OCR equivalent) and a low-text illustration
@@ -80,12 +80,13 @@ public release.
 
 ## Import and activation
 
-Every `content_pack` request declares a route `kind`; the server never infers it
-from other fields or from archive contents. Catalog queries use `kind="catalog"`
-and place the entry subtype in `content_kind`.
+Every `content_pack` request declares one of the four route kinds
+`core_rules|addon|module|preset`; the server never infers it from other fields
+or from archive contents. Its complete action set is
+`list|get|import|export|activate|deactivate|remove`.
 
 Use `content_pack(action="import", kind="addon")` for an addon,
-`kind="rule"` for a `core_rules` archive, and `kind="preset"` for a preset.
+`kind="core_rules"` for a core-rules archive, and `kind="preset"` for a preset.
 Provide exactly one managed `artifact` or allowlisted `source_path`; inline
 descriptors are not accepted because they cannot carry verified blobs.
 For a public-catalog download, verify both the descriptor checksum and the
@@ -96,7 +97,7 @@ archive, edition, dependencies, sources, images, every actor, sourced play
 profile, and `metadata.agent_finalization`, then creates fresh cast identities
 and bindings. Activation remains an explicit Owner/DM operation.
 
-Import/install never implies branch activation. Enable an addon with revision-
+Import never implies branch activation. Enable an addon with revision-
 safe Owner/DM `content_pack(action="activate", kind="addon")`. Module activation
 uses `kind="module"` and remains a separate campaign operation. Snapshot locks keep exact package versions and
 checksums; one package kind cannot borrow another kind's authority.

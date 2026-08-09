@@ -28,8 +28,9 @@ Campaign state, not the prompt, owns the phase. The MCP refreshes session exposu
 ## Shareable actors and modules
 
 PCs, NPCs, and monsters use package-owned `sagasmith.actor-card.v3` records.
-Export with `character_query(view="content_package")` and import with
-`character_create_from(mode="content_actor")`. The target always receives a new
+Move them between installations only inside a finalized `preset` or `module`
+Pack, managed through `content_pack`. Runtime creation from an exact imported
+card always receives a new
 Character identity and no ActorKnowledge. The 2014 and 2024 SRD creatures are
 ordinary cards in bundled preset packs, not host- or driver-side name tables.
 Import must settle every resolution before release. Source-explicit action
@@ -41,8 +42,9 @@ requirement exists but no executable plan does, the DM Agent may compile one
 source-bound plan on first use and persist it on the content actor card.
 
 Bind module NPCs, monsters, and pregenerated PCs with
-`module_draft(action="edit", operation="actor")`, then export with
-`module_query(view="package")`. The package carries a signed Scene Atlas with
+`module_draft(action="edit", operation="actor")`, explicitly finalize the
+reviewed draft, then export with `content_pack(action="export", kind="module")`.
+The package carries a signed Scene Atlas with
 exact scene text and retrieval chunks, the source
 index, embedded assets, reviewed content, cards, and stable scene bindings.
 `content_pack(action="import", kind="module")` replays it through Core and creates
@@ -56,7 +58,7 @@ complete procedure.
 1. Read the active branch, continuity context, current scene, and caller-visible actor knowledge.
 2. Separate player statement, character intent, and missing rules inputs.
 3. Use `rule_search` then `rule_expand`; use the same search/expand pattern for modules.
-4. Let the engine settle deterministic mechanics and let the SagaSmith Agent perform ordinary GM rulings on targets, sight, exceptions, and narrative cost. Stop externally only for player-owned choices, owner approvals, permission changes, or missing/conflicting source evidence.
+4. Let the engine settle deterministic mechanics. Grid combat uses engine map geometry; agent-positioned combat uses structured Agent spatial facts. The SagaSmith Agent also performs ordinary GM rulings on exceptions and narrative cost. Stop externally only for player-owned choices, owner approvals, permission changes, or missing/conflicting source evidence.
 5. Use controlled tools for state, scene progress, events, memory, and actor knowledge.
 6. Snapshot major divergence, danger, chapter transitions, and combat boundaries.
 

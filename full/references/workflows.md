@@ -66,15 +66,18 @@ own exposure. Loading a group for one Agent must not expose it to another.
    campaign folder into one campaign while retaining one immutable module
    revision per physical document. A root-level adventure remains its own
    campaign. Do not create one campaign per appendix, map packet, or supplement.
-4. Load `lobby.modules`. For each module PDF call `module_draft` in this exact order:
-   `stage` -> `inspect` -> `validate` -> `ingest` -> `activate`. Keep the same
-   `job_id`; use a stable, stage-specific idempotency key for each write.
-   Between `inspect` and `validate`, repair a damaged PDF transcript only through
-   `module_draft(action="evidence")` followed by one checksum-bound
-   `module_draft(action="edit", operation="source_text")` batch per page. Text-only Agents
-   use two-source agreement or bounded context with unchanged digit sequences;
+4. Load `lobby.modules`. For each module PDF call `module_draft(start)` once.
+   Core+D&D stage, inspect, normalize, and mechanically construct the first
+   editable workspace. Keep the same `job_id`; read the current draft and its
+   issues, use `evidence` plus revision-checked `edit` operations until the
+   Agent is satisfied, then send an explicit `confirmation` to `finalize`.
+   Repair damaged PDF text only through one checksum-bound
+   `edit(operation="source_text")` batch per page. Text-only Agents use
+   two-source agreement or bounded context with unchanged digit sequences;
    only a reviewer that actually saw the image may use rendered-page evidence.
-   Re-read the updated inspection and revision before continuing.
+   Re-read the updated draft and revision after every edit. Finalization creates
+   an immutable Pack but never activates it; activate later through
+   `content_pack(kind="module")`.
 5. Review `module_query(view="index")`. Search only selects candidates; expand the
    chosen scene before using its facts. Verify scene boundaries, keeper/public
    visibility, encounter participants, exact source excerpts, spatial locations,
@@ -185,9 +188,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
    For an already reviewed shared actor, use
    `character_create_from(mode="content_actor")`. PC, NPC, and monster share one
    card format; import creates a new runtime identity and an empty ActorKnowledge
-   ledger. Browse bundled standard monsters/NPCs as `actor_card` catalog entries,
-   or export/import a complete `kind="preset"` content package through
-   `content_pack(action="list", kind="actor_preset")`. Never choose a creature by a
+   ledger. Browse bundled standard monsters/NPCs in the relevant finalized
+   Preset Pack through `content_pack(action="list"|"get", kind="preset")`. Never choose a creature by a
    host-maintained name table.
 9. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
@@ -205,37 +207,37 @@ own exposure. Loading a group for one Agent must not expose it to another.
 
 ## Share or migrate structured content
 
-1. Enter Lobby and load `lobby.characters`, `lobby.modules`, and, for preset
-   libraries, `lobby.rules`. Export a PC/NPC/monster with
-   `character_query(view="content_package")`; review its sheet and notes before
-   distributing the managed `.sagasmith-pack` artifact.
-2. Before module export, call `module_draft(action="edit", operation="actor")` for every cast
+1. Enter Lobby and load the relevant authoring group. Cross-installation content
+   moves only through finalized `sagasmith.content-package` v2 archives. Actor
+   cards belong in a `preset` or `module` Pack; there is no public character
+   export side door.
+2. Before module finalization, call `module_draft(action="edit", operation="actor")` for every cast
    NPC, encounter monster, and pregenerated PC. Use stable content actor ids,
    binding kinds, roles, and actual Scene Atlas keys. Verify
    `module_query(view="actors")`.
-3. Call `module_query(view="package", include_package=true)` for inspection and
-   transfer its managed archive. Do not package progress, continuity,
-   ActorKnowledge, branches, random state, or Snapshots as source content.
+3. Review the current draft and evidence, save package decisions through
+   `module_draft(edit, operation="package")`, and finalize with explicit Agent
+   confirmation. Inspect or transfer the saved archive through
+   `content_pack(action="get"|"export", kind="module")`. Do not package progress,
+   continuity, ActorKnowledge, branches, random state, or Snapshots.
 4. On the target installation, call
    `content_pack(action="import", kind="module")` with exactly one managed artifact or
    allowlisted `.sagasmith-pack` path. Treat returned actor ids as new
    identities. Re-read the imported index, actor bindings, assets, reviews, and
    validation and Agent finalization before play.
-5. For a default actor library, export
-   `content_pack(action="list", kind="actor_preset", edition=..., include_package=true)`.
-   Import one nested card through content-actor creation with the same pack
-   plus its exact `artifact_id`. Optional rule dependencies still need normal
-   reviewed installation and campaign activation.
-6. For a reviewed extension rule pack, call
-   `content_pack(action="export", kind="rule", payload={campaign_id, pack_id, version,
-   metadata, include_package?})`. The exporter replaces local source/chunk ids
+5. For an actor library, use `content_pack(action="list"|"get"|"export",
+   kind="preset")` and retain its exact artifact ids. Optional rule dependencies
+   still need normal reviewed import and campaign activation.
+6. For a reviewed Core/Addon Pack, call
+   `content_pack(action="export", kind="core_rules"|"addon", payload={campaign_id,
+   pack_id, version, ...})`. The exporter replaces local source/chunk ids
    with stable keys and embeds the complete indexed sources. Keep distribution
    private unless the owner supplies an explicit license and attribution. The
    result is a unified `core_rules` archive, not loose rule-pack JSON.
 7. On the target installation, call
-   `content_pack(action="import", kind="rule")` with exactly one managed artifact or
+   `content_pack(action="import", kind="core_rules"|"addon")` with exactly one managed artifact or
    allowlisted `.sagasmith-pack` path and a stable idempotency key. Verify exact
-   dependencies. Import installs definitions globally but does not activate
+   dependencies. Import stores the finalized definitions but does not activate
    them for a campaign; Owner/DM activation remains separate.
 8. If an extension also ships actors, keep them in the Addon package's `actors`
    collection. Publish an independently runnable adventure as a Module package
@@ -273,10 +275,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    submit `--agent-reinforcement-trigger-json` with the exact excerpt, future
    round, decision, and observed-state reason. Keep the semantic judgment at
    the Agent boundary and the actual entry in generic `combat_join`.
-4. Call `combat_start` only after preflight succeeds. Let it compile a temporary
-   combat map from the recorded spatial scene and location. Load the owner/DM
-   `play.combat_control` group for this transition. If it falls back to a
-   12-by-12 canvas, do not narrate those dimensions as module-authored facts. If
+4. Call `combat_start` only after preflight succeeds and choose one immutable
+   encounter `positioning_mode`. For `grid`, supply or compile a real temporary
+   battle map and a coordinate for every participant; missing geometry is an
+   input error. For `agent`, send no map or coordinates and let the Agent supply
+   structured spatial facts on each relevant action. Load the owner/DM
+   `play.combat_control` group for this transition. If
    the selected source chunk explicitly says a participant starts under a
    condition, pass it in that actor's `source_conditions` with
    `duration="encounter"`, the service-returned immutable `source_ref`, and the
@@ -337,12 +341,12 @@ own exposure. Loading a group for one Agent must not expose it to another.
    supplies only generic bindings and the returned fingerprint to
    `combat_choice(action="execute_plan")`. Do not add a dedicated CLI flag or
    apply the rider later with `combat_hp_change`.
-   When exact scene evidence and current relative position give the target Half,
-   Three-Quarters, or Total Cover, the Agent supplies the attacker, distinct
-   target, attack mode, exact source reference/excerpt, decision, and reason.
-   Send only the cover degree; the server verifies the current-scene evidence
-   and the D&D engine derives +2 AC, +5 AC, or an untargetable target. Never
-   calculate a numeric cover bonus in the Agent or encounter driver.
+   In grid mode, the engine derives targeting, range, cover, visibility,
+   adjacency, and geometry from coordinates and the battle map. In agent mode,
+   send no coordinates: the Agent supplies the facade's exact attack, movement,
+   or area `spatial_facts`, including a stable decision id and reason. Never
+   calculate a numeric cover bonus, omit allies from an area decision, or mix
+   both positioning modes.
 3. When an attack returns `pending_reaction`, read the target's
    `combat_query(view="reactions")`, then use
    `combat_choice(action="resolve_defense")`. Do not roll or apply damage twice.
@@ -420,9 +424,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
 7. End each completed turn with `combat_end_turn`, using the latest revision and a
    fresh idempotency key. Refresh status after every write.
 8. Call `combat_end` through owner/DM `combat.control` with a structured outcome
-   only when the encounter is actually over. Do not end while a death-save
-   participant is at 0 HP without Dead or Stable. The server returns the campaign
-   to `play`; reopen exposure before further play writes.
+   when the encounter is actually over. It returns unfinished 0-HP actors in
+   `post_combat_recovery` and moves the campaign to `play`; reopen exposure, then
+   use `character_state_change(death_save|stabilize)` until each is settled.
 9. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
    to wait, call `campaign_change(action="stable_recovery")` once with every
    simultaneously waiting Stable actor; the engine rolls each `1d4`-hour delay,
@@ -496,15 +500,21 @@ own exposure. Loading a group for one Agent must not expose it to another.
 ## Rulebook to executable optional pack
 
 1. Load `lobby.rules`; run `rulebook_draft` in order:
-   `stage` -> `inspect` -> `ingest` -> `extract_candidates` -> `review` ->
-   `compile` -> `install` -> `activate`.
-2. Review exact imported chunks and provenance. Candidate extraction is not
-   approval; unsupported content remains pending.
-3. Compile only safe declarative IR through `content_pack` when a separate
-   reviewed mechanic is needed. Arbitrary code is never executable rule content.
-4. Use `content_pack(action="test", kind="rule")` and inspect the installed inactive pack.
-   Activation requires explicit campaign-owner/DM approval and a fresh campaign
-   revision; the Agent must not infer that approval from its own adjudication.
+   `start` -> repeated `get/evidence/edit` -> `finalize`. Core+D&D own source
+   normalization, the first mechanical candidates, deterministic repair, and
+   validation. The Agent may repeatedly find, add, reopen, split, merge, include,
+   exclude, and replace source-bound candidates before finalization.
+2. Review exact chunks/pages, every issue, and the current revision. One-book
+   decisions remain in the draft/Pack edit history; do not add them as Core or
+   D&D parser heuristics. Candidate extraction is not approval, and missing or
+   conflicting evidence is never permission to invent content.
+3. Finalize only after reviewing the complete current draft, resolving actual
+   blockers, and explicitly confirming publication. Finalization validates and
+   stores one immutable `core_rules` or `addon` Pack; corrections use a new
+   draft/version.
+4. Inspect or activate through `content_pack(get|activate,
+   kind="core_rules"|"addon")`. Activation requires explicit campaign-owner/DM
+   approval and a fresh campaign revision; finalization never implies it.
 5. Settle checks with `character_check` in play or `combat_check` in combat. For
    a 2014 opposed check, use one atomic `character_check(action="contest")` call instead of
    inventing a DC or comparing client-side rolls. Then audit

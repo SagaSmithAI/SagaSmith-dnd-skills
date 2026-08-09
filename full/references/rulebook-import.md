@@ -4,7 +4,11 @@ Use the three-tool authoring contract:
 
 - `rulebook_draft`: source-to-finalized Rule/Addon Pack;
 - `module_draft`: source-to-finalized Module Pack;
-- `content_pack`: finalized Pack import, export, test, install, and activation.
+- `content_pack`: finalized Pack list/get/import/export/activate/deactivate/remove.
+
+All three facades are Lobby-only. `content_pack.kind` is exactly
+`core_rules`, `addon`, `module`, or `preset`; it is never inferred from an id
+or archive.
 
 ## Start the mechanical pass
 
@@ -75,8 +79,9 @@ compiles the source-bound artifacts, validates the Pack, and saves its immutable
 version. There is no separate public compile step and no draft mutation after
 finalization.
 
-Use `content_pack(action="test", kind="rule")`, then `install` and `activate`
-with the same explicit `kind`. Activation
-is an explicit Owner/DM decision and requires campaign revision/idempotency
-contracts. For an already reviewed portable archive, skip parsing and call
-`content_pack(action="import", kind="rule")`.
+The finalized archive is already validated and stored. Use
+`content_pack(action="get", kind="core_rules"|"addon")` to inspect it and
+`content_pack(action="activate", kind="core_rules"|"addon")` only when the
+campaign should use it. Activation is an explicit Owner/DM decision and
+requires campaign revision/idempotency contracts. For an already finalized v2
+archive, skip parsing and call `content_pack(action="import", kind=...)`.

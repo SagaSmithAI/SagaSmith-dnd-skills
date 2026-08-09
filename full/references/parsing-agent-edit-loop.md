@@ -19,7 +19,8 @@ and validation. The Agent owns semantic edits until explicit finalization.
 5. Call `rulebook_draft(action="finalize")` with the latest revision, completion
    note, and final Pack manifest only when every candidate is resolved and the
    blocker count is zero. Finalization freezes, compiles, and saves the Pack.
-6. Use `content_pack(test|install|activate, kind="rule")` as separate Owner/DM operations.
+6. Inspect or activate the saved Pack through `content_pack(get|activate,
+   kind="core_rules"|"addon")`; no public build, test, or install step exists.
 
 ## Agent permissions before finalization
 
@@ -49,3 +50,9 @@ descriptor and records `metadata.agent_finalization`. Activation is always a lat
 When a progressed scene was renamed or restructured, the Agent records the
 continuity decision at activation as `from_scene_id` -> finalized
 `to_scene_key` plus its reason; runtime progress itself remains campaign state.
+
+The Agent may keep editing for as many review passes as necessary before
+finalization. “No current blocker” is not automatic publication approval: the
+Agent must inspect the current revision and send the explicit confirmation.
+After finalization, corrections require a new draft/version rather than a
+mutation of the immutable Pack.

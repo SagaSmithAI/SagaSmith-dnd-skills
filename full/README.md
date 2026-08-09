@@ -27,18 +27,17 @@ Full 模式是 SagaSmithAI 的 D&D 5e 2014/2024 带团工作流。它要求 `sag
 
 ## 可分享角色与模组
 
-PC、NPC、怪物共用包内 `sagasmith.actor-card.v3`。通过
-`character_query(view="content_package")` 导出，通过
-`character_create_from(mode="content_actor")` 导入；目标端总是创建新的
+PC、NPC、怪物共用包内 `sagasmith.actor-card.v3`。跨安装迁移时必须放进
+已定稿的 `preset` 或 `module` Pack，并通过 `content_pack` 管理；目标端总是创建新的
 Character identity，而且不会携带 actor knowledge。2014/2024 SRD 怪物和
 NPC 是随附 preset pack 中的普通卡，不是 Host/驱动器里的名称硬编码。
 导入器必须在发布前固定 resolution；来源显式区分的动作变体分别成卡，OCR 仅做
 结构可证明的恢复，运行时不再首次补义。
 
 结构化模组先用 `module_draft(action="edit", operation="actor")` 绑定 NPC、怪物和预设
-PC，再由 `module_query(view="package")` 导出。包中包括带场景正文与检索 chunks 的签名 Scene Atlas、源索引、
+PC，审查并显式定稿后再由 `content_pack(action="export", kind="module")` 导出。包中包括带场景正文与检索 chunks 的签名 Scene Atlas、源索引、
 内嵌资产、审核内容、角色卡与稳定场景关联；导入通过
-`content_pack(action="import")` 通过 Core 重放该结构并生成新 actor id。它不
+`content_pack(action="import", kind="module")` 通过 Core 重放该结构并生成新 actor id。它不
 包含进度、世界状态、记忆、分支或 Snapshot。加载 Lobby 的
 `portable.content` Skill group 获取完整操作边界。
 

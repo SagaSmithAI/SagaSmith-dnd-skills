@@ -18,9 +18,11 @@ reruns Core+D&D checks. Accepted and rejected dispositions remain editable.
 
 Call `rulebook_draft(finalize)` with the latest revision, completion note, and
 final manifest only after all blockers are resolved. It freezes, compiles, and
-saves the immutable Pack atomically. Use `content_pack(test|install|activate, kind="rule")`
-afterward; finalization never activates a campaign.
+saves the immutable Pack atomically. Inspect it with `content_pack(get)` and
+activate it with `content_pack(activate)`, using `kind="core_rules"` or
+`kind="addon"`; finalization never activates a campaign.
 
-For an already reviewed portable archive, skip parsing and call
-`content_pack(import, kind="rule")`. Preserve exact citations, checksums, dependency locks,
-and receipts. OCR repair must not invent numbers, identities, or rules.
+For an already finalized v2 archive, skip parsing and call
+`content_pack(import, kind="core_rules"|"addon")`. Preserve exact citations,
+checksums, dependency locks, and receipts. OCR repair must not invent numbers,
+identities, or rules.

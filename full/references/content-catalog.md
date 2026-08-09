@@ -12,9 +12,9 @@ be conflated:
 For the bundled 2014 SRD, `dnd5e.content.srd2014@1.4.0` is installed during MCP
 startup when the full D&D skill repository is configured. Its records retain a
 `bundled:srd2014/...` reference to the original Markdown file. Optional books
-must use source-bound `rulebook_draft` or `content_pack(action="build", kind="source_rule")`; every artifact supplies imported
-`source_chunk_ids`, which the MCP resolves to the exact document chunk/page
-citations before the pack can be installed.
+must use the source-bound `rulebook_draft` editing/finalization loop; every
+artifact supplies imported `source_chunk_ids`, which the MCP resolves to the
+exact document chunk/page citations before the Pack can be finalized.
 
 The bundled 2024 catalog is a separate
 `dnd5e.content.srd2024@1.0.0` pack compiled only from SRD 5.2.1 Markdown. It
@@ -48,7 +48,9 @@ the actual subclass artifact instead of applying a second empty marker card.
 ## Agent procedure
 
 1. Read `campaign_rules(action="get_profile")` and the current branch state.
-2. Call `content_pack(action="list", kind="catalog")` with campaign, optional `content_kind`, and query.
+2. Use `content_pack(action="list"|"get", kind="core_rules"|"addon")` to
+   inspect only the effective Core and enabled Addon Pack versions, then select
+   their exact catalog artifact id.
 3. Present only returned options and their source references to the player. Read
    `selection_requirements` for spell eligibility, subclass class/level,
    species grants, class/subclass feature level, background choices, and feat
@@ -84,8 +86,8 @@ the actual subclass artifact instead of applying a second empty marker card.
    resolves the latter by default from the exact rule/source and current actor
    state. Do not bypass either result by editing raw sheets.
 
-An imported extension is not automatically enabled, and installation is not a
-mechanics claim. The DM selects its exact pack version per branch. Snapshots
+An imported extension is not automatically enabled, and import is not a
+mechanics claim. The DM selects its exact Pack version per branch. Snapshots
 then retain that version/checksum lock for replay and audit.
 
 Each bundled catalog is built from leaf records, not index pages: individual

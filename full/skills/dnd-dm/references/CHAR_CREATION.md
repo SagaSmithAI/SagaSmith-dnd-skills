@@ -112,9 +112,9 @@ mechanics only for PCs and source-statblocked actors; a `narrative_only` actor i
 not mechanically authoritative.
 
 Recording a class, subclass, species, or subspecies name is not sufficient.
-Before the first `play` phase and after every level-up, query
-`content_pack(action="list", kind="catalog")`
-and reconcile every class/subclass feature whose `minimum_level` is met, plus every
+Before the first `play` phase and after every level-up, retrieve selection
+artifacts from the campaign's effective Core and enabled Addon Packs and
+reconcile every class/subclass feature whose `minimum_level` is met, plus every
 species grant and required choice, through `character_content_apply`. Treat
 `catalog_only` as a stop condition that needs reviewer/DM completion, never as an
 applicable card. When importing a finished character whose printed scores and HP
@@ -271,8 +271,8 @@ limits by hand:
    complete level-up. Cross-check every returned feature's `minimum_level`
    against its cited class or subclass text before applying it; an implausible
    early unlock is an import/compiler defect and a stop condition, not a bonus.
-5. Resolve each reported cantrip, known-spell, or spellbook choice from
-   `content_pack(action="list", kind="catalog")`; apply only eligible artifact ids.
+5. Resolve each reported cantrip, known-spell, or spellbook choice through the
+   effective rule/content retrieval surface; apply only eligible artifact ids.
    A Wizard adds the reported spells with `method="spellbook"`. For a prepared
    caster, also apply each newly chosen class spell not yet present on the card
    with `method="class_prepared"`; these card-hydration selections do not consume
