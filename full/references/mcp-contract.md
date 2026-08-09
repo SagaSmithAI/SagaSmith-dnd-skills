@@ -16,6 +16,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Module artifact | `module_draft(start/get/evidence/edit/finalize)`, `content_pack(import/export/activate)` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/preflight/actors)`, `module_search`, `module_expand`, `module_set_progress` |
+| NPC conversation | `npc_runtime_capabilities`, `conversation_open`, `conversation_status`, `conversation_ingest`, `conversation_activations`, `npc_activation_checkout`, `npc_activation_submit`, `conversation_close`, `conversation_abort` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
@@ -900,7 +901,32 @@ resolution requests for ordinary public tools. After such a write, the bundle
 is stale and must be reread. `audience_render` returns the exact safe
 `publication.text`; publish that value unchanged.
 
-### Isolated NPC turn contract
+### Persistent NPC conversation contract
+
+During Play, Owner/DM opens one conversation with explicit same-campaign
+participants. The MCP stores a durable draft journal and one private logical
+runtime for every NPC. It derives perception and language understanding for
+each ingested event and returns only public activation descriptors plus opaque
+actor-scoped worker handles. The Director never receives private actor context.
+
+An isolated host NPC subagent checks out its own capsule, retaining the same
+`conversation_id + actor_runtime_id` model context across activations. It has
+zero tools and returns only `npc-conversation-proposal.v2`. That proposal has no
+free utterance field: all speakable text is segmented with speech act, truth
+posture, basis refs, targets, language, and delivery. MCP validates the lease,
+actor scope, current authority, evidence and targets, then derives the only
+publishable `publication`.
+
+Player inputs and publications update the draft/inboxes immediately but do not
+write campaign authority. `conversation_close` selects explicit per-actor
+working-delta indexes and atomically commits the exact public transcript,
+server-derived retrieval text, ActorKnowledge, relationships, goals, and
+commitments. Any campaign event, actor revision, branch/Snapshot change, or
+mechanic makes the session stale. Version 1 closes/reopens around mechanics;
+it does not hot-refresh. MCP never owns the model or provider KV. See
+`host-integration-npc-conversation.md`.
+
+### Legacy isolated NPC turn contract
 
 During Play or Combat, Owner/DM may call `continuity_context` with
 `purpose="npc_turn"`, one NPC/monster `actor_id`, explicit

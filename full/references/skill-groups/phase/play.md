@@ -14,5 +14,9 @@ Play is live non-combat scene resolution. At each turn:
 5. At meaningful scene completion, atomically record event, facts, actor
    knowledge, manifest progress, and a proportionate checkpoint.
 
+For connected NPC dialogue, open one MCP conversation, retain one isolated host
+worker per NPC, publish only MCP-validated publications, and atomically close
+the transcript before any authoritative mechanic or scene mutation.
+
 Start Combat only from reviewed canonical actors and scene evidence. Do not
 carry a pre-restore context bundle into resumed narration.

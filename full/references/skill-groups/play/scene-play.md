@@ -9,7 +9,8 @@ module-specific narrative behavior from current world state and exact context.
 The engine changes only validated state primitives. A narrative instruction is
 context for reasoning, not a hidden trigger engine.
 
-Use `actor_turn` or the richer `npc_turn` for autonomous actors,
+Use the persistent NPC conversation runtime for connected Play dialogue. Use
+`actor_turn` or the legacy single-turn `npc_turn` for standalone autonomous actors,
 `faction_turn` for faction decisions, and `audience_render` before publishing a
 player-safe view. Validate each generic proposal with `bounded_evaluation`; a
 validated proposal is still not a state change.

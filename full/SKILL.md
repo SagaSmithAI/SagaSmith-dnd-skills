@@ -176,13 +176,13 @@ The machine-readable phase/tool-group mapping is
   include the current `continuity_context.context_receipt`. A stale, wrong
   branch/principal, unsigned, or source-incomplete receipt is rejected; reread
   context after any revision or restore before committing the ruling.
-- For a live named NPC/monster turn, load the conditional `npc.portrayal` Skill
-  group, request `continuity_context(purpose="npc_turn")`, and use the host's
-  tool-free isolated portrayal capability when available. The proposal is not
-  authoritative: resolve mechanics with public MCP tools, re-read after every
-  state change, accept only explicit delta indexes, and commit through the
-  signed `npc_turn` continuity path. Follow
-  `references/host-integration-npc-turn.md` on hosts without `portray_npc`.
+- For connected live NPC dialogue during Play, load `npc.portrayal` and
+  `play.npc_conversation`, then follow
+  `references/host-integration-npc-conversation.md`. Open once, keep one
+  actor-isolated host worker per NPC, publish only MCP `publication`, close
+  atomically before mechanics/state changes, and release the workers. Use the
+  signed single-turn `npc_turn` path only for a standalone reaction or Combat;
+  follow `references/host-integration-npc-turn.md` for that legacy boundary.
 - For autonomous actor, player-audience rendering, faction, source
   interpretation, or Agent-owned ruling isolation, request the matching
   `continuity_context` purpose, run the fixed zero-tool evaluation, and submit

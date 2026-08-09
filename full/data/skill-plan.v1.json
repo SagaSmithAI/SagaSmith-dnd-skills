@@ -159,6 +159,13 @@
       "depends_on": ["continuity.read", "continuity.write", "core.context_isolation", "core.evidence_ruling"],
       "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/play/npc-portrayal.md", "action": "read", "max_chars": 3600}]
     },
+    "npc.conversation": {
+      "load_policy": "tool_group",
+      "visibility": "dm",
+      "reason": "Connected Play dialogue needs MCP-owned logical runtimes, isolated host NPC workers, validated publication, and one atomic close.",
+      "depends_on": ["continuity.read", "continuity.write", "core.context_isolation"],
+      "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/play/npc-conversation.md", "action": "read", "max_chars": 3000}]
+    },
     "evaluation.actor": {
       "load_policy": "operation",
       "visibility": "dm",
@@ -305,6 +312,7 @@
     "lobby.storage_admin": {"required": ["storage.admin"], "tools": ["storage_migrate"]},
     "play.scene": {"required": ["scene.play", "continuity.read"], "tools": ["actor_knowledge_query", "bounded_evaluation", "branch_query", "campaign_event", "continuity_context", "module_expand", "module_query", "module_search"]},
     "play.scene_control": {"required": ["scene.play", "continuity.write", "snapshot.branch", "content.solutions"], "tools": ["actor_knowledge_change", "campaign_change", "campaign_rules", "content_solution", "memory_change", "memory_query", "module_set_progress", "playthrough_manifest", "snapshot_create", "snapshot_query", "state_revision"]},
+    "play.npc_conversation": {"required": ["npc.conversation"], "tools": ["conversation_abort", "conversation_activations", "conversation_close", "conversation_ingest", "conversation_open", "conversation_status", "npc_activation_checkout", "npc_activation_submit"]},
     "play.characters": {"required": ["character.state"], "tools": ["character_action", "character_content_apply", "character_create_from", "character_metadata_update", "character_query", "character_state_change", "inventory_change", "inventory_transfer", "wallet_change"]},
     "play.addon_actors": {"required": ["addon.actors"], "tools": ["addon_actor_instantiate"]},
     "play.resolution": {"required": ["resolution.checks"], "tools": ["character_check", "dnd_ability_roll", "dnd_check", "dnd_dice_roll", "rule_expand", "rule_search"]},
