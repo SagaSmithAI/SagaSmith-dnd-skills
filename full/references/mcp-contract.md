@@ -422,7 +422,7 @@ identity. The target gets a fresh Character id and empty ActorKnowledge.
 Optional card art references one package `actor_image` asset; image bytes never
 enter Character state or snapshots.
 
-The installed edition's standard actors are preset-package cards, not engine
+The active edition's standard actors are preset-package cards, not engine
 constructors or name lookups. Browse the relevant finalized Preset Pack with
 `content_pack(action="list"|"get", kind="preset")`.
 
@@ -436,6 +436,11 @@ replays the stored structure with fresh runtime actor ids. Campaign progress,
 world state, ActorKnowledge, random streams, branches, and snapshots are never
 packaged. A valid finalized package may activate only through an explicit Owner/DM action.
 
+Source-authored Rule/Addon and Module Packs retain the Agent's final confirmation
+in `metadata.agent_finalization`. Their `metadata.authoring_review` also retains
+the candidate dispositions or package-edit history from the final draft, so
+source-specific corrections and exclusions remain auditable after export/import.
+
 Core-rule and addon packages contain flat rule definitions, selection artifacts,
 mechanics, resolutions, sources, and optional actor cards. Stable source/chunk
 keys are rebound to fresh local ids on import. Use
@@ -444,10 +449,10 @@ core_rules, or `kind="preset"` for a preset, providing one
 archive artifact or allowlisted path plus an idempotency key. Inline descriptors
 are rejected because they cannot prove their blobs.
 
-Author new Preset and Addon Packs through their respective draft/finalization
-workflow, not a public `content_pack(build)` operation. `content_pack` only
-manages immutable finalized archives and never accepts an untyped payload bag
-or a legacy component envelope.
+Author new Addon Packs through `rulebook_draft`; Preset Packs must already be
+finalized by the trusted system/content pipeline. Neither is a public
+`content_pack(build)` operation. `content_pack` only manages immutable finalized
+archives and never accepts an untyped payload bag or a legacy component envelope.
 
 Import does not grant campaign authority. Addons require a
 separate revision-safe Owner/DM `content_pack(action="activate", kind="addon")`; module

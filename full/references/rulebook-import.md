@@ -76,8 +76,10 @@ Call `rulebook_draft(action="finalize")` with:
 Finalization requires every candidate to be included or excluded and every
 blocker to be resolved. It atomically freezes the candidate fingerprint,
 compiles the source-bound artifacts, validates the Pack, and saves its immutable
-version. There is no separate public compile step and no draft mutation after
-finalization.
+version. `metadata.authoring_review` carries the candidate-set fingerprint and
+each candidate's final disposition, note, issues, and edit history; exclusions
+therefore remain auditable after the Pack leaves the source installation. There
+is no separate public compile step and no draft mutation after finalization.
 
 The finalized archive is already validated and stored. Use
 `content_pack(action="get", kind="core_rules"|"addon")` to inspect it and
