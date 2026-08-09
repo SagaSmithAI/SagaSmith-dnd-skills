@@ -450,9 +450,9 @@ archive artifact or allowlisted path plus an idempotency key. Inline descriptors
 are rejected because they cannot prove their blobs.
 
 Author new Addon Packs through `rulebook_draft`; Preset Packs must already be
-finalized by the trusted system/content pipeline. Neither is a public
-`content_pack(build)` operation. `content_pack` only manages immutable finalized
-archives and never accepts an untyped payload bag or a legacy component envelope.
+finalized by the trusted system/content pipeline. There is no public Pack builder:
+`content_pack` only manages immutable finalized archives and never accepts an
+untyped payload bag or a component envelope.
 
 Import does not grant campaign authority. Addons require a
 separate revision-safe Owner/DM `content_pack(action="activate", kind="addon")`; module
