@@ -1,62 +1,106 @@
-# Portable cards and packages
+# Unified content packages
 
-## Actors and modules
+## One archive, four semantic kinds
 
-PC, NPC, and monster share `actor_card`; `payload.actor_type` selects the role.
-Export with `character_query(view="portable_card")`; import exactly one card,
-artifact, or allowlisted path with `character_create_from(mode="portable_card")`.
-Import creates a fresh identity and never copies campaign state or
-ActorKnowledge. Browse standard cards with
-`rule_pack_query(view="content_catalog", kind="actor_card")` and select an exact
-`artifact_id`; never reconstruct a creature by name. Custom mechanics use their
-reviewed plan or persist an Agent-compiled `content_solution` on first use.
+Every shareable unit uses `sagasmith.content-package` v2 in a
+`.sagasmith-pack` archive. The physical fields are always `manifest`,
+`dependencies`, `sources`, `assets`, `content_reviews`, `actors`, `content`,
+and metadata. The `kind` remains semantically strict:
 
-Bind cast, encounters, and pregenerated PCs with `module_import(bind_actor)` and
-inspect `module_query(view="actors")` before export. The v2 descriptor inside
-`.sagasmith-module` locks play/continuity contracts, dependencies, source, Scene
-Atlas, catalogs, narrative, reviews, actor cards, components, and readiness;
-asset bytes use content-addressed archive paths. Runtime campaign state,
-ActorKnowledge, random streams, branches, and snapshots are excluded.
+- `core_rules`: built-in rule definitions and their evidence;
+- `addon`: optional rule definitions and actor presets, installed globally and
+  enabled per branch by an Owner/DM;
+- `module`: Scene Atlas, catalogs, narrative context, maps, cast, monsters, and
+  pregenerated PCs, attached to one campaign;
+- `preset`: reusable PC/NPC/monster cards with no campaign state.
 
-Import one managed or allowlisted archive with `module_import(import_package)`.
-The MCP validates descriptor, blobs, edition, and exact dependencies before Core
-re-ingest and fresh actor creation. Only `playable`/`complete` may activate;
-review `draft`/`indexed` inactive. Re-read all imported indexes and readiness.
-Reject module-pack v1; never preserve foreign IDs or edit the database.
+Do not accept `sagasmith.portable`, loose JSON cards, `*_pack` envelopes,
+release manifests, or `.sagasmith-module` archives. Do not inline source text or
+image bytes in a descriptor. Every byte belongs to one content-addressed asset.
 
-## Rule packs, releases, and addons
+## Actor cards and images
 
-Export reviewed rules with `rule_pack_query(view="package", ...)`. Packages use
-stable source/chunk keys and carry citation text. Keep distribution `private`
-without an explicit shareable license and attribution.
+PC, NPC, and monster share `sagasmith.actor-card.v3`; `actor_type` selects the
+role. Owner-dependent statblock templates retain the same optional presentation
+reference on their source card until runtime instantiation. Either card may
+reference one package `actor_image` asset by `asset_key`.
+Runtime character rows and snapshots never store that image. Import always
+creates a fresh runtime identity and never transfers ActorKnowledge, branches,
+random streams, or campaign state.
 
-Import with `rule_import(action="import_package")` from exactly one inline,
-managed, or allowlisted source. Verify edition and dependencies. Import creates
-an inactive draft with fresh local ids; install and Owner/DM activation remain
-separate.
+Export one actor with `character_query(view="content_package")`. Import either
+an installed exact `artifact_id`, or an `artifact_id` from exactly one managed
+or allowlisted archive, with `character_create_from(mode="content_actor")`.
+Browse installed standard cards through
+`content_pack(action="list", kind="catalog", content_kind="actor_card")`; never reconstruct
+a creature by name.
 
-Rule packages require `resolution_policy="build_time_complete"` and a readiness
-report recomputed from artifacts and mechanic providers. Export, import, and
-install reject missing, stale, or deferred reports. Addons repeat this audit at
-the envelope and each rule component.
+Image extraction is conservative. A source page must contain the actor heading
+(exact or a bounded letter-spacing OCR equivalent) and a low-text illustration
+region. Evaluate every page in the actor's evidence, keep only the strongest
+crop above the floor, and record page/crop/method/confidence. Text/statblock
+crops and unrelated art are rejected. A proven absence of source illustration
+is an explicit non-blocking result; a missing heading, invalid page, undersized
+candidate, or uncertain crop requires review and blocks release. Never fill an
+absence with invented imagery.
+Never reuse a crop by actor name alone. Reuse requires the same normalized name
+and the same ordered source/chunk/page evidence; different module, edition,
+variant, or duplicate-name evidence must be extracted independently.
 
-Pin rule `definition_checksum` and release component `checksum`. Compose exact
-ids and versions with `rule_pack_query(view="release")`; inspection never
-imports, installs, activates, or grants access.
+Only a complete, rules-legal character document may become a pregenerated PC
+actor card. Preserve an incomplete or partially filled sheet as
+`player_reference`, record the review gap, and send it through normal completion
+and character-creation workflow instead of inventing missing class, level,
+ability, HP, or equipment fields.
 
-Build an addon from a complete source-bound rule pack and reviewed preset pack;
-import with `rule_import(import_addon)`. Components install globally but stay
-inactive until revision-safe Owner/DM `campaign_rules(set_addon)`. Branches and
-snapshots retain exact versions. Policies are `branch` for rules, `library` for
-presets, and `none` for modules; addons cannot contain module components or own
-module activation. Editions and conflict ids must validate.
+## Sources and evidence
 
-Partial preset export may contain proven cards and deferred templates, but the
-rule component still covers every source section and candidate. Catalog-only
-statblocks use rebound source/chunk ids and exact printed name through
-`character_create_from(mode="statblock")`. Parameterized companions remain
-templates until required owner/class context is provided and retained.
+Each source has exactly one UTF-8 normalized-document blob. Sections and chunks
+store offsets and hashes into that blob, not duplicate prose. `source_ref`
+contains an exact `source_key`, `chunk_key`, optional page, and note. Original
+PDFs may be retained as `original_document` assets. On import, Core verifies all
+hashes and recreates local source/chunk ids while preserving stable citations.
 
-Before distribution, cold-start a fresh MCP home and run the addon regression:
-publicly import, inspect, enable, catalog, disable, and exactly re-export. Keep
-commercial-source reports private.
+A distributed file that was not normalized or cited is an auxiliary asset, not
+evidence. Keep maps and player/character reference files as typed `map` or
+`player_reference` assets with their corpus-relative logical path. Never attach
+them to `source.original_asset_keys` or claim their prose was indexed. A public
+catalog may expose authorized browser assets by checksum; install only from the
+complete verified archive.
+
+Treat package construction and public release as different gates. A local
+private package may use `distribution="private"` and `license="user-supplied"`;
+never rewrite those values merely because the software repository is Apache-2.0.
+A public package requires a supported open license, exact HTTPS
+`license_evidence`, matching licenses on every asset, and source-specific
+attribution. A self-asserted authorization boolean is not evidence. Commercial
+documents and crops extracted from them stay private unless a separate grant is
+actually supplied; an SRD card must drop any commercial illustration before
+public release.
+
+## Import and activation
+
+Every `content_pack` request declares a route `kind`; the server never infers it
+from other fields or from archive contents. Catalog queries use `kind="catalog"`
+and place the entry subtype in `content_kind`.
+
+Use `content_pack(action="import", kind="addon")` for an addon,
+`kind="rule"` for a `core_rules` archive, and `kind="preset"` for a preset.
+Provide exactly one managed `artifact` or allowlisted `source_path`; inline
+descriptors are not accepted because they cannot carry verified blobs.
+For a public-catalog download, verify both the descriptor checksum and the
+index's whole-archive SHA-256/byte size before opening or importing it.
+
+Use `content_pack(action="import", kind="module")` for a module. Import validates the
+archive, edition, dependencies, sources, images, every actor, sourced play
+profile, and `metadata.agent_finalization`, then creates fresh cast identities
+and bindings. Activation remains an explicit Owner/DM operation.
+
+Import/install never implies branch activation. Enable an addon with revision-
+safe Owner/DM `content_pack(action="activate", kind="addon")`. Module activation
+uses `kind="module"` and remains a separate campaign operation. Snapshot locks keep exact package versions and
+checksums; one package kind cannot borrow another kind's authority.
+
+Before distribution, validate a cold archive round trip, source/chunk evidence,
+dependency locks, actor image ownership, fresh actor identity, and branch-safe
+activation. Keep non-redistributable sources private.

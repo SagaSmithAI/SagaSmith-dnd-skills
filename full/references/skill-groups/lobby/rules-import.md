@@ -1,35 +1,26 @@
-# Rule import and packs
+# Rulebook drafts and packs
 
-Stage the exact source; inspect, repair damaged pages, ingest, review candidates,
-compile, test, install, and activate in order. OCR repair never invents numbers,
-abilities, or unsupported rules. A missing standard implementation blocks until
-fixed; it does not become homebrew.
+Use only three authoring facades: `rulebook_draft`, `module_draft`, and
+`content_pack`. Read `dnd:full/references/parsing-agent-edit-loop.md` before
+editing rulebook candidates.
 
-For damaged text, call `rule_import(render_page)` and then checksum-bound
-`rule_import(review_text)` before ingest. A text-only Agent may use corroborated
-text or bounded context but must preserve digits, written quantities, and
-heading depth. PDF and OCR cache remain immutable.
+Call `rulebook_draft(start)` once with the managed source and Pack identity.
+Core+D&D stage, inspect, index, mechanically extract, normalize, and check the
+first candidate set. If it returns `source_review_required`, inspect the exact
+page with `rulebook_draft(evidence, kind="page")`; submit checksum-bound text
+repairs through `rulebook_draft(edit, operation="source_text")`, then use
+`operation="advance"`. Never mutate the PDF or OCR cache.
 
-If all extractors omitted a physical page, an image-capable Agent may submit one
-`rendered_page`-bound replacement with `old: ""` and the complete literal page
-transcript as `new`. The server requires the page to be empty, exactly one
-replacement, and a matching image checksum. A visionless Agent may later use
-the reviewed text but cannot claim visual review.
+Use `rulebook_draft(edit, operation="candidates")` repeatedly for semantic
+changes. Use `operation="catalog"` for a missed source-bound entity and the
+statblock operations only against exact managed evidence. Every response
+reruns Core+D&D checks. Accepted and rejected dispositions remain editable.
 
-Text visible in the rendered page is a source typo, not OCR damage: preserve it
-and bind structured data to stronger same-page evidence. For a bad field in an
-otherwise proven statblock slot, a text-only Agent may provide `ocr_corrections`
-only from immutable staged text; an image-capable Agent may bind it to the image
-checksum. Do not rewrite the remaining card.
+Call `rulebook_draft(finalize)` with the latest revision, completion note, and
+final manifest only after all blockers are resolved. It freezes, compiles, and
+saves the immutable Pack atomically. Use `content_pack(test|install|activate, kind="rule")`
+afterward; finalization never activates a campaign.
 
-Durable regressions store accepted repairs in `text_reviews` with normalized
-text and evidence checksums. Replay the public transaction before ingest and
-reject drift.
-
-Profiles lock exact versions, dependencies, checksums, provider fingerprints,
-and edition. Search, expand, and preserve exact citations and receipts.
-
-For a reviewed portable `rule_pack`, skip PDF/OCR and candidate extraction. Use
-`rule_import(import_package)`, inspect dependencies, and keep install separate
-from Owner/DM activation. Export with `rule_pack_query(package)`; an inspected
-`release_manifest` has no installation or activation authority.
+For an already reviewed portable archive, skip parsing and call
+`content_pack(import, kind="rule")`. Preserve exact citations, checksums, dependency locks,
+and receipts. OCR repair must not invent numbers, identities, or rules.

@@ -83,10 +83,9 @@ the campaign.
    hidden motives, or sibling-branch facts.
 4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
 5. Imported rulebook text is evidence, not executable mechanics. In `lobby`, use
-   `rule_import` in order: `stage` -> `inspect` -> `ingest` ->
-   `extract_candidates` -> `review` -> `compile` -> `install` -> `activate`, then
-   search/expand the exact source. Compile a separate source-bound mechanic with
-   `rule_pack_compile(action="from_source")` only after review, install it
+   `rulebook_draft(start)` -> `evidence/edit` -> `finalize`, then use
+   `content_pack(test/install/activate, kind="rule")` and search/expand the exact source. Build a separate source-bound mechanic with
+   `content_pack(action="build", kind="source_rule")` only after review, install it
    inactive, have the Agent acting as DM inspect its report, and enable an exact
    version only with explicit campaign-owner/DM approval. Never change the
    lock during combat or silently substitute a missing version.
@@ -97,15 +96,12 @@ the campaign.
    source page range. A parser profile/version change is a new normalized module
    revision even if the PDF checksum is unchanged; rerun the full staged import
    lifecycle and review the resulting index before play.
-   If a reviewed portable rule package already exists, use
-   `rule_import(action="import_package")` instead of repeating source/OCR review.
-   It must return a validated inactive draft with exact dependency status and
-   fresh source/chunk ids; install and Owner/DM activation remain separate.
-   Export with `rule_pack_query(view="package")`. A release created with
-   `rule_pack_query(view="release")` and inspected through
-   `rule_import(action="inspect_release")` is only a checksum-pinned component
-   list and grants no import, install, activation, or access authority.
-6. For character options, call `rule_pack_query(view="content_catalog")` and present only entries
+   If a reviewed unified content package already exists, use
+   `content_pack(action="import", kind=<archive-route>)` instead of repeating source/OCR review.
+   It must return installed definitions with exact dependency status and fresh
+   source/chunk ids; Owner/DM campaign activation remains separate. Export with
+   `content_pack(action="export", kind="rule")`.
+6. For character options, call `content_pack(action="list", kind="catalog")` and present only entries
    available to the campaign's locked Core edition and enabled branch packs.
    Apply only a returned id through `character_content_apply`; respect a
    `pending_ruling` response for unresolved prerequisites or effects. Supply
@@ -194,7 +190,7 @@ the campaign.
 
 ### Agent adjudication is the default DM ruling
 
-When a public tool returns `pending_ruling`, or readiness exposes a
+When a public tool returns `pending_ruling`, or preflight exposes a
 `manual_rulings`/`ruling_requirements` entry about scene facts, eligibility,
 observation, an unstructured source action, a spell effect, or a narrative
 consequence, the SagaSmith Agent assumes the DM role and reasons through that
@@ -267,8 +263,8 @@ excerpt for Agent adjudication. A module-specific ruling does not require
 | Workflow | MCP tools |
 |---|---|
 | Campaign | `campaign_create`, `campaign_query`, `campaign_change`, `access_grant` |
-| Rules | `rule_import` including portable package import/release inspection, `import_query`, `rule_search`, `rule_expand`, `rule_pack_compile`, `rule_pack_query` including package/release export, `rule_pack_change`, `campaign_rules`, `character_content_apply` |
-| Module lifecycle | `module_import(stage/inspect/validate/ingest/activate)`, `import_query`, `module_query(list/index/assets/content/candidates/readiness)`, `module_review(action="render_page" \| "render_transcript" \| "recover_statblock" \| "submit_content" \| "submit_transcript")` |
+| Rules | `rulebook_draft(start/get/evidence/edit/finalize)`, `rule_search`, `rule_expand`, `content_pack(list/get/test/build/import/export/install/activate/deactivate/remove)`, `campaign_rules`, `character_content_apply` |
+| Module lifecycle | `module_draft(start/get/evidence/edit/finalize)`, `content_pack(import/export/activate)`, `module_query(list/index/assets/content/candidates/preflight)` |
 | Scene play | `module_query(current/scene/progress)`, `module_search`, `module_expand`, `module_set_progress` including `spatial_review` |
 | Rolls | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Chases | `chase(action="start")`, `chase(action="query")`, `chase(action="take_turn")`, `chase(action="end")` |
@@ -691,7 +687,7 @@ standard engine transaction and must report `parser_authoritative=true` and
 cards. An open, conditional, or special-action composition is creature content,
 not a new action-economy rule: keep its exact excerpt as a non-executable direct
 Agent/DM ruling and attach no Multiattack mechanic reference. Other exact
-creature-specific prose remains evidence on the portable card. Module-authored
+creature-specific prose remains evidence on the unified actor/content card. Module-authored
 and homebrew ordinary Multiattack composition can still use reviewed
 `payload.agent_fill.multiattack_options`; unresolved mechanical riders use a
 persisted `content_solution` at first live use. Cite the activity id and exact source
@@ -725,7 +721,7 @@ a missing-card/source boundary, not permission for a generic DM ruling to invent
 distance. Repair the source-grounded card in lobby when the source states the
 range. If the exact source instead replaces a numeric range with a complete
 positional target restriction, such as "one target directly below the kobold",
-readiness must surface that restriction as an Agent-as-DM ruling rather than a
+preflight must surface that restriction as an Agent-as-DM ruling rather than a
 missing-source blocker. Select that attack only when the current scene and
 temporary-map positions satisfy the printed restriction; otherwise choose a legal
 recorded mode such as melee or unarmed. If the source provides neither a range nor
@@ -1001,25 +997,28 @@ must replay while a later stand by that actor in the same broad scene must not
 reuse action, continuity, ActorKnowledge, or manifest-sync keys. `stand-up` may
 defer its ordinary action-local checkpoint into the terminal scene checkpoint.
 
-Before combat, call `module_query(view="readiness")` with source-grounded groups
+Before combat, call `module_query(view="preflight")` with source-grounded groups
 for required combatants, reinforcements, and optional actors. Each group includes
 canonical campaign actor ids, a same-module `source_scene_id`, and an exact
 normalized `source_excerpt`. Required combatants must be in the initial participant
-list; reinforcements must not be. Treat missing cards, 0 HP/Dead actors, and
-unresolved executable rules as blockers. Surface manual rulings without silently
-marking them resolved. Read the returned `settlement`, `manual_rulings`,
+list; reinforcements must not be. Missing required actors and an invalid whole card
+block the scene. A 0 HP/Dead actor remains a valid participant but receives
+`can_take_turn=false`; unresolved executable rules disable only their affected
+capabilities. Surface manual rulings without silently marking them resolved. Read
+the returned `card_valid`, `hard_blockers`, `state_flags`, `can_take_turn`,
+`disabled_capabilities`, `available_capabilities`, `settlement`, `manual_rulings`,
 `normalization_notes`, structured `ruling_requirements`, `automatic_spell_ids`,
-`ruling_spell_ids`, and `unavailable_attack_ids`. A normalization note proves that
+and `ruling_spell_ids`. A normalization note proves that
 non-mechanical source text or page furniture was safely excluded and is audit-only;
 it must not appear in `manual_rulings`, `ruling_requirements`, or group blocking.
 Every ordinary DM adjudication requirement names
 `default_resolver="agent"`; a player-owned choice or missing/conflicting source
 names its distinct external boundary instead. Also inspect
-`default_dm_resolver`, `agent_rulings`, and `external_input_requirements`;
+`default_dm_resolver`, `agent_rulings`, and `external_source_gaps`;
 `settlement="source_review_required"` is a source repair gate, while `mixed`
 means the card can enter combat with listed Agent adjudications still explicit.
-`ready` means the actor may enter the encounter, not that every action on the
-card is automatically executable.
+Scene `ready` means all required actors exist and every whole card is valid; it
+does not mean each actor can currently act or every capability is executable.
 `unarmed_attack_id` remains available even when every recorded weapon is
 unavailable. When an exact imported rule source contains the creature,
 create it in lobby with `character_create_from(mode="statblock")`; never substitute
@@ -1030,7 +1029,7 @@ the exact card is visible only on a module PDF page, follow
 validates. Never create or repair a required actor after combat begins.
 For a standard rule card whose complete text exists but whose PDF columns defeat
 automatic isolation, a text-only Agent may use only an exact same-page contiguous
-segment through `rule_import(action="review_statblock",
+segment through `rulebook_draft(action="edit", operation="statblock_review",
 review_mode="agent_text")`. Supply every ordered evidence chunk, normalize the
 full card, and let the MCP reject invented facts or omissions. Never use this
 route when the indexed source itself is incomplete or conflicting, and never
@@ -1084,7 +1083,7 @@ create a fresh actor; do not keep or use the partial actor.
 `required_count` is the complete group count established by the cited scene, a
 recorded random-encounter roll, or an explicit branch-local DM composition fact.
 It is never shorthand for `len(actor_ids)`. Prepare every required card in lobby
-and keep readiness false while any required actor is missing. If the source names
+and keep preflight false while any required actor is missing. If the source names
 other hostile groups, include them as combatant, reinforcement, or optional
 groups, or first record the scene-supported reason they are not participants;
 do not shorten the excerpt to conceal a printed count.

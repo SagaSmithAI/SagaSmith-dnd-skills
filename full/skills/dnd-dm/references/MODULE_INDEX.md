@@ -1,8 +1,8 @@
 # Module Index and Play
 
 Full Runtime uses MCP-managed Markdown artifacts. Generate module text or provide a
-configured source path, then call `module_import` in order: `stage`, `inspect`,
-`validate`, `ingest`, `activate`. Do not let the agent read arbitrary local module
+configured source path, then call `module_draft(start)`, repeat `evidence/edit`,
+call `finalize`, and activate through `content_pack`. Do not let the agent read arbitrary local module
 paths in Full Runtime.
 
 Every stage uses the same D&D parser profile. Pass a stable stage-specific
@@ -23,7 +23,7 @@ returned scene content. The runtime normalizes PDF control characters, soft
 hyphens, smart quotes, and dash variants for containment; this does not make a
 paraphrase, translation, or cross-scene hit valid evidence.
 
-For encounter readiness, `required_count` describes the complete current group,
+For encounter preflight, `required_count` describes the complete current group,
 not the number of cards that happen to exist. Derive it from an exact printed
 count, persist the result of a source random table/roll, or record an explicit
 branch-local DM composition fact. Create every required PC/NPC/monster card in
@@ -44,7 +44,7 @@ write may omit `status` and `progress` so their current values remain unchanged.
 If the scene text names a creature but its appendix card is missing because the
 PDF stored it as an image, follow
 `../../../references/module-image-content-review.md`. Render and inspect the
-managed page, validate an immutable `module_review(action="submit_content")`, then create exact
+managed page, validate an immutable `module_draft(action="edit", operation="content")`, then create exact
 actors from its review id in lobby. Do not substitute another creature or create
 the missing card after combat starts.
 

@@ -12,10 +12,10 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 |---|---|
 | Health and owned storage | `storage_status`, `storage_migrate`, `server_capabilities` |
 | Campaign | `campaign_create`, `campaign_query(list/get/party/resume)`, `campaign_change`, `access_grant(campaign/actor)` |
-| Rules | `rule_import(discover/import_package/inspect_release/stage/inspect/render_page/review_text/recover_statblock/ingest/review_statblock/extract_candidates/review/compile/install/activate)`, `import_query`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `rule_pack_compile(draft/from_source)`, `rule_pack_query(list/inspect/test/content_catalog/sources/source_chunks/actor_presets/package/release)`, `rule_pack_change(install/remove)`, `campaign_rules(get_profile/set_profile/set_pack/remove_pack/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
+| Rules | `rulebook_draft(start/get/evidence/edit/finalize)`, `rule_search`, `rule_expand`, `rule_seed_status`, `rule_seed_bundled`, `content_pack(list/get/test/build/import/export/install/activate/deactivate/remove)`, `campaign_rules(get_profile/set_profile/core_relock/explain/receipts)`, `character_content_apply`, `content_solution(query/compile)` |
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
-| Module artifact | `module_import(stage/inspect/validate/ingest/activate/bind_actor/import_package)`, `import_query` |
-| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/readiness/actors/package)`, `module_review(action="render_page" \| "render_transcript" \| "recover_statblock" \| "submit_content" \| "submit_transcript")`, `module_search`, `module_expand`, `module_set_progress` |
+| Module artifact | `module_draft(start/get/evidence/edit/finalize)`, `content_pack(import/export/activate)` |
+| Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/preflight/actors/package)`, `module_draft(evidence/edit)`, `module_search`, `module_expand`, `module_set_progress` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
@@ -27,8 +27,8 @@ names or emulate aliases client-side. The consolidated calls are:
 - `chase(action="start" | "query" | "take_turn" | "end")`;
 - `character_check(action="check" | "group" | "contest" | "reroll")`;
 - `campaign_rules(action="core_relock")`;
-- `rule_import(action="render_page" | "review_text" | "recover_statblock")`;
-- `module_review(action="render_page" | "render_transcript" | "recover_statblock" | "submit_content" | "submit_transcript")`;
+- `rulebook_draft(action="evidence" | "edit")`;
+- `module_draft(action="evidence" | "edit")`;
 - `memory_change(action="commit")` and `memory_query(view="diagnostics")`;
 - `combat_choice(action="on_hit_ruling" | "execute_plan")`; the former only
   dismisses an exact-source, Agent-reviewed no-op, while executable custom
@@ -51,8 +51,13 @@ current theater-of-the-mind visibility remains an Agent/DM decision.
 Every action uses only its documented payload fields. Unknown fields are an
 error, and a facade action retains the original role, phase, revision,
 idempotency, source-evidence, and random-stream boundary. In particular,
-`rule_import(render_page|review_text|recover_statblock)` is Lobby-only and DM-only;
-`module_review(render_transcript|submit_transcript|recover_statblock|submit_content)`
+`content_pack` always requires an explicit route `kind`; it never guesses from
+`pack_id`, `source_id`, archive contents, or a catalog entry subtype. Use
+`kind="catalog"` plus optional `content_kind` for catalog filtering. The
+published action-payload contract is the single exact-field whitelist; handlers
+add domain checks but do not maintain a second allowed/required field table.
+`rulebook_draft(evidence|edit)` is Lobby-only and DM-only;
+`module_draft(evidence|edit)`
 is Lobby-only and DM-only;
 rendering may also be used by a DM during Play. Chase, contests, and Heroic
 Inspiration rerolls are Play-only. On-hit rulings are
@@ -72,7 +77,7 @@ human. Unless a workflow explicitly requires player intent, owner approval,
 missing-source review, or permission escalation, the SagaSmith Agent performs
 the DM ruling itself from the locked rules, exact expanded source, current
 scene, canonical actor cards, and branch state. This is the default for
-`status="pending_ruling"`, readiness `manual_rulings`, descriptive source
+`status="pending_ruling"`, preflight `manual_rulings`, descriptive source
 activities, generic spell effects, Ready releases, environmental facts, and
 module-specific procedures.
 For combat tactics backed only by a reviewed descriptive feature/activity or
@@ -119,7 +124,7 @@ they must not copy, alphabetize, or independently prioritize a local list of
 ruling kinds. This preserves player intent and approval boundaries when a
 single result also contains Agent-owned or source-review work.
 The ownership contract also covers lobby review states that are not yet live
-actions. `rule_import(action="extract_candidates")` returns
+actions. `rulebook_draft(action="get")` returns
 `job.review_resolution` plus `job.review_requirements`, and each pending or
 needs-revision candidate carries a `ruling_requirement`. A
 `module_query(view="candidates")` entry with `execution_state="review_ready"`
@@ -175,7 +180,7 @@ inferring ownership from the word "review."
 
 For a campaign locked to 2014, the installed `dnd5e.content.srd2014` catalog
 provides source-linked class, subclass, species, background, feat, spell, and
-item records. Use `rule_pack_query(view="content_catalog")` to discover only the core edition and
+item records. Use `content_pack(action="list", kind="catalog")` to discover only the core edition and
 extension packs enabled on the current branch. Do not search an inactive pack
 and then apply its option by id. The list response includes compact
 `selection_requirements` and source citations without copying an entire rule
@@ -278,7 +283,7 @@ first and fails if it is cross-module or does not contain the recorded key; it
 must not silently select a different duplicate key elsewhere in the module.
 
 For visual evidence, an owner/DM calls `module_query(view="assets")`, then
-`module_review(action="render_page")` for one page of the imported PDF. The tool returns an MCP
+`module_draft(action="evidence")` for one page of the imported PDF. The tool returns an MCP
 image and registers a content-addressed derived asset. After inspecting that
 image, submit only observed edges through `module_set_progress.spatial_review`.
 Core validates same-module unique endpoints, the PDF/rendered asset and page,
@@ -290,14 +295,14 @@ omit `status` and `progress`; existing values are preserved. See
 `module-visual-atlas.md` for the full sequence and schema.
 
 Staged rulebooks and modules also expose a pre-ingest transcription-review path.
-`rule_import(action="render_page")` returns `transcription.normalized`,
+`rulebook_draft(action="evidence")` returns `transcription.normalized`,
 `transcription.native_text`, and two local `ocr.variants` beside the image;
-`module_review(action="render_transcript")` returns the equivalent bundle for a
+`module_draft(action="evidence")` returns the equivalent bundle for a
 module import job. A text-only Agent may consume these textual fields without
 claiming visual inspection. After the job is `inspected`, submit a batch of
 unique exact replacements for that physical page with
-`rule_import(action="review_text")` or
-`module_review(action="submit_transcript")`, the normalized page SHA-256, current
+`rulebook_draft(action="edit", operation="source_text")` or
+`module_draft(action="edit", operation="source_text")`, the normalized page SHA-256, current
 import revision, rationale, fresh idempotency key, and one evidence basis:
 
 - `cross_text`: the proposed text occurs in at least two returned text sources;
@@ -317,7 +322,7 @@ These actions repair transcription/structure, not missing mechanics; unresolved
 or conflicting source facts remain an external review boundary.
 
 For a 2014 creature card that exists only in the PDF image layer, first call
-`module_review(action="recover_statblock")` with the exact managed PDF page. The
+`module_draft(action="edit", operation="statblock")` with the exact managed PDF page. The
 server performs checksum-bound layout OCR and requires the embedded text or a
 second OCR scale to corroborate the complete critical fingerprint. This requires
 no model vision. A custom Multiattack first returns
@@ -326,7 +331,7 @@ exact `agent_fill_requirements`; the Agent reasons over that returned text and
 retries the same action with a fresh idempotency key plus
 `payload.agent_fill`. Only the filled retry creates the immutable review. If OCR
 remains ambiguous, an image-capable DM may render and
-inspect its managed page, then call `module_review(action="submit_content")`.
+inspect its managed page, then call `module_draft(action="edit", operation="content")`.
 The MCP validates the normalized 2014 statblock before Core stores immutable
 module/scene/page/asset evidence. Never route a 2024 campaign through this 2014
 OCR grammar. For a 2024 card, submit complete indexed text with
@@ -339,8 +344,8 @@ Re-read it with `module_query(view="content")` and create campaign actors with
 `module-image-content-review.md`; missing text extraction is not evidence that a
 printed card is absent, and visual transcription is not permission to fill gaps.
 
-In `lobby`, run `module_import` in strict order: `stage` -> `inspect` ->
-`validate` -> `ingest` -> `activate`. `stage` accepts either generated
+In `lobby`, run `module_draft(start)` -> repeated `evidence/edit` -> `finalize`,
+then activate the immutable Pack through `content_pack`. `start` accepts either generated
 `payload.name` + `payload.content`, or a user document in `payload.source_path`.
 The latter is limited to `SAGASMITH_DND_MCP_MODULE_IMPORT_ROOTS`; the server
 copies PDF/Markdown/text into checksum-addressed MCP storage before Core reads it.
@@ -348,13 +353,20 @@ Inspect exposes the Core PDF-to-Markdown page/bookmark statistics and complete
 scene/spatial preview. Ingest remains inactive, and only activation changes the
 campaign's active revision under optimistic concurrency.
 
+Module finalization requires the Agent's exact
+`confirmation={confirmed: true, note: ...}` after it reviews the current draft,
+issues, evidence, and saved package decisions. Callers do not submit publication
+dimensions. The server validates the descriptor and source references, records
+the reviewer and note in `metadata.agent_finalization`, and emits a Pack with no
+publication-matrix field.
+
 For PDFs, `preview.valid` also requires every scene to have an in-bounds
 `page_start`/`page_end`; the preview exposes those fields together with source
 line ranges. The normalized revision identity is the source checksum plus
-`parser_profile` plus `parser_version`. Re-run inspect -> validate -> ingest ->
-activate after a parser upgrade even when the document checksum and semantic
-scene diff are unchanged, then verify the inactive and active indexes before
-starting play.
+`parser_profile` plus `parser_version`. Start a new draft after a parser upgrade
+even when the document checksum and semantic scene diff are unchanged, repeat
+the Agent evidence/edit loop, finalize it, then activate its immutable Pack and
+verify the inactive and active indexes before starting play.
 
 When `combat_start` has a current scene (or receives `scene_id`), the server
 creates and freezes an encounter-local `battle_map`. It may enforce supplied
@@ -371,8 +383,8 @@ progress scene remains the source of `current_location_key` and
 dimensions, the map falls back to a 12-by-12-cell canvas; clients must not
 describe those fallback bounds as module-authored room dimensions.
 
-Call `module_import(action="inspect")` before validation; every later stage uses
-the same D&D parser profile. Every write carries a stable stage-specific `idempotency_key`;
+Call `module_draft(action="get")` whenever current state is needed; every edit uses
+the same D&D parser profile. Every write carries a stable operation-specific `idempotency_key`;
 an exact retry returns the original result. A player may read `party` scope or
 their own authorized `player:<actor_id>` scope only. Keeper scene reads expose
 only the redaction marker, and player combat-map views omit blocked cells,
@@ -382,8 +394,8 @@ difficult terrain, world patches, checksums, and DM overrides.
 
 | Intent | MCP tool |
 |---|---|
-| Create from direct/build/template/statblock, portable card, or exact narrative identity evidence | `character_create_from(mode=...)` |
-| Read campaign actors, reusable library, classify a support document, or export a portable card | `character_query(get/list/library/document/portable_card)` |
+| Create from direct/build/template/statblock, unified content actor, or exact narrative identity evidence | `character_create_from(mode=...)` |
+| Read campaign actors, reusable library, classify a support document, or export an actor package | `character_query(get/list/library/document/content_package)` |
 | Replace a complete reviewed card | `character_sheet_replace` |
 | Inventory | `inventory_change(add/update/remove/equip/recharge/consume_ammunition)`, `inventory_transfer` |
 | Wallet, spell, effects, resources, advancement | `wallet_change(adjust/transfer)`, `character_spell_prepare(set/replace_all)`, `campaign_change(party_rest/stable_recovery/advancement_configure/experience_award/loot_acquire/currency_spend/item_spend/consumable_use)`, `character_state_change(effect_add/effect_remove/resource_set/level_advance/stand)` |
@@ -391,99 +403,58 @@ difficult terrain, world patches, checksums, and DM overrides.
 | Actor-scoped knowledge | `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)` |
 | Shared stash/wallet | `campaign_query(view="party")`, `inventory_change`, `inventory_transfer`, `wallet_change` |
 
-### Portable actor, preset, module, and rule packages
+### Unified core-rule, addon, module, and preset packages
 
-`sagasmith.portable` schema v1 is the cross-installation sharing boundary. PC,
-NPC, and monster use the same `kind="actor_card"` envelope and distinguish their
-role with `payload.actor_type`. A card contains the complete validated sheet,
-notes, provenance, dependencies, and semantic bindings. It never contains the
-database Character id, campaign id, revision, membership, or ActorKnowledge.
-The exporting principal must be authorized to read the full card; sharing is an
-explicit publication step, so review sheet and notes for private material.
+`sagasmith.content-package` v2 is the only cross-installation boundary. Every
+`.sagasmith-pack` has the same physical fields and content-addressed blob layout;
+`kind=core_rules|addon|module|preset` preserves distinct authority. Legacy loose
+JSON cards, `*_pack` envelopes, release manifests, and `.sagasmith-module` are
+not accepted.
 
-Export one runtime actor with `character_query(view="portable_card")`. Import
-with `character_create_from(mode="portable_card")`, providing exactly one
-inline `card`, managed `artifact`, or allowlisted `source_path`. Import validates
-the D&D sheet and campaign edition, creates a fresh Character identity, and
-returns `actor_knowledge_imported=false`. A replacement or copy therefore starts
-with an empty subjective ledger; transmit only knowledge established in play.
+PC, NPC, and monster use `sagasmith.actor-card.v3`. Export a runtime actor with
+`character_query(view="content_package")`. Import an installed `artifact_id`, or
+an exact actor from one managed/allowlisted archive, with
+`character_create_from(mode="content_actor")`. The target gets a fresh Character
+id and empty ActorKnowledge. Optional static-actor or dependent-statblock card
+art references one package `actor_image` asset; image bytes never enter
+Character state or snapshots.
 
-The installed edition's standard actors are ordinary cards in a bundled
-`preset_pack`, not engine constructors or name lookups. Use
-`rule_pack_query(view="content_catalog", kind="actor_card")` to browse the
-campaign-compatible catalog and pass one installed `artifact_id` to portable
-creation. Use `rule_pack_query(view="actor_presets", payload={edition,
-include_package:true})` to export the whole SRD package, or add `artifact_id` to
-export one card. When importing from an inline/managed/allowlisted preset pack,
-provide the pack source and the exact nested `artifact_id`. The 2014 package
-contains 317 parsed actor cards and the 2024 package contains 330; source text,
-checksums, normalization notes, edition dependency, license, and attribution are
-retained.
+The installed edition's standard actors are preset-package cards, not engine
+constructors or name lookups. Browse with
+`content_pack(action="list", kind="catalog", content_kind="actor_card")`; export with
+`content_pack(action="list", kind="actor_preset")`. The 2014 and 2024 catalogs contain 317
+and 330 cards respectively.
 
-A `kind="module_pack"` v2 descriptor and its `.sagasmith-module` archive are an
-independent structured-source distribution, not a campaign save. Before export,
-bind cast members, encounter creatures, and
-pregenerated PCs through `module_import(action="bind_actor")`, using stable
-portable actor ids and Scene Atlas keys; inspect them through
-`module_query(view="actors")`. Export with `module_query(view="package")`.
-The descriptor contains classification, edition compatibility, recommended
-party/level/advancement guidance, continuity, exact dependencies, normalized
-source, signed Scene Atlas text/chunks, catalogs, narrative dossiers,
-relationships/endings, reviewed content, actor cards, component locks, and
-seven-dimensional readiness. Asset bytes use `blobs/sha256/<checksum>` inside
-the archive instead of base64 JSON. Import replays the stored Scene Atlas instead
-of rerunning the receiver's current parser heuristics. It excludes scoped
-progress, world state, events, memory,
-ActorKnowledge, random position, branches, and Snapshots.
+A module package contains compatibility and play profile, normalized sources,
+Scene Atlas, catalogs, narrative dossiers/endings, reviews, maps/assets, cast,
+monsters, pregenerated PCs, and final Agent confirmation. Export through
+`module_query(view="package")`; import through
+`content_pack(action="import", kind="module")` using exactly one managed `artifact` or
+allowlisted `.sagasmith-pack` path. Core verifies every descriptor/blob hash and
+replays the stored structure with fresh runtime actor ids. Campaign progress,
+world state, ActorKnowledge, random streams, branches, and snapshots are never
+packaged. A valid finalized package may activate only through an explicit Owner/DM action.
 
-Import a module package in Lobby with
-`module_import(action="import_package")`, providing exactly one managed archive
-artifact or allowlisted `.sagasmith-module` path when assets exist. The MCP
-validates the descriptor, every blob and D&D card before mutation, checks the
-campaign's locked edition and all exact rule/module dependencies, re-ingests via
-Core, materializes assets in managed storage, creates fresh actor identities,
-and restores actor/scene bindings. Activation is the final transaction and is
-allowed only for `playable` or `complete`; import `draft`/`indexed` inactive for
-review. Pregenerated PCs become reusable library templates; NPCs and monsters
-become campaign actors. Re-read index, actors, assets, content reviews, catalogs,
-narrative and readiness. A checksum-valid package does not enable optional rule
-dependencies or make descriptive prose executable. Reject module-pack v1; there
-is no legacy routing or conversion path. Addon activation never accepts module
-receipts and never changes module active state.
+Core-rule and addon packages contain flat rule definitions, selection artifacts,
+mechanics, resolutions, sources, and optional actor cards. Stable source/chunk
+keys are rebound to fresh local ids on import. Use
+`content_pack(action="import", kind="addon")` for an addon, `kind="rule"` for
+core_rules, or `kind="preset"` for a preset, providing one
+archive artifact or allowlisted path plus an idempotency key. Inline descriptors
+are rejected because they cannot prove their blobs.
 
-A portable `kind="rule_pack"` carries the rule manifest, selection artifacts,
-safe mechanic IR, provenance, and the complete indexed rule sources required by
-its citations. Export in Lobby as DM with
-`rule_pack_query(view="package", payload={campaign_id, pack_id, version,
-metadata, include_package?})`. Runtime `source_id` and `chunk_id` values are
-replaced by deterministic `source_key` and section-qualified `chunk_key`
-locators. Resolution plans are re-fingerprinted after remapping. A shareable
-export requires explicit `metadata.license` and `metadata.attribution`; the
-default distribution is private.
+Author a preset archive with `content_pack(action="build", kind="preset")`. Author an
+addon with `content_pack(action="build", kind="addon")` from one or more managed,
+unified `core_rules`/`preset` component artifacts. The facade validates each
+component separately, flattens sources/assets/actors and rule records, rejects
+conflicting stable ids, and emits one self-contained `.sagasmith-pack`; it never
+accepts an untyped payload bag or a legacy component envelope.
 
-Import through `rule_import(action="import_package")` with exactly one inline
-`package`, managed `artifact`, or allowlisted `source_path`, plus an idempotency
-key. The MCP verifies envelope and source hashes, system, campaign edition,
-source editions, exact dependency versions/checksums, stable citation ownership,
-and the D&D pack compiler. It rebuilds sources and chunks with fresh local ids
-and re-fingerprints plans. The result is a validated inactive draft only:
-`rule_pack_change(action="install")` and an Owner/DM
-`campaign_rules(action="set_pack")` remain separate. Missing dependencies are
-reported; a local checksum conflict rejects import. No package carries access or
-campaign authority.
-
-Rule-to-rule dependency locks use the imported package's
-`metadata.definition_checksum`. That checksum covers portable rule semantics,
-sources, and dependency locks, but excludes distribution-only metadata and local
-UUIDs. Release-manifest components instead use each complete portable envelope
-checksum. Do not substitute one checksum domain for the other.
-
-Use `rule_pack_query(view="release")` to create a thin
-`kind="release_manifest"` containing exact `rule_pack`, `preset_pack`, and
-`module_pack` component ids, versions, checksums, and optionality. Inspect it on
-the receiver with `rule_import(action="inspect_release")`. Inspection only
-reports component status and the correct import facade. It performs no network
-fetch, import, installation, activation, or permission grant.
+Import and global installation do not grant campaign authority. Addons require a
+separate revision-safe Owner/DM `content_pack(action="activate", kind="addon")`; module
+activation remains campaign-specific. Exact package dependencies use the whole
+descriptor checksum; embedded rule definitions use `definition_checksum` for
+their immutable semantic identity. No release-manifest layer exists.
 
 The campaign instance is authoritative. After any actor or party mutation, read
 `character_query(view="get")` or `campaign_query(view="party")` and use returned `derived` values. Do not use
@@ -564,7 +535,7 @@ Before passing an allowlisted PDF/text file to module import, use
 `character_query(view="document")` when it may be a character sheet,
 pregenerated-PC packet, or ability-score option document. The result stages and
 normalizes the artifact, reports its checksum and `document_kind`, preserves
-manual-input choices, and explicitly sets `module_import_allowed=false` for
+manual-input choices, and explicitly sets `module_draft_allowed=false` for
 character documents. Never force such a document through the module parser.
 
 For the initial campaign party, classify all supplied character documents before
@@ -776,7 +747,7 @@ projection with a second write.
 | Rules edition and locale | Core campaign Rule Profile | Bound character `sheet.edition` is projected on every write |
 | Elapsed campaign time | `campaign.state.game_time.elapsed_ticks` | `world_time` is an optional anchored calendar projection; wall-clock timestamps and exposure TTLs are operational time |
 | Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | The campaign view's `effective_game_phase` is the server-owned derivation consumed by drivers; exposure refreshes from it |
-| Active module | Core active `ModuleSource` revision set, captured as exact `module_activations` in a snapshot | Import-job `activated` is a workflow receipt; do not store `module_imports.active` in campaign state |
+| Active module | Core active `ModuleSource` revision set, captured as exact `module_activations` in a snapshot | Import-job `activated` is a workflow receipt; do not store `module_drafts.active` in campaign state |
 | Rule source revision | Immutable `RuleSource` id and chunks | A reimport retires the prior revision; default search selects the active revision, while an exact historic source id/citation remains auditable |
 | Current branch | `campaign.active_branch_id` | Public `is_current` is derived; no independent branch boolean exists |
 | Snapshot head | Each branch's `head_snapshot_id` | Public `snapshot.is_head` is derived; no independent snapshot boolean exists |
@@ -1103,7 +1074,7 @@ resources, rests, non-combat casts, and activities) are rejected while an
 encounter is active. Do not use a profile mismatch to bypass combat action
 economy.
 
-## Source-bound actors and scene readiness
+## Source-bound actors and scene preflight
 
 Create likely combatants and reinforcements in `lobby`, before combat. For a
 creature present in an imported rule source, use
@@ -1118,7 +1089,7 @@ reconstructs the card from deterministic text chunks, and narrows provenance to
 the retained `source.text_layout_recovery.chunk_ids`. This first recovery path
 does not render a page and works for an Agent without image capability.
 If required source facts remain absent or conflicting for a 2014 card, call DM-only Lobby
-`rule_import(action="recover_statblock",
+`rulebook_draft(action="edit", operation="statblock_recovery",
 payload={job_id, name, page_number?, agent_fill?})`.
 Use the exact printed heading for `name`; keep a differently named campaign
 instance in the later actor-creation payload.
@@ -1153,14 +1124,14 @@ fact, use an actually image-capable `review_mode="visual"` reviewer instead.
 Successful exclusion of trailing creature prose or page furniture is returned
 separately as `normalization_notes`. These notes preserve the audit trail but are
 not executable uncertainty: they must not create `ruling_requirements`, change
-`settlement` away from `automatic` on their own, or block a readiness group.
+`settlement` away from `automatic` on their own, or invalidate a whole card.
 When recovered rulebook text includes an ordinary weapon-only Multiattack, the
 standard D&D parser and engine own its exact composition. `agent_fill` is
 rejected. An open, conditional, or special-action composition instead remains
 an exact-source direct Agent/DM ruling without an executable Multiattack
 mechanic reference. This does not make
 every creature-specific passive or rider a new generic engine rule: exact
-source prose remains evidence on the portable card and may carry a reviewed
+source prose remains evidence on the unified actor/content card and may carry a reviewed
 generic plan. Otherwise the DM Agent compiles that plan on first use while the
 engine continues to own payment, rolls, damage, action economy, and timing.
 Text-layout recovery also compares every explicit
@@ -1173,7 +1144,7 @@ coverage check is independent of creature name.
 
 When OCR is structurally ambiguous but the indexed rule source contains the
 complete card in one exact-page, ordered contiguous chunk segment, DM-only
-`rule_import(action="review_statblock")` also accepts
+`rulebook_draft(action="edit", operation="statblock_review")` also accepts
 `review_mode="agent_text"` and `evidence_chunk_ids`. The import job must belong
 to that same `source_id`. A driver may deterministically choose among historical
 jobs only when every candidate has the same nonempty artifact name and checksum;
@@ -1184,7 +1155,7 @@ membership, parses the normalized card, rejects every normalized fact absent
 from the selected text, and rejects omission of any selected statblock evidence.
 The review content kind and parser must match the locked 2014 or 2024 edition.
 If that reviewed rulebook card contains an ordinary weapon-only Multiattack or
-another standard mechanical card, `rule_import(action="review_statblock")`
+another standard mechanical card, `rulebook_draft(action="edit", operation="statblock_review")`
 accepts it only when the engine produces a complete structured implementation.
 An open/special composition must instead preserve the exact direct Agent-ruling
 boundary described above. The review rejects
@@ -1221,7 +1192,7 @@ For an image-only module card, use the reviewed visual workflow and
 `mode="module_statblock"` instead. Every module-authored Multiattack is an
 Agent-review gate. `module_query(view="candidates")` returns
 `agent_fill_requirements` with the exact activity excerpt and available parsed
-weapon ids; `module_review(action="submit_content")` rejects a parser-only
+weapon ids; `module_draft(action="edit", operation="content")` rejects a parser-only
 composition until `payload.agent_fill` covers every listed activity exactly
 once. This remains true when phrase matching happened to produce the correct
 candidate. Each requirement allows `structured` or `agent_ruling`: the latter
@@ -1270,10 +1241,11 @@ The text candidate normalizer must retain a named `Spellcasting` entry when its
 description begins with the creature's proper name, and must not mistake prose
 inside a `Hit` clause or surrounding monster lore for a new trait/action.
 Context-bounded OCR repair is allowed only when the token is mechanically
-impossible and the printed rule is unambiguous; unresolved spell names must make
-scene readiness fail with `incomplete_statblock_spell_hydration`.
+impossible and the printed rule is unambiguous; unresolved spell names disable
+the card's `spellcasting` capability with
+`incomplete_statblock_spell_hydration` without invalidating unrelated attacks.
 
-Before `combat_start`, call `module_query(view="readiness")` with a manifest:
+Before `combat_start`, call `module_query(view="preflight")` with a manifest:
 
 ```json
 {
@@ -1302,16 +1274,19 @@ Before `combat_start`, call `module_query(view="readiness")` with a manifest:
 ```
 
 Required combatants must be present in the initial `participant_ids`.
-Reinforcements must not be initial participants. Readiness is false when a
-required actor is missing, at 0 HP/Dead, or has unresolved executable card rules;
-manual rulings are surfaced but do not falsely disappear. Each combat card also
+Reinforcements must not be initial participants. Preflight is false only when a
+required actor is missing or its whole card is invalid. Each combat card separates
+`card_valid`/`hard_blockers`, `state_flags`/`can_take_turn`, and
+`available_capabilities`/`disabled_capabilities`. Dead or 0 HP is state; missing
+range, ammunition, or semantic settlement disables only the affected capability.
+Manual rulings are surfaced but do not falsely disappear. Each combat card also
 returns structured `ruling_requirements`: ordinary adjudications identify the
 Agent as the default resolver, while player intent and missing/conflicting source
-identify their external boundary. A missing ranged or thrown range is a blocking
-card/source defect rather than a license to invent distance. When the exact
+identify their external boundary. A missing ranged or thrown range disables that
+attack rather than licensing an invented distance. When the exact
 source replaces a numeric range with a complete positional target restriction
-(for example, one target directly below the attacker), readiness instead reports
-that restriction as an Agent-owned manual ruling and remains combat-ready. The
+(for example, one target directly below the attacker), preflight instead reports
+that restriction as an Agent-owned manual ruling and keeps the card valid. The
 Agent may select the action only when current scene/map positions satisfy the
 printed restriction; it must not invent a generic numeric range. The excerpt must be an
 exact normalized substring of that same module scene; it is not a fuzzy query and
@@ -1321,7 +1296,7 @@ means that the actor may enter combat, not that every card entry is automatic.
 source, a recorded source-table roll, or an explicit Agent-as-DM composition
 fact. It is
 not derived from the current length of `actor_ids`; missing cards must keep the
-group unready. If an excerpt names a larger count or additional hostile groups,
+group blocked in preflight. If an excerpt names a larger count or additional hostile groups,
 manifest the complete composition or record the source-supported branch change
 that removed them. Never select a shorter substring merely to evade that count.
 `automatic_spell_ids` describes structured effect settlement, while component,
@@ -1334,12 +1309,12 @@ advantage only when the stated offer condition is satisfied. On success call
 turn. On failure no actor joins.
 
 Rule text retrieval and executable rules are separate. For user documents, use
-`rule_import(action="stage")`; it accepts only configured import roots, and every
+`rulebook_draft(action="start")`; it accepts only configured import roots, and every
 later action reads only the checksum-addressed MCP-managed artifact. Core performs
 the shared PDF/Markdown normalization and records the original checksum, parser
 warnings, and per-chunk page ranges. Direct ingestion helpers are internal and are
 not part of the public contract. Only the safe declarative IR accepted by
-`rule_pack_compile(action="draft" | "from_source")` can settle mechanics;
+`content_pack(action="build", kind="rule" | "source_rule")` can settle mechanics;
 arbitrary Python, expression evaluation,
 network access, and database paths are forbidden. Installation does not enable
 a pack. A DM explicitly pins a validated version per branch, and snapshots keep
@@ -1358,7 +1333,7 @@ review the exact candidate and source chunk rather than reconstruct a spell from
 memory. This import path is text-only and does not require host-model image
 understanding.
 For a user-imported executable rule, use
-`rule_pack_compile(action="from_source")`: citations
+`content_pack(action="build", kind="source_rule")`: citations
 must be imported chunk ids and are resolved server-side to the exact source id,
 document checksum, heading path, and page range. Use `character_check` outside
 combat and `combat_check` during combat when an enabled `check.before` rule needs
@@ -1392,7 +1367,7 @@ roll even when its actor, ability, and DC happen to match.
 Treat rule-profile and branch rule-pack changes as campaign writes. First read
 `campaign_rules(action="get_profile")`, then pass its latest `campaign_revision`
 as `expected_revision` together with a stable `idempotency_key` to
-`campaign_rules(action="set_profile" | "set_pack" | "remove_pack")`. Reuse the
+`campaign_rules(action="set_profile")` or `content_pack(action="activate" | "deactivate", kind="rule")`. Reuse the
 same key only for an exact retry; a stale revision requires a fresh read and review.
 
 The base engine is not an implicit fallback. Every new campaign locks either
@@ -1540,7 +1515,7 @@ If no plan exists, the first live use returns
 `semantic_solution.status="content_authoring_required"` before the custom rider
 is executed. The DM Agent may call `content_solution(action="compile")` in
 Lobby, Play, or Combat, using the exact actor revision and card identity. The
-plan is persisted on that portable card and the same paid window resumes through
+plan is persisted with that exact content artifact and the same paid window resumes through
 `combat_choice(action="execute_plan")`; retries and later uses reuse its
 fingerprint and never reinterpret prose.
 Never put arbitrary Python names or state patches in a plan. If an occurrence is
@@ -1572,7 +1547,7 @@ options requires an Agent-performed DM ruling only if selected and must not
 disable ordinary attacks. During Lobby review, the Agent must read every exact
 module-specific composition and attach
 `payload.agent_fill.multiattack_options` to
-`module_review(action="submit_content")`. Each declaration is bound to the
+`module_draft(action="edit", operation="content")`. Each declaration is bound to the
 activity id and exact source excerpt and may contain only existing parsed weapon
 ids, compatible modes, and explicit counts. The server validates it and stores
 the normalized Agent attribution in immutable review metadata. This is a
@@ -1909,7 +1884,7 @@ Recovery allowance/usage, Natural Recovery's declared meditation and
 once-per-Long-Rest use, automatic 2014 level-20 Sorcerous Restoration, the
 2024 level-5+ declared half-class-level recovery and once-per-Long-Rest use, the source
 Bard's campaign membership, conscious state, source-bound feature,
-level-scaled die, and rule readiness.
+level-scaled die, and rule semantic validation.
 Only after every member reports `ready=true` may orchestration call one
 `campaign_change(action="party_rest",
 payload={rest_type:"short_rest",members,duration_minutes})`. The runtime—not the
@@ -1991,13 +1966,16 @@ perception. The driver must not generate the matrix from missing evidence.
 `module_set_progress` requires the current `expected_state_version` for that
 scene/scope row (`0` for its first write) and a fresh idempotency key.
 When a module revision can no longer remap a progressed scene,
-`module_import(action="validate")` returns
+`module_draft(action="start")` or a later `edit(operation="advance")` exposes
 `diff.progress_impact[action="needs_dm_review"]` with a structured
 `ruling_requirement`. Its default resolver is the Agent because selecting the
-best source-supported remap or retirement is a DM continuity decision; if the
-old/new source evidence is missing or contradictory, retain the external
-source-review classification instead. The aggregate validation
-`ruling_requirements` must preserve the same records.
+best source-supported remap or retirement is a DM continuity decision. At
+`content_pack(action="activate", kind="module")`, pass each settled decision as
+the old `from_scene_id`, the finalized candidate `to_scene_key`, and a nonempty
+reason. Draft-local target scene ids are not portable. If old/new source
+evidence is missing or contradictory, retain the external source-review
+classification instead. The aggregate validation `ruling_requirements` must
+preserve the same records.
 
 Every campaign owns one monotonic `state.game_time.elapsed_ticks` chronology;
 one tick is six seconds. `state.world_time` is only an optional branch-local

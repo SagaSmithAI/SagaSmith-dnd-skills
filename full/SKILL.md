@@ -77,15 +77,14 @@ The machine-readable phase/tool-group mapping is
 - Runtime character state uses `sheet v2` / `notes v2`; load
   `references/character-schema-v2.md` before creating or mutating a PC, NPC, or
   monster. All three are full `Character` records, not abbreviated stat blocks.
-- PC, NPC, and monster sharing uses one checksum-bound portable `actor_card`
-  schema. Import creates a fresh runtime identity and never copies ActorKnowledge.
-- Portable extension `rule_pack` import rebuilds stable citations but produces
-  only a validated inactive draft. Installation and Owner/DM campaign activation
-  remain separate; a thin release manifest grants neither authority.
-  Standard SRD monsters/NPCs are bundled `preset_pack` cards, not host-side
-  creature definitions. Structured module sharing uses only the independent v2
-  `.sagasmith-module` archive; addons never embed or activate modules. Read the
-  `portable.content` Skill group before importing or exporting either format.
+- PC, NPC, and monster sharing uses package-owned `sagasmith.actor-card.v3`.
+  Import creates a fresh runtime identity and never copies ActorKnowledge; an
+  optional image remains a package asset and never enters a snapshot.
+- Core rules, addons, modules, and presets use the single
+  `sagasmith.content-package` v2 `.sagasmith-pack` format while retaining
+  different install/activation authority. Stable source/chunk citations are
+  rebound to fresh local ids. Read the `portable.content` Skill group before
+  importing or exporting content.
 - Use granular character / party MCP tools for inventory, wallet, equipment,
   prepared spells, effects, resources, and actor adventure state. Subjective
   information belongs to ActorKnowledge. `character_sheet_replace` is
@@ -121,6 +120,17 @@ The machine-readable phase/tool-group mapping is
   page furniture that the parser safely excluded; retain it for audit, but never
   turn it into a ruling requirement or source-review blocker. Never bypass either
   gate.
+- For an unfinalized rulebook Pack, Core+D&D own mechanical extraction,
+  deterministic repair, and validation while the Agent owns repeated semantic
+  editing through `rulebook_draft(edit)`. Read
+  `references/parsing-agent-edit-loop.md`; rerun the returned issue loop after
+  every edit and call `rulebook_draft(finalize)` only with the latest revision,
+  zero blockers, and final Pack manifest. Accepted/rejected draft dispositions
+  are not frozen decisions. Use `module_draft` for module books; after reviewing
+  the current draft and evidence, finalize with an explicit Agent confirmation.
+  A Pack contains no caller-authored publication matrix: descriptor validation and
+  `metadata.agent_finalization` are the publication boundary. Use `content_pack` only after either
+  draft is finalized, and always provide its route `kind` explicitly.
 - For module maps or diagrams, follow `references/module-visual-atlas.md`.
   Text parsing remains fail-closed; only an inspected page image may support a
   `reviewed_image` connection.

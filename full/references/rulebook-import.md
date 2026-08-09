@@ -1,284 +1,82 @@
-# User Rulebook Import
+# Rulebook import
 
-Use this workflow only in the `lobby` phase after loading `lobby.rules`. A PDF is first normalized and
-indexed as evidence; it does not become executable merely because it was imported.
-Before starting, require `server_capabilities.features.structured_rulebook_import`
-and `source_bound_rule_packs` to be true. Consume the published
-`rulebook_import.stages` contract instead of guessing tool names.
+Use the three-tool authoring contract:
 
-## Portable package path
+- `rulebook_draft`: source-to-finalized Rule/Addon Pack;
+- `module_draft`: source-to-finalized Module Pack;
+- `content_pack`: finalized Pack import, export, test, install, and activation.
 
-If the owner already has a reviewed `sagasmith.portable` `rule_pack`, do not
-repeat PDF normalization, OCR, candidate extraction, or semantic review. Call
-`rule_import(action="import_package")` with exactly one inline package, managed
-artifact, or allowlisted source path and a stable idempotency key. Confirm that
-the package system and source editions match the campaign and inspect every
-exact dependency status. Import reconstructs source/chunk ids and citations but
-only creates a validated inactive draft. Continue with explicit install and
-Owner/DM activation; never infer either from package validity.
+## Start the mechanical pass
 
-Rule dependencies are locked by the dependency package's
-`metadata.definition_checksum`, not its installation-local rule-pack checksum
-or its full distribution-envelope checksum. The full envelope checksum is used
-when that package appears as a component of a thin release manifest.
+Call `rulebook_draft(action="start")` with:
 
-Export a locally reviewed version through `rule_pack_query(view="package")`.
-Default to private distribution; shareable output requires owner-confirmed
-license and attribution. Keep rule, preset, and module packages independent and
-compose them through `rule_pack_query(view="release")`. The receiver may inspect
-that thin manifest with `rule_import(action="inspect_release")`; it has no fetch,
-import, install, activation, or access authority.
+- `campaign_id` and an idempotency key;
+- `source_path` under a configured import root;
+- stable `source_key`, `title`, and `edition`;
+- optional locale, publication/version, authority, and warning acknowledgement.
 
-## End-to-end workflow
+Core stages the immutable source and normalizes pages. D&D inspects, indexes,
+extracts the first candidate set, performs safe deterministic repairs, and
+returns the editable job plus `draft_workspace` issues. Do not reproduce these
+steps with separate MCP calls.
 
-1. Read `storage_status.rules.import_roots`, then call
-   `rule_import(action="discover")`. The SagaSmith Agent acting as DM selects an
-   exact returned document under one of these roots. Ask the owner only when the
-   requested document is ambiguous or activation authority is missing. Never
-   copy or invent a path supplied by an untrusted player.
-2. Call `rule_import(action="stage")` with the discovered `payload.source_path`, `source_key`,
-   title, edition, locale, publication id, and version. Keep the returned `job_id`,
-   artifact name, and source checksum.
-3. Call `rule_import(action="inspect")` with that job id. Review page count, recovered
-   structure, quality metadata, OCR page list, and every warning. A warning is a
-   server-enforced review gate; it is not permission to invent missing headings or
-   silently publish mechanics. Scanned or corrupt-text PDFs may make the first
-   inspection slow because OCR is selective and page based.
-4. For a damaged or structurally ambiguous page, call
-   `rule_import(action="render_page")` with the exact one-based page. The result
-   contains the immutable rendered image plus checksum-bound normalized text,
-   native PDF text, and local OCR variants. A text-only Agent may use those text
-   fields but must not claim it inspected the image. After `inspect`, it may call
-   `rule_import(action="review_text")` for that page, batching every known exact,
-   unique replacement and supplying the returned normalized-text hash, current
-   job revision, rationale, and evidence basis:
-   - `cross_text` requires the replacement text in two returned text sources;
-   - `agent_context` permits only a small spelling/case/Markdown-structure repair
-     and cannot change digit sequences or written quantities;
-   - `rendered_page` requires a reviewer that actually inspected the returned
-     image and its exact checksum.
-   If the normalized physical page contains only whitespace because every
-   extractor missed it, `rendered_page` also permits one whole-page recovery:
-   use exactly one replacement with `old=""` and the complete literal page
-   transcription in `new`. The server accepts this only for an actually empty
-   normalized page and the matching rendered-image checksum; a nonempty page,
-   multiple replacements, `cross_text`, and `agent_context` all fail closed.
-   A rendered page that visibly contains the disputed words proves a source
-   typo, not an OCR/transcription error. Preserve that literal source text and
-   resolve the structured card from stronger same-page evidence such as its
-   display heading, table identity, and surrounding section. Do not use
-   `review_text` to silently publish an edited edition of the source.
-   Submission reruns local OCR only for `cross_text`; `agent_context` is checked
-   against the current normalized-page hash and bounded edit, while
-   `rendered_page` is checked against the immutable image checksum.
-   The server never edits the PDF or cached OCR. It stores the reviewer,
-   evidence hashes, before/after page hashes, and replacements, then reruns
-   inspection against the revised view. Copy heading depth from adjacent entries
-   of the same content kind; capitalization alone does not establish hierarchy.
-   If reparsing exposes a mistake, an unpublished inspected job may submit a
-   further version bound to the new page hash (at most eight per page). Refresh
-   the job revision after every version. Once ingested, create a new import job
-   instead of mutating history. Missing or conflicting mechanics remain blocked; do not use
-   transcript review to reconstruct them from model memory.
-   For a durable whole-book regression, copy every accepted repair into that
-   document's source-review manifest under `text_reviews`. Retain the one-based
-   page, current `base_text_sha256`, exact `old`/`new` replacements, rationale,
-   evidence basis, review method, and (for `rendered_page`) the exact image
-   checksum. `regression_rulebooks.py --catalog-manifest ...` re-renders the
-   evidence and replays each revision through the public `review_text` facade
-   before ingest. On an exact resumed run the public idempotency record may
-   return the already stored revision even though the current page hash is now
-   the revised hash; without that exact replay the server rejects a stale base
-   hash before writing. Never refresh a stored hash merely to make a stale
-   correction apply; re-review the changed normalized page instead.
-5. Call `rule_import(action="ingest")`. If and only if the Agent acting as DM
-   reviewed all warnings from available exact evidence, pass
-   `payload.acknowledge_warnings=true`. This uses the same Core PDF/Markdown
-   normalization path as module documents and stores page-aware retrieval chunks.
-   Normalized and page-extraction results are content-addressed, so exact retries and
-   later parser passes reuse verified work instead of repeatedly decoding/OCRing the PDF.
-6. Use `rule_search` with `source_ids=[<exact source_id>]`, select a hit from that
-   source, and call
-   `rule_expand`. Check the chunk text, heading path, page range, and source checksum.
-   For whole-book compilation, call
-   `rule_import(action="recover_statblocks")` once after indexing. It first accepts
-   deterministic complete cards assembled from checksum-bound indexed chunks, then
-   uses cached local layout OCR only for the remaining 2014 pages. One malformed
-   card must become an itemized failure and must not abort the rest of the book.
-   Treat out-of-range ability scores, ambiguous identities, and incomplete
-   multi-page cards as unresolved evidence, never as values to clamp or recall from
-   model knowledge. The internal `indexed_text` review mode is reserved for this
-   server batch action and is not a caller-selectable shortcut.
-7. If `character_create_from(mode="statblock")` fails because the indexed text
-   split one card across columns or attached its headings to an adjacent
-   creature, retry it with the source-established page/neighborhood `chunk_ids`
-   and `payload.source_statblock_name` set to the exact printed creature heading.
-   Keep the differently named campaign instance in `payload.name`. The server
-   deterministically selects that creature's core chunk, stops at the next
-   creature core, reconstructs the ability and action sections, and returns
-   `source.text_layout_recovery` with the exact retained chunk ids. This is the
-   first recovery path for a text-only Agent and requires neither page rendering
-   nor image understanding. If the indexed text still omits or conflicts on a
-   required fact, call `import_query(view="list", kind="rulebook")` and match
-   the exact `source_id` to its retained import `job_id`; this also works when
-   the source was indexed in an earlier process. For a 2014 source, then call
-   `rule_import(action="recover_statblock")` with that `job_id`, exact printed
-   creature heading as `name`, and a fresh idempotency key. Standard rulebook
-   mechanics are engine-authoritative: do not include `payload.agent_fill`.
-   A parsed standard Multiattack is used directly; an unparsed standard
-   Multiattack or other mechanical card is an engine implementation gap that
-   must be fixed and tested before retrying. Do not add a creature-name special
-   case or ask the Agent to redefine the printed rule. Do not use a
-   campaign instance name such as a named dragon in place of
-   `Adult Blue Dragon`. Supply `page_number` only when it is already
-   source-established; otherwise let the server read the printed-page index hint
-   and scan nearby physical pages. Core then runs local layout OCR, isolates the
-   target column, distinguishes repeated decorative/narrative copies of the
-   creature name by the adjacent size/type/alignment core, rejects
-   low-confidence critical fields, and requires either
-   target-segment embedded-text corroboration or agreement from an independent
-   OCR scale. The result is a checksum-bound reviewed 2014 statblock; retry actor
-   creation with `mode="reviewed_rule_statblock"` and its returned `review_id`.
-   If the structural card is correct but OCR damaged one exact cell or action
-   line, call `rule_import(action="render_page")` for that page. A text-only
-   Agent compares `transcription.native_text`, `transcription.normalized`, and
-   the returned OCR variants, then retries `recover_statblock` with exact
-   `page_number`, `statblock_slot`, and `ocr_corrections`. An ability correction
-   is a complete `score (+/-modifier)` value. A text correction is one exact
-   `old` OCR span plus its exact `new` source span. With
-   `correction_evidence_basis="staged_text"`, the immutable staged page text
-   must contain the new value. If both text extraction and OCR damaged that
-   value, only an Agent or human that actually inspected the returned image may
-   use `correction_evidence_basis="rendered_page"`, together with its exact
-   `rendered_image_checksum`. In both cases the old span must be unique inside
-   the selected structural card, and the corrected card must pass full
-   parsing/corroboration. Use a fresh idempotency key for a changed
-   correction; an exact retry replays the complete stored response without
-   rerunning OCR or Agent review. This is Agent-reviewed
-   transcription repair, not permission to infer a number or rule from memory.
-   `recover_statblock` must reject a 2024 source instead of applying 2014 layout
-   grammar. For 2024, use a complete exact-page indexed segment with the
-   edition-matching `review_statblock` text path below, or an image-capable
-   edition-matching visual review.
-8. If 2014 layout OCR cannot isolate a card, or a 2024 card bypasses OCR, but the
-   already-indexed chunks still contain
-   the complete card as one ordered, contiguous segment on an exact page, a
-   text-only Agent acting as DM may normalize only that segment. Require
-   `server_capabilities.features.indexed_text_statblock_review` and one
-   unambiguous retained artifact identity whose jobs match the `source_id`.
-   Equivalent historical jobs with the same artifact name and checksum are safe
-   to select deterministically; if those identities differ, stop and use an
-   explicitly reviewed `--source-job-id`. Then call
-   `rule_import(action="review_statblock")` with
-   `review_mode="agent_text"`, the exact `page_number`, normalized full card,
-   observation, and ordered `evidence_chunk_ids`. The MCP independently requires
-   every chunk to belong to that source, cover the page, and have contiguous
-   ordinals; it rejects both facts absent from the evidence and selected evidence
-   omitted from the normalized card. The source and campaign must agree on 2014
-   or 2024, and that edition selects the statblock parser. Use the returned `review_id` with
-   `character_create_from(mode="reviewed_rule_statblock")`.
-   The engine continues to own generic D&D transactions: action economy,
-   attacks, saves, damage, resource payment, timing windows, and structured
-   Multiattack composition. Missing or conflicting source facts, or a generic
-   printed mechanic that the engine cannot execute, must reject the review as
-   `engine_implementation_required`; implement it with a source-backed
-   regression test before recreating the actor. Exact creature-, spell-, item-,
-   or feature-specific prose must instead carry a persisted exact-source direct
-   Agent-ruling clause created during import/review. A reusable typed plan may
-   be added then or compiled by the DM Agent on first use. The ruling boundary
-   settles only the authored content outcome and cannot replace the engine-owned
-   transaction.
-   This is layout normalization, not model-memory reconstruction. If the indexed
-   facts themselves are missing or conflicting, stop at explicit source review.
-   Bounded text-layer repair may accept `l/I` for `1`, `o` for `0`, and `f`
-   between two numeric range components for `/`, but only at the matching
-   numeric positions. Changed DCs, bonuses, dice, damage types, and other
-   numeric facts remain rejected.
-   The bounded 2014 layout path may recompute a damaged redundant ability
-   modifier only from a clearly printed score. It may restore one missing
-   ability label only when all six source scores are present and the remaining
-   five labels uniquely establish the canonical column order; it never supplies
-   a missing score or clamps an illegal value. Explicit `Actions for Type ...`
-   sections are source-defined variants and must become separate actor cards,
-   each with only its own action set.
-   During a private Monster Manual build, an exact bundled SRD actor may be
-   reused only when edition is 2014, publication id is exactly `mm2014`, and one
-   unique OCR-confusable identity matches. The private card is rebuilt in the
-   target preset namespace and records the source card version/checksum. Never
-   apply this optimization to supplements or same-name variants. A visibly
-   damaged heading may be superseded only by one reviewed actor on the same
-   source page.
-   An image-capable reviewer may instead render the exact page and transcribe only
-   observed fields through the same action with `review_mode="visual"` (the
-   default). A text-only Agent must not claim visual review, repair tokens from
-   rules memory, select a similar SRD creature, or acknowledge a conflict as
-   success.
-9. Call `rule_import(action="extract_candidates")`, review every candidate, and
-   submit explicit decisions through `rule_import(action="review")`. Candidate
-   extraction never makes content executable. Translate only a reviewed rule into
-   the safe declarative IR. Start from
-   `examples/rule-packs/xanathar-tools-skills.template.json` when applicable.
-   Replace `$SOURCE_ID` and `$CHUNK_ID` with the import/search results.
-   Every otherwise-unclaimed mechanically signaled chunk must remain represented
-   during extraction by an `agent_resolution_required` catalog candidate with
-   exact citations. This is a transient Lobby review state and must never appear
-   in a compiled pack or addon. It is not descriptive merely because no parser
-   handled it. Accepting that candidate immediately stores a direct exact-source
-   Agent-ruling clause unless the reviewer supplies a native mechanic or typed
-   plan. The compiled artifact must be `ruling_ready` (or
-   `descriptive_ready` for proven descriptive material). Missing identity, core
-   statistics, or source text may not be relabeled as semantic deferral.
-   A recovered review on a page with other unresolved cards is projected only
-   into its matching candidate; unrelated cards on that page remain. Reject
-   page numbers, section labels, captions, and narrative fragments explicitly
-   in the replayable catalog manifest. For a whole-book actor catalog, retain
-   each Agent slot review (`page_number`, `statblock_slot`, `name`, and any
-   `ocr_corrections`), the explicit rejection decisions, expected content-kind
-   counts, and either the exact expected actor-name multiset or its canonical
-   SHA-256. The portable round trip must fail on any missing, duplicate, or
-   unexpected actor name.
-   Dice procedures, numbered random-effect tables, and adjudication guidance
-   count as mechanical signals even when no specialized entity parser matches.
-   Preserve exact source evidence for every retained chunk. A reviewed generic
-   plan may be included at build time; otherwise the first actual custom-card use
-   compiles and persists one through `content_solution`. A no-candidate
-   whole-book regression must never publish one descriptive sample as coverage
-   for the rest of a mechanical source.
-10. Call `rule_import(action="compile")` for the reviewed import job, or
-   `rule_pack_compile(action="from_source")` for a separately authored mechanic.
-   Do not use an unbound draft for a
-   user-imported executable rule. The server replaces every chunk id with a canonical
-   source/checksum/page citation and rejects a chunk from another source.
-11. Call `rule_pack_query(view="test" | "inspect")`. The Agent acting as DM
-   reviews failures and parser warnings from exact evidence. Install only a validated exact version with
-   `rule_import(action="install")` or `rule_pack_change(action="install")`.
-   Standalone package export/import/install and composed-addon export/import
-   must all report and independently recompute
-   `resolution_readiness.complete=true`, an empty `unresolved` list, and
-   `first_use_compilation_required=false`.
-12. After explicit campaign-owner/DM approval, read
-   `campaign_rules(action="get_profile")` and
-   activate the reviewed import with `rule_import(action="activate")`, or pin a
-   separately installed version with `campaign_rules(action="set_pack")`, using
-   the latest campaign revision.
-13. During non-combat play, use `character_check` for a rule-aware check. During
-    combat, use `combat_check`. For a 2014 opposed check, use the atomic
-    `character_check(action="contest")` tool and supply rule facts independently for each side.
-    Agent-as-DM-established situational facts go in `rule_facts`; they cannot override
-    actor, check kind, ability, or DC.
-14. Verify the result with `campaign_rules(action="explain")` and
-    `campaign_rules(action="receipts")`. A receipt must contain the imported chunk id, original
-    document checksum, page range, exact pack lock, and ruleset fingerprint.
+If source inspection has warnings and they were not acknowledged, `start`
+returns `source_review_required` without indexing. Use
+`rulebook_draft(action="evidence", kind="page")` to inspect a checksum-bound
+page. Submit a bounded transcript repair with
+`rulebook_draft(action="edit", operation="source_text")`, then call
+`operation="advance"`. Only acknowledge warnings after examining their exact
+evidence.
 
-## Xanathar pilot
+## Inspect evidence
 
-The included template demonstrates the optional tool/skill synergy procedure as a
-`check.before` mechanic. It activates only when the DM supplies both
-`skill_proficiency_applies=true` and `tool_proficiency_applies=true`; the engine then
-rolls the check with Advantage. The source PDF and extracted prose are never stored in
-this skill repository.
+Use `rulebook_draft(action="get")` to list jobs or retrieve one job. Use
+`rulebook_draft(action="evidence")` with:
 
-The example book may produce a bookmark-match warning even when its text layer and
-most structure are usable. Keep that warning in the imported source provenance,
-acknowledge it only after review, and compare the selected chunk with the rendered
-source page before installation.
+- `kind="chunks"` for indexed source chunks, optionally filtered by page/query;
+- `kind="page"` for a managed rendered page and its transcription evidence.
+
+The source PDF, normalized page cache, OCR variants, source checksum, and
+indexed chunks remain immutable. A rendered-page claim requires the returned
+image checksum. A text-only Agent must not claim visual inspection.
+
+## Edit the draft
+
+All writes use `rulebook_draft(action="edit")` and one operation:
+
+| Operation | Purpose |
+|---|---|
+| `advance` | Resume mechanical indexing/extraction after source review |
+| `source_text` | Save a bounded checksum-bound transcript repair |
+| `statblock_recovery` | Recover one named or a page-bounded statblock catalog |
+| `statblock_review` | Save reviewed normalized statblock content/fill |
+| `catalog` | Add a mechanically missed, source-bound candidate |
+| `candidates` | Include, exclude, reopen, split, merge, or replace candidates |
+
+Candidate edits may remain temporarily incomplete. Core+D&D persist the edit,
+append history, and return deterministic issues. Resolve all blockers before
+finalization; do not turn one book's decision into a global parsing heuristic.
+
+For a split or merge, add the reviewed replacement and explicitly exclude each
+superseded candidate. Preserve exact chunk/page evidence. Never invent missing
+numbers, identities, ownership, selection rules, or executable mechanics.
+
+## Finalize and save
+
+Call `rulebook_draft(action="finalize")` with:
+
+- current `expected_revision` and a fresh idempotency key;
+- `job_id` and a completion note;
+- final manifest plus optional mechanics/provenance.
+
+Finalization requires every candidate to be included or excluded and every
+blocker to be resolved. It atomically freezes the candidate fingerprint,
+compiles the source-bound artifacts, validates the Pack, and saves its immutable
+version. There is no separate public compile step and no draft mutation after
+finalization.
+
+Use `content_pack(action="test", kind="rule")`, then `install` and `activate`
+with the same explicit `kind`. Activation
+is an explicit Owner/DM decision and requires campaign revision/idempotency
+contracts. For an already reviewed portable archive, skip parsing and call
+`content_pack(action="import", kind="rule")`.

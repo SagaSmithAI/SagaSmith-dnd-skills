@@ -59,9 +59,9 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    the returned `manual_input` option available to the player. If a directory
    contains one adventure plus appendices or map/resource PDFs, keep them in one
    campaign and import each physical module document as its own immutable revision.
-6. Use the `module_import` state machine in order: `stage`, `inspect`, `validate`,
-   `ingest`, then `activate`. For generated content, stage with `payload.name` and
-   `payload.content`. For a user PDF/Markdown/text module, stage with
+6. Use `module_draft(start)`, repeat `evidence/edit`, then call `finalize`; activate
+   the resulting Pack through `content_pack`. For generated content, start with
+   `payload.name` and `payload.content`. For a user PDF/Markdown/text module, start with
    `payload.source_path`; it must be inside the server-configured module import
    roots. The server copies it into checksum-addressed MCP storage, and Core
    performs PDF-to-Markdown normalization. Never bypass staging with a direct path.
@@ -86,7 +86,7 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    branch-aware, and snapshot-restorable; do not edit immutable import metadata.
    If a required 2014 creature card exists only as a PDF image, follow
    `../../references/module-image-content-review.md`: first call the
-   service-owned `module_review(action="recover_statblock")`, re-read
+   service-owned `module_draft(action="edit", operation="statblock")`, re-read
    `module_query(view="content")`, and create the actor with
    `mode="module_statblock"` before play or combat. Only if recovery remains
    ambiguous may an image-capable reviewer render, inspect, and submit the page.
@@ -103,8 +103,8 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    the text-only model to infer pixels.
    Inspect `module_query(view="candidates")` as a separate evidence gate.
    `review_ready` text candidates must retain their exact `source_chunk_ids` in
-   `module_review(action="submit_content")`. A blocked 2014 candidate requires
-   `module_review(action="recover_statblock")` first; a blocked 2024 candidate
+   `module_draft(action="edit", operation="content")`. A blocked 2014 candidate requires
+   `module_draft(action="edit", operation="statblock")` first; a blocked 2024 candidate
    requires complete edition-matching indexed text or capable visual review. A rendered managed page
    and literal visual transcription is only the image-capable fallback. Never
    fill OCR gaps from memory. For a
@@ -148,21 +148,23 @@ Read the phase plan returned by `campaign_query(view="resume")` and
    baseline.
 
 Before combat, create a participant manifest from the expanded source scene and
-call `module_query(view="readiness")`. Every group records its role, required
+call `module_query(view="preflight")`. Every group records its role, required
 count, canonical actor ids, same-module `source_scene_id`, and exact normalized
 `source_excerpt`. Initial participants must satisfy every required `combatant`
 group. Actors in a `reinforcement` group stay out of the initial list and may enter
-only through `combat_join` after the source condition succeeds. Missing, Dead/0 HP,
-or mechanically unresolved required actors block combat start; surfaced manual
-rulings require review but must not be erased from the readiness report. By
+only through `combat_join` after the source condition succeeds. Missing required
+actors or a whole-card `card_valid=false` result blocks combat start. Dead/0 HP
+actors remain valid participants with `can_take_turn=false`, while mechanically
+unresolved entries disable only the affected capabilities. Surfaced manual
+rulings require review but must not be erased from the preflight report. By
 default the SagaSmith Agent performs that DM review from exact source and current
 state; player-owned choices, missing evidence, and owner approvals remain their
 respective boundaries. A
 `ready: true` manifest can still have `settlement: mixed`: inspect per-card
-`manual_rulings`, structured `ruling_requirements`, `ruling_spell_ids`, and
-`unavailable_attack_ids` before switching to combat. Resolve entries marked
+`state_flags`, `disabled_capabilities`, `available_capabilities`, `manual_rulings`,
+structured `ruling_requirements`, and `ruling_spell_ids` before switching to combat. Resolve entries marked
 `default_resolver="agent"` through Agent reasoning and public tools. Missing
-ranged or thrown ranges are source/card blockers, not discretionary DM ranges;
+ranged or thrown ranges disable those attacks and are not discretionary DM ranges;
 when the exact statblock instead supplies a complete positional restriction such
 as "one target directly below", treat it as Agent-owned targeting, require the
 current map positions to satisfy it, and never invent a numeric range;

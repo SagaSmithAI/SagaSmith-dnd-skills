@@ -10,12 +10,12 @@ First call `module_query(view="candidates")` for the exact module. Route by the
 returned `execution_state`:
 
 - For `review_ready`, inspect `normalized_content`, validation, scene, and every
-  source chunk. Submit that exact normalized text to `module_review(action="submit_content")` with
+  source chunk. Submit that exact normalized text to `module_draft(action="edit", operation="content")` with
   the returned `scene_id`, `source_chunk_ids`, and edition-matching
   `content_kind` (`dnd5e_2014_statblock` or `dnd5e_2024_statblock`); do not
   replace text evidence with a page-memory reconstruction.
 - For a blocked 2014 card, do not submit the candidate as text evidence. First call
-  `module_review(action="recover_statblock")` with its exact module, scene,
+  `module_draft(action="edit", operation="statblock")` with its exact module, scene,
   stable content key, printed name, managed page, and optional asset id. The
   service performs local layout OCR, verifies the imported PDF checksum, and
   independently corroborates all critical facts. This route works for a
@@ -32,7 +32,7 @@ returned `execution_state`:
    confirm that the normalized text does not contain an executable statblock, or
    that the candidate was explicitly blocked by the evidence gate.
 2. For a 2014 card, use `module_query(view="assets")`, select the managed PDF,
-   and first call `module_review(action="recover_statblock")`. If the recovered card has no
+   and first call `module_draft(action="edit", operation="statblock")`. If the recovered card has no
    module-authored Multiattack semantic gap, re-read its immutable review and
    continue at step 5; do not re-transcribe it. If the response instead has
    `requires_agent_fill=true` and `review=null`, read only
@@ -46,7 +46,7 @@ returned `execution_state`:
    For a 2024 card, skip this step and retain its edition-matching text evidence.
 3. If 2014 recovery fails, or a 2024 card lacks complete indexed text, and the
    Agent can inspect images, call
-   `module_review(action="render_page")` for the cited page and inspect the
+   `module_draft(action="evidence")` for the cited page and inspect the
    returned image itself. A text-only Agent must stop here.
 4. Transcribe only visible card facts into canonical English statblock Markdown
    for the campaign's locked 2014 or 2024 edition. Preserve the exact name,
@@ -55,7 +55,7 @@ returned `execution_state`:
    attack bonus, reach/range, damage dice, damage bonus, and damage type. Do not
    fill an absent field from memory or a similar creature.
 5. For an image-capable manual transcription, call
-   `module_review(action="submit_content")` with the appendix `scene_id`, stable
+   `module_draft(action="edit", operation="content")` with the appendix `scene_id`, stable
    `content_key`, normalized Markdown, managed PDF or rendered-image asset,
    1-based page, a literal visual observation, and a fresh idempotency key. If
    the card contains any module-authored Multiattack, inspect the returned
@@ -72,7 +72,7 @@ returned `execution_state`:
    `character_create_from(mode="module_statblock", payload={"campaign_id": ...,
    "review_id": ..., "name": ..., "character_type": "monster"})`. Re-read the
    actor and verify AC, HP, attacks, source refs, and unresolved rules before
-   adding its canonical id to the scene-readiness manifest. If the printed
+   adding its canonical id to the scene-preflight manifest. If the printed
    statblock repeats a known spell as a numeric action, that action is an explicit
    creature-specific override: the hydrated spell card's displayed effect/range
    and structured resolution must agree with the printed action, even when the
@@ -172,7 +172,7 @@ effects use the same declaration with `resolution="agent_ruling"` and no
 `options`. This explicitly removes any parser proposal and leaves the action as
 an Agent DM ruling when selected. Player choices and
 missing-image/source review still pause at their own boundaries. Never erase a
-warning to make readiness pass.
+warning to make preflight pass.
 
 The review belongs to the imported campaign module and is immutable provenance;
 it is not branch-scoped narrative state. Actors created from it retain the review

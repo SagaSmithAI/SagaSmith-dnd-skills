@@ -150,7 +150,7 @@ mechanic id 进入版本锁定的引擎实现。
 模组使用：
 
 ```text
-stage → inspect → validate → ingest → activate
+module_draft(start → Agent evidence/edit loop → finalize) → content_pack(activate, kind="module")
 ```
 
 导入结果包括：
@@ -235,7 +235,7 @@ sheet v2 与 notes v2 结构。
 导入、审核或导出自设内容时，系统必须完成 resolution audit。能够稳定表达的
 内容保存严格、类型化的 `resolution_plan`；不适合自动化但来源完整的内容保存
 精确 `source_ref`/`source_excerpt` 与 Agent-ruling requirement。两者都随
-portable card 发布。如果某张自设卡尚无方案，DM Agent 可在 Lobby、Play 或 Combat
+统一 content package 发布。如果某张自设卡尚无方案，DM Agent 可在 Lobby、Play 或 Combat
 第一次实际触发时读取有界来源上下文，调用 `content_solution(action="compile")`
 持久化一次；同一待处理窗口随后用 `combat_choice(action="execute_plan")` 继续，
 之后始终复用指纹，不再次解释原文。
@@ -477,7 +477,7 @@ MCP 结果重建。相同 `context_epoch` 不重复切换。
 2. 确认可见性、参与者、地图、地点和 source refs；
 3. 准备所有需要机械行动的 actor；
 4. 为第一次实际使用的叙事 NPC/谈判建立 context anchor；
-5. 读取 readiness 和所有 manual ruling requirement；
+5. 读取 preflight、局部禁用能力和所有 manual ruling requirement；
 6. 解决 Agent-owned ruling；
 7. 对玩家选择、owner approval 和缺失/冲突来源保持阻塞；
 8. 更新 SceneProgress 的 current location 与 scene state。

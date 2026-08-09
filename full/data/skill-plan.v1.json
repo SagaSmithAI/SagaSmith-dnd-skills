@@ -57,7 +57,7 @@
     "phase.lobby": {
       "load_policy": "phase",
       "visibility": "public",
-      "reason": "Lobby has source, party, rule-lock, and readiness gates before live play.",
+      "reason": "Lobby has source, party, rule-lock, validation, and finalization gates before live play.",
       "depends_on": ["core.bootstrap", "core.transactions"],
       "documents": [{"kind": "asset", "identifier": "dnd:full/references/skill-groups/phase/lobby.md", "action": "read", "max_chars": 1800}]
     },
@@ -102,8 +102,8 @@
       "reason": "Portable actor cards, preset, module, and rule packages require fresh identities, checksum validation, lifecycle isolation, and knowledge isolation.",
       "depends_on": ["core.identity", "core.transactions"],
       "documents": [
-        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Actors and modules", "max_chars": 3000},
-        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Rule packs, releases, and addons", "max_chars": 3800}
+        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Actor cards and images", "max_chars": 3000},
+        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Import and activation", "max_chars": 3800}
       ]
     },
     "content.solutions": {
@@ -121,7 +121,7 @@
       "reason": "Reviewed addon actor templates require DM-authorized instantiation, exact package locks, fresh campaign identities, and isolated actor knowledge.",
       "depends_on": ["core.identity", "core.transactions"],
       "documents": [
-        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Actors and modules", "max_chars": 2500}
+        {"kind": "asset", "identifier": "dnd:full/references/skill-groups/lobby/portable-content.md", "action": "section", "heading": "Actor cards and images", "max_chars": 2500}
       ]
     },
     "rules.import": {
@@ -298,13 +298,13 @@
     "lobby.campaign": {"required": ["campaign.lifecycle", "snapshot.branch"], "tools": ["access_grant", "branch_change", "branch_query", "campaign_change", "campaign_event", "campaign_rules", "playthrough_manifest", "snapshot_create", "snapshot_query", "snapshot_restore", "state_revision"]},
     "lobby.characters": {"required": ["character.build", "portable.content"], "tools": ["character_ability_apply", "character_action", "character_content_apply", "character_create_from", "character_metadata_update", "character_query", "character_sheet_replace", "character_spell_prepare", "character_state_change", "dnd_ability_roll", "dnd_dice_roll", "inventory_change", "inventory_transfer", "wallet_change"]},
     "lobby.addon_actors": {"required": ["addon.actors"], "tools": ["addon_actor_instantiate"]},
-    "lobby.rules": {"required": ["rules.import", "portable.content"], "tools": ["campaign_rules", "content_solution", "import_query", "rule_expand", "rule_import", "rule_pack_change", "rule_pack_compile", "rule_pack_query", "rule_search", "rule_seed_bundled", "rule_seed_status"]},
-    "lobby.modules": {"required": ["modules.import", "portable.content"], "tools": ["module_expand", "module_import", "module_query", "module_review", "module_search", "module_set_progress"]},
+    "lobby.rules": {"required": ["rules.import", "portable.content"], "tools": ["campaign_rules", "content_pack", "content_solution", "rule_expand", "rule_search", "rule_seed_bundled", "rule_seed_status", "rulebook_draft"]},
+    "lobby.modules": {"required": ["modules.import", "portable.content"], "tools": ["module_draft", "module_expand", "module_query", "module_search", "module_set_progress"]},
     "lobby.memory": {"required": ["continuity.read"], "tools": ["actor_knowledge_query", "bounded_evaluation", "continuity_context"]},
     "lobby.memory_control": {"required": ["continuity.write"], "tools": ["actor_knowledge_change", "memory_change", "memory_query"]},
     "lobby.storage_admin": {"required": ["storage.admin"], "tools": ["storage_migrate"]},
     "play.scene": {"required": ["scene.play", "continuity.read"], "tools": ["actor_knowledge_query", "bounded_evaluation", "branch_query", "campaign_event", "continuity_context", "module_expand", "module_query", "module_search"]},
-    "play.scene_control": {"required": ["scene.play", "continuity.write", "snapshot.branch", "content.solutions"], "tools": ["actor_knowledge_change", "campaign_change", "campaign_rules", "content_solution", "memory_change", "memory_query", "module_review", "module_set_progress", "playthrough_manifest", "snapshot_create", "snapshot_query", "state_revision"]},
+    "play.scene_control": {"required": ["scene.play", "continuity.write", "snapshot.branch", "content.solutions"], "tools": ["actor_knowledge_change", "campaign_change", "campaign_rules", "content_solution", "memory_change", "memory_query", "module_draft", "module_set_progress", "playthrough_manifest", "snapshot_create", "snapshot_query", "state_revision"]},
     "play.characters": {"required": ["character.state"], "tools": ["character_action", "character_content_apply", "character_metadata_update", "character_query", "character_state_change", "inventory_change", "inventory_transfer", "wallet_change"]},
     "play.addon_actors": {"required": ["addon.actors"], "tools": ["addon_actor_instantiate"]},
     "play.resolution": {"required": ["resolution.checks"], "tools": ["character_check", "dnd_ability_roll", "dnd_check", "dnd_dice_roll", "rule_expand", "rule_search"]},
@@ -331,13 +331,11 @@
     "character_create_from:reviewed_rule_statblock": ["source.content_review"],
     "character_create_from:statblock": ["source.content_review"],
     "memory_change:commit": ["continuity.write"],
-    "module_review:recover_statblock": ["source.content_review"],
-    "module_review:render_transcript": ["source.content_review"],
-    "module_review:submit_content": ["source.content_review"],
-    "module_review:submit_transcript": ["source.content_review"],
-    "rule_import:recover_statblock": ["source.content_review"],
-    "rule_import:render_page": ["source.content_review"],
-    "rule_import:review_text": ["source.content_review"],
+    "module_draft:evidence": ["source.content_review"],
+    "module_draft:edit": ["source.content_review"],
+    "rulebook_draft:evidence": ["source.content_review"],
+    "rulebook_draft:edit": ["source.content_review"],
+    "rulebook_draft:finalize": ["source.content_review"],
     "content_solution:compile": ["core.evidence_ruling"],
     "combat_start:started": ["combat.observe"],
     "combat_end:closed": ["scene.play", "continuity.write"],

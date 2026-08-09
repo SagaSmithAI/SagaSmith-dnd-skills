@@ -47,7 +47,7 @@ host-specific phase/group list.
 - Keep PC/NPC/monster cards, actor access, and ActorKnowledge independent.
 - Use exact source references for module metadata, scene progress, rewards, and
   endings.
-- Keep rule/module import in Lobby and pass every review/readiness gate.
+- Keep rule/module import in Lobby and pass every validation/finalization gate.
 - Use current revisions and stable idempotency keys for retriable writes.
 - Snapshot meaningful boundaries. Fork important alternatives from a parent
   snapshot; never let sibling branches contaminate each other.

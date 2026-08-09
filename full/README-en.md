@@ -27,9 +27,9 @@ Campaign state, not the prompt, owns the phase. The MCP refreshes session exposu
 
 ## Shareable actors and modules
 
-PCs, NPCs, and monsters use one checksum-validated portable actor-card format.
-Export with `character_query(view="portable_card")` and import with
-`character_create_from(mode="portable_card")`. The target always receives a new
+PCs, NPCs, and monsters use package-owned `sagasmith.actor-card.v3` records.
+Export with `character_query(view="content_package")` and import with
+`character_create_from(mode="content_actor")`. The target always receives a new
 Character identity and no ActorKnowledge. The 2014 and 2024 SRD creatures are
 ordinary cards in bundled preset packs, not host- or driver-side name tables.
 Import must settle every resolution before release. Source-explicit action
@@ -38,16 +38,17 @@ OCR repairs, and an Agent may correct a damaged OCR span only through exact
 page/slot evidence corroborated by staged text or an actually inspected render.
 The engine never interprets source prose. When an exact-source ruling
 requirement exists but no executable plan does, the DM Agent may compile one
-source-bound plan on first use and persist it on the portable card.
+source-bound plan on first use and persist it on the content actor card.
 
 Bind module NPCs, monsters, and pregenerated PCs with
-`module_import(action="bind_actor")`, then export with
+`module_draft(action="edit", operation="actor")`, then export with
 `module_query(view="package")`. The package carries a signed Scene Atlas with
 exact scene text and retrieval chunks, the source
 index, embedded assets, reviewed content, cards, and stable scene bindings.
-`module_import(action="import_package")` replays it through Core and creates
+`content_pack(action="import", kind="module")` replays it through Core and creates
 fresh actor ids. Progress, world state, memory, branches, and Snapshots are not
-content-package data. Load the Lobby `portable.content` Skill group for the
+content-package data. Every kind uses a `.sagasmith-pack` archive. Load the Lobby
+`portable.content` Skill group for the
 complete procedure.
 
 ## Minimal turn loop

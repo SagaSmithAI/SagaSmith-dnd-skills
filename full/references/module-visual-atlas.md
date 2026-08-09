@@ -14,7 +14,7 @@ reviewed topology.
 2. Call `module_query(view="assets", payload={"module_id": ...})`. Select the
    imported `application/pdf` asset; do not read an arbitrary local path.
 3. Locate a candidate page from scene page ranges or expanded source text, then
-   call `module_review(action="render_page")` with `campaign_id` and a payload
+   call `module_draft(action="evidence")` with `campaign_id` and a payload
    containing `module_id`, `page_number`, and optional `source_asset_id`.
    Inspect the returned image itself. Text extraction, room
    numbering, heading order, and a generic cross-reference are not visual proof.

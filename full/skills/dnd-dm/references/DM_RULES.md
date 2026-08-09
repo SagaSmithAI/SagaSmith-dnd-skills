@@ -49,7 +49,7 @@
 - 战斗结束后统一结算条件、死亡、掉落、消耗、经验/里程碑和世界后果并保存。
 - 对每个仍相关的 NPC/怪物保留完整 HP、临时 HP、资源、条件、效果、装备、物品和
   `notes.profile.summary`；击败、离场或死亡也是卡上的状态/叙事变化，而不是只写一行 event。
-- readiness 的 `required_count` 必须是原文、已记录的随机遭遇掷骰或当前分支 DM 事实确定的
+- preflight 的 `required_count` 必须是原文、已记录的随机遭遇掷骰或当前分支 DM 事实确定的
   完整分组数量，不能直接填写现有 `actor_ids` 的长度。缺一张必要角色卡就保持未就绪；原文还
   列出其他敌对、增援或可选组时应一并 manifest，不能截短引文来隐藏人数。
 
@@ -128,18 +128,22 @@ or `player_name` as permission.
 | 已记录网格、敌对、触及、可见性与移动模式产生的借机攻击窗口 | 未记录触发器、强迫移动/传送的语义、剧情后果 |
 | 2014/2024 突袭差异、反应支付、每回合法术限制 | 先攻同值时玩家/DM 的最终顺序选择 |
 
-战斗 readiness 的 `ready` 只表示角色可进入遭遇，不表示整张卡都可自动结算。逐项检查
-`settlement`、`manual_rulings`、`ruling_requirements`、`automatic_spell_ids`、
-`ruling_spell_ids` 和 `unavailable_attack_ids`。`default_resolver="agent"` 的普通
+战斗 preflight 的 `ready` 只表示必需角色存在且整卡有效，不表示角色当前能行动或每项都可自动结算。逐卡检查
+`card_valid`、`hard_blockers`、`state_flags`、`can_take_turn`、
+`disabled_capabilities` 和 `available_capabilities`，再读取 `settlement`、
+`manual_rulings`、`ruling_requirements`、`automatic_spell_ids` 与
+`ruling_spell_ids`。`default_resolver="agent"` 的普通
 DM 判定由 Agent 直接思考并用公开工具落实；玩家选择和缺失/冲突来源仍保留各自边界。
 同时核对 `default_dm_resolver`、`agent_rulings` 和
-`external_input_requirements`：`settlement="source_review_required"` 表示必须修复或
+`external_source_gaps`：`settlement="source_review_required"` 表示必须修复或
 复核来源，不能由 Agent 编造；`mixed` 表示可入场，但列出的普通叙事裁决仍由 Agent
 承担。原生工具结果与 facade 顶层必须保留相同的 `ruling_kind`，不得把嵌套的来源复核
 误降级成通用 Agent 裁决。
-地图上缺失通常射程的远程攻击属于来源/卡片缺失，必须阻止开战；有来源数值时应先在
-lobby 修复卡片，不能由通用判定编造距离。若原文明确用完整的位置限制取代数字射程（例如
-“只能以 kobold 正下方的一个目标为目标”），则该攻击保持 `ready=true`/`settlement=mixed`，
+0 HP 或 Dead 只会进入 `state_flags` 并令 `can_take_turn=false`；缺少普通射程、弹药、
+完整法术 id 或完整法术施放水合只禁用对应能力，不阻止其他有效角色和能力开战。
+地图上缺失通常射程的远程攻击属于来源/卡片缺失；有来源数值时应先在 lobby 修复卡片，
+不能由通用判定编造距离。若原文明确用完整的位置限制取代数字射程（例如
+“只能以 kobold 正下方的一个目标为目标”），则该攻击保持整卡有效且 `settlement=mixed`，
 由 Agent 根据当前场景与临时战斗地图位置判定能否选择；不满足位置时改用合法已记录攻击，
 不得反推或编造通用射程。无论装备状态或弹药是否耗尽，角色都可显式使用
 `weapon_id: "unarmed-strike"`。战斗结束后的 `combat_query(status)` 是最终历史快照，当前

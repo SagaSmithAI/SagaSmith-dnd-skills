@@ -12,7 +12,7 @@ scene, or when two stores appear to contain the same information.
 | Current objective world truth | CampaignMemory revision ledger | Stable-key fact in `memory_change(action="commit").facts`; administrative `memory_change` | ActorKnowledge or duplicated prose note |
 | What one PC/NPC believes, knows, forgot, or was told | ActorKnowledge revision ledger | Exact actor item in `memory_change(action="commit").actor_knowledge`; administrative `actor_knowledge_change` | World fact, another actor's ledger, or workspace memory |
 | Current HP, resources, equipment, effects, spell preparation, durable actor state | Character sheet v2 | Granular character/party mutation tool | CampaignMemory or character notes |
-| Published/generated module definitions | Immutable module revision | `module_import(stage/inspect/validate/ingest/activate)` | Campaign fact before it occurs in play |
+| Published/generated module definitions | Immutable Module Pack revision | `module_draft(start/get/evidence/edit/finalize)` then `content_pack(activate, kind="module")` | Campaign fact before it occurs in play |
 | Branch-local module progress and spatial review | Module progress ledger | `module_set_progress` | Edited module source |
 | Restorable materialized campaign state | Snapshot | Snapshot member of `memory_change(action="commit")`; isolated `snapshot_create` for administration | Recap prose or workspace file |
 | Player-facing summary of changes | Snapshot recap | Deterministic snapshot recap; optional reviewed presentation layer | Source of truth for facts or restore |

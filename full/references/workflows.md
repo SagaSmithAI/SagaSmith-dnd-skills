@@ -60,18 +60,18 @@ own exposure. Loading a group for one Agent must not expose it to another.
 3. Inventory every allowlisted file before importing. Call
    `character_query(view="document")` for character sheets, pregenerated-PC
    packets, and ability-score option files. Its classification and checksum are
-   authoritative; these documents never enter `module_import`. Keep explicit
+   authoritative; these documents never enter `module_draft`. Keep explicit
    `manual` score entry available even when the document supplies arrays.
    For a campaign directory, group every document below the same top-level
    campaign folder into one campaign while retaining one immutable module
    revision per physical document. A root-level adventure remains its own
    campaign. Do not create one campaign per appendix, map packet, or supplement.
-4. Load `lobby.modules`. For each module PDF call `module_import` in this exact order:
+4. Load `lobby.modules`. For each module PDF call `module_draft` in this exact order:
    `stage` -> `inspect` -> `validate` -> `ingest` -> `activate`. Keep the same
    `job_id`; use a stable, stage-specific idempotency key for each write.
    Between `inspect` and `validate`, repair a damaged PDF transcript only through
-   `module_review(action="render_transcript")` followed by one checksum-bound
-   `module_review(action="submit_transcript")` batch per page. Text-only Agents
+   `module_draft(action="evidence")` followed by one checksum-bound
+   `module_draft(action="edit", operation="source_text")` batch per page. Text-only Agents
    use two-source agreement or bounded context with unchanged digit sequences;
    only a reviewer that actually saw the image may use rendered-page evidence.
    Re-read the updated inspection and revision before continuing.
@@ -83,11 +83,11 @@ own exposure. Loading a group for one Agent must not expose it to another.
    parser found no source-backed topology.
    If a PDF map contains required topology, use
    `module-visual-atlas.md`: `module_query(view="assets")` ->
-   `module_review(action="render_page")` -> visual inspection ->
+   `module_draft(action="evidence")` -> visual inspection ->
    `module_set_progress(spatial_review=...)`. Never infer an edge from room order.
    If a 2014 appendix statblock is image-only, use
    `module-image-content-review.md`. First call
-   `module_review(action="recover_statblock")`; the server performs
+   `module_draft(action="edit", operation="statblock")`; the server performs
    layout OCR and independent critical-fact corroboration without requiring model
    vision. If it returns `requires_agent_fill=true`, the Agent reads the returned
    normalized OCR text and exact requirements, supplies the semantic
@@ -100,7 +100,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    `content_kind="dnd5e_2024_statblock"`, or use an image-capable literal visual
    transcription; otherwise leave the card unresolved.
     Also inspect `module_query(view="candidates")`. A `review_ready` candidate may
-    be submitted to `module_review(action="submit_content")` only with its exact
+    be submitted to `module_draft(action="edit", operation="content")` only with its exact
      `source_chunk_ids`. Read its structured `ruling_requirement`: complete-text
      review defaults to the Agent, so do not pause merely because the workflow
      calls it a DM review. If `agent_fill_requirements.required` is true, the
@@ -108,7 +108,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
      `agent_ruling`; parser-produced options are never authoritative for module
      creatures. A `blocked` candidate whose requirement names
     `missing_or_conflicting_source_review` is a stop condition. For 2014, first
-    use `module_review(action="recover_statblock")` with its managed PDF page.
+    use `module_draft(action="edit", operation="statblock")` with its managed PDF page.
     For 2024, require complete edition-matching indexed text or capable visual
     review. If ambiguity remains, an image-capable
     reviewer may transcribe only observed fields, or leave it unresolved. A
@@ -159,9 +159,9 @@ own exposure. Loading a group for one Agent must not expose it to another.
    from that heading through the next creature core and report
    `source.text_layout_recovery`; it does not require Agent vision. If required
    facts are still absent or conflicting on a 2014 card, use
-   `import_query(view="list", kind="rulebook")` to find the retained `job_id`
+   `rulebook_draft(action="get")` to find the retained `job_id`
    whose `source_id` exactly matches the selected source, then call
-   `rule_import(action="recover_statblock", payload={job_id, name, page_number?})`.
+   `rulebook_draft(action="edit", operation="statblock_recovery", payload={job_id, name, page_number?})`.
    `name` is the exact printed creature heading, not a differently named campaign
    instance.
    The server performs 2014 local layout OCR, uses the adjacent creature core to
@@ -173,7 +173,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    edition-matching visual review; `recover_statblock` must reject it. If OCR is structurally
    ambiguous but one exact indexed page still contains the complete card as an
    ordered contiguous chunk segment, a text-only Agent may normalize that segment
-   through `rule_import(action="review_statblock",
+   through `rulebook_draft(action="edit", operation="statblock_review",
    payload={job_id,page_number,normalized_content,observation,
    review_mode:"agent_text",evidence_chunk_ids:[...]})`. The MCP verifies source,
    page, ordinal continuity, no invented normalized fact, and no omitted selected
@@ -183,11 +183,11 @@ own exposure. Loading a group for one Agent must not expose it to another.
    Read `module-image-content-review.md` for the distinction between an image-only
    full card and a standard card with module instance changes.
    For an already reviewed shared actor, use
-   `character_create_from(mode="portable_card")`. PC, NPC, and monster share one
+   `character_create_from(mode="content_actor")`. PC, NPC, and monster share one
    card format; import creates a new runtime identity and an empty ActorKnowledge
    ledger. Browse bundled standard monsters/NPCs as `actor_card` catalog entries,
-   or export/import a complete `preset_pack` through
-   `rule_pack_query(view="actor_presets")`. Never choose a creature by a
+   or export/import a complete `kind="preset"` content package through
+   `content_pack(action="list", kind="actor_preset")`. Never choose a creature by a
    host-maintained name table.
 9. Apply every confirmed class/subclass feature and complete species/background
    card, then re-read each actor's `derived` values and unresolved rules.
@@ -207,51 +207,50 @@ own exposure. Loading a group for one Agent must not expose it to another.
 
 1. Enter Lobby and load `lobby.characters`, `lobby.modules`, and, for preset
    libraries, `lobby.rules`. Export a PC/NPC/monster with
-   `character_query(view="portable_card")`; review its sheet and notes before
-   distributing the managed `.sagasmith.json` artifact.
-2. Before module export, call `module_import(action="bind_actor")` for every cast
-   NPC, encounter monster, and pregenerated PC. Use stable portable actor ids,
+   `character_query(view="content_package")`; review its sheet and notes before
+   distributing the managed `.sagasmith-pack` artifact.
+2. Before module export, call `module_draft(action="edit", operation="actor")` for every cast
+   NPC, encounter monster, and pregenerated PC. Use stable content actor ids,
    binding kinds, roles, and actual Scene Atlas keys. Verify
    `module_query(view="actors")`.
-3. Call `module_query(view="package", include_package=true)` for an inline
-   transfer or use its managed artifact. Do not package progress, continuity,
+3. Call `module_query(view="package", include_package=true)` for inspection and
+   transfer its managed archive. Do not package progress, continuity,
    ActorKnowledge, branches, random state, or Snapshots as source content.
 4. On the target installation, call
-   `module_import(action="import_package")` with exactly one inline package,
-   managed artifact, or allowlisted source path. Treat returned actor ids as new
+   `content_pack(action="import", kind="module")` with exactly one managed artifact or
+   allowlisted `.sagasmith-pack` path. Treat returned actor ids as new
    identities. Re-read the imported index, actor bindings, assets, reviews, and
-   readiness before play.
+   validation and Agent finalization before play.
 5. For a default actor library, export
-   `rule_pack_query(view="actor_presets", edition=..., include_package=true)`.
-   Import one nested card through portable character creation with the same pack
+   `content_pack(action="list", kind="actor_preset", edition=..., include_package=true)`.
+   Import one nested card through content-actor creation with the same pack
    plus its exact `artifact_id`. Optional rule dependencies still need normal
    reviewed installation and campaign activation.
 6. For a reviewed extension rule pack, call
-   `rule_pack_query(view="package", payload={campaign_id, pack_id, version,
+   `content_pack(action="export", kind="rule", payload={campaign_id, pack_id, version,
    metadata, include_package?})`. The exporter replaces local source/chunk ids
    with stable keys and embeds the complete indexed sources. Keep distribution
-   private unless the owner supplies an explicit license and attribution.
+   private unless the owner supplies an explicit license and attribution. The
+   result is a unified `core_rules` archive, not loose rule-pack JSON.
 7. On the target installation, call
-   `rule_import(action="import_package")` with exactly one inline package,
-   managed artifact, or allowlisted path and a stable idempotency key. Verify the
-   returned edition and exact dependency statuses. The result is only a
-   validated inactive draft; install and campaign Owner/DM activation remain
-   separate explicit steps.
-8. If an extension also ships presets or a module, keep them as independent
-   packages and create a checksum-pinned thin manifest through
-   `rule_pack_query(view="release")`. Inspect it with
-   `rule_import(action="inspect_release")`. Never treat a release manifest as
-   authority to fetch, import, install, activate, or expose a component.
+   `content_pack(action="import", kind="rule")` with exactly one managed artifact or
+   allowlisted `.sagasmith-pack` path and a stable idempotency key. Verify exact
+   dependencies. Import installs definitions globally but does not activate
+   them for a campaign; Owner/DM activation remains separate.
+8. If an extension also ships actors, keep them in the Addon package's `actors`
+   collection. Publish an independently runnable adventure as a Module package
+   and connect it with an exact dependency. Do not create a release manifest.
 
-## Scene readiness and temporary combat map
+## Scene preflight and temporary combat map
 
 1. Build a source-grounded participant manifest from the expanded encounter scene.
    Each group has a stable key, role (`combatant`, `reinforcement`, or `optional`),
    required count, canonical campaign actor ids, same-module `source_scene_id`, and
    an exact normalized `source_excerpt`.
-2. Call `module_query(view="readiness")`. Do not start while a required actor is
-   missing, Dead/at 0 HP, lacks an executable card, or carries unresolved required
-   rules. `source_excerpt` is an evidence assertion and must be an exact normalized
+2. Call `module_query(view="preflight")`. Do not start while a required actor is
+   missing or its whole card is invalid. Dead/0 HP is actor state; missing range,
+   ammunition, or semantic settlement disables only that capability. `source_excerpt`
+   is an evidence assertion and must be an exact normalized
    substring of the expanded same-module scene; use a verified `module_search` hit
    when needed, never a paraphrase. Review surfaced manual rulings and their
    structured `ruling_requirements` rather than hiding them. The Agent resolves
@@ -274,7 +273,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    submit `--agent-reinforcement-trigger-json` with the exact excerpt, future
    round, decision, and observed-state reason. Keep the semantic judgment at
    the Agent boundary and the actual entry in generic `combat_join`.
-4. Call `combat_start` only after readiness succeeds. Let it compile a temporary
+4. Call `combat_start` only after preflight succeeds. Let it compile a temporary
    combat map from the recorded spatial scene and location. Load the owner/DM
    `play.combat_control` group for this transition. If it falls back to a
    12-by-12 canvas, do not narrate those dimensions as module-authored facts. If
@@ -333,7 +332,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    An unstructured/descriptive Multiattack remains an Agent-as-DM adjudication
    boundary but never blocks that ordinary single weapon attack.
    If an exact reviewed passive adds conditional custom damage or another rider,
-   keep it on the exact portable card. On first use, the DM Agent compiles one
+   keep it on the exact unified actor/content card. On first use, the DM Agent compiles one
    source-bound generic plan and persists it with `content_solution`; the driver
    supplies only generic bindings and the returned fingerprint to
    `combat_choice(action="execute_plan")`. Do not add a dedicated CLI flag or
@@ -375,7 +374,7 @@ own exposure. Loading a group for one Agent must not expose it to another.
    template instantiation, sheet replacement, and inventory changes. Therefore
    `semantic_solution.status="content_authoring_required"` is an invalid
    data invariant failure, not a normal workflow or a prompt: stop, return to
-   Lobby, migrate or reimport the card, and re-run readiness. Runtime never
+   Lobby, migrate or reimport the card, and re-run preflight. Runtime never
    authors that contract. A genuinely one-off
    descriptive activity, unstructured spell, or scene procedure with printed
    save damage remains a two-call recoverable transaction with one immutable
@@ -496,14 +495,14 @@ own exposure. Loading a group for one Agent must not expose it to another.
 
 ## Rulebook to executable optional pack
 
-1. Load `lobby.rules`; run `rule_import` in order:
+1. Load `lobby.rules`; run `rulebook_draft` in order:
    `stage` -> `inspect` -> `ingest` -> `extract_candidates` -> `review` ->
    `compile` -> `install` -> `activate`.
 2. Review exact imported chunks and provenance. Candidate extraction is not
    approval; unsupported content remains pending.
-3. Compile only safe declarative IR through `rule_pack_compile` when a separate
+3. Compile only safe declarative IR through `content_pack` when a separate
    reviewed mechanic is needed. Arbitrary code is never executable rule content.
-4. Use `rule_pack_query(view="test")` and inspect the installed inactive pack.
+4. Use `content_pack(action="test", kind="rule")` and inspect the installed inactive pack.
    Activation requires explicit campaign-owner/DM approval and a fresh campaign
    revision; the Agent must not infer that approval from its own adjudication.
 5. Settle checks with `character_check` in play or `combat_check` in combat. For

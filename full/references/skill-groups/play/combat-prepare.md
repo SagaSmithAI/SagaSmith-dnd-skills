@@ -1,7 +1,7 @@
 # Combat preparation
 
 Start combat only from reviewed canonical actor cards and a current scene.
-Resolve source readiness, participants, reinforcements, encounter conditions,
+Resolve scene preflight, participants, reinforcements, encounter conditions,
 and relevant custom content before `combat_start`.
 
 The server creates the temporary combat map and encounter transaction. Supply

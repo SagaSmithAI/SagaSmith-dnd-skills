@@ -26,7 +26,7 @@ instance, `mode="template"` to copy an existing library template, and
 When the user supplies a character sheet, pregenerated-PC packet, or ability
 option document, first call `character_query(view="document")` with the campaign
 id and allowlisted source path. Use its classified fields and checksum as review
-input; do not send it through `module_import`. The inspection is not permission to
+input; do not send it through `module_draft`. The inspection is not permission to
 invent missing sheet fields: complete and confirm them before build. Its
 `manual_input` contract preserves manual six-score entry alongside any extracted
 arrays.
@@ -113,7 +113,7 @@ not mechanically authoritative.
 
 Recording a class, subclass, species, or subspecies name is not sufficient.
 Before the first `play` phase and after every level-up, query
-`rule_pack_query(view="content_catalog")`
+`content_pack(action="list", kind="catalog")`
 and reconcile every class/subclass feature whose `minimum_level` is met, plus every
 species grant and required choice, through `character_content_apply`. Treat
 `catalog_only` as a stop condition that needs reviewer/DM completion, never as an
@@ -272,7 +272,7 @@ limits by hand:
    against its cited class or subclass text before applying it; an implausible
    early unlock is an import/compiler defect and a stop condition, not a bonus.
 5. Resolve each reported cantrip, known-spell, or spellbook choice from
-   `rule_pack_query(view="content_catalog")`; apply only eligible artifact ids.
+   `content_pack(action="list", kind="catalog")`; apply only eligible artifact ids.
    A Wizard adds the reported spells with `method="spellbook"`. For a prepared
    caster, also apply each newly chosen class spell not yet present on the card
    with `method="class_prepared"`; these card-hydration selections do not consume

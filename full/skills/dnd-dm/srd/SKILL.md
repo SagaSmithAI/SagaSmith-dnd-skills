@@ -14,10 +14,10 @@ This Skill carries three optional corpora:
 Runtime ingestion is a reviewed lobby workflow. Do not call a retired direct
 ingestion surface:
 
-Call `rule_import(action="stage")` with a source path inside the configured rule
+Call `rulebook_draft(action="start")` with a source path inside the configured rule
 import roots and set `source_key`, `title`, `edition`, `locale`, and
 `publication_id` (`srd-5.2.1`, `srd-5.1`, or `srd-5.1-zh`). Then call
-`rule_import(action="inspect")` and `rule_import(action="ingest")` with the same
+`rulebook_draft(action="get")` and `rulebook_draft(action="start")` with the same
 job. Use `rule_search` and `rule_expand` during play. Candidate extraction,
 compilation, installation, and activation are only for a reviewed executable
 extension pack; ordinary SRD evidence stops after ingest.

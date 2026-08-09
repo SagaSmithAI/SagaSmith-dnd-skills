@@ -184,7 +184,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    For encounter participants, use exact rule statblocks or reviewed module
    cards and retain all warnings. When a 2014 module candidate is blocked by damaged
    page layout, `prepare-statblock` must call
-   `module_review(action="recover_statblock")` against its exact managed PDF
+   `module_draft(action="edit", operation="statblock")` against its exact managed PDF
    page before any visual override. The server performs and corroborates OCR, so
    a text-only Agent can consume the returned text. If the response reports
    `requires_agent_fill=true`, the Agent must read the exact OCR draft and
@@ -229,7 +229,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    reports `parser_authoritative=true`; any missing composition is an engine
    implementation gap. For module-authored or homebrew cards, the parser remains
    transcription support only: have the Agent read the exact reviewed source
-   and submit `module_review(action="submit_content")` with
+   and submit `module_draft(action="edit", operation="content")` with
    `payload.agent_fill.multiattack_options`. If a composition includes a
    special activity or unsupported module procedure, submit
    `resolution="agent_ruling"` without `options`; this preserves the custom
@@ -302,7 +302,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    never checkpoint each chase turn or replace the chase with a fabricated
    outcome event.
 6. Before combat, read the exact encounter scene and its location. Call
-   `module_query(view="readiness")` with every source/DM-established group.
+   `module_query(view="preflight")` with every source/DM-established group.
    `required_count` is the complete group count, not `len(actor_ids)`: derive it
    from an exact printed count, a persisted random-table roll, or an explicit
    branch-local DM composition fact, and prepare all required cards. Include other
@@ -1015,7 +1015,7 @@ same room name. Before using a DC, participant excerpt, or map location:
 5. copy the contiguous evidence substring from that expanded chunk, while also
    requiring it to belong to the selected scene.
 
-The readiness check normalizes PDF control characters, soft hyphens, typographic
+The preflight check normalizes PDF control characters, soft hyphens, typographic
 quotes, dash variants, case, and whitespace. This only compensates for extraction
 artifacts. It never makes a paraphrase, translation, truncated count, or text from
 another scene acceptable.
