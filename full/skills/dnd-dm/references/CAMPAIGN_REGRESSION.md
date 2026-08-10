@@ -248,9 +248,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    named-monster special case.
    In a native Agent session, reproduce `discover-rule-sources` through the
    public facade: while in `lobby`, use `exposure(search/set)` to load
-   `content_pack`, `rulebook_draft`, and `character_create_from`, then call
-   `content_pack(action="list", payload={"kind":"source", "system_id":"dnd5e",
-   "edition":<campaign edition>})`. A returned source `id` is the only valid
+   `rule_search`, `rule_seed_status`, `rulebook_draft`, and
+   `character_create_from`. Search the exact creature with
+   `rule_search(campaign_id=<campaign id>, query=<exact printed identity>)`; use
+   `rule_seed_status(campaign_id=<campaign id>, query=<source title>, limit=...)`
+   when source-level inventory is needed. A returned hit `source_id` or source
+   inventory `id` is the only valid
    `payload.source_id` for `character_create_from(mode="statblock")`; an active
    module id, Pack id, module scene id, or document id is a different namespace
    and must never be substituted. If the exact creature is printed only in the
