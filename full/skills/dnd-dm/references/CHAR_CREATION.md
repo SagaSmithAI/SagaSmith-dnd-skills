@@ -40,10 +40,13 @@ not be sent. Then query the exact active `class`, `species`, and `background`
 artifacts with `character_query(view="catalog")` and apply them through
 `character_content_apply`, satisfying every returned selection requirement.
 Apply the class first so its reviewed materializer owns level-one class
-progression, HP/Hit Dice, proficiencies, spellcasting, and class equipment;
+progression, HP/Hit Dice, proficiencies, and any structured spellcasting profile;
 apply species and background next so their reviewed grants own traits,
-background equipment, wallet, and provenance. Apply every returned level-one
-feature and required spell artifact through the same catalog facade.
+background choices, wallet, and provenance. Then resolve every selected class
+and background equipment entry to its exact active `item` artifact and apply it
+through `character_content_apply`; never reconstruct a catalogued item in an
+opaque inventory payload. Apply every returned level-one feature and required
+spell artifact through the same catalog facade.
 
 Do not prewrite or replace those rule-backed mechanical fields with
 `character_sheet_replace`: that is a superseded parallel build path and can

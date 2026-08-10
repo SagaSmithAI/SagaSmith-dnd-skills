@@ -93,9 +93,11 @@ then retain that version/checksum lock for replay and audit.
 Each bundled catalog is built from leaf records, not index pages: individual
 spells, twelve classes, twelve subclass sections, species cards,
 source-linked class/subclass feature sections, backgrounds, feats, and
-structured equipment rows. A base
-class card is `catalog_only`: its name is not proof that level features have
-been applied. Complex species such as Dragonborn also remain `catalog_only`
+structured equipment rows. A bare base-class name or prose card remains
+`catalog_only`; only a card with the reviewed `class_definition` needed for the
+level-one materializer is `selection_ready`. Applying that class card still does
+not apply its separate level-one feature and equipment selections. Complex
+species such as Dragonborn also remain `catalog_only`
 until every ancestry-dependent grant is structured. Spell catalog cards retain
 class eligibility, but a character card records only the class actually chosen
 in `grant.source_key`.
