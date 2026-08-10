@@ -154,9 +154,11 @@ character revision and an idempotency key. For `roll_4d6_drop_lowest`, first
 call it without assignments so the server rolls and records all six pools, then
 call it again with the player's complete assignment. Caller-supplied dice are
 never accepted. `dnd_ability_roll` is available when a separate campaign-bound
-server roll is required. For a new PC, pass the chosen legal generation method
-and assignments through `character_create_from(mode="build")` so validation,
-template creation, and instance creation remain atomic.
+server roll is required. For a new PC, first call
+`character_create_from(mode="build")` with only `campaign_id`, `name`, and the
+optional public `summary`, take `result.instance`, and then call
+`character_ability_apply` on that campaign actor. Do not put caller-authored
+`ruleset` or `rolls` fields into `ability_generation`; the service records them.
 
 The recorded assignments are the creation baseline. Later species adjustments,
 ASI/feat choices, magic, and other legal changes may make the current

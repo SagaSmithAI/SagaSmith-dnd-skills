@@ -17,11 +17,44 @@ have distinct provenance:
   submit a `rolls` argument, reroll a pending set, or generate scores through
   `dnd_ability_roll` (which is an ordinary d20 check, not score generation).
 
-For a new PC, call `character_create_from(mode="build")` with complete validated `sheet v2` and
-`notes v2`. It creates the public template and independent campaign instance in one
-transaction. Use `character_create_from(mode="direct")` for a direct NPC/monster
-instance, `mode="template"` to copy an existing library template, and
-`mode="statblock"` to create an NPC/monster from an exact imported rule source.
+For a new PC, bootstrap a validated default card first; do not guess a complete
+sheet in the opaque `payload` object:
+
+```json
+{
+  "mode": "build",
+  "payload": {
+    "campaign_id": "<campaign id>",
+    "name": "<character name>",
+    "summary": "<public one-paragraph description>"
+  },
+  "idempotency_key": "<stable build occurrence>"
+}
+```
+
+Take the campaign actor from `result.instance` (not the library template). Apply
+the six scores next with
+`character_ability_apply(character_id, method, assignments,
+expected_revision, idempotency_key)`; the `ruleset` is service-owned and must
+not be sent. Then re-read the actor, copy its entire returned `sheet` and
+`notes`, change only reviewed level-one class/background/species, saving throws,
+skills, HP/Hit Dice, spellcasting, starting equipment, wallet, and profile
+fields, and submit that complete copy through `character_sheet_replace` at the
+current revision. In the returned v2 shapes, a class entry is
+`{name, level, subclass:"", hit_die:<integer such as 10>}`;
+`combat.hp` is `{value,max,temp}`; `combat.hit_dice` is an object keyed by die
+such as `d10`, not an array. Finally apply the exact active catalog artifacts
+for class, species, background, features, and spells through
+`character_content_apply`, satisfying every returned selection. Re-read and
+audit the finished actor before Play.
+
+Do not pass a partially authored `sheet` or `notes` to `mode="build"`, do not
+place `name` inside `sheet.identity`, and do not hand-author
+`ability_generation`. Supplying a complete already validated current-schema
+sheet is supported only when the caller truly has that whole document. Use
+`character_create_from(mode="direct")` for a direct NPC/monster instance,
+`mode="template"` to copy an existing library template, and `mode="statblock"`
+to create an NPC/monster from an exact imported rule source.
 
 When the user supplies a character sheet, pregenerated-PC packet, or ability
 option document, first call `character_query(view="document")` with the campaign
