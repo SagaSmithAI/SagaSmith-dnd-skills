@@ -10,6 +10,21 @@ reuse them for the rest of this draft lifecycle. Do not start another draft or
 guess either identifier when a large inspection payload is persisted by the
 host.
 
+Before activation, retrieve draft evidence only through these exact shapes:
+
+```json
+{"action":"evidence","payload":{"job_id":"<job id>","kind":"chunks","limit":100}}
+{"action":"evidence","payload":{"job_id":"<job id>","kind":"chunks","query":"<one short exact source phrase>","limit":20}}
+{"action":"evidence","payload":{"job_id":"<job id>","kind":"page","page_number":2,"include_ocr_text":true}}
+```
+
+There are no `top_k`, `queries`, `pages`, or `scene_keys` fields on this action.
+Do not call `module_search` with the editable draft id: search/expand addresses
+an imported active Pack revision after finalization. For Pack decisions, copy a
+returned chunk receipt as `{source_key, page, chunk_hash, note}`, using the
+chunk's returned `content_hash` as `chunk_hash`; never calculate it or substitute
+the editable module id for `source_key`.
+
 Use `module_draft(edit)` for reviewed content, statblocks, assets, and actor
 bindings. Extract party range, levels, advancement, endings, scenes,
 encounters, actors, items, maps, clues, and exact references. Prose is not
