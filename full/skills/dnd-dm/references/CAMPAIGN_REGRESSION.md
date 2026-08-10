@@ -73,6 +73,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    content or a later active parent creates a new revision instead of colliding
    with the earlier refresh.
 
+   For the current module authoring facade, retain `result.job_id` and
+   `result.module_id` from `module_draft(start)`; never restart or guess after a
+   host persists the large inspection payload. After evidence review and Pack
+   edits, finalize with
+   `payload={job_id, pack_id, confirmation:{confirmed:true,note:...}}` and a
+   top-level `idempotency_key`. `pack_id` is the stable Pack identity chosen by
+   the Agent at this trust boundary, not a package-edit field. Import the
+   returned archive through `content_pack(import, kind="module")`, then activate
+   the module id returned by that import rather than the editable draft id.
+
    After the finalized Pack is imported and its returned module id is active,
    initialize `playthrough_manifest` with schema version 2. Put the full object
    at `payload.manifest`; keep `expected_revision`, `branch_id`, and

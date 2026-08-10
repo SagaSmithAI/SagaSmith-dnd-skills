@@ -5,6 +5,10 @@ validate, and mechanically import an inactive editable module workspace in one
 operation. A failed validation remains a draft; inspect its page with
 `module_draft(evidence)`, submit a checksum-bound
 `module_draft(edit, operation="source_text")`, then use `operation="advance"`.
+Retain the returned `result.job_id` and `result.module_id` from the receipt and
+reuse them for the rest of this draft lifecycle. Do not start another draft or
+guess either identifier when a large inspection payload is persisted by the
+host.
 
 Use `module_draft(edit)` for reviewed content, statblocks, assets, and actor
 bindings. Extract party range, levels, advancement, endings, scenes,
@@ -40,8 +44,12 @@ decision before finalization.
 
 After reviewing the current draft, its issues, evidence, imported scenes, and
 saved package decisions, call `module_draft(finalize)` with
-`confirmation={confirmed: true, note: ...}`. The confirmation is the Agent's
-final editorial decision; do not manufacture or submit publication dimensions.
+`payload={job_id, pack_id, confirmation:{confirmed:true, note:...}}`; `version`
+is optional and defaults to `1.0.0`. `pack_id` is the stable Agent-selected Pack
+identity (for example `dnd5e.module.<slug>`), is required only at finalization,
+and is not a package-edit field. Keep `idempotency_key` at the tool-call top
+level. The confirmation is the Agent's final editorial decision; do not
+manufacture or submit any other publication dimensions.
 The server validates the finalized workspace, stores `metadata.agent_finalization`
 with the reviewer and note, freezes the workspace, and writes the immutable
 Module Pack archive. A module may carry or depend on a companion Addon Pack for
