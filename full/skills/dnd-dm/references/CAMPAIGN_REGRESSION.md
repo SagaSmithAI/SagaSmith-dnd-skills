@@ -54,7 +54,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    tools cannot be loaded and that module, continuity, and combat projections
    are player-safe.
 
-   In `lobby`, verify storage, server capabilities, the campaign edition, the
+   Before campaign creation, read the edition from the discovered inventory
+   unit, current Pack descriptor, or source manifest. Pass it explicitly to
+   `campaign_create`; never accept the tool's default or silently mix 2014 and
+   2024. The transcript must retain the source-declared edition and successful
+   create arguments so the corpus report can reject an omitted or mismatched
+   edition.
+
+   In `lobby`, verify storage, server capabilities, that campaign edition, the
    locked Core fingerprint, and the active module revision. Complete the staged
    module import and explicitly resolve any warning gate before activation. Give
    every parser behavior change a new parser version before refreshing. A refresh
@@ -251,6 +258,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `rule_search`, `rule_seed_status`, `rulebook_draft`, and
    `character_create_from`. Search the exact creature with
    `rule_search(campaign_id=<campaign id>, query=<exact printed identity>)`; use
+   no `page`, `source_ids`, `source_keys`, or publication filter unless exact
+   source evidence supplies it. Omit an unknown optional filter instead of
+   sending an empty list or guessing a page.
+   Use
    `rule_seed_status(campaign_id=<campaign id>, query=<source title>, limit=...)`
    when source-level inventory is needed. A returned hit `source_id` or source
    inventory `id` is the only valid
