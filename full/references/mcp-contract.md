@@ -386,6 +386,17 @@ threatened movement, then supplies the exact structured `spatial_facts`
 required by the action. D&D still owns dice, action economy, damage, resources,
 effects, and state commits. The mode never changes before `combat_end`.
 
+`combat_query(view="render")` is a read-only native MCP media response over an
+already audience-filtered combat snapshot. `payload.audience_projection="caller"`
+preserves the caller's authorized view; `"party_public"` starts from that view and
+can only remove information, so an Owner/DM request cannot elevate the shared
+image. The response contains structured metadata, accessible `alt_text`, and one
+PNG `ImageContent`. It never advances a revision or becomes combat authority.
+Grid renders show only projected map/token data. Agent-mode renders state that no
+mechanical geometry exists and never invent a grid. Source-backed portraits are
+loaded only through the actor's checksum-bound managed `portrait_ref`; otherwise
+the renderer uses a deterministic initials token.
+
 Call `module_draft(action="get")` whenever current state is needed; every edit uses
 the same D&D parser profile. Every write carries a stable operation-specific `idempotency_key`;
 an exact retry returns the original result. A player may read `party` scope or

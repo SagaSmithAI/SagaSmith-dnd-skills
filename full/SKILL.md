@@ -69,7 +69,9 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   monster. All three are full `Character` records, not abbreviated stat blocks.
 - PC, NPC, and monster sharing uses package-owned `sagasmith.actor-card.v3`.
   Import creates a fresh runtime identity and never copies ActorKnowledge; an
-  optional image remains a package asset and never enters a snapshot.
+  optional package-owned image is retained as a checksum-bound
+  `notes.profile.portrait_ref`. Managed image bytes stay outside snapshots; the
+  immutable source reference may travel with the runtime card.
 - Core rules, addons, modules, and presets use the single
   `sagasmith.content-package` v2 `.sagasmith-pack` format while retaining
   different install/activation authority. Stable source/chunk citations are

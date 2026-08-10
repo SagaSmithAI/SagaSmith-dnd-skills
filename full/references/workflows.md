@@ -309,12 +309,23 @@ own exposure. Changing one session's native tools must not expose them to anothe
 6. After `combat_start`, reopen exposure. The server phase is now `combat`; load
    `combat.observe`, `combat.turn`, or `combat.actions` for an acting player.
    Load `combat.control`, `combat.save`, or `combat.map` only for an owner/DM.
+   When the host can send MCP image content, request
+   `combat_query(view="render", payload={audience_projection:"party_public"})`
+   for the shared table channel. Use `caller` only for the same authorized private
+   audience. Send the returned native image content and use its `alt_text`; do not
+   reconstruct the image from status JSON.
 
 ## Combat turn loop
 
 1. Read `combat_query(view="status")` and
    `combat_query(view="available_actions", actor_id=...)`. Use the returned current
    actor, revision, budgets, conditions, positions, and derived attacks.
+   Render on request and after a meaningful spatial change such as combat start,
+   a map patch, reinforcement entry, or a tactically important move. Do not render
+   after every write. Rendering is read-only and non-blocking: if it fails, continue
+   from authoritative combat state and explain that only the image failed. A grid
+   render uses server geometry; an Agent-mode render is explicitly nonspatial and
+   must never imply coordinates, range, obstruction, or line of sight.
    For automated execution, the Agent must also declare the actor's tactics.
    `--agent-target-priority-json` lists every opponent in exact order and works
    for PCs, allies, and hostiles. `--agent-spell-priority-json` orders supported

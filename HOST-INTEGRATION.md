@@ -13,6 +13,9 @@ SagaSmith Full Runtime requires both this Skills repository and the
 - Use fresh, zero-tool evaluation for signed bounded semantic bundles.
 - Keep the private NPC transport out of model schemas and use one zero-tool
   context per `conversation + NPC`.
+- Preserve native MCP content blocks. A combat render returns text metadata plus
+  `ImageContent`; store or send that media through the Host's ordinary attachment
+  path instead of flattening it into JSON or exposing a local artifact path.
 
 ## Mutable native tools
 
@@ -43,6 +46,9 @@ refresh it does not support the D&D runtime contract.
    stale.
 8. Run one NPC activation and verify parent history and another actor's private
    knowledge are absent.
+9. In Combat, dynamically load `combat_query`, request a `party_public` render,
+   and verify the Host can send its native image content without revealing a
+   hidden actor. Treat render failure as a media failure, not a combat failure.
 
 ## Supported discovery layouts
 

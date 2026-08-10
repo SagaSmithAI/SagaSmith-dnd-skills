@@ -21,3 +21,9 @@ ruling provenance. A decorative image is not mechanical geometry.
 
 In grid mode, map revision participates in movement and reaction validation.
 Re-query the map after any patch, join, restore, or movement conflict.
+
+Rendering is a projection, not another map model. Request it through
+`combat_query(view="render")`. A grid result may depict the current projected
+geometry and package-owned actor portraits. An Agent-mode result must remain a
+nonspatial initiative card with no invented coordinates. Send `party_public`
+images to shared channels; do not send a private `caller` render there.

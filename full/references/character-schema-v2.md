@@ -108,7 +108,12 @@ restore the public library template.
 `progression` records level, XP, classes, subclass, hit die, background, and
 species, including `background_grants` for the background feature, starting item
 IDs, language/tool grants, and selection choices. `identity` records gender, age,
-height, weight, faith/deity, visible features, and an optional `portrait_uri`.
+height, weight, faith/deity, and visible features. Do not place an arbitrary
+portrait URI in the mechanical sheet. An imported package actor may instead have
+`notes.profile.portrait_ref`, containing the exact package asset key, SHA-256,
+image media type, alt text, and package id/version/checksum. The MCP resolves only
+its managed checksum-bound bytes; callers never supply a filesystem or network
+path for runtime rendering.
 `combat` records current/max/temp HP, AC, initiative, all movement modes, hit
 dice, `hp_progression` gains by level (`fixed|rolled|manual`), death saves,
 exhaustion, inspiration, and an explicit wounded flag.
