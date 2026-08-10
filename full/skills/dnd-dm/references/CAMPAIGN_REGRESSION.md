@@ -104,6 +104,21 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `campaign_query(view="resume")` and rebuild against the returned revision;
    never copy the revision number out of an error string.
 
+   After creating the source-selected number of PCs, call
+   `playthrough_manifest(action="replace")` with the complete manifest returned
+   by `get`, adding one full `party.members` record per chosen PC. Each record
+   carries `actor_id`, current `name`, `status="active"`, `source`,
+   `source_asset_path`, current `level`, `xp`, `hit_points`, `resources`,
+   `wallet`, `equipment`, and `knowledge_scope_actor_id` equal to its
+   `actor_id`. Preserve every unrelated manifest field and source reference.
+   Then call `sync` without invented party fields and require the returned
+   manifest to become `ready` with exactly `party.selected_size` active members
+   before entering Play. `sync` only refreshes actors already registered in the
+   manifest; `payload.party_actor_ids` is not a registration mechanism and must
+   not be used. If `selected_size` came from a source-confirmed recommendation,
+   it remains the source maximum; create the missing PCs rather than silently
+   lowering it.
+
    For every repeatable driver mutation whose authored content may legitimately
    be identical later, supply a non-empty stable `--occurrence-id`. Reuse it only
    to retry that exact occurrence; use a new id for a later identical check,
