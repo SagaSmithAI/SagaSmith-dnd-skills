@@ -19,6 +19,16 @@ history, so one-book Agent decisions travel with the draft instead of becoming
 parser heuristics. Reserve revision/idempotency requirements for durable start
 and finalization boundaries, not every fine edit.
 
+The public request shape puts each decision field directly beside `operation`
+inside `payload`; do not add a `package` wrapper and do not put request-control
+fields inside `payload`. For example, a sourced readiness repair is
+`module_draft(action="edit", payload={job_id, operation:"package", manifest:{play_profile:...}}, expected_revision=..., idempotency_key=...)`.
+The only package decision fields are `manifest`, `catalogs`, `narrative`,
+`dependencies`, `metadata`, and `version`. Copy every `source_ref` value
+verbatim from the current `module_draft(evidence)` receipt, including its full
+SHA-256 strings; never retype, splice, or infer a checksum. Re-read the draft
+after the edit and verify the stored decision before finalization.
+
 After reviewing the current draft, its issues, evidence, imported scenes, and
 saved package decisions, call `module_draft(finalize)` with
 `confirmation={confirmed: true, note: ...}`. The confirmation is the Agent's
