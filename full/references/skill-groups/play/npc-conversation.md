@@ -12,11 +12,44 @@ multi-turn dialogue.
    There are no separate `npc_actor_ids` or `npc_ids` fields.
 2. Rule `audience_facts` from current scene evidence before every `ingest`.
    Perception, comprehension, and response selection belong to the Agent; MCP
-   never guesses them.
+   never guesses them. Use the public payload shape exactly; do not invent
+   aliases from prose fields:
+
+   ```json
+   {
+     "conversation_id": "...",
+     "event": {
+       "type": "speech",
+       "speaker_actor_id": "participant runtime id",
+       "content": "...",
+       "declared_target_actor_ids": []
+     },
+     "audience_facts": {
+       "decision_id": "unique stable id",
+       "resolver": "agent",
+       "perceived_actor_ids": [],
+       "understood_actor_ids": [],
+       "response_actor_ids": [],
+       "partial_renditions": {},
+       "basis_refs": [],
+       "reason": "scene-specific ruling"
+     },
+     "expected_conversation_revision": 1,
+     "idempotency_key": "..."
+   }
+   ```
+
+   `speech` and `action` events require a participant `speaker_actor_id`.
+   `understood_actor_ids` and `response_actor_ids` must be subsets of
+   `perceived_actor_ids`; response ids select NPC runtimes to activate, not
+   every listener or addressed PC.
 3. Send only returned `activation_ref` descriptors to
-   `npc_conversation_worker(action="activate")`.
+   `npc_conversation_worker(action="activate")`. Pass the returned descriptor
+   verbatim; do not reconstruct it or omit its revision/cursor fields.
 4. Treat worker output as a candidate. Rule publication audience (per segment
-   when necessary), call `publish`, then show only MCP `publication`.
+   when necessary), call `publish` with the returned `publication_id`, current
+   conversation revision, a new idempotency key, and the same complete
+   `audience_facts` shape, then show only MCP `publication`.
 5. If a proposal requests a mechanic, stop publication work, select the
    actor-owned and listener candidates that are already valid, and atomically
    `close` the conversation (or `abort` it when no draft should persist). Release
