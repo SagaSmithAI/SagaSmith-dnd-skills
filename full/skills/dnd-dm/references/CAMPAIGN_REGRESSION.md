@@ -64,6 +64,43 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    content hash, and resolved title. An exact retry reuses the staged job; changed
    content or a later active parent creates a new revision instead of colliding
    with the earlier refresh.
+
+   After the finalized Pack is imported and its returned module id is active,
+   initialize `playthrough_manifest` with schema version 2. Put the full object
+   at `payload.manifest`; keep `expected_revision`, `branch_id`, and
+   `idempotency_key` at the tool-call top level. Use the active imported module
+   id, not the Pack id or editable draft id. The complete empty Lobby shape is:
+
+   ```json
+   {
+     "schema_version": 2,
+     "run_id": "<run id>",
+     "campaign_line_id": "<inventory campaign-line id>",
+     "module_ids": ["<active imported module id>"],
+     "status": "lobby",
+     "source_refs": ["<exact validated module source reference>"],
+     "current": {"module_id": "", "chapter_id": "", "chapter_title": "", "scene_id": "", "scene_title": "", "objective": ""},
+     "traversal": {"reachable_scene_ids": [], "visited_scene_ids": [], "excluded_scenes": [], "branch_decisions": []},
+     "party": {"party_size_status": "source_confirmed", "recommended_minimum": "<source integer>", "recommended_maximum": "<source integer>", "selected_size": "<source maximum>", "party_size_review": {}, "use_pregenerated_first": true, "members": [], "replacements": []},
+     "npcs": [],
+     "quests": [],
+     "clues": [],
+     "world_state": {},
+     "snapshot_dag": {"active_branch_id": "", "head_snapshot_id": "", "nodes": []},
+     "random_stream": {"algorithm": "", "seed_fingerprint": "", "position": 0},
+     "ending": {"status": "pending", "conditions": [], "achieved_condition_id": "", "verification": []},
+     "review_blocks": []
+   }
+   ```
+
+   Replace quoted integer placeholders with JSON integers. A top-level source
+   reference uses `purpose`, managed `asset_path`, `asset_sha256`, exact
+   `page_start`/`page_end`, ordered `heading_path`, service-owned
+   `content_sha256`, active `module_id`, optional resolved scene/chunk ids, and
+   exact `excerpt`. After every rejected manifest mutation, refresh with
+   `campaign_query(view="resume")` and rebuild against the returned revision;
+   never copy the revision number out of an error string.
+
    For every repeatable driver mutation whose authored content may legitimately
    be identical later, supply a non-empty stable `--occurrence-id`. Reuse it only
    to retry that exact occurrence; use a new id for a later identical check,
