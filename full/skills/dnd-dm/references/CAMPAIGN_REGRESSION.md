@@ -246,6 +246,18 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    add a generic engine implementation and source-backed test, relock the
    campaign's built-in Core pack explicitly, and retry. Never add a
    named-monster special case.
+   In a native Agent session, reproduce `discover-rule-sources` through the
+   public facade: while in `lobby`, use `exposure(search/set)` to load
+   `content_pack`, `rulebook_draft`, and `character_create_from`, then call
+   `content_pack(action="list", payload={"kind":"source", "system_id":"dnd5e",
+   "edition":<campaign edition>})`. A returned source `id` is the only valid
+   `payload.source_id` for `character_create_from(mode="statblock")`; an active
+   module id, Pack id, module scene id, or document id is a different namespace
+   and must never be substituted. If the exact creature is printed only in the
+   active module, discover and complete its module content review and use
+   `mode="module_statblock"` with the immutable `review_id` instead. Restore the
+   entry phase after preparation and consume the native tool-list change before
+   continuing.
    A corpus combat is not covered by starting an encounter containing only
    party PCs. Before `combat_start`, expand the exact encounter evidence,
    prepare and preflight every required source-backed combatant, and include at
