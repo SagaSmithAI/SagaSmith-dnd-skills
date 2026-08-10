@@ -181,7 +181,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    a scene that the exact scene query can return in one request.
 3. Before creating or completing any PC, read the exact
    `dnd:full/skills/dnd-dm/references/CHAR_CREATION.md` asset and follow its
-   executable bootstrap, ability-score, full-sheet review, catalog-application,
+   executable bootstrap, ability-score, catalog-application, metadata-profile,
    and final audit sequence. `character_create_from(mode="build")` does not
    accept shorthand class/species/background ids: create the bootstrap actor,
    then use the returned campaign instance id with the dedicated public tools.

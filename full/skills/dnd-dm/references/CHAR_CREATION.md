@@ -36,22 +36,28 @@ Take the campaign actor from `result.instance` (not the library template). Apply
 the six scores next with
 `character_ability_apply(character_id, method, assignments,
 expected_revision, idempotency_key)`; the `ruleset` is service-owned and must
-not be sent. Then re-read the actor, copy its entire returned `sheet` and
-`notes`, change only reviewed level-one class/background/species, saving throws,
-skills, HP/Hit Dice, spellcasting, starting equipment, wallet, and profile
-fields, and submit that complete copy through `character_sheet_replace` at the
-current revision. In the returned v2 shapes, a class entry is
-`{name, level, subclass:"", hit_die:<integer such as 10>}`;
-`combat.hp` is `{value,max,temp}`; `combat.hit_dice` is an object keyed by die
-such as `d10`, not an array. Finally apply the exact active catalog artifacts
-for class, species, background, features, and spells through
-`character_content_apply`, satisfying every returned selection. Re-read and
-audit the finished actor before Play.
+not be sent. Then query the exact active `class`, `species`, and `background`
+artifacts with `character_query(view="catalog")` and apply them through
+`character_content_apply`, satisfying every returned selection requirement.
+Apply the class first so its reviewed materializer owns level-one class
+progression, HP/Hit Dice, proficiencies, spellcasting, and class equipment;
+apply species and background next so their reviewed grants own traits,
+background equipment, wallet, and provenance. Apply every returned level-one
+feature and required spell artifact through the same catalog facade.
+
+Do not prewrite or replace those rule-backed mechanical fields with
+`character_sheet_replace`: that is a superseded parallel build path and can
+silently conflict with catalog materialization. Use
+`character_metadata_update` for the re-read `notes.profile` copy containing the
+confirmed public description and background characteristics. Finally re-read
+the actor and verify its class/species/background selections, abilities,
+HP/Hit Dice, proficiencies, equipment, wallet, features, spells, and profile
+before Play.
 
 Do not pass a partially authored `sheet` or `notes` to `mode="build"`, do not
 place `name` inside `sheet.identity`, and do not hand-author
-`ability_generation`. Supplying a complete already validated current-schema
-sheet is supported only when the caller truly has that whole document. Use
+`ability_generation`. A complete already validated current-schema sheet is a
+direct/imported-card boundary, not a second bootstrap workflow. Use
 `character_create_from(mode="direct")` for a direct NPC/monster instance,
 `mode="template"` to copy an existing library template, and `mode="statblock"`
 to create an NPC/monster from an exact imported rule source.
