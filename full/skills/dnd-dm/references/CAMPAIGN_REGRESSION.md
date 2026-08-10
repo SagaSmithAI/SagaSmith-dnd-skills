@@ -258,6 +258,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `mode="module_statblock"` with the immutable `review_id` instead. Restore the
    entry phase after preparation and consume the native tool-list change before
    continuing.
+   A parser candidate marked `review_only`, `blocked`, or
+   `missing_or_conflicting_source_review` is not by itself an external boundary.
+   First determine whether the card is a standard creature whose exact enabled
+   rule source can be discovered, or whether the module page can be reviewed
+   through the public page-render/content-review workflow. Move `play -> lobby`
+   before either preparation path, refresh the bound exposure with
+   `get/search/set`, and return to `play` only after the resulting actor passes
+   source preflight. Stop for external input only after those exact evidence
+   paths are absent, contradictory, or unavailable to the current reviewer.
    A corpus combat is not covered by starting an encounter containing only
    party PCs. Before `combat_start`, expand the exact encounter evidence,
    prepare and preflight every required source-backed combatant, and include at
