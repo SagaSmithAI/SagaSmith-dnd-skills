@@ -54,12 +54,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    tools cannot be loaded and that module, continuity, and combat projections
    are player-safe.
 
-   Before campaign creation, read the edition from the discovered inventory
-   unit, current Pack descriptor, or source manifest. Pass it explicitly to
-   `campaign_create`; never accept the tool's default or silently mix 2014 and
-   2024. The transcript must retain the source-declared edition and successful
-   create arguments so the corpus report can reject an omitted or mismatched
-   edition.
+   Before campaign creation, read the edition and selected advancement mode
+   from the discovered inventory unit, current Pack descriptor, or source
+   manifest. Pass both explicitly to `campaign_create`; never accept tool
+   defaults, silently mix 2014 and 2024, or replace source-selected XP with
+   milestone advancement. The transcript must retain the source-declared
+   profile and successful create arguments so the corpus report can reject an
+   omitted or mismatched value.
 
    In `lobby`, verify storage, server capabilities, that campaign edition, the
    locked Core fingerprint, and the active module revision. Complete the staged
