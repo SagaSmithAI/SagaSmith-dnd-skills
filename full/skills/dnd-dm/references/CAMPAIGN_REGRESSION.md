@@ -96,8 +96,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Replace quoted integer placeholders with JSON integers. A top-level source
    reference uses `purpose`, managed `asset_path`, `asset_sha256`, exact
    `page_start`/`page_end`, ordered `heading_path`, service-owned
-   `content_sha256`, active `module_id`, optional resolved scene/chunk ids, and
-   exact `excerpt`. After every rejected manifest mutation, refresh with
+   `content_sha256`, active `module_id`, required resolved `scene_id` and
+   `chunk_id`, and exact `excerpt`. Resolve those identifiers from
+   `module_search` followed by `module_expand` against the active imported Pack;
+   inventory coordinates alone cannot replace the current chunk receipt. After
+   every rejected manifest mutation, refresh with
    `campaign_query(view="resume")` and rebuild against the returned revision;
    never copy the revision number out of an error string.
 
