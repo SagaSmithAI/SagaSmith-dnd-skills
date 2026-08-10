@@ -107,7 +107,8 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    After creating the source-selected number of PCs, call
    `playthrough_manifest(action="replace")` with the complete manifest returned
    by `get`, adding one full `party.members` record per chosen PC. Each record
-   carries `actor_id`, current `name`, `status="active"`, `source`,
+   carries `actor_id`, current `name`, `status="active"`, `source` (exactly
+   `pregen`, `generated`, or `replacement`),
    `source_asset_path`, current `level`, `xp`, `hit_points`, `resources`,
    `wallet`, `equipment`, and `knowledge_scope_actor_id` equal to its
    `actor_id`. Preserve every unrelated manifest field and source reference.
