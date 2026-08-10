@@ -134,9 +134,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    manifest to become `ready` with exactly `party.selected_size` active members
    before entering Play. `sync` only refreshes actors already registered in the
    manifest; `payload.party_actor_ids` is not a registration mechanism and must
-   not be used. If `selected_size` came from a source-confirmed recommendation,
-   it remains the source maximum; create the missing PCs rather than silently
-   lowering it.
+   not be used. An empty manifest is not evidence that no campaign actors exist.
+   Before any PC build, call `character_query(view="list")`, retain every
+   campaign-bound PC instance id, and calculate
+   `missing = selected_size - existing_campaign_pc_count`. Call build exactly
+   `max(0, missing)` times; when the count is already sufficient, call it zero
+   times and register the existing actors. Do not create a bench/reserve PC in a
+   fresh regression campaign. If `selected_size` came from a source-confirmed
+   recommendation, it remains the source maximum; create only genuinely missing
+   PCs rather than silently lowering it.
 
    For every repeatable driver mutation whose authored content may legitimately
    be identical later, supply a non-empty stable `--occurrence-id`. Reuse it only
