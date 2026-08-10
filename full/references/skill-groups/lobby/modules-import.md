@@ -26,6 +26,11 @@ returned chunk's complete `source_ref` object verbatim. A page result includes
 reviewed fact and copy its `source_ref` verbatim. Never construct a reference
 from the page transcription checksum, image checksum, editable module id, or a
 separately copied `content_hash`.
+These draft citations are authoring-only. After finalizing, importing, and
+activating the Pack, never reuse a draft `source_ref` or its portable chunk key
+in campaign progress, a playthrough manifest, continuity, or mechanics. Search
+the active runtime module with `module_search`, select a hit, and copy the exact
+runtime `source_ref` returned by `module_expand`.
 
 Use `module_draft(edit)` for reviewed content, statblocks, assets, and actor
 bindings. Extract party range, levels, advancement, endings, scenes,
