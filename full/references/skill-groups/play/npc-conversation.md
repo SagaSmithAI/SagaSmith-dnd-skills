@@ -4,7 +4,12 @@ Use `npc_conversation` as the only Director-visible MCP facade and read
 `../../host-integration-npc-conversation.md` before the first connected
 multi-turn dialogue.
 
-1. `open` with explicit participants and idempotency.
+1. `open` with every PC and NPC runtime id together in the one
+   `payload.participant_actor_ids` array. At least one listed actor must be a
+   campaign-bound NPC or monster. Put `idempotency_key` inside the payload along
+   with optional `scope_id`, `query`, and `branch_id`:
+   `npc_conversation(campaign_id=..., action="open", payload={participant_actor_ids:[pc_id,npc_id,...], idempotency_key:...})`.
+   There are no separate `npc_actor_ids` or `npc_ids` fields.
 2. Rule `audience_facts` from current scene evidence before every `ingest`.
    Perception, comprehension, and response selection belong to the Agent; MCP
    never guesses them.
