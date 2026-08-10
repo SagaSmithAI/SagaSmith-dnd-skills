@@ -1445,6 +1445,9 @@ Use `access_grant(scope="campaign")` for campaign roles and
 `access_grant(scope="actor")` for explicit PC/NPC control or private-sheet
 visibility. A player's `player_name` field is descriptive
 only and is never an authorization mechanism.
+The actor payload accepts only `actor_id` plus at least one explicit boolean
+`can_control` or `can_view_private`. Omitted permission booleans retain their
+current values; `role`, string `control`, and `permissions` are unsupported.
 
 All campaign-bound granular character writes require the character's current
 `expected_revision` and a fresh `idempotency_key`. Inventory transfer additionally
