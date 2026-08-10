@@ -16,7 +16,7 @@ ordered import stages, canonical citation fields, and play/combat settlement too
 | Roll | `dnd_dice_roll`, `dnd_check`, `dnd_ability_roll`, `character_check(action="check" \| "group" \| "contest" \| "reroll")` |
 | Module artifact | `module_draft(start/get/evidence/edit/finalize)`, `content_pack(import/export/activate)` |
 | Scene play | `module_query(list/index/scene/current/progress/assets/content/candidates/preflight/actors)`, `module_search`, `module_expand`, `module_set_progress` |
-| NPC conversation | `conversation_open`, `conversation_status`, `conversation_ingest`, `conversation_activations`, `npc_activation_checkout`, `npc_activation_submit`, `conversation_close`, `conversation_abort`; host requirements are advertised by `server_capabilities.npc_conversations` |
+| NPC conversation | `npc_conversation(open/get/ingest/publish/close/abort)`; the Host-only authenticated transport is intentionally absent from the model surface; requirements are advertised by `server_capabilities.npc_conversations` |
 | Chronology | `memory_change(add/upsert/revise/supersede/commit)`, `campaign_event(add/list)`, `memory_query(list/search/diagnostics)`, `actor_knowledge_change(add/revise)`, `actor_knowledge_query(list/search)`, `continuity_context`, `bounded_evaluation(validate)` |
 | Snapshot | `snapshot_create`, `snapshot_query(list/verify/lineage/recap/core)`, `snapshot_restore`, `branch_query(list/compare)`, `branch_change(create/checkout/create_core_upgrade)` |
 | Audit | `state_revision(history/receipt/undo/redo)` |
@@ -910,25 +910,32 @@ is stale and must be reread. `audience_render` returns the exact safe
 
 During Play, Owner/DM opens one conversation with explicit same-campaign
 participants. The MCP stores a durable draft journal and one private logical
-runtime for every NPC. It derives perception and language understanding for
-each ingested event and returns only public activation descriptors plus opaque
-actor-scoped worker handles. The Director never receives private actor context.
+runtime for every NPC. The Agent rules perception, comprehension, partial
+renditions, and which NPCs should respond from current scene evidence. MCP
+validates those facts, projects separate redacted actor inboxes, and returns
+opaque activation refs only for selected responders. The Director never
+receives private actor context, transport credentials, or leases.
 
 An isolated host NPC subagent checks out its own capsule, retaining the same
 `conversation_id + actor_runtime_id` model context across activations. It has
-zero tools and returns only `npc-conversation-proposal.v2`. That proposal has no
+zero tools and returns only `npc-conversation-proposal.v3`. That proposal has no
 free utterance field: all speakable text is segmented with speech act, truth
-posture, basis refs, targets, language, and delivery. MCP validates the lease,
-actor scope, current authority, evidence and targets, then derives the only
-publishable `publication`.
+posture, basis refs, targets, language, and delivery. Speech acts are open-form;
+actions declare narrative or mechanical settlement. MCP is the sole semantic
+validator. A Host may repair structured validation failures inside the same
+lease, then receives a pending publication candidate.
 
-Player inputs and publications update the draft/inboxes immediately but do not
-write campaign authority. `conversation_close` selects explicit per-actor
-working-delta indexes and atomically commits the exact public transcript,
-server-derived retrieval text, ActorKnowledge, relationships, goals, and
-commitments. Any campaign event, actor revision, branch/Snapshot change, or
-mechanic makes the session stale. Version 1 closes/reopens around mechanics;
-it does not hot-refresh. MCP never owns the model or provider KV. See
+The Director supplies overall and, when needed, per-segment audience facts to
+`publish`; only then does the publication enter the journal. MCP derives
+listener knowledge candidates from understood published segments without
+asserting the speaker's claim is true. `close` explicitly selects actor-owned
+and listener candidates and atomically commits the exact transcript.
+
+Every write carries conversation revision and idempotency. Unrelated campaign
+events do not stale the session. Branch/scene changes invalidate it; an actor
+revision refreshes only that actor runtime. Resolution requests wait locally
+and do not suppress safe speech or unrelated actors. MCP never owns the model
+or provider KV. See
 `host-integration-npc-conversation.md`.
 
 ### Legacy isolated NPC turn contract

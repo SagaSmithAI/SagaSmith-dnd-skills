@@ -178,9 +178,13 @@ The machine-readable phase/tool-group mapping is
   context after any revision or restore before committing the ruling.
 - For connected live NPC dialogue during Play, load `npc.portrayal` and
   `play.npc_conversation`, then follow
-  `references/host-integration-npc-conversation.md`. Open once, keep one
-  actor-isolated host worker per NPC, publish only MCP `publication`, close
-  atomically before mechanics/state changes, and release the workers. Use the
+  `references/host-integration-npc-conversation.md`. Use the single
+  `npc_conversation` facade; before every ingest/publication, let the Agent rule
+  who perceived, understood, and should respond from current scene evidence.
+  Dispatch only selected opaque activations, keep one actor-isolated Host worker
+  per NPC, publish only MCP `publication`, close atomically, and release the
+  workers. A mechanical request waits only for its affected action and does not
+  stop safe speech or unrelated actors. Use the
   signed single-turn `npc_turn` path only for a standalone reaction or Combat;
   follow `references/host-integration-npc-turn.md` for that legacy boundary.
 - For autonomous actor, player-audience rendering, faction, source

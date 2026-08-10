@@ -1,92 +1,120 @@
 # Host integration: persistent NPC conversations
 
-This is the primary Play-mode contract for consecutive dialogue. It requires a
-host with real subagents. The MCP owns semantic actor runtimes and authority;
-the host owns model workers and provider KV caches. There is no server-managed
-inference and no single-model fallback.
+Use this Play-only protocol for connected multi-turn dialogue. MCP owns the
+durable journal, validation, actor-scoped context, and atomic close. The Agent
+owns scene interpretation and audience rulings. The Host owns isolated model
+workers and ephemeral provider caches.
 
-## Required host capabilities
+## Required Host boundary
 
-Before opening a conversation, verify
-`server_capabilities.npc_conversations.execution_mode` is
-`"client_subagents_required"`. The host must provide:
+Require `server_capabilities.npc_conversations.schema_version=2` and
+`execution_mode="client_subagents_required"`.
 
-- one isolated message context per `conversation_id + actor_runtime_id`;
-- zero tools, workspace, parent history, skills, and durable host memory inside
-  each NPC worker;
-- host-level routing so the Director model never receives an actor's private
-  checkout capsule or raw proposal;
-- structured JSON output and actor-scoped dispatch;
-- persistent worker contexts until close/abort, followed by explicit disposal.
+- Keep one zero-tool message context per `conversation_id + actor_runtime_id`.
+- Never give an NPC worker parent history, workspace access, Skills, another
+  actor's context, or state-writing tools.
+- Keep `npc_conversation_transport` in Host code only. It must not appear in
+  model tool definitions or prompts. Authenticate it with the per-connection
+  Host token.
+- Give the Director only `npc_conversation` and
+  `npc_conversation_worker`. The worker tool accepts an opaque
+  `activation_ref`; it never returns bootstrap, lease, raw proposal, private
+  intent, truth posture, or basis refs.
+- Dispose worker contexts after close/abort. KV cache is performance state,
+  never campaign authority.
 
-If those guarantees are unavailable, do not start the conversation protocol.
-Do not silently let one model context portray every NPC.
+If the Host cannot enforce these guarantees, do not open a conversation.
 
-## Director flow
+## Director workflow
 
-1. Open `play.npc_conversation` and call
-   `conversation_open(campaign_id, participant_actor_ids, scope_id, query)`.
-   Participants are explicit, same-campaign actors. MCP creates one durable
-   logical runtime and one initial private authority snapshot for every NPC.
-2. Send each player-observable utterance/action through
-   `conversation_ingest`. The MCP derives perception, language understanding,
-   direct targets, and NPC activations. The Director sees only public activation
-   descriptors and opaque `worker_handle` values.
-3. Dispatch each chosen activation to the host NPC worker bridge. In
-   SagaSmith Agent use `npc_conversation_worker(action="activate", ...)`. The
-   bridge performs checkout and submit inside host code; never copy the private
-   capsule into the Director prompt.
-4. Publish only `npc_activation_submit.publication`. Never publish the worker's
-   proposal, `private_intent`, truth posture, decision summary, working deltas,
-   basis refs, or bootstrap.
-5. If the result is `resolution_required`, stop dialogue. Close the completed
-   transcript, execute the ordinary public mechanic/state tools, and open a new
-   conversation from fresh authority. Version 1 does not hot-refresh a running
-   conversation across an authoritative mutation.
-6. At the natural boundary, choose explicit working-delta indexes per actor and
-   call `conversation_close` once. The MCP commits the exact public transcript,
-   a server-derived retrieval summary, and accepted ActorKnowledge/actor-state
-   changes atomically. Then call the host worker's `release` action.
+1. Call `npc_conversation(action="open")` once with explicit participants and
+   an `idempotency_key`. Record `conversation_id` and
+   `conversation_revision`.
+2. For every player/scene stimulus, first rule `audience_facts`, then call
+   `action="ingest"` with the current revision and a new idempotency key.
+3. Dispatch only returned activations with
+   `npc_conversation_worker(action="activate")`. An observed NPC is not
+   automatically activated; only `response_actor_ids` produce work.
+4. A worker result with `publication_ready` is not yet public. Rule audience
+   for the publication and call `npc_conversation(action="publish")`. For
+   mixed delivery/language, provide `segment_audience_facts`, one entry per
+   `utterance_segments` item. Publish only the MCP-derived `publication`.
+5. Handle `resolution_requests` with ordinary public mechanic tools. A request
+   waits only for the affected action/actor; safe speech and unrelated actors
+   may continue. Feed an actual result back as a new `ingest` event when it
+   matters to the conversation.
+6. At the natural boundary, inspect listener and actor-owned candidates. Call
+   `action="close"` with explicit indexes for only the changes to persist.
+   Then release Host workers. Use `action="abort"` to discard the draft.
 
-Every active call checks the campaign revision, branch, latest event sequence,
-and participant actor revisions. `SESSION_STALE` means the draft must not
-continue. Close if the completed transcript can still be committed under the
-same authority; otherwise abort and reopen after handling the external change.
+Every write requires `expected_conversation_revision` and `idempotency_key`.
+Replay an identical request with the same key; on
+`CONVERSATION_REVISION_CONFLICT`, call `action="get"` and review current state.
+Do not overwrite.
 
-## Actor worker and cache layout
+## Agent audience ruling
 
-The first checkout returns `bootstrap`; later checkouts use the worker's inbox
-cursor and normally return only working state plus new inbox events. Keep the
-model prefix in this order:
+For each event or segment, submit:
 
-1. stable zero-tool NPC contract and proposal v2 shape;
-2. conversation-scene public context;
-3. this NPC's private initial actor/knowledge/relationship/goal/commitment data;
-4. this NPC's actually perceived conversation events;
-5. the current activation.
+```json
+{
+  "decision_id": "unique stable id",
+  "resolver": "agent",
+  "perceived_actor_ids": [],
+  "understood_actor_ids": [],
+  "response_actor_ids": [],
+  "partial_renditions": {},
+  "basis_refs": [],
+  "reason": "short scene-specific ruling"
+}
+```
 
-This produces a cache tree with a shared contract/scene prefix and one private
-branch per NPC. Once private actor branches diverge, never share their suffix KV
-blocks. Provider cache loss is a performance event, not a continuity event:
-recreate the worker from bootstrap plus the MCP actor journal. Track
-`cached_tokens`, but never store provider KV as campaign authority.
+Apply current range, occlusion, barriers, noise, delivery, language, senses,
+effects, and explicit source mechanics. Treat declared targets as intent, not
+proof of perception or comprehension. Keep `understood_actor_ids` and
+`response_actor_ids` within `perceived_actor_ids`; responses must name NPC
+runtimes. Use `partial_renditions[actor_id]` only for the limited meaning that
+actor obtained.
 
-Invalidate and dispose the worker on close/abort, branch or Snapshot changes,
-scene/actor/knowledge revisions, principal changes, model/prompt/schema changes,
-or any authoritative mechanic. Opaque handles, leases, signatures, and receipts
-belong in host runtime state, not in the model's stable prompt prefix.
+Do not infer audience from a fixed `whisper` rule, assume all participants hear
+normal speech, or assume Common when an actor has no language list. If exact
+mechanics are absent, make a bounded DM ruling and cite the current scene facts.
+If evidence is insufficient for a consequential decision, request the missing
+scene fact or resolve an ordinary check; do not broaden the audience.
 
-## Proposal v2 boundary
+MCP projects a separate inbox per actor:
 
-`npc-conversation-proposal.v2` has no free `utterance.text`. Every speakable
-byte is an `utterance_segments[]` item carrying speech act, truth posture,
-basis refs, targets, language, and delivery. Factual/deceptive
-assert/reveal/lie segments require an allowed actor basis. Mechanical actions
-require `resolution_requests`. The MCP validates the exact activation lease,
-actor runtime, basis refs, targets, working deltas, and authority before deriving
-publication.
+- not perceived: no event;
+- perceived only: generic sensory cue, never raw content;
+- partial: only the Agent-supplied rendition;
+- understood: full allowed content.
 
-Player lines and validated publications enter the draft journal immediately so
-later NPC turns perceive them. They do not mutate campaign authority until
-`conversation_close`. A listener receives a claim with provenance (for example,
-"Mara said X"), not automatic proof that X is objectively true.
+## Proposal v3 and knowledge ownership
+
+The NPC worker returns `npc-conversation-proposal.v3`. Every speakable byte
+belongs to `utterance_segments`; each segment carries open-form `speech_act`,
+truth posture, basis refs, targets, language, and delivery. Truth-bearing or
+deceptive content requires actor-capsule basis. `proposed_action` uses
+`summary`, `target_refs`, `settlement` (`narrative` or `mechanical`), and
+`mechanic_hint`; a mechanical action requires a resolution request.
+
+MCP is the only semantic validator. The Host checks JSON and capsule identity,
+then submits. On `validation_failed`, retain the same lease, give only the
+structured issues back to that NPC worker, and retry. Cancel the lease on Host
+failure.
+
+An NPC proposal may change only its own actor-state, ActorKnowledge, goals,
+relationships, and commitments. It may not write what another actor learned.
+After publication, MCP mechanically creates listener knowledge candidates only
+for actors that understood a segment. These record “speaker said X” with
+provenance; they never assert X is true. The Director explicitly selects any
+candidate at close.
+
+## Authority and invalidation
+
+Conversation authority is local: branch, scene/version, participant actor
+revisions, and the facts/knowledge actually loaded for an actor. An unrelated
+campaign event or revision does not stale the whole conversation. A changed
+actor invalidates and rebuilds only that actor runtime; branch or scene changes
+invalidate the conversation. After an actor refresh, dispatch only new
+activation refs and let the Host create a fresh worker context.
