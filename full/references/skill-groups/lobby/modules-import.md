@@ -32,6 +32,15 @@ must preserve or submit the full reviewed manifest: `title`, `classification`,
 `compatibility`, `play_profile`, `continuity`, `activation`, and
 `content_summary`. Its structural request is
 `module_draft(action="edit", payload={job_id, operation:"package", manifest:{title, classification, compatibility, play_profile, continuity, activation, content_summary}}, expected_revision=..., idempotency_key=...)`.
+Use the current module schema inside that manifest: `classification` is the
+source-reviewed `adventure` or `campaign`; `compatibility` contains `editions`
+and `required_capabilities`; `continuity` contains `series_id`, `order`,
+`continues_from`, and `state_policy`; and `activation` contains `mode` and
+`default_active`. Omit `catalogs` or `narrative` when there is no reviewed
+structured decision to replace. If supplied, every catalog value is an array,
+and `narrative` contains the two arrays `dossiers` and `endings`; never replace
+those structures with opening/ending prose strings. A source-defined legal
+ending belongs as a cited structured entry in `narrative.endings`.
 
 Build `play_profile` with `party_size={minimum, maximum, source_refs}`,
 `starting_level={value, source_refs}`, `expected_end_level={value, source_refs}`,
