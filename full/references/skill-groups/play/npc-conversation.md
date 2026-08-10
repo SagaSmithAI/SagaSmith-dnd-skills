@@ -15,10 +15,14 @@ multi-turn dialogue.
 5. If a proposal requests a mechanic, stop publication work, select the
    actor-owned and listener candidates that are already valid, and atomically
    `close` the conversation (or `abort` it when no draft should persist). Release
-   every worker before any mechanic, scene mutation, phase transition, or combat.
+   every worker before settling that mechanic. Also close or abort before a
+   participant/scene/branch mutation, Chase, phase transition, or combat.
+   Unrelated Play operations may continue; re-query the conversation afterward
+   and honor actor refresh or stale invalidation.
 6. Resolve the request through ordinary public tools. If dialogue continues,
    open a new conversation and ingest the actual result as a new stimulus; never
-   keep the earlier conversation open across the authoritative write.
+   keep the earlier conversation open across a write that invalidates its
+   participant, scene, or branch authority.
 
 Never expose the Host transport, private capsule, lease, raw proposal, intent,
 truth posture, or basis refs. Never activate every witness. A perceived but

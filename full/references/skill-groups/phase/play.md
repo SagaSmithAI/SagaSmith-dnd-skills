@@ -15,8 +15,16 @@ Play is live non-combat scene resolution. At each turn:
    knowledge, manifest progress, and a proportionate checkpoint.
 
 For connected NPC dialogue, open one MCP conversation, retain one isolated host
-worker per NPC, publish only MCP-validated publications, and atomically close
-the transcript before any authoritative mechanic or scene mutation.
+worker per NPC, and publish only MCP-validated publications. Unrelated Play
+operations may continue. Close or abort before mutating a participant, the
+bound scene, or the current branch; always close or abort before starting a
+Chase, starting Combat, or leaving Play. After any concurrent write, call
+`npc_conversation(action="get")` and honor actor refresh or stale status before
+continuing.
+
+A Chase is an exclusive structured procedure inside Play, not another phase.
+No Conversation may remain active when it starts. End and re-query the Chase
+before calling `combat_start`; never combine both transitions in one write.
 
 Start Combat only from reviewed canonical actors and scene evidence. Do not
 carry a pre-restore context bundle into resumed narration.

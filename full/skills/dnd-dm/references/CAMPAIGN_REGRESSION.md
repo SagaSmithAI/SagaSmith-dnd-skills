@@ -319,11 +319,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
 5a. Exercise connected Play dialogue through `npc_conversation`, with the Agent
    supplying `audience_facts` for every ingest and segment audience for every
    publication. Verify that the Director receives no private capsule, lease,
-   raw proposal, intent, or basis-only content. Before a check, resource write,
-   scene mutation, phase transition, or combat start, atomically `close` or
-   `abort` the conversation and release every worker. Then execute the public
-   mechanic; if dialogue continues, open a new conversation and ingest the
-   actual result as a new stimulus. Cover both
+   raw proposal, intent, or basis-only content. Allow one unrelated Play write,
+   then re-query and prove the conversation remains usable. Before a requested
+   mechanic or any participant/scene/branch mutation, atomically `close` or
+   `abort` the conversation and release every worker. Always do so before Chase,
+   phase transition, or combat start. Then execute the public mechanic; if
+   dialogue continues, open a new conversation and ingest the actual result as
+   a new stimulus. Cover both
    conversation -> mechanic -> conversation and
    conversation -> rejected combat -> close/abort -> combat.
 5b. When the active route invokes the 2014 DMG chase rules, run

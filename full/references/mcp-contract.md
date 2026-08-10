@@ -762,6 +762,12 @@ projection with a second write.
 | Runtime phase | Active `campaign.state.combat.active`, otherwise `campaign.state.game_phase` (`lobby` or `play`) | The campaign view's `effective_game_phase` is the server-owned derivation consumed by drivers; exposure refreshes from it |
 | Active module | Core active `ModuleSource` revision set, captured as exact `module_activations` in a snapshot | Import-job `activated` is a workflow receipt; do not store `module_drafts.active` in campaign state |
 | Rule source revision | Immutable `RuleSource` id and chunks | A reimport retires the prior revision; default search selects the active revision, while an exact historic source id/citation remains auditable |
+
+Public `rule_search` and `rule_expand` always require `campaign_id`. Their
+source set is server-derived: matching bundled core, that campaign's Lobby
+rulebook imports, and sources cited by the current branch's active Pack lock.
+Caller filters may narrow this set but never add another campaign's source, and
+a chunk id selected under one campaign must not be expanded under another.
 | Current branch | `campaign.active_branch_id` | Public `is_current` is derived; no independent branch boolean exists |
 | Snapshot head | Each branch's `head_snapshot_id` | Public `snapshot.is_head` is derived; no independent snapshot boolean exists |
 | Current scene | Core scoped `SceneProgress` whose scene belongs to an active module revision | Playthrough manifest chapter/scene is synchronized projection; `ModuleChapter.status` describes indexing only, and `current_room` is a label while `current_location_key` is spatial identity |

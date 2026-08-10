@@ -42,8 +42,11 @@ If the Host cannot enforce these guarantees, do not open a conversation.
 5. A `resolution_request` ends this conversation transaction. Inspect listener
    and actor-owned candidates, call `action="close"` with only the changes to
    persist (or `action="abort"` to discard the draft), and release every Host
-   worker before any authoritative mechanic, scene mutation, phase transition,
-   or combat start.
+   worker before settling that requested mechanic. Also close or abort before a
+   participant/scene/branch mutation, Chase, phase transition, or combat start.
+   An unrelated Play operation may continue without globally closing this
+   conversation; re-read conversation status afterward and honor actor refresh
+   or stale invalidation.
 6. Resolve the request through ordinary public mechanic tools. If dialogue
    continues, open a new conversation and ingest the actual result as a new
    stimulus. Do not carry the prior conversation revision or worker context

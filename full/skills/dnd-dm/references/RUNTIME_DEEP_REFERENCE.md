@@ -78,7 +78,10 @@ the campaign.
    canonical source metadata, digest, and excerpt to match.
 3. Ask for intent when it is ambiguous. Never reveal unseen rooms, future twists,
    hidden motives, or sibling-branch facts.
-4. Use `rule_search` then `rule_expand` for disputed or edition-sensitive rules.
+4. Use campaign-bound `rule_search(campaign_id=...)` then
+   `rule_expand(campaign_id=...)` for disputed or edition-sensitive rules. The
+   server limits results to this campaign's core, Lobby imports, and active
+   branch Pack sources; never reuse a chunk id from another campaign.
 5. Imported rulebook text is evidence, not executable mechanics. In `lobby`, use
    `rulebook_draft(start)` -> `evidence/edit` -> `finalize`, then use
    `content_pack(get|activate, kind="core_rules"|"addon")` and search/expand the
@@ -367,6 +370,9 @@ Chase exhaustion remains distinct evidence on the actor and every level gained
 that way ends on the next Short or Long Rest, while unrelated exhaustion
 remains. After the source-backed chase outcome, record the scene transition and
 create one verified scene checkpoint; do not checkpoint every chase turn.
+No Conversation may remain active when a Chase starts. A Chase is an exclusive
+Play procedure, not a phase. Before Combat, end and re-query the Chase, then
+call `combat_start` separately.
 
 Every live PC, NPC, and monster is an authoritative v2 actor card. Use
 `character_query(view="get")` after every write. Use granular facade tools instead of replacing a whole
