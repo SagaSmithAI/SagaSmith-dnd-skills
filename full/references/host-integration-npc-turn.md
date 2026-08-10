@@ -1,10 +1,10 @@
-# Host integration: legacy isolated NPC turns
+# Host integration: isolated single NPC turns
 
 For consecutive Play-mode dialogue, use
 `host-integration-npc-conversation.md`. The conversation protocol keeps one
 actor-isolated worker per NPC until close and is now the primary path. This
-document remains the compatibility contract for one standalone NPC turn and
-for Combat, where persistent conversations are intentionally not exposed.
+document is the current contract for one standalone NPC turn and for Combat,
+where persistent conversations are intentionally not exposed.
 
 This is the NPC-dialogue specialization of
 `host-integration-bounded-context.md`. Read and enforce that document first.

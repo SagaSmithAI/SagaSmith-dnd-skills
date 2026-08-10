@@ -943,12 +943,14 @@ and listener candidates and atomically commits the exact transcript.
 
 Every write carries conversation revision and idempotency. Unrelated campaign
 events do not stale the session. Branch/scene changes invalidate it; an actor
-revision refreshes only that actor runtime. Resolution requests wait locally
-and do not suppress safe speech or unrelated actors. MCP never owns the model
-or provider KV. See
+revision refreshes only that actor runtime. Before an authoritative mechanic,
+scene mutation, phase transition, or combat, the Director closes or aborts the
+whole conversation and releases every worker. If dialogue continues after the
+public mechanic, it opens a new conversation and ingests the result as a new
+stimulus. MCP never owns the model or provider KV. See
 `host-integration-npc-conversation.md`.
 
-### Legacy isolated NPC turn contract
+### Isolated single NPC turn contract
 
 During Play or Combat, Owner/DM may call `continuity_context` with
 `purpose="npc_turn"`, one NPC/monster `actor_id`, explicit
@@ -1024,7 +1026,11 @@ Call `exposure(action="open", campaign_id?, principal_id?)`, discover exact tool
 ids with `action="search"`, and change the session's loaded ids with
 `action="set"` plus `add_tool_ids`/`remove_tool_ids`. `action="get"` returns the
 current campaign, principal, phase, expiry, and loaded ids. Opening again replaces
-the session binding. A campaign phase change crops incompatible tools.
+the session binding and clears its loaded tool ids. A campaign phase change,
+snapshot restore, branch checkout, or state undo/redo keeps the binding, crops
+incompatible tools, and may change the authoritative phase or branch. After the
+notification, refresh the native list and use `exposure(search/set)` to load the
+needed tools; do not call `open` merely to refresh phase exposure.
 
 Every successful open/set sends MCP `tools/list_changed`. The Host must refresh
 the native list and call newly listed domain tools directly. This is the only
@@ -1069,7 +1075,9 @@ Non-local reusable-character library reads retain the reusable sheet but omit
 private template notes.
 
 Use `game_phase(action="set", tool_profile="lobby" | "play")` only for the
-non-combat transition. `combat_start` moves the campaign to `combat` and
+non-combat transition. Leaving Play requires every chase and persistent NPC
+conversation to be closed. `combat_start` likewise requires no active chase or
+conversation, moves the campaign to `combat`, and
 `combat_end` returns it to `play`; the server removes incompatible loaded tools.
 Authorization, revision, idempotency, and engine checks apply even if a
 client presents a stale schema.

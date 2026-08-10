@@ -63,8 +63,10 @@ load a whole large document by default.
 - Let `combat_start` and `combat_end` own Combat phase transitions.
 - Use server dice and the campaign random stream.
 - Snapshot meaningful boundaries and branches, not every roll or turn.
-- After restore, discard old context and revisions, resume again, reopen the
-  exposure, and reread invalidated guidance.
+- After restore, discard old context and revisions, consume `tools/list_changed`,
+  refresh the native list, resume again, then use `exposure(search/set)` on the
+  existing binding to load the needed current-phase tools. Reopen only for a
+  genuinely new campaign/principal binding.
 - Keep `standalone/` separate; never silently downgrade Full Runtime.
 
 For exact facade payloads, inspect the selected tool/action and use

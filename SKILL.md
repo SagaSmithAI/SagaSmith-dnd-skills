@@ -23,9 +23,12 @@ It is not the portable standalone runtime.
 5. Read the canonical workflow at `{baseDir}/full/SKILL.md`. Use bounded
    `skill_query(action="section"|"search")` reads for task-specific depth.
    For any isolated semantic decision, follow the returned operation group and
-   `{baseDir}/full/references/host-integration-bounded-context.md`. For a rich
-   named-NPC dialogue turn, additionally load `npc.portrayal` and follow
-   `{baseDir}/full/references/host-integration-npc-turn.md`.
+   `{baseDir}/full/references/host-integration-bounded-context.md`. For connected
+   multi-turn NPC dialogue in Play, load `npc.portrayal` plus
+   `play.npc_conversation` and follow
+   `{baseDir}/full/references/host-integration-npc-conversation.md`. Use
+   `{baseDir}/full/references/host-integration-npc-turn.md` only for one
+   standalone reaction or Combat.
 6. Do not silently switch to `{baseDir}/standalone/`. Ask before accepting
    that explicit loss of MCP persistence, permissions, rule locks, combat
    transactions, actor knowledge, and Snapshot guarantees.

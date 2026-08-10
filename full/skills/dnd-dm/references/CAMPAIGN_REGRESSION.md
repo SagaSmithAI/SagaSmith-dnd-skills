@@ -5,11 +5,51 @@ without bypassing the same MCP exposure available to a live Agent. The run is a
 gameplay audit, not only a parser benchmark. Never import server modules, read the
 database directly, raw-patch actor sheets, or infer missing module facts.
 
+## Corpus inventory and coverage matrix
+
+Before creating campaigns, discover the corpus from current public Pack
+catalogs, every configured `.sagasmith-pack` archive, declared fixture/import
+roots, and modules installed or active through the public MCP facade. Inspect
+package kind, descriptor checksum, source checksum, finalization/readiness, and
+activation state. Scan configured raw adventure roots too, but classify each
+source from evidence; a PDF extension alone does not make an adventure runnable.
+
+Write a machine-readable inventory with one record for every discovered
+candidate. Each record is either a runnable coverage unit or an exclusion with
+`reason_code`, source/checksum, and evidence. Distinguish companion material,
+player sheets, maps, rule/monster supplements, synthetic mechanism fixtures,
+obsolete package transports, cache duplicates, system mismatch, and
+source-only drafts lacking a finalized current Pack. Never use a handwritten
+module whitelist: a newly discovered candidate must become runnable or an
+explicit pending/excluded record, never disappear from the report.
+
+From that inventory, generate a source-backed matrix across module/campaign
+line, scene or chapter, key mechanism, `grid|agent` positioning, `dm|player`
+audience, and `normal|restore` path. Each runnable module must reach at least one
+legal complete ending. Cover mutually exclusive alternatives with focused
+source-cited scenarios rather than a Cartesian product; a companion volume need
+not invent an independent ending. Store route decisions and module-specific
+audit evidence with the edited Pack or its regression fixture, not in Core,
+D&D, MCP, or a generic driver heuristic.
+
 ## Per-campaign gate
 
 Run every step through one campaign-bound MCP session/exposure at a time.
 
-1. In `lobby`, verify storage, server capabilities, the campaign edition, the
+1. Cold-start each DM and player session from exactly the six native core tools:
+   `skill_query`, `campaign_query`, `exposure`, `game_phase`,
+   `server_capabilities`, and `storage_status`. Use Skill guidance plus
+   `exposure(open/search/set)`, consume every real `tools/list_changed`, refresh
+   `tools/list`, and call only tools present in that session's native list. Do
+   not call an unexposed facade, emulate a result, or use an alias fallback.
+   Open once for the campaign/principal binding; after phase, restore, checkout,
+   undo, or redo, keep that binding and use `exposure(search/set)` to load the
+   needed current-phase tools. Record native tool, phase, exposure, and
+   `host_context_binding` timelines. A player session must prove that DM-only
+   tools cannot be loaded and that module, continuity, and combat projections
+   are player-safe.
+
+   In `lobby`, verify storage, server capabilities, the campaign edition, the
    locked Core fingerprint, and the active module revision. Complete the staged
    module import and explicitly resolve any warning gate before activation. Give
    every parser behavior change a new parser version before refreshing. A refresh
@@ -276,7 +316,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    as "the enemies make a check with advantage for the group" applies advantage
    only to that enemy side. Compare totals atomically, and preserve
    `tie_no_change` rather than declaring either side successful on a tie.
-5a. When the active route invokes the 2014 DMG chase rules, run
+5a. Exercise connected Play dialogue through `npc_conversation`, with the Agent
+   supplying `audience_facts` for every ingest and segment audience for every
+   publication. Verify that the Director receives no private capsule, lease,
+   raw proposal, intent, or basis-only content. Before a check, resource write,
+   scene mutation, phase transition, or combat start, atomically `close` or
+   `abort` the conversation and release every worker. Then execute the public
+   mechanic; if dialogue continues, open a new conversation and ingest the
+   actual result as a new stimulus. Cover both
+   conversation -> mechanic -> conversation and
+   conversation -> rejected combat -> close/abort -> combat.
+5b. When the active route invokes the 2014 DMG chase rules, run
    `scripts.regression_chase` through the public stdio MCP exposure. Bind
    `chase(action="start")` to the exact expanded scene `source_ref`, excerpt, quarry,
    pursuers, and printed starting distance. Require `mode="theater_of_the_mind"`
@@ -300,7 +350,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    starting-distance evidence. Seal the
    completed chase and its manifest/world-state update with one checkpoint;
    never checkpoint each chase turn or replace the chase with a fabricated
-   outcome event.
+   outcome event. Before `combat_start`, call `chase(action="end")`, re-query
+   and prove the chase inactive, consume the resulting native-list change, and
+   load the needed Play/combat transition tools. Assert that starting Combat
+   while a chase is active is rejected and that no state ever contains two
+   active structured workflows.
 6. Before combat, read the exact encounter scene and its location. Call
    `module_query(view="preflight")` with every source/DM-established group.
    `required_count` is the complete group count, not `len(actor_ids)`: derive it
@@ -333,7 +387,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    reasoning. Do not turn that module phrase into a new universal threshold.
 7. Start combat from `play` and require the automatic transition to `combat` plus
    an encounter-local temporary map whose encounter, spatial scene, module, and
-   location provenance agree. Exercise at least one structured automatic path
+   location provenance agree. Across the generated corpus matrix, cover both
+   immutable positioning modes. A `grid` encounter supplies a coordinate for
+   every participant, exercises authoritative geometry, and requests a render;
+   preserve the native image and accessible alt text, using package-owned
+   portraits or the deterministic fallback. Rendering failure is non-blocking
+   and must retain the text/alt projection. An `agent` encounter supplies no map
+   or coordinates and records the Agent's action-specific `spatial_facts`.
+   After `combat_start` and `combat_end`, consume `tools/list_changed`, verify
+   the native list, then `exposure(search/set)` the required current-phase tools;
+   phase refresh never auto-loads the next phase's tools. Exercise at least one structured automatic path
    and any relevant owned reaction/choice window. End with a structured outcome;
    never stop while a spell resolution, reaction, death save, or concentration
    obligation is pending. When a hostile selects a structured Multiattack, pass
@@ -1064,6 +1127,16 @@ Run destructive rehearsal steps on a disposable branch created from a verified
 source checkpoint. Carry fresh campaign/actor/scene revisions and idempotency keys
 through every mutation.
 
+Run this audit through a real MCP session and capture notifications. Exercise
+an exact idempotent retry, a stale revision conflict followed by authoritative
+refresh and request rebuild, process/session restart plus resume, verified
+`snapshot_restore`, branch create/checkout, and `state_revision` undo/redo.
+After every operation that can change phase or checkout, require an immediate
+`tools/list_changed`, refresh the native list before the next domain call, use
+`exposure(search/set)` on the retained binding, and prove the next legal call
+succeeds. Cross a changed host context binding for checkout/restore; do not
+mistake a phase-only transition for a context-epoch barrier.
+
 Every checkpoint must capture the exact active module revision set. After a
 restore or branch creation, verify those module ids before reading the current
 scene, and require the current scene to belong to one of them. Public
@@ -1171,14 +1244,22 @@ a valid workaround. Verify both branches through `memory_query` or
 
 ## Corpus completion report
 
-For every campaign, retain machine-readable reports for import/index, all-scene
-walk, PC preparation, hostile preparation, non-combat resolution, combat, and
-final read-only audit. A corpus is complete only when all campaigns satisfy:
+For every campaign, retain machine-readable reports for inventory/disposition,
+the generated coverage matrix, import/index, all-scene walk, PC preparation,
+hostile preparation, Agent decisions, non-combat resolution, NPC dialogue,
+chase where applicable, combat, ending, recovery, and final read-only audit.
+Retain a structured transcript, tool timeline, phase/exposure/native-list
+timeline, authoritative random receipts, audience projections, ending checks,
+and minimum diagnostic failure evidence. A corpus is complete only when all
+runnable campaigns satisfy:
 
 - every non-reference/non-overview scene was read and progressed on an isolated
   branch;
 - a source-bound PC and all selected encounter actors are complete;
 - one source-cited non-combat check and one structured combat path committed;
+- one legal source-defined ending completed, saved, and restored;
+- the matrix as a whole proves Grid and Agent combat, DM and player audience,
+  normal and recovery paths, and every discovered exclusion has a reason code;
 - ActorKnowledge exists only on the rehearsal branch for actual witnesses;
 - HP/resources, scene progress, current scene, facts, and knowledge are restored
   on the source branch;

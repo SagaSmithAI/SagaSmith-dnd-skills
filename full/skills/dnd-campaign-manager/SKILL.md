@@ -46,8 +46,11 @@ current native tool list remain the routing source of truth.
 - Use current revisions and stable idempotency keys for retriable writes.
 - Snapshot meaningful boundaries. Fork important alternatives from a parent
   snapshot; never let sibling branches contaminate each other.
-- After restore, verify the new head, resume again, reopen exposure, and reread
-  campaign, characters, module progress, continuity, and actor knowledge.
+- After restore, verify the new head, consume `tools/list_changed`, refresh the
+  native list, resume again, and use `exposure(search/set)` on the existing
+  binding for the needed current-phase tools. Reopen only for a genuinely new
+  campaign/principal binding. Reread campaign, characters, module progress,
+  continuity, and actor knowledge.
 - Treat the playthrough manifest as progress/audit state, not an alternative
   mutation channel.
 - Keep `standalone/` separate and never claim it has MCP persistence or

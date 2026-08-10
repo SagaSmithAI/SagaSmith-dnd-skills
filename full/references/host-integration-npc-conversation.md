@@ -39,15 +39,15 @@ If the Host cannot enforce these guarantees, do not open a conversation.
    for the publication and call `npc_conversation(action="publish")`. For
    mixed delivery/language, provide `segment_audience_facts`, one entry per
    `utterance_segments` item. Publish only the MCP-derived `publication`.
-5. Handle `resolution_requests` with ordinary public mechanic tools. A request
-   waits only for the affected action/actor; safe speech and unrelated actors
-   may continue. Feed the actual result back through `action="ingest"` with an
-   event whose `type` is `resolution` and whose `resolved_resolution_ids`
-   contains the request IDs returned by MCP. This marks only those requests
-   resolved in the same conversation-revision write.
-6. At the natural boundary, inspect listener and actor-owned candidates. Call
-   `action="close"` with explicit indexes for only the changes to persist.
-   Then release Host workers. Use `action="abort"` to discard the draft.
+5. A `resolution_request` ends this conversation transaction. Inspect listener
+   and actor-owned candidates, call `action="close"` with only the changes to
+   persist (or `action="abort"` to discard the draft), and release every Host
+   worker before any authoritative mechanic, scene mutation, phase transition,
+   or combat start.
+6. Resolve the request through ordinary public mechanic tools. If dialogue
+   continues, open a new conversation and ingest the actual result as a new
+   stimulus. Do not carry the prior conversation revision or worker context
+   across that write.
 
 Every write requires `expected_conversation_revision` and `idempotency_key`.
 Replay an identical request with the same key; on

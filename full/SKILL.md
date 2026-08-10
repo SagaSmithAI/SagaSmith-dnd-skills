@@ -174,11 +174,14 @@ Module generation is maintained separately in `SagaSmith-module-gen-skills`.
   `npc_conversation` facade; before every ingest/publication, let the Agent rule
   who perceived, understood, and should respond from current scene evidence.
   Dispatch only selected opaque activations, keep one actor-isolated Host worker
-  per NPC, publish only MCP `publication`, close atomically, and release the
-  workers. A mechanical request waits only for its affected action and does not
-  stop safe speech or unrelated actors. Use the
+  per NPC, and publish only MCP `publication`. Before any authoritative mechanic,
+  scene mutation, phase transition, or combat start, close or abort the whole
+  conversation atomically and release every worker. Resolve the requested
+  mechanic through ordinary public tools, then open a new conversation and
+  ingest the result as a new stimulus if dialogue continues. Use the
   signed single-turn `npc_turn` path only for a standalone reaction or Combat;
-  follow `references/host-integration-npc-turn.md` for that legacy boundary.
+  follow `references/host-integration-npc-turn.md` for that current single-turn
+  boundary.
 - For autonomous actor, player-audience rendering, faction, source
   interpretation, or Agent-owned ruling isolation, request the matching
   `continuity_context` purpose, run the fixed zero-tool evaluation, and submit

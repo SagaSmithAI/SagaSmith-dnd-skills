@@ -12,11 +12,13 @@ multi-turn dialogue.
    `npc_conversation_worker(action="activate")`.
 4. Treat worker output as a candidate. Rule publication audience (per segment
    when necessary), call `publish`, then show only MCP `publication`.
-5. Resolve requested mechanics locally without suspending unrelated dialogue,
-   then `ingest` a `resolution` event naming the completed
-   `resolved_resolution_ids`.
-6. Select actor-owned and mechanically derived listener candidates explicitly,
-   `close` with the current conversation revision, and release workers.
+5. If a proposal requests a mechanic, stop publication work, select the
+   actor-owned and listener candidates that are already valid, and atomically
+   `close` the conversation (or `abort` it when no draft should persist). Release
+   every worker before any mechanic, scene mutation, phase transition, or combat.
+6. Resolve the request through ordinary public tools. If dialogue continues,
+   open a new conversation and ingest the actual result as a new stimulus; never
+   keep the earlier conversation open across the authoritative write.
 
 Never expose the Host transport, private capsule, lease, raw proposal, intent,
 truth posture, or basis refs. Never activate every witness. A perceived but

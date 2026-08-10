@@ -18,7 +18,9 @@ model-authored principal. Do not silently switch to `standalone/`.
 Treat the `host_context_binding` returned by resume/continuity as a hard model
 context boundary. For any bounded semantic decision, load the returned
 operation group and follow
-`{baseDir}/../../full/references/host-integration-bounded-context.md`. For a
-named NPC dialogue turn, additionally load `npc.portrayal` and follow
-`{baseDir}/../../full/references/host-integration-npc-turn.md`; never use a
-general background subagent as the isolation boundary.
+`{baseDir}/../../full/references/host-integration-bounded-context.md`. For
+connected multi-turn NPC dialogue in Play, load `npc.portrayal` plus
+`play.npc_conversation` and follow
+`{baseDir}/../../full/references/host-integration-npc-conversation.md`. Use
+`host-integration-npc-turn.md` only for one standalone reaction or Combat;
+never use a general background subagent as the isolation boundary.

@@ -306,8 +306,10 @@ own exposure. Changing one session's native tools must not expose them to anothe
    `character_check(action="group")`; the engine, not the Agent, applies each
    actor card and the "at least half succeed" threshold. Record the comparisons
    and source condition in a campaign event.
-6. After `combat_start`, reopen exposure. The server phase is now `combat`; load
-   `combat.observe`, `combat.turn`, or `combat.actions` for an acting player.
+6. After `combat_start`, consume `tools/list_changed`, refresh the native list,
+   and keep the existing exposure binding. The server phase is now `combat`;
+   use `exposure(search/set)` to load `combat.observe`, `combat.turn`, or
+   `combat.actions` for an acting player.
    Load `combat.control`, `combat.save`, or `combat.map` only for an owner/DM.
    When the host can send MCP image content, request
    `combat_query(view="render", payload={audience_projection:"party_public"})`
@@ -432,8 +434,10 @@ own exposure. Changing one session's native tools must not expose them to anothe
    fresh idempotency key. Refresh status after every write.
 8. Call `combat_end` through owner/DM `combat.control` with a structured outcome
    when the encounter is actually over. It returns unfinished 0-HP actors in
-   `post_combat_recovery` and moves the campaign to `play`; reopen exposure, then
-   use `character_state_change(death_save|stabilize)` until each is settled.
+   `post_combat_recovery` and moves the campaign to `play`; consume
+   `tools/list_changed`, refresh the native list, and use
+   `exposure(search/set)` on the existing binding before calling
+   `character_state_change(death_save|stabilize)` until each is settled.
 9. After combat, a Stable actor at 0 HP cannot rest. If the scene permits the party
    to wait, call `campaign_change(action="stable_recovery")` once with every
    simultaneously waiting Stable actor; the engine rolls each `1d4`-hour delay,
@@ -468,9 +472,10 @@ own exposure. Changing one session's native tools must not expose them to anothe
 5. Do not change a prepared list during advancement. Re-read the actor and
    verify all resources and derived values; submit any revised complete list
    through the next completed `campaign_change(action="party_rest")`.
-6. Create a snapshot, switch back to `play`, and reopen phase exposure. Stop if
-   the runtime reports unsupported multiclass state or any catalog item
-   remains unresolved.
+6. Create a snapshot, switch back to `play`, consume `tools/list_changed`, and
+   use `exposure(search/set)` on the existing binding to load the needed Play
+   tools. Stop if the runtime reports unsupported multiclass state or any
+   catalog item remains unresolved.
 
 ## Feature settlement examples
 
@@ -561,11 +566,12 @@ continuity, and its authorized actor knowledge.
    does not delete snapshots.
 
 For destructive or stateful regression, enter `lobby`, create and verify a source
-checkpoint, then create-and-checkout a disposable branch. Return to `play`, reopen
-exposure, run the scene/combat workflow, record actor-scoped knowledge and a full
+checkpoint, then create-and-checkout a disposable branch. Return to `play`, refresh
+the native list and use `exposure(search/set)` on the existing binding, run the scene/combat workflow, record actor-scoped knowledge and a full
 snapshot, then return through `lobby`. The phase change dirties the disposable
 branch, so create and verify a second lobby checkpoint before checkout; otherwise
-the clean-branch guard must reject the switch. Checkout the source branch. Reopen
-exposure after every phase or branch change. Verify source HP/resources and query
+the clean-branch guard must reject the switch. Checkout the source branch. Refresh
+the native list and use `exposure(search/set)` after every phase or branch change;
+call `open` only for a genuinely different campaign/principal binding. Verify source HP/resources and query
 each actor's knowledge on both branches; a branch comparison must show the test
 memory and subjective knowledge only on the disposable branch. There is no merge.
