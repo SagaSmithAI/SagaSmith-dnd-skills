@@ -246,6 +246,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    add a generic engine implementation and source-backed test, relock the
    campaign's built-in Core pack explicitly, and retry. Never add a
    named-monster special case.
+   A corpus combat is not covered by starting an encounter containing only
+   party PCs. Before `combat_start`, expand the exact encounter evidence,
+   prepare and preflight every required source-backed combatant, and include at
+   least one canonical opposing NPC/monster actor together with the party.
+   Narrative-only actors are not combatants. The transcript must retain the
+   participant manifest and source references so the regression can distinguish
+   a real encounter from an empty or all-allied combat shell.
    When the card slot is structurally proven but one OCR cell or action line is
    damaged, render that exact page and compare its native/normalized/OCR text
    streams. A text-only Agent may persist an exact page+slot
