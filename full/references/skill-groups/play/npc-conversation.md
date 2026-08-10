@@ -12,7 +12,9 @@ multi-turn dialogue.
    `npc_conversation_worker(action="activate")`.
 4. Treat worker output as a candidate. Rule publication audience (per segment
    when necessary), call `publish`, then show only MCP `publication`.
-5. Resolve requested mechanics locally without suspending unrelated dialogue.
+5. Resolve requested mechanics locally without suspending unrelated dialogue,
+   then `ingest` a `resolution` event naming the completed
+   `resolved_resolution_ids`.
 6. Select actor-owned and mechanically derived listener candidates explicitly,
    `close` with the current conversation revision, and release workers.
 

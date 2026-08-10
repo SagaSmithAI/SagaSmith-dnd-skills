@@ -41,8 +41,10 @@ If the Host cannot enforce these guarantees, do not open a conversation.
    `utterance_segments` item. Publish only the MCP-derived `publication`.
 5. Handle `resolution_requests` with ordinary public mechanic tools. A request
    waits only for the affected action/actor; safe speech and unrelated actors
-   may continue. Feed an actual result back as a new `ingest` event when it
-   matters to the conversation.
+   may continue. Feed the actual result back through `action="ingest"` with an
+   event whose `type` is `resolution` and whose `resolved_resolution_ids`
+   contains the request IDs returned by MCP. This marks only those requests
+   resolved in the same conversation-revision write.
 6. At the natural boundary, inspect listener and actor-owned candidates. Call
    `action="close"` with explicit indexes for only the changes to persist.
    Then release Host workers. Use `action="abort"` to discard the draft.
