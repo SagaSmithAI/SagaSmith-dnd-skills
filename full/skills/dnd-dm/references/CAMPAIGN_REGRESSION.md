@@ -173,7 +173,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    step. Manifest excerpts may select ordered source fragments, whereas event,
    memory, progress, and ruling excerpts must remain contiguous exact text.
    a scene that the exact scene query can return in one request.
-3. Classify and import every module-supplied PC document before building seats.
+3. Before creating or completing any PC, read the exact
+   `dnd:full/skills/dnd-dm/references/CHAR_CREATION.md` asset and follow its
+   executable bootstrap, ability-score, full-sheet review, catalog-application,
+   and final audit sequence. `character_create_from(mode="build")` does not
+   accept shorthand class/species/background ids: create the bootstrap actor,
+   then use the returned campaign instance id with the dedicated public tools.
+   Classify and import every module-supplied PC document before building seats.
    Fill every applicable party seat from those pregenerated PCs first, up to the
    module's source-cited maximum recommended party size; only then build the
    remaining legal seats from active content catalog ids. A present applicable
