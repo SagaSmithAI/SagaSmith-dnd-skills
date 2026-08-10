@@ -429,7 +429,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `abort` the conversation and release every worker. Always do so before Chase,
    phase transition, or combat start. Then execute the public mechanic; if
    dialogue continues, open a new conversation and ingest the actual result as
-   a new stimulus. Cover both
+   a new stimulus. For `open`, put every PC and NPC campaign runtime id together
+   in the single `payload.participant_actor_ids` array and put
+   `idempotency_key` in that same payload. At least one listed runtime must
+   resolve to an NPC or monster. There are no `npc_actor_ids`, `npc_ids`,
+   `actor_id`, or `npc_identity` aliases. Read
+   `dnd:full/references/skill-groups/play/npc-conversation.md` for the exact
+   ingest/publish/close shapes before the first conversation call. Cover both
    conversation -> mechanic -> conversation and
    conversation -> rejected combat -> close/abort -> combat.
 5b. When the active route invokes the 2014 DMG chase rules, run
