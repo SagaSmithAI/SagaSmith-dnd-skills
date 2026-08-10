@@ -101,10 +101,9 @@ those receipts; prose summaries are not evidence that a ritual, countdown, or
 other repeated procedure occurred.
 `server_capabilities.ruling_policy` publishes this split for cold-start Agents;
 use it instead of treating every `pending_ruling` as the same kind of missing
-input. For the fixed 13-tool Agent path, every `exposure_call` result whose live
-status is `pending_ruling` also carries `ruling_resolution` and a policy
-reference. Its default resolver is `agent`; a result explicitly classified as
-one of the external-input exceptions instead names `external_input`. This
+input. Native domain results carry the ruling resolution and policy reference.
+The default resolver is `agent`; a result explicitly classified as one of the
+external-input exceptions instead names `external_input`. This
 annotation assigns the next work; it does not claim that the effect has already
 settled.
 
@@ -918,12 +917,12 @@ receives private actor context, transport credentials, or leases.
 
 An isolated host NPC subagent checks out its own capsule, retaining the same
 `conversation_id + actor_runtime_id` model context across activations. It has
-zero tools and returns only `npc-conversation-proposal.v3`. That proposal has no
-free utterance field: all speakable text is segmented with speech act, truth
-posture, basis refs, targets, language, and delivery. Speech acts are open-form;
-actions declare narrative or mechanical settlement. MCP is the sole semantic
-validator. A Host may repair structured validation failures inside the same
-lease, then receives a pending publication candidate.
+zero tools and returns only `npc-conversation-proposal.v4`. Every speakable byte
+is inside an utterance segment whose only required field is `text`. Speech act,
+truth posture, basis refs, targets, language, and delivery are optional; supplied
+actor-scoped refs are validated. Actions declare narrative or mechanical
+settlement. MCP is the sole semantic validator. A Host may repair structured
+validation failures inside the same lease, then receives a publication candidate.
 
 The Director supplies overall and, when needed, per-segment audience facts to
 `publish`; only then does the publication enter the journal. MCP derives
@@ -1006,67 +1005,28 @@ operational signal, not permission to rewrite history automatically.
 
 ## Session exposure and game phase
 
-The MCP, not an agent configuration, owns tool exposure. Every connection starts
-with a compact core: `exposure_open`, `exposure_status`, `exposure_search`,
-`exposure_inspect`, `exposure_load`, `exposure_unload`, `exposure_call`,
-`campaign_query`, `game_phase`, `skill_query`, and server diagnostics. Read
-`sagasmith://bootstrap` or call `skill_query(action="plan")` on a cold start
-and read every `required_now` document. The plan expands the Core groups,
-server-owned phase baseline, authorized loaded tool groups, and an optional
-operation binding through the dependency DAG in
-`dnd:full/data/skill-plan.v1.json`. Resume with
-`campaign_query(view="resume")`, then call
-`exposure_open(campaign_id, principal_id)`, search/inspect a group, and load it.
-Loaded groups are scoped to that MCP session and principal; another connected
-agent must open and load its own exposure. A session/principal has exactly one
-active exposure. Calling `exposure_open` again replaces the previous exposure;
-load multiple compatible same-phase groups into the current exposure and discard
-older exposure ids.
+The MCP, not Agent configuration, owns tool exposure. Every connection starts
+with exactly six core tools: `exposure`, `server_capabilities`, `storage_status`,
+`campaign_query`, `game_phase`, and `skill_query`.
 
-`campaign_query(view="resume")`, `exposure_open`, `exposure_status`,
-`exposure_inspect`, `exposure_load`, `exposure_unload`, `game_phase`,
-`combat_start`, and `combat_end` return a `skill_plan` or
-`skill_plan_delta`. Read its `required_now` documents before unfamiliar work.
-Successful planned `skill_query(read/section)` calls return a
-`skill_read_receipt`; later plans report the group in `already_satisfied` while
-the document checksum is unchanged. A changed checksum appears under
-`invalidated`. Skill read state reduces repeated context only: it is never a
-permission or transaction bypass. Use bounded `outline/section/search` for
-task-specific depth after the planned fragments.
+Call `exposure(action="open", campaign_id?, principal_id?)`, discover exact tool
+ids with `action="search"`, and change the session's loaded ids with
+`action="set"` plus `add_tool_ids`/`remove_tool_ids`. `action="get"` returns the
+current campaign, principal, phase, expiry, and loaded ids. Opening again replaces
+the session binding. A campaign phase change crops incompatible tools.
 
-If `available=false`, stop live campaign work and repair the installed Skills
-pack; a Full Runtime installation rejects domain-group loading in this state,
-so do not silently fall back to an unplanned full-document load. Call
-`skill_query(action="plan", refresh=true)` only after an installed Skills
-update. That explicit refresh rebuilds the file index, revalidates the manifest
-against the public tool-group contract, and exposes changed checksums for
-rereading.
+Every successful open/set sends MCP `tools/list_changed`. The Host must refresh
+the native list and call newly listed domain tools directly. This is the only
+exposure layer. Use the native tool schema plus runtime validation as the input
+contract. A Host that cannot refresh mutable native schemas does not implement
+this D&D contract. Use bounded `skill_query(outline/section/search)` only for
+task-specific Skill depth.
 
-`exposure_inspect(group_id, tool_id?, selector?)` returns the ordinary group
-catalog. When `tool_id` is provided, it additionally returns the actual
-top-level input schema, selector values, and a machine-readable payload contract
-for every public facade action. Strict actions report
-`contract_kind="exact_field_contract"` with an exact allowed/required field
-set and `additional_properties=false`. It also returns bounded MCP-contract
-excerpts when installed. Treat runtime validation as authoritative and never
-use an arbitrary payload field as a schema escape hatch.
-
-| Phase | Intended state | Example groups |
-|---|---|---|
-| `lobby` | Game-outside setup, imports, campaign administration, character building | player-safe `lobby.characters`, `lobby.memory`; owner/DM `lobby.campaign`, `lobby.rules`, `lobby.modules`, `lobby.memory_control` |
-| `play` | Live non-combat exploration and downtime | player-safe `play.scene`, `play.characters`, `play.resolution`; owner/DM `play.scene_control`, `play.combat_control`, `play.chase` |
-| `combat` | Active structured encounter | player-safe `combat.observe`, `combat.turn`, `combat.actions`; owner/DM `combat.control`, `combat.save`, `combat.map` |
-
-For native clients supporting MCP `tools/list_changed`, loading or unloading a
-group changes the actual tool list. If a host cannot refresh its native schemas,
-it keeps the core and calls the same loaded domain tool through
-`exposure_call(exposure_id, tool_id, arguments)`. It returns the same structured
-facade result as a native domain-tool call, not an internal content/result tuple.
-This is a transport fallback, not a permission bypass: it performs the identical
-session and phase check. For image-producing tools, the fallback keeps the JSON
-envelope in the first text/structured-content block and forwards each MCP image
-block separately. Read the envelope for provenance and inspect the image block;
-never expect base64 image data inside `result` or discard non-text content.
+| Phase | Intended state |
+|---|---|
+| `lobby` | setup, imports, Pack authoring, campaign administration, character building |
+| `play` | live non-combat exploration, downtime, dialogue, checks, and continuity |
+| `combat` | active structured encounters in Grid or Agent spatial mode |
 
 The server initialization capability advertises `tools.listChanged=true`.
 Single-user hosts should set `SAGASMITH_DND_MCP_BOUND_PRINCIPAL_ID`; the server
@@ -1081,17 +1041,15 @@ binding establishes or changes a context epoch. A repeated identical binding
 does not loop. Audience, role, principal, campaign, branch, checkout, and
 restore transitions intentionally establish a new epoch.
 
-An exposure without `campaign_id` may load only `lobby.bootstrap` (system list
-and campaign creation), plus the `system:local`-only storage administration
-group. After campaign creation or selection, call `exposure_open` again with the
-campaign id. Campaign administration, rules and module-import groups additionally
-require owner/DM membership. A campaign-bound exposure rejects arguments that
+An exposure without `campaign_id` may add only bootstrap/storage tools allowed
+by their policy. After campaign creation or selection, reopen with the campaign
+id. Campaign administration and rule/module authoring additionally require
+owner/DM membership. A campaign-bound exposure rejects arguments that
 target a different campaign, including character ids resolved to that campaign.
 Objective memory, actor-knowledge writes, snapshot history, state history, rule
 receipts, scene progression, combat start/end/join, and map patches are likewise
-kept in owner/DM control groups. Do not load a control group merely to make its
-tools visible to a player Agent; use the player-safe read group and let actor
-authorization govern that Agent's own card and subjective knowledge.
+kept under owner/DM authorization. Tool visibility never replaces actor and
+operation authorization.
 
 The runtime enforces the same boundary even when a caller bypasses progressive
 discovery and invokes a facade directly. In particular, players cannot inspect
@@ -1101,8 +1059,8 @@ private template notes.
 
 Use `game_phase(action="set", tool_profile="lobby" | "play")` only for the
 non-combat transition. `combat_start` moves the campaign to `combat` and
-`combat_end` returns it to `play`; the server invalidates incompatible loaded
-groups. Authorization, revision, idempotency, and engine checks apply even if a
+`combat_end` returns it to `play`; the server removes incompatible loaded tools.
+Authorization, revision, idempotency, and engine checks apply even if a
 client presents a stale schema.
 Direct character-card mutations (sheet replacement, inventory, wallet, effects,
 resources, rests, non-combat casts, and activities) are rejected while an

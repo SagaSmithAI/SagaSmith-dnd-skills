@@ -11,14 +11,11 @@ settlement, continuity ledgers, the playthrough manifest, and Snapshot recovery.
 ## Exposure and session start
 
 1. Call `storage_status`, then `campaign_query(view="list")` and select a campaign.
-2. Call `exposure_open(campaign_id, principal_id)`. Its phase is authoritative.
-3. Call `exposure_search` and `exposure_inspect`, then load only the groups needed
-   for this step with `exposure_load`.
-   Use player-safe read/action groups for player Agents. Load `*_control`,
-   `combat.save`, or `combat.map` only in an owner/DM exposure.
-4. A native dynamic client refreshes `tools/list`. A client that cannot refresh
-   calls the loaded domain tool with `exposure_call`; consume its structured result
-   exactly like a native call.
+2. Call `exposure(action="open", campaign_id=...)`. Its phase is authoritative.
+3. Call `exposure(action="search")`, then add or remove exact tool ids with
+   `exposure(action="set")`. Authorization and phase filtering remain server-owned.
+4. Refresh `tools/list` after `tools/list_changed`, then call listed domain tools
+   directly.
 5. In `play`, read `module_query(view="current")`, expand the exact scene with
    `module_query(view="scene")`, read recent `campaign_event(action="list")`, and
    call `continuity_context` separately for each acting PC or NPC. For a DM
@@ -30,7 +27,7 @@ settlement, continuity ledgers, the playthrough manifest, and Snapshot recovery.
    write, phase transition, branch checkout, or restore.
 
 An exposure belongs to one MCP session and principal. Every other Agent opens its
-own exposure. Loading a group for one Agent must not expose it to another.
+own exposure. Changing one session's native tools must not expose them to another.
 
 ## Module-authored narrative behavior
 
@@ -53,8 +50,8 @@ own exposure. Loading a group for one Agent must not expose it to another.
 
 ## New campaign and module PDF
 
-1. Without a campaign, open an exposure and load `lobby.bootstrap`; call
-   `campaign_create`, then reopen the exposure with the new campaign id.
+1. Without a campaign, open an exposure and add `campaign_create`; after creation,
+   reopen the exposure with the new campaign id.
 2. Lock the correct Core edition with `campaign_rules`. Do not silently use a
    different edition or optional publication.
 3. Inventory every allowlisted file before importing. Call
@@ -202,12 +199,11 @@ own exposure. Loading a group for one Agent must not expose it to another.
     include the opening event,
     deterministic-key objective facts, per-actor knowledge only for actual
     witnesses, and the initial snapshot. Supply a fresh `idempotency_key` and the
-    current campaign revision. This requires the owner/DM `lobby.memory_control`
-    and `lobby.campaign` groups.
+    current campaign revision. This requires owner/DM authorization.
 
 ## Share or migrate structured content
 
-1. Enter Lobby and load the relevant authoring group. Cross-installation content
+1. Enter Lobby and add the relevant authoring tools. Cross-installation content
    moves only through finalized `sagasmith.content-package` v2 archives. Actor
    cards belong in a `preset` or `module` Pack; there is no public character
    export side door.

@@ -8,34 +8,29 @@ description: "Create and maintain source-bound SagaSmith D&D campaigns. Use for 
 Use the `sagasmith_dnd` MCP runtime. Campaign truth belongs to the server, not
 workspace memory, prose, a local CLI, or direct database writes.
 
-## Start with the runtime plan
+## Start with the runtime
 
-1. Call `skill_query(kind="skill", action="plan")` and read every
-   `required_now` document. Stop if `available=false`.
+1. Read this Skill and only the task-relevant deep reference.
 2. For an existing campaign, call `campaign_query(view="resume")` and discard
    pre-restore or pre-resume assumptions.
-3. Open one campaign-bound exposure, inspect the selected facade action, load
-   only the relevant group, and read its `skill_plan_delta`.
-4. Use `exposure_call` only for hosts that do not refresh native tool schemas.
-5. Use `refresh=true` once after updating the installed Skills pack, not during
-   ordinary campaign operations.
+3. Call `exposure(action="open")`, search for the smallest relevant tool set,
+   and change it with `exposure(action="set")`.
+4. Refresh after `tools/list_changed` and call listed native tools directly.
 
 ## Route campaign work
 
-| Work | Load | Read deeper only when needed |
+| Work | Search/add these native tools | Read deeper only when needed |
 |---|---|---|
-| Create/list a campaign | `lobby.bootstrap` | `references/CAMPAIGN_MANAGER_DEEP_REFERENCE.md` |
-| Rules, membership, manifest, snapshots, branches | `lobby.campaign` | `references/database-contract.md` |
-| Build/import/advance characters | `lobby.characters` | `../dnd-dm/references/CHAR_CREATION.md` |
-| Import and lock rules | `lobby.rules` | `../../references/rulebook-import.md` |
-| Import modules and assets | `lobby.modules` | `../dnd-dm/references/MODULE_INDEX.md` |
-| Read continuity/knowledge | `lobby.memory` | `../../references/memory-ownership.md` |
-| Write continuity/knowledge | `lobby.memory_control` | `references/CAMPAIGN_MANAGER_DEEP_REFERENCE.md` |
-| Save/restore during play | `play.scene_control` or `combat.save` | `references/database-contract.md` |
+| Create/list a campaign | `campaign_create`, `campaign_query` | `references/CAMPAIGN_MANAGER_DEEP_REFERENCE.md` |
+| Membership, manifest, snapshots, branches | `access_grant`, `playthrough_manifest`, `snapshot_*`, `branch_*` | `references/database-contract.md` |
+| Build/import/advance characters | `character_*`, `content_pack` | `../dnd-dm/references/CHAR_CREATION.md` |
+| Import and lock rules | `rulebook_draft`, `content_pack`, `campaign_rules` | `../../references/rulebook-import.md` |
+| Import modules and assets | `module_draft`, `content_pack`, `module_query` | `../dnd-dm/references/MODULE_INDEX.md` |
+| Continuity/knowledge | `memory_*`, `campaign_event`, `actor_knowledge_*`, `continuity_context` | `../../references/memory-ownership.md` |
+| Save/restore | `snapshot_*`, `branch_*`, `state_revision` | `references/database-contract.md` |
 
-Use `skill_query(action="search"|"section")` for deep references. The
-machine-readable `skill_plan` is the routing source of truth; do not maintain a
-host-specific phase/group list.
+Use `skill_query(action="search"|"section")` for deep references. Let the MCP's
+current native tool list remain the routing source of truth.
 
 ## Campaign invariants
 
@@ -52,8 +47,7 @@ host-specific phase/group list.
 - Snapshot meaningful boundaries. Fork important alternatives from a parent
   snapshot; never let sibling branches contaminate each other.
 - After restore, verify the new head, resume again, reopen exposure, and reread
-  campaign, characters, module progress, continuity, actor knowledge, and any
-  invalidated Skill fragment.
+  campaign, characters, module progress, continuity, and actor knowledge.
 - Treat the playthrough manifest as progress/audit state, not an alternative
   mutation channel.
 - Keep `standalone/` separate and never claim it has MCP persistence or

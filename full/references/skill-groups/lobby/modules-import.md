@@ -9,12 +9,15 @@ operation. A failed validation remains a draft; inspect its page with
 Use `module_draft(edit)` for reviewed content, statblocks, assets, and actor
 bindings. Extract party range, levels, advancement, endings, scenes,
 encounters, actors, items, maps, clues, and exact references. Prose is not
-executable; unresolved party size or play-critical content remains a blocker.
+executable; incomplete editorial coverage remains visible advice unless it
+causes structural corruption, missing/conflicting source identity, explicit
+test failure, or compilation failure.
 
 Save manifest, catalogs, narrative, dependencies, and metadata with
-`module_draft(edit, operation="package")`. Each revision-checked write enters
-the Pack edit history, so one-book Agent decisions travel with the draft instead
-of becoming parser heuristics.
+`module_draft(edit, operation="package")`. Each write enters the Pack edit
+history, so one-book Agent decisions travel with the draft instead of becoming
+parser heuristics. Reserve revision/idempotency requirements for durable start
+and finalization boundaries, not every fine edit.
 
 After reviewing the current draft, its issues, evidence, imported scenes, and
 saved package decisions, call `module_draft(finalize)` with

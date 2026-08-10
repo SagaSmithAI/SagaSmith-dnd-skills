@@ -25,7 +25,7 @@ flowchart LR
     M --> R[D&D runtime + Core]
 ```
 
-Full 模式首先通过 `exposure_open` 建立会话，再按任务搜索、检查并加载能力组。MCP 端根据战役阶段、principal、role、campaign 和 TTL 控制工具；Skill 不复制一份工具白名单，也不允许模型越过 exposure 直接写状态。
+Full 模式首先调用 `exposure(action="open")` 建立会话，再用 `search/set` 按任务改变原生工具列表。MCP 端根据战役阶段、principal、role、campaign 和 TTL 控制工具；Skill 不复制工具白名单，也不允许模型越过 exposure 直接写状态。
 
 ### 可分享内容
 

@@ -7,7 +7,7 @@ description: "Run D&D 5e 2014 or 2024 sessions through the SagaSmith D&D MCP ser
 
 This manual was moved intact from the parent `dnd-dm/SKILL.md`. Resolve every
 relative path written below against `full/skills/dnd-dm/`, its original base;
-the concise parent Skill and the MCP skill plan are the current entry points.
+the concise parent Skill and the MCP native tool list are the current entry points.
 
 ## Contents
 
@@ -19,15 +19,12 @@ the concise parent Skill and the MCP skill plan are the current entry points.
 
 ## Runtime
 
-This full skill is MCP-first. Start with `storage_status`, then
-`exposure_open` for the active campaign; search, inspect, and load only the
-needed `lobby`, `play`, or `combat` capability group. Hosts that cannot refresh
-native tool schemas must invoke a loaded domain tool through `exposure_call`.
-Call `skill_query(kind="skill", action="plan")` and read every
-`required_now` document. Treat `skill_plan` and `skill_plan_delta` returned by
-resume, exposure, and phase-transition tools as the authoritative context-load
-instructions. The short fragments under `../../references/skill-groups/`
-route ordinary work; this larger document is an on-demand deep reference.
+This full skill is MCP-first. Start with `storage_status`, then call
+`exposure(action="open")` for the active campaign. Search for exact tool ids,
+change the native list with `exposure(action="set")`, refresh after
+`tools/list_changed`, and call listed tools directly. The short fragments under
+`../../references/skill-groups/` route ordinary work; this larger document is
+an on-demand deep reference.
 All raw tool names below may be prefixed by the host, for example
 `mcp_sagasmith_dnd_`.
 For user rulebook import, also require the structured/source-bound flags from
@@ -35,8 +32,8 @@ For user rulebook import, also require the structured/source-bound flags from
 If the server is unavailable, stop using this skill and load `standalone/` rather
 than switching to a local CLI.
 
-Do not read the entire MCP contract before every mutation. Follow the current
-Skill plan, then search or read the exact relevant contract section. Load
+Do not read the entire MCP contract before every mutation. Search or read the
+exact relevant contract section. Load
 these deep references only when needed:
 
 - actor creation or advancement: `references/CHAR_CREATION.md`

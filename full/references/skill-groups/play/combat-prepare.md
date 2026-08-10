@@ -9,5 +9,4 @@ only spatial facts supported by map or scene evidence; uncertain geometry
 remains an explicit DM ruling. Do not privately scale the authored encounter
 because the party uses the module's recommended maximum size.
 
-After start, refresh tools and read the Combat Skill plan before taking the
-first turn.
+After start, refresh the native tool list before taking the first turn.

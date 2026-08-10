@@ -91,12 +91,13 @@ MCP projects a separate inbox per actor:
 - partial: only the Agent-supplied rendition;
 - understood: full allowed content.
 
-## Proposal v3 and knowledge ownership
+## Proposal v4 and knowledge ownership
 
-The NPC worker returns `npc-conversation-proposal.v3`. Every speakable byte
-belongs to `utterance_segments`; each segment carries open-form `speech_act`,
-truth posture, basis refs, targets, language, and delivery. Truth-bearing or
-deceptive content requires actor-capsule basis. `proposed_action` uses
+The NPC worker returns `npc-conversation-proposal.v4`. Every speakable byte
+belongs to `utterance_segments`, and each segment requires only `text`.
+`speech_act`, truth posture, basis refs, targets, language, and delivery are
+optional expression metadata. When supplied, basis refs and targets must remain
+within the actor capsule constraints. `proposed_action` uses
 `summary`, `target_refs`, `settlement` (`narrative` or `mechanical`), and
 `mechanic_hint`; a mechanical action requires a resolution request.
 

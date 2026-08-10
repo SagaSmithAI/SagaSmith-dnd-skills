@@ -8,7 +8,7 @@ description: "Create and maintain D&D campaigns through the SagaSmith D&D MCP se
 This manual was moved intact from the parent
 `dnd-campaign-manager/SKILL.md`. Resolve every relative path written below
 against `full/skills/dnd-campaign-manager/`, its original base; the concise
-parent Skill and the MCP skill plan are the current entry points.
+parent Skill and the MCP native tool list are the current entry points.
 
 ## Contents
 
@@ -18,20 +18,15 @@ parent Skill and the MCP skill plan are the current entry points.
 - Continuity
 
 `full/` is MCP-first. Use the raw MCP names below (a client may prefix them),
-not shell `sagasmith-dnd` commands. Call
-`skill_query(kind="skill", action="plan")` and read every `required_now`
-document. Search or read only the task-relevant sections of
+not shell `sagasmith-dnd` commands. Search or read only the task-relevant sections of
 `../../references/mcp-contract.md` and
 `../dnd-dm/references/DM_RULES.md`.
 
-Open an MCP session exposure when resuming a campaign. Use `lobby` groups for
-setup, module, import, indexing, and character-building workflows; load `play`
-groups only when live in-character play begins. Use `exposure_call` only when
-the host cannot refresh the native MCP tool list. One session/principal has one
-active exposure. Load multiple compatible groups into it; a later `exposure_open`
-replaces the earlier exposure, so discard every older exposure id.
-Read the phase plan returned by `campaign_query(view="resume")` and
-`exposure_open`, plus each group delta returned by `exposure_load`.
+Open an MCP session exposure when resuming a campaign. Search for exact tool ids
+and change the native list with `exposure(action="set")`; use Lobby tools for
+setup/import/building and Play tools only for live play. One session/principal
+has one active exposure, and reopening replaces its campaign binding. Refresh
+the native schema after every `tools/list_changed` notification.
 
 ## Start and Modules
 

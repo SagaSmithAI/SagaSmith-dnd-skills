@@ -13,9 +13,7 @@ as `mcp_sagasmith_dnd_`.
 
 1. On a zero-knowledge host, first read `sagasmith://bootstrap`. If resources
    are unavailable, call the always-visible
-   `skill_query(kind="skill", action="plan")`. Read every document in
-   `required_now`; the plan is derived from the server-owned phase, trusted
-   campaign role, and loaded tool groups. Use `outline`, `section`, and
+   `skill_query(kind="skill", action="read", identifier="dnd.full")`. Use `outline`, `section`, and
    `search` only for task-specific depth. Do not load the entire DM skill or
    MCP contract by default. If the plan reports `available=false`, stop live
    campaign work and repair the installed Skills pack. Use `refresh=true` once
@@ -29,19 +27,13 @@ as `mcp_sagasmith_dnd_`.
    Hosts that retain conversation history must also perform the out-of-band
    `campaign_query(view="binding")` check before every later inference; if it
    cannot be verified, do not replay the prior campaign context.
-3. Start every MCP session with `exposure_open`, then use `exposure_search`,
-   `exposure_inspect`, and `exposure_load` for the current campaign phase. Pass
-   `tool_id` and an optional `selector` to `exposure_inspect` before using a
-   compact facade whose payload is unfamiliar. Follow an
-   `exact_field_contract` as a strict whitelist. Before a campaign exists, load only
-   `lobby.bootstrap`; reopen the exposure with the returned `campaign_id` before
-   loading campaign-bound groups. There is one active exposure per MCP
-   session/principal: calling `exposure_open` again replaces it. Load every
-   compatible group needed for the current phase into that one exposure; never
-   retain or call an older exposure id. Read the `skill_plan` or
-   `skill_plan_delta` returned by `campaign_query(view="resume")`,
-   `exposure_open`, `exposure_inspect`, `exposure_load`, `game_phase`,
-   `combat_start`, and `combat_end`.
+3. Start every MCP session with `exposure(action="open")`. Use
+   `exposure(action="search")` to find task-relevant public tools and
+   `exposure(action="set")` to add or remove their ids. Refresh native schemas
+   after `tools/list_changed`, then call listed tools directly. Before a campaign
+   exists, add only campaign-bootstrap tools; reopen with the returned
+   `campaign_id` before campaign-bound work. One MCP session/principal has one
+   active exposure, and phase changes may crop its loaded tools.
 4. Use Full Runtime only when the `sagasmith_dnd` MCP tools are available. The
    bounded Skill-group fragments under `references/skill-groups/` are the
    operational loading surface; use the child Skills and
@@ -62,8 +54,6 @@ discoveries. Read `references/memory-ownership.md` before routing a "remember th
 request or persisting a scene. Do not use workspace memory as campaign state.
 
 Module generation is maintained separately in `SagaSmith-module-gen-skills`.
-The machine-readable phase/tool-group mapping is
-`data/skill-plan.v1.json`; do not maintain a host-specific duplicate.
 
 ## Invariants
 
@@ -123,9 +113,9 @@ The machine-readable phase/tool-group mapping is
 - For an unfinalized rulebook Pack, Core+D&D own mechanical extraction,
   deterministic repair, and validation while the Agent owns repeated semantic
   editing through `rulebook_draft(edit)`. Read
-  `references/parsing-agent-edit-loop.md`; rerun the returned issue loop after
-  every edit and call `rulebook_draft(finalize)` only with the latest revision,
-  zero blockers, and final Pack manifest. Accepted/rejected draft dispositions
+  `references/parsing-agent-edit-loop.md`; rerun the issue loop after every edit
+  and call `rulebook_draft(finalize)` only after all hard blockers are resolved
+  and the Agent has explicitly confirmed the current draft. Accepted/rejected draft dispositions
   are not frozen decisions. Use `module_draft` for module books; after reviewing
   the current draft and evidence, finalize with an explicit Agent confirmation.
   A Pack contains no caller-authored publication matrix: descriptor validation and

@@ -16,9 +16,10 @@ changes. Use `operation="catalog"` for a missed source-bound entity and the
 statblock operations only against exact managed evidence. Every response
 reruns Core+D&D checks. Accepted and rejected dispositions remain editable.
 
-Call `rulebook_draft(finalize)` with the latest revision, completion note, and
-final manifest only after all blockers are resolved. It freezes, compiles, and
-saves the immutable Pack atomically. Inspect it with `content_pack(get)` and
+Call `rulebook_draft(finalize)` with the latest revision, idempotency key,
+completion note, and explicit confirmation after all hard blockers are resolved.
+Remaining unselected candidates become excluded. It freezes, compiles, and saves
+the immutable Pack atomically. Inspect it with `content_pack(get)` and
 activate it with `content_pack(activate)`, using `kind="core_rules"` or
 `kind="addon"`; finalization never activates a campaign.
 

@@ -30,7 +30,7 @@ unvalidated answer asynchronously.
 
 ## Required host algorithm
 
-1. Load the `npc.portrayal` bounded Skill plan for operation
+1. Read the NPC portrayal guidance relevant to
    `continuity_context:npc_turn`.
 2. Cross any changed `host_context_binding` barrier before evaluation. Let MCP
    construct the bundle. The host must never merge parent history,

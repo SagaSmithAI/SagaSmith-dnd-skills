@@ -449,11 +449,10 @@ Agent 每次 session 都应假定自己“刚醒来”，不能靠旧对话继�
 1. `storage_status`；
 2. `campaign_query(view="resume", payload={"campaign_id": ...})`，一次取得 campaign、
    当前 branch/head、manifest、current scene、continuity、当前 context receipt
-   与 phase/role Skill plan；
-3. 根据有效 phase 打开新的 campaign exposure；
-4. 用 `skill_query(action="plan")` 读取所有 `required_now` fragment；随后读取
-   `exposure_inspect` / `exposure_load` 返回的 `skill_plan_delta`；
-5. 用 `exposure_inspect(group_id, tool_id, selector)` 读取不熟悉 facade action 的字段契约；
+   与有效 phase；
+3. 调用 `exposure(action="open")` 打开 campaign exposure；
+4. 用 `exposure(action="search")` 找到所需工具，再用 `action="set"` 改变原生列表；
+5. 处理 `tools/list_changed`，按原生 schema 直接调用工具；
 6. 对每个实际行动 actor 单独调用 `continuity_context`；
 7. DM 行为裁定加入相关 actor/scene/location/quest/item refs；
 8. 重读 party 和所有相关 Character；

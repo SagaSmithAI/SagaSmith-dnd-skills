@@ -9,39 +9,31 @@ Use the `sagasmith_dnd` MCP runtime. Do not emulate a successful state change,
 roll, rule settlement, or snapshot in prose or through direct database/CLI
 access.
 
-## Start with the runtime plan
+## Start with the runtime
 
-1. Call `skill_query(kind="skill", action="plan")` and read every
-   `required_now` document.
-2. Stop if the plan reports `available=false`; repair the Skills/MCP
-   installation before live play.
-3. Resume with `campaign_query(view="resume")`, then open one campaign-bound
-   exposure. Search, inspect, and load only the task-relevant group.
-4. Read every returned `skill_plan` or `skill_plan_delta`. A checksum-satisfied
-   group does not need to be read again. Use `refresh=true` once only after an
-   installed Skills update.
-5. Use `exposure_call` only when the host cannot refresh native tools after
-   `tools/list_changed`.
+1. Read this Skill and only the task-relevant deep reference.
+2. Resume with `campaign_query(view="resume")`, then call
+   `exposure(action="open")` for that campaign.
+3. Search for the smallest useful tool set and change it with
+   `exposure(action="set")`.
+4. Refresh after `tools/list_changed` and call the listed native tool directly.
 
-The plan is context-loading guidance. Server-owned phase, trusted principal,
-campaign role, actor grants, revision, idempotency, source validation, and
-transactions remain authoritative.
+Server-owned phase, trusted principal, campaign role, actor grants, revision,
+idempotency, source validation, and transactions remain authoritative.
 
 ## Route by phase and capability
 
-| Work | Load | Read deeper only when needed |
+| Work | Search/add these native tools | Read deeper only when needed |
 |---|---|---|
-| Resume, scene evidence, narration | `play.scene` | `references/RUNTIME_DEEP_REFERENCE.md` |
-| Scene/world/knowledge writes | `play.scene_control` | `../../references/memory-ownership.md` |
-| Checks and contests | `play.resolution` | `references/DM_RULES.md` |
-| Character resources and rests | `play.characters` | `../../references/character-schema-v2.md` |
-| Enter combat | `play.combat_control` | `references/RUNTIME_DEEP_REFERENCE.md` |
-| Observe, turns, and actions | `combat.observe`, `combat.turn`, `combat.actions` | `references/DM_RULES.md` |
-| End combat or add actors | `combat.control` | `references/RUNTIME_DEEP_REFERENCE.md` |
-| Tactical map changes | `combat.map` | `references/DM_MAP_SYS.md` |
-| Campaign/module preparation | matching `lobby.*` group | `references/MODULE_INDEX.md`, `references/MODULE_ARC.md` |
-| Character creation/advancement | `lobby.characters` | `references/CHAR_CREATION.md` |
-| Full campaign regression | groups required by the current phase | `references/CAMPAIGN_REGRESSION.md` |
+| Scene evidence and narration | `module_query`, `module_search`, `module_expand`, `continuity_context` | `references/RUNTIME_DEEP_REFERENCE.md` |
+| Scene/world/knowledge writes | `memory_change`, `campaign_event`, `actor_knowledge_change` | `../../references/memory-ownership.md` |
+| Checks and contests | `character_check`, `dnd_check`, `dnd_dice_roll` | `references/DM_RULES.md` |
+| Character resources and rests | `character_*`, `campaign_change` | `../../references/character-schema-v2.md` |
+| Enter/end combat | `combat_start`, `combat_end`, `combat_join` | `references/RUNTIME_DEEP_REFERENCE.md` |
+| Observe, turns, and actions | `combat_query`, `combat_turn`, `combat_*` | `references/DM_RULES.md` |
+| Tactical map or Agent spatial facts | map tools or action-specific Agent facts | `references/DM_MAP_SYS.md` |
+| Campaign/module preparation | `module_draft`, `content_pack`, `character_*` | `references/MODULE_INDEX.md`, `references/MODULE_ARC.md` |
+| Full campaign regression | tools required by the current phase | `references/CAMPAIGN_REGRESSION.md` |
 
 Use `skill_query(action="search"|"section")` for these deep references; do not
 load a whole large document by default.
