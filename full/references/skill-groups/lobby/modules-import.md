@@ -21,13 +21,22 @@ and finalization boundaries, not every fine edit.
 
 The public request shape puts each decision field directly beside `operation`
 inside `payload`; do not add a `package` wrapper and do not put request-control
-fields inside `payload`. For example, a sourced readiness repair is
-`module_draft(action="edit", payload={job_id, operation:"package", manifest:{play_profile:...}}, expected_revision=..., idempotency_key=...)`.
-The only package decision fields are `manifest`, `catalogs`, `narrative`,
-`dependencies`, `metadata`, and `version`. Copy every `source_ref` value
-verbatim from the current `module_draft(evidence)` receipt, including its full
-SHA-256 strings; never retype, splice, or infer a checksum. Re-read the draft
-after the edit and verify the stored decision before finalization.
+fields inside `payload`. The only package decision fields are `manifest`,
+`catalogs`, `narrative`, `dependencies`, `metadata`, and `version`. Each supplied
+field is a complete replacement, not a deep patch. Therefore a manifest edit
+must preserve or submit the full reviewed manifest: `title`, `classification`,
+`compatibility`, `play_profile`, `continuity`, `activation`, and
+`content_summary`. Its structural request is
+`module_draft(action="edit", payload={job_id, operation:"package", manifest:{title, classification, compatibility, play_profile, continuity, activation, content_summary}}, expected_revision=..., idempotency_key=...)`.
+
+Build `play_profile` with `party_size={minimum, maximum, source_refs}`,
+`starting_level={value, source_refs}`, `expected_end_level={value, source_refs}`,
+`advancement={modes, recommended, source_refs}`, and
+`pregenerated_characters={available, applicability, source_refs}`. Obtain a
+current chunk-evidence receipt and reuse each source reference verbatim as
+`{source_key, page, chunk_hash, note}`; never retype, splice, or infer its
+checksum. Re-read the draft after the edit and verify the complete stored
+decision before finalization.
 
 After reviewing the current draft, its issues, evidence, imported scenes, and
 saved package decisions, call `module_draft(finalize)` with
