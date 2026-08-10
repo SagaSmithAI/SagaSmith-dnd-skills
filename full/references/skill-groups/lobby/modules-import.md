@@ -21,9 +21,11 @@ Before activation, retrieve draft evidence only through these exact shapes:
 There are no `top_k`, `queries`, `pages`, or `scene_keys` fields on this action.
 Do not call `module_search` with the editable draft id: search/expand addresses
 an imported active Pack revision after finalization. For Pack decisions, copy a
-returned chunk receipt as `{source_key, page, chunk_hash, note}`, using the
-chunk's returned `content_hash` as `chunk_hash`; never calculate it or substitute
-the editable module id for `source_key`.
+returned chunk's complete `source_ref` object verbatim. A page result includes
+`citation_candidates`; choose a candidate whose excerpt/heading supports the
+reviewed fact and copy its `source_ref` verbatim. Never construct a reference
+from the page transcription checksum, image checksum, editable module id, or a
+separately copied `content_hash`.
 
 Use `module_draft(edit)` for reviewed content, statblocks, assets, and actor
 bindings. Extract party range, levels, advancement, endings, scenes,
@@ -61,7 +63,8 @@ Build `play_profile` with `party_size={minimum, maximum, source_refs}`,
 `starting_level={value, source_refs}`, `expected_end_level={value, source_refs}`,
 `advancement={modes, recommended, source_refs}`, and
 `pregenerated_characters={available, applicability, source_refs}`. Obtain a
-current chunk-evidence receipt and reuse each source reference verbatim as
+current chunk-evidence receipt (or a page `citation_candidates` entry) and reuse
+each `source_ref` verbatim as
 `{source_key, page, chunk_hash, note}`; never retype, splice, or infer its
 checksum. Re-read the draft after the edit and verify the complete stored
 decision before finalization.
