@@ -14,8 +14,13 @@ settlement, continuity ledgers, the playthrough manifest, and Snapshot recovery.
 2. Call `exposure(action="open", campaign_id=...)`. Its phase is authoritative.
 3. Call `exposure(action="search")`, then add or remove exact tool ids with
    `exposure(action="set")`. Authorization and phase filtering remain server-owned.
+   Keep each search to one short capability phrase or exact tool id. Never join
+   several tool ids and narrative requirements into one query; empty matches are
+   not evidence that the phase has no tools.
 4. Refresh `tools/list` after `tools/list_changed`, then call listed domain tools
-   directly.
+   directly. A core tool is not a proxy for a newly exposed domain tool: after
+   loading `character_query` or `combat_query`, call that native tool rather than
+   placing its name or action inside `campaign_query`.
 5. In `play`, read `module_query(view="current")`, expand the exact scene with
    `module_query(view="scene")`, read recent `campaign_event(action="list")`, and
    call `continuity_context` separately for each acting PC or NPC. For a DM
@@ -431,7 +436,12 @@ own exposure. Changing one session's native tools must not expose them to anothe
    require or write a synthetic Dying condition. Refresh state before continuing;
    a revived actor may still act, while a pending result may only end its turn.
 7. End each completed turn with `combat_end_turn`, using the latest revision and a
-   fresh idempotency key. Refresh status after every write.
+   fresh idempotency key. Refresh status after every write. A committed attack,
+   spell, movement, common action, or death save does not itself end the turn
+   unless the returned authoritative status has already advanced it. Repair a
+   rejected, still-intended action before ending the turn; do not silently turn
+   a missing `weapon_id`, malformed allocation, or other payload error into a
+   deliberate pass.
 8. Call `combat_end` through owner/DM `combat.control` with a structured outcome
    when the encounter is actually over. It returns unfinished 0-HP actors in
    `post_combat_recovery` and moves the campaign to `play`; consume

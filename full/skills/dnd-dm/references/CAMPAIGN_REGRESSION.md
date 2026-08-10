@@ -42,6 +42,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `exposure(open/search/set)`, consume every real `tools/list_changed`, refresh
    `tools/list`, and call only tools present in that session's native list. Do
    not call an unexposed facade, emulate a result, or use an alias fallback.
+   Issue one short capability phrase or exact tool id per exposure search; a
+   concatenated list of tool names plus narrative text is an invalid discovery
+   probe. After `set` and `tools/list_changed`, call the newly listed native tool
+   itself. Core `campaign_query` must never proxy a `character_query`,
+   `combat_query`, or mutation by carrying synthetic `tool`/`action` fields.
    Open once for the campaign/principal binding; after phase, restore, checkout,
    undo, or redo, keep that binding and use `exposure(search/set)` to load the
    needed current-phase tools. Record native tool, phase, exposure, and
@@ -469,7 +474,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    public tool, and let the SagaSmith Agent perform the resulting DM ruling.
    If the action returns `pending_ruling`, inspect its payment and latest
    revision before applying any generic public dice/state/continuity writes;
-   never pay the action twice or invent a `combat_choice` window.
+   never pay the action twice or invent a `combat_choice` window. Do not report
+   the narrated effect as applied merely because its slot/use payment committed.
+   Preserve the pending ruling and complete the bounded evaluation plus explicit
+   public settlement, or choose a different legal recovery such as
+   `character_state_change(action="stabilize")`; never fabricate an effect roll
+   or healing amount.
    Assign a stable `procedure_id` and require it to survive in the paid action,
    Agent ruling receipt, and temporary combat-map patch. Reconstruct repeated
    procedure counts and ending predicates from those receipts; a narration-only
