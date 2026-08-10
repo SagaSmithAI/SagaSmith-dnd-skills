@@ -121,11 +121,36 @@ module/scene/chunk/page/hash reference, an excerpt containing the exact actor
 name, an authored role, and a concise summary. The service stores immutable
 source evidence in notes and marks the card `narrative_only`, `source_bound`,
 `combat_statblock=not_imported`, and `combat_eligible=false`. Re-read the card,
-restore the prior `play` exposure, add the actor to the playthrough manifest, and
+keep the current `play` exposure, add the actor to the playthrough manifest, and
 checkpoint. The default sheet values on this identity card are schema sentinels,
 not inferred module mechanics: never use the card in a check or combat, never
 claim its AC/HP/abilities as authored, and never upgrade it into a combatant
 without later importing an exact statblock.
+
+Use this executable public request shape:
+
+```json
+{
+  "mode": "narrative_npc",
+  "payload": {
+    "campaign_id": "<campaign id>",
+    "name": "<exact printed name>",
+    "role": "<authored narrative role>",
+    "summary": "<concise source-grounded summary>",
+    "source_ref": {"module_id": "...", "scene_id": "...", "chunk_id": "...", "page_start": 1, "page_end": 1, "heading_path": ["..."], "content_sha256": "..."},
+    "source_excerpt": "<excerpt containing the exact name>"
+  },
+  "idempotency_key": "<stable occurrence key>"
+}
+```
+
+Do not send separate `module_id`/`scene_id`, `occurrence_id`, caller-supplied
+status `tags`, or an `expected_revision`; module identity belongs inside the
+exact `source_ref`, and the top-level idempotency key is the stable occurrence
+identity. For an anonymous counted instance, additionally send the exact
+printed `source_identity`, a stable `instance_key`, and use the canonical name
+`<source_identity> [<instance_key>]` unless a complete committed
+`identity_agent_ruling` assigns a proper name.
 
 When an active PC dies, disappears, or leaves, create any replacement through the
 same public, source-audited character workflow. Reuse an applicable unused

@@ -481,11 +481,11 @@ and content hash, an excerpt containing the exact actor name, a role, and a
 summary. The result stores source evidence in notes and reports
 `combat_statblock="not_imported"` and `combat_eligible=false`; its actor card is
 tagged `narrative_only` and `source_bound`. Those sentinel mechanics must not be
-used for checks or combat. The full-playthrough driver must switch from `play` to
-`lobby`, replay creation under its explicit stable occurrence id, restore `play`
-on success or failure, upsert the actor into `manifest.npcs`, and verify a
-checkpoint. A later same-named NPC from the same source chunk needs a new
-occurrence id.
+used for checks or combat. Create it directly in `play` with required payload
+fields `campaign_id`, `name`, `role`, `summary`, `source_ref`, and
+`source_excerpt`, plus a stable top-level `idempotency_key`; upsert the actor into
+`manifest.npcs` and verify a checkpoint. A later distinct instance from the same
+source chunk needs a new idempotency key.
 When the source defines several anonymous instances under one printed identity,
 create a separate actor for each one with `source_identity` equal to that exact
 source label and a stable `instance_key`. By default, store the canonical name

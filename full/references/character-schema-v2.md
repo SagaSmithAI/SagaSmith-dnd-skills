@@ -57,6 +57,11 @@ notes and the card carries `narrative_only`/`source_bound` tags plus an explicit
 `combat_eligible=false` response. It may own relationships, goals, and
 ActorKnowledge, but no caller may treat its placeholder AC, HP, abilities, speed,
 or other derived mechanics as authored.
+The required payload fields are exactly `campaign_id`, `name`, `role`, `summary`,
+`source_ref`, and `source_excerpt`; creation also requires a top-level stable
+`idempotency_key`. Optional anonymous-instance fields are `source_identity`,
+`instance_key`, and `identity_agent_ruling`. Do not send `occurrence_id`, status
+tags, or duplicate module/scene ids beside `source_ref`.
 For repeated anonymous source identities, keep one card and knowledge scope per
 instance. Supply the exact printed `source_identity` plus a stable
 `instance_key`; the default display name is

@@ -216,6 +216,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `character_create_from(mode="narrative_npc")` directly in Play,
    verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
    register the actor in the manifest, and verify its checkpoint.
+   The exact payload requires `campaign_id`, `name`, `role`, `summary`, the
+   complete active `source_ref`, and `source_excerpt`; use the stable occurrence
+   identity as the top-level `idempotency_key`. Do not add separate module/scene
+   ids, `occurrence_id`, caller-owned status tags, or `expected_revision`.
    For a source-counted anonymous group, create one actor per actual instance.
    Set `--narrative-npc-source-identity` to the exact printed group label and a
    distinct stable `--narrative-npc-instance-key`. Use
