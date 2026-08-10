@@ -59,8 +59,9 @@ multi-turn dialogue.
    and honor actor refresh or stale invalidation.
 6. Resolve the request through ordinary public tools. If dialogue continues,
    open a new conversation and ingest the actual result as a new stimulus; never
-   keep the earlier conversation open across a write that invalidates its
-   participant, scene, or branch authority.
+   reopen until the authoritative mechanic has committed. Never keep the
+   earlier conversation open across that mechanic or a write that invalidates
+   its participant, scene, or branch authority.
 
 Never expose the Host transport, private capsule, lease, raw proposal, intent,
 truth posture, or basis refs. Never activate every witness. A perceived but

@@ -48,9 +48,9 @@ If the Host cannot enforce these guarantees, do not open a conversation.
    conversation; re-read conversation status afterward and honor actor refresh
    or stale invalidation.
 6. Resolve the request through ordinary public mechanic tools. If dialogue
-   continues, open a new conversation and ingest the actual result as a new
-   stimulus. Do not carry the prior conversation revision or worker context
-   across that write.
+   continues, open a new conversation only after the mechanic commits, then
+   ingest the actual result as a new stimulus. Do not carry the prior
+   conversation revision or worker context across that write.
 
 Every write requires `expected_conversation_revision` and `idempotency_key`.
 Replay an identical request with the same key; on
