@@ -334,6 +334,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `get/search/set`, and return to `play` only after the resulting actor passes
    source preflight. Stop for external input only after those exact evidence
    paths are absent, contradictory, or unavailable to the current reviewer.
+   Do not infer that an actor or encounter is blocked from the creation result's
+   aggregate `settlement="source_review_required"` label alone. Run the
+   source-grounded `module_query(view="preflight")` and use its `ready`,
+   `card_valid`, `hard_blockers`, and `disabled_capabilities` fields as the
+   authoritative combat gate. A complete attack remains usable when unresolved
+   source-backed spells are explicitly disabled; continue with the usable
+   capability and retain the spell diagnostics in the transcript. Repair first
+   only when preflight reports the whole card invalid, a required capability for
+   the intended action is disabled, or mechanically indispensable evidence is
+   actually absent or conflicting.
    A corpus combat is not covered by starting an encounter containing only
    party PCs. Before `combat_start`, expand the exact encounter evidence,
    prepare and preflight every required source-backed combatant, and include at

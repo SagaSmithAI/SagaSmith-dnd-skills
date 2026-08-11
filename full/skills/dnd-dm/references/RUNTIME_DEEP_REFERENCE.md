@@ -1015,8 +1015,13 @@ Every ordinary DM adjudication requirement names
 `default_resolver="agent"`; a player-owned choice or missing/conflicting source
 names its distinct external boundary instead. Also inspect
 `default_dm_resolver`, `agent_rulings`, and `external_source_gaps`;
-`settlement="source_review_required"` is a source repair gate, while `mixed`
-means the card can enter combat with listed Agent adjudications still explicit.
+`settlement="source_review_required"` identifies source-backed capabilities that
+need repair; it is not by itself a whole-card or encounter blocker. Use
+`card_valid`, `hard_blockers`, `disabled_capabilities`, and the scene-level
+`ready` result as the authoritative gate. A card with a complete usable attack
+may enter combat while unresolved spells remain explicitly disabled and audited;
+repair is mandatory before using those disabled capabilities. `mixed` means the
+card can enter combat with listed Agent adjudications still explicit.
 Scene `ready` means all required actors exist and every whole card is valid; it
 does not mean each actor can currently act or every capability is executable.
 `unarmed_attack_id` remains available even when every recorded weapon is
