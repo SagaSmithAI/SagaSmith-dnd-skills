@@ -81,6 +81,12 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    (lowercase ASCII words joined by hyphens, such as `master-of-souls`), not an
    opaque server id. Keep the same key across OCR/Agent-fill retries and still
    cite the exact managed page and scene.
+   Submit the evidence-bound transcription once without `agent_fill`. When the
+   response has `requires_agent_fill=true`, treat it as a read-only preview:
+   copy `validation.agent_fill_requirements`, make the source-semantic decision
+   yourself, and resubmit the same review with the completed `agent_fill`.
+   Do not query the entire draft to rediscover that bounded contract, and do
+   not trust a parser-proposed Multiattack composition as authoritative.
 3. An ending entry, dossier, encounter label, or `module_set_progress` value is
    narrative metadata and never substitutes for a mechanical content review.
 
