@@ -304,8 +304,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    module id, Pack id, module scene id, or document id is a different namespace
    and must never be substituted. If the exact creature is printed only in the
    enabled rule source, pass the exact printed identity as
-   `payload.source_statblock_name`, give repeated runtime instances distinct
-   `payload.name` values, and verify the returned `statblock.source_identity`.
+   `payload.source_statblock_name`, pass selected evidence only as
+   `payload.chunk_ids` (there is no `exact_chunks` field), give repeated runtime
+   instances distinct `payload.name` values, and verify the returned
+   `statblock.source_identity`.
    If the exact creature is printed only in the
    active module, discover and complete its module content review and use
    `mode="module_statblock"` with the immutable `review_id` instead. Also pass
