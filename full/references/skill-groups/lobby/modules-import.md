@@ -10,6 +10,16 @@ reuse them for the rest of this draft lifecycle. Do not start another draft or
 guess either identifier when a large inspection payload is persisted by the
 host.
 
+After a process/session restart, recover authoring state before calling
+`start`: call `module_draft(action="get")` with no payload to list the campaign's
+public draft handles. Resume an unfinished matching job with
+`module_draft(action="get", payload={"job_id":"..."})`, matching the managed
+artifact checksum/source identity and intended Pack revision. Do not assume an
+empty conversational context means no draft exists. If several unfinished jobs
+match and the public receipts do not identify which revision is intended, stop
+on that genuine source/version ambiguity instead of silently creating another
+draft or selecting by an internal database order.
+
 Before activation, retrieve draft evidence only through these exact shapes:
 
 ```json
