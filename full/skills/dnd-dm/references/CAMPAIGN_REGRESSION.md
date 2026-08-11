@@ -1292,6 +1292,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     conclusion facts, NPC state, quest state, world state, and actual-witness
     ActorKnowledge through public outcome and manifest paths with exact source
     references. Narrative prose by itself is not a machine-verifiable ending.
+    Through the native MCP facade, select the indexed conclusion with
+    `module_set_progress` and persist every decisive sourced proposition through
+    `memory_change(action="upsert")` (or one atomic `commit` when event,
+    audience facts, and ActorKnowledge are settled together). Give each fact a
+    stable `fact_key`, exact content, and source metadata; refresh an existing
+    fact before supplying its `expected_revision_id`. Call
+    `playthrough_manifest(action="sync", ...)` to project the authoritative
+    current scene. A direct native ending may then check that proposition with
+    `kind="memory_fact"`, the exact `fact_key`, empty `path`, and an exact
+    content comparison. Do not reconstruct or replace the complete manifest to
+    write one outcome or current-scene field.
 22. Configure each source-defined ending through the public regression driver's
     `configure-ending` action. Its `source_ref` must use the manifest source
     schema and preserve the asset/checksum, module, scene, chunk, page, content
