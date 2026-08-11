@@ -30,8 +30,11 @@ If the Host cannot enforce these guarantees, do not open a conversation.
 1. Call `npc_conversation(action="open")` once with explicit participants and
    an `idempotency_key`. Record `conversation_id` and
    `conversation_revision`.
-   On Host/Agent restart, reopen only the native MCP connection and exposure
-   binding. Discover current-branch public recovery handles with
+   On Host/Agent restart, establish the new native MCP session and its campaign
+   exposure binding once. Within a retained session, never call
+   `exposure(open)` as a phase/restore refresh; consume `tools/list_changed`,
+   refresh the native list, and use `exposure(search/set)` instead. Discover
+   current-branch public recovery handles with
    `npc_conversation(action="list", payload={})`, then `get` the selected id;
    never scrape a transcript or persist private transport state as campaign
    authority. Recreate workers only from returned activation refs. If an

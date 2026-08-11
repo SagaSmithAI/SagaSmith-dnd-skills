@@ -1285,7 +1285,10 @@ refresh and request rebuild, process/session restart plus resume, verified
 After every operation that can change phase or checkout, require an immediate
 `tools/list_changed`, refresh the native list before the next domain call, use
 `exposure(search/set)` on the retained binding, and prove the next legal call
-succeeds. Cross a changed host context binding for checkout/restore; do not
+succeeds. Within the same Host process, never call `exposure(open)` after one of
+these transitions: `open` replaces the session exposure and is not a refresh.
+Only a new MCP session or a genuinely changed campaign/principal binding opens
+again. Cross a changed host context binding for checkout/restore; do not
 mistake a phase-only transition for a context-epoch barrier.
 
 Every checkpoint must capture the exact active module revision set. After a
