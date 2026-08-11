@@ -46,6 +46,17 @@ label is not a mechanical card. Before finalization, submit an evidence-backed
 then re-read the draft and retain the returned content `review_id`. Do not
 finalize a route-required opposition repair until the review is present and can
 be consumed later by `character_create_from(mode="module_statblock")`.
+Use the current facade shapes, with request controls outside `payload`:
+
+```json
+{"action":"edit","payload":{"job_id":"<job id>","operation":"statblock","scene_id":"<draft scene id>","content_key":"<stable source slot key>","name":"<printed name>","page_number":59,"source_asset_id":"<only when returned by draft evidence>","agent_fill":{}},"expected_revision":3,"idempotency_key":"..."}
+{"action":"edit","payload":{"job_id":"<job id>","operation":"content","scene_id":"<draft scene id>","content_key":"<stable source slot key>","normalized_content":{},"observation":"<evidence-backed review note>","source_asset_id":"<only when returned by draft evidence>","page_number":59,"source_chunk_ids":["<returned draft chunk id>"],"content_kind":"statblock","agent_fill":{}},"expected_revision":3,"idempotency_key":"..."}
+```
+
+There are no `candidate_id`, `review_mode`, `source_ref`, or `source_excerpt`
+fields on these edit operations. Copy the draft `scene_id`, source asset id,
+page, and chunk ids from the current job/evidence response; do not reuse active
+runtime scene ids or construct authoring identifiers.
 
 Save manifest, catalogs, narrative, dependencies, and metadata with
 `module_draft(edit, operation="package")`. Each write enters the Pack edit
