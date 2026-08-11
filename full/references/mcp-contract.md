@@ -766,8 +766,9 @@ projection with a second write.
 Public `rule_search` and `rule_expand` always require `campaign_id`. Their
 source set is server-derived: matching bundled core, that campaign's Lobby
 rulebook imports, and sources cited by the current branch's active Pack lock.
-Caller filters may narrow this set but never add another campaign's source, and
-a chunk id selected under one campaign must not be expanded under another.
+The optional `filters` object may narrow this set but never add another
+campaign's source; the first lookup normally omits it, and a chunk id selected
+under one campaign must not be expanded under another.
 | Current branch | `campaign.active_branch_id` | Public `is_current` is derived; no independent branch boolean exists |
 | Snapshot head | Each branch's `head_snapshot_id` | Public `snapshot.is_head` is derived; no independent snapshot boolean exists |
 | Current scene | Core scoped `SceneProgress` whose scene belongs to an active module revision | Playthrough manifest chapter/scene is synchronized projection; `ModuleChapter.status` describes indexing only, and `current_room` is a label while `current_location_key` is spatial identity |
