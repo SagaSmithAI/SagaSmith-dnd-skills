@@ -1239,6 +1239,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     atomic party-rest response's exact campaign revision; do not re-read and use
     a later revision, because that would attach the rest narrative across an
     unrelated intervening write.
+    The facade payload uses `members`, not `actor_ids`. Each member object
+    requires the authoritative `character_id` and that actor's exact current
+    `expected_revision`; `duration_minutes` and `rest_type` are siblings of
+    `members`. Re-query every member after any preceding stabilization or
+    `character_action`. For a plain Long Rest, omit optional prepared-spell and
+    Hit Die choices unless the current card and Agent decision require them.
+    When corpus coverage requires resource settlement, first query the current
+    party card and commit one actually available, source-bound noncombat
+    activity or spell through `character_action`; never invent an activity just
+    to satisfy coverage. Then construct the one atomic party rest from the
+    resulting current actor revisions.
     Never run the rest twice, edit the database, or accept a receipt from an
     intervening campaign mutation.
     When the rest closes a sourced event, require that event's recorded outcome
