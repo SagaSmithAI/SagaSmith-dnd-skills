@@ -25,10 +25,13 @@ another draft.
 Before repairing or finalizing saved Pack decisions, use the bounded
 `module_draft(action="get", payload={"job_id":"...","view":"package"})`
 read. It returns the current draft handle and `pack_draft` without the large
-mechanical inspection payload. Preserve the whole returned decision object and
-replace only fields justified by current evidence; in particular, copy every
-`source_ref` verbatim from `module_draft(evidence)` rather than substituting a
-coverage-fixture hash or reconstructing a partial manifest.
+mechanical inspection payload. It also returns a bounded `finalized_package`
+summary when that job has already been finalized; import its exact `artifact`
+instead of starting another draft or repeating review. Preserve the whole
+returned decision object and replace only fields justified by current evidence;
+in particular, copy every `source_ref` verbatim from `module_draft(evidence)`
+rather than substituting a coverage-fixture hash or reconstructing a partial
+manifest.
 
 When the previous cycle already finalized the intended Pack and only import or
 activation remains, inspect every matching source job from that list until the
