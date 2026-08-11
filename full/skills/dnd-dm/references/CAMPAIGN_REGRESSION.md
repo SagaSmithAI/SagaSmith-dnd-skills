@@ -354,6 +354,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    payment, and state mutation. A parser-damaged spell name that produced no
    hydrated card remains a source-repair diagnostic and is never reconstructed
    from memory.
+   On resume, first compare the active encounter's immutable participants and
+   source manifest with the still-unmet evidence. If that encounter cannot
+   qualify because it contains the wrong actor revision, lacks the required
+   hydrated card, or used non-matching source evidence, end it through
+   `combat_end` and rebuild the qualifying encounter once from current actors.
+   Do not spend later cycles resolving otherwise irrelevant turns merely to
+   preserve an encounter that cannot satisfy the regression contract. Never
+   replace participants inside active Combat or patch actor state directly.
    A corpus combat is not covered by starting an encounter containing only
    party PCs. Before `combat_start`, expand the exact encounter evidence,
    prepare and preflight every required source-backed combatant, and include at
