@@ -559,6 +559,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    ingest/publish/close shapes before the first conversation call. Cover both
    conversation -> mechanic -> conversation and
    conversation -> rejected combat -> close/abort -> combat.
+   The latter is a controlled negative invariant probe. Open the authoritative
+   conversation, but do not ingest, activate a worker, or close it before the
+   probe. Submit an otherwise valid source-backed `combat_start` and require it
+   to fail specifically because the conversation is active; an unrelated
+   revision, participant, map, or coordinate failure is not evidence. The
+   rejected call cannot mutate state, so it does not violate the normal
+   close-before-mechanic rule. Then `get` and close/abort the conversation,
+   release any worker, retry the same valid combat start at the refreshed
+   revision, require success, and truthfully end that now-covered encounter as
+   interrupted before returning to Play.
    On every fresh Host or Agent process that resumes an existing campaign in
    Play, load `npc_conversation` and call `action="list"` before the first
    authoritative Play mutation. If it returns an active public handle, call
