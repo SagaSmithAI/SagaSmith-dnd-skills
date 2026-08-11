@@ -602,6 +602,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    branch-local DM composition fact, and prepare all required cards. Include other
    printed hostiles as initial, reinforcement, or optional groups, or record the
    scene-supported reason they are absent.
+   The route's source excerpt and the active Pack scene must remain the same
+   normalized source text. If the active Pack contains mojibake, replacement
+   characters, or another extraction-corrupted spelling that is absent from the
+   managed source, do not copy the corrupted Pack text merely because preflight
+   accepts it. Return to Lobby, create an explicit new draft/version from the
+   same managed source, repair that bounded page through the source-review
+   workflow, finalize/import/activate it, and then rebuild the participant
+   manifest from the corrected scene. Keep the source-specific replacement and
+   evidence with that Pack; do not add a book-specific parser heuristic or
+   weaken the regression excerpt comparison.
    A still-active PC does not have to be forced into every encounter. When the
    current world state and Agent-as-DM adjudication establish that the PC remains
    elsewhere (for example, stable and unconscious at the keep), pass one
