@@ -169,8 +169,11 @@ Build `play_profile` with `party_size={minimum, maximum, source_refs}`,
 `starting_level={value, source_refs}`, `expected_end_level={value, source_refs}`,
 `advancement={modes, recommended, source_refs}`, and
 `pregenerated_characters={available, applicability, source_refs}`. Obtain a
-current chunk-evidence receipt (or a page `citation_candidates` entry) and reuse
-each `source_ref` verbatim as
+current chunk-evidence receipt (or a page `citation_candidates` entry). Before
+the package edit, repeat each selected chunk lookup with its exact heading or a
+short exact excerpt and `limit=1`; if that does not return the intended unique
+chunk, refine the query instead of carrying a reference out of a broad or
+offloaded result. Reuse each single-result `source_ref` verbatim as
 `{source_key, page, chunk_hash, note}`; never retype, splice, or infer its
 checksum. Re-read the draft after the edit and verify the complete stored
 decision before finalization.
