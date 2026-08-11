@@ -297,6 +297,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `payload.source_id` for `character_create_from(mode="statblock")`; an active
    module id, Pack id, module scene id, or document id is a different namespace
    and must never be substituted. If the exact creature is printed only in the
+   enabled rule source, pass the exact printed identity as
+   `payload.source_statblock_name`, give repeated runtime instances distinct
+   `payload.name` values, and verify the returned `statblock.source_identity`.
+   If the exact creature is printed only in the
    active module, discover and complete its module content review and use
    `mode="module_statblock"` with the immutable `review_id` instead. Also pass
    the exact printed card name as `payload.source_identity`; this is checked
