@@ -324,6 +324,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `payload.chunk_ids` (there is no `exact_chunks` field), give repeated runtime
    instances distinct `payload.name` values, and verify the returned
    `statblock.source_identity`.
+   Treat every returned `source_id` and `chunk_id` as an opaque exact value.
+   Copy each complete value character-for-character from the latest successful
+   `rule_search` result; never retype, normalize, splice, or reconstruct one
+   UUID from another result. If statblock creation reports that chunks do not
+   belong to the requested source, re-run the exact-identity search, compare
+   the complete source and chunk ids against the submitted JSON, and retry only
+   with exact values from one returned source. A one-character mismatch or a
+   UUID assembled from multiple results is an Agent input error, not missing
+   source evidence and not grounds to weaken MCP validation.
    If the exact creature is printed only in the
    active module, discover and complete its module content review and use
    `mode="module_statblock"` with the immutable `review_id` instead. Also pass
