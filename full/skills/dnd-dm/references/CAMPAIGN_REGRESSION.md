@@ -465,6 +465,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    ingest/publish/close shapes before the first conversation call. Cover both
    conversation -> mechanic -> conversation and
    conversation -> rejected combat -> close/abort -> combat.
+   On every fresh Host or Agent process that resumes an existing campaign in
+   Play, load `npc_conversation` and call `action="list"` before the first
+   authoritative Play mutation. If it returns an active public handle, call
+   `get` with that returned id and either resume the workflow or explicitly
+   `abort` it before starting a replacement dialogue, creating another NPC, or
+   attempting a mechanic or phase transition. An empty process-local worker
+   registry is not evidence that no authoritative conversation remains active.
 5b. When the active route invokes the 2014 DMG chase rules, run
    `scripts.regression_chase` through the public stdio MCP exposure. Bind
    `chase(action="start")` to the exact expanded scene `source_ref`, excerpt, quarry,
