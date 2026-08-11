@@ -382,10 +382,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    immutable participants and source manifest with the still-unmet evidence.
    If Combat coverage and every remaining Combat-specific mechanism are already
    satisfied, an encounter left active by an interrupted regression process is
-   no longer part of the route. Query its authoritative status, then immediately
-   call `combat_end` with a truthful `outcome.status="interrupted"`. Do not spend
-   actions, advance turns, or replay the completed encounter before returning to
-   the first remaining Play or ending gap.
+   no longer part of the route. Treat them as satisfied only when the audit has
+   one bounded encounter containing the qualifying source-backed `combat_start`,
+   at least one successful engine-owned attack/activity/spell execution before
+   its `combat_end`, and `combat_query(view="render")` when rendering is required.
+   Participants, a ready source manifest, coordinates, or `combat_start` alone do
+   not prove execution. A qualifying active encounter at round 1 with no such
+   action receipt is unfinished: resume it and execute the remaining Combat
+   mechanisms. Only when the receipts already exist should you query status and
+   immediately call `combat_end` with a truthful
+   `outcome.status="interrupted"`; do not replay the completed encounter before
+   returning to the first remaining Play or ending gap.
    Take participant ids from `combat_query(status)`, then load
    `character_query` and read each required actor individually with `view=get`;
    do not assume a host's bounded summary of the nested encounter exposed every
