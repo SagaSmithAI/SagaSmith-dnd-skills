@@ -49,14 +49,22 @@ be consumed later by `character_create_from(mode="module_statblock")`.
 Use the current facade shapes, with request controls outside `payload`:
 
 ```json
-{"action":"edit","payload":{"job_id":"<job id>","operation":"statblock","scene_id":"<draft scene id>","content_key":"<stable source slot key>","name":"<printed name>","page_number":59,"source_asset_id":"<only when returned by draft evidence>","agent_fill":{}},"expected_revision":3,"idempotency_key":"..."}
-{"action":"edit","payload":{"job_id":"<job id>","operation":"content","scene_id":"<draft scene id>","content_key":"<stable source slot key>","normalized_content":{},"observation":"<evidence-backed review note>","source_asset_id":"<only when returned by draft evidence>","page_number":59,"source_chunk_ids":["<returned draft chunk id>"],"content_kind":"statblock","agent_fill":{}},"expected_revision":3,"idempotency_key":"..."}
+{"action":"edit","payload":{"job_id":"<job id>","operation":"statblock","scene_id":"<draft scene id>","content_key":"<stable source slot key>","name":"<printed name>","page_number":59,"source_asset_id":"<only when returned by draft evidence>"},"expected_revision":3,"idempotency_key":"..."}
+{"action":"edit","payload":{"job_id":"<job id>","operation":"content","scene_id":"<draft scene id>","content_key":"<stable source slot key>","normalized_content":"<complete source statblock as one text string>","observation":"<evidence-backed review note>","source_asset_id":"<only when returned by draft evidence>","page_number":59,"source_chunk_ids":["<returned draft chunk id>"],"content_kind":"dnd5e_2014_statblock"},"expected_revision":3,"idempotency_key":"..."}
 ```
 
 There are no `candidate_id`, `review_mode`, `source_ref`, or `source_excerpt`
 fields on these edit operations. Copy the draft `scene_id`, source asset id,
 page, and chunk ids from the current job/evidence response; do not reuse active
 runtime scene ids or construct authoring identifiers.
+`normalized_content` is the complete evidence-backed statblock text, not a JSON
+card. Use the edition-specific content kind returned by the current facade
+(`dnd5e_2014_statblock` for a 2014 campaign or `dnd5e_2024_statblock` for a
+2024 campaign), never the generic word `statblock`. Omit `agent_fill` on the
+first request. Only when the response reports `requires_agent_fill=true`, copy
+its exact `agent_fill_requirements` and submit the required semantic declaration
+with a fresh idempotency key; an empty object and transcription-repair fields
+such as `source_text`, `abilities`, or `ocr_corrections` are not semantic fills.
 
 Save manifest, catalogs, narrative, dependencies, and metadata with
 `module_draft(edit, operation="package")`. Each write enters the Pack edit
