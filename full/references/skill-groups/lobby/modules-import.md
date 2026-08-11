@@ -82,13 +82,16 @@ Use the current facade shapes, with request controls outside `payload`:
 
 ```json
 {"action":"edit","payload":{"job_id":"<job id>","operation":"statblock","scene_id":"<draft scene id>","content_key":"<stable source slot key>","name":"<printed name>","page_number":59,"source_asset_id":"<only when returned by draft evidence>"},"expected_revision":3,"idempotency_key":"..."}
-{"action":"edit","payload":{"job_id":"<job id>","operation":"content","scene_id":"<draft scene id>","content_key":"<stable source slot key>","normalized_content":"<complete source statblock as one text string>","observation":"<evidence-backed review note>","source_asset_id":"<only when returned by draft evidence>","page_number":59,"source_chunk_ids":["<returned draft chunk id>"],"content_kind":"dnd5e_2014_statblock"},"expected_revision":3,"idempotency_key":"..."}
+{"action":"edit","payload":{"job_id":"<job id>","operation":"content","scene_id":"<draft scene id>","content_key":"<stable source slot key>","normalized_content":"<complete source statblock as one text string>","observation":"<evidence-backed review note>","source_chunk_ids":["<returned draft chunk id>"],"content_kind":"dnd5e_2014_statblock"},"expected_revision":3,"idempotency_key":"..."}
+{"action":"edit","payload":{"job_id":"<job id>","operation":"content","scene_id":"<draft scene id>","content_key":"<stable source slot key>","normalized_content":"<complete source statblock as one text string>","observation":"<evidence-backed visual review note>","source_asset_id":"<returned managed asset id>","page_number":59,"content_kind":"dnd5e_2014_statblock"},"expected_revision":3,"idempotency_key":"..."}
 ```
 
 There are no `candidate_id`, `review_mode`, `source_ref`, or `source_excerpt`
-fields on these edit operations. Copy the draft `scene_id`, source asset id,
-page, and chunk ids from the current job/evidence response; do not reuse active
-runtime scene ids or construct authoring identifiers.
+fields on these edit operations. A content review requires exactly one evidence
+mode: either `source_chunk_ids`, or the paired `source_asset_id` plus
+`page_number`. Never send both modes in one request. Copy the selected evidence
+fields and draft `scene_id` from the current job/evidence response; do not reuse
+active runtime scene ids or construct authoring identifiers.
 `normalized_content` is the complete evidence-backed statblock text, not a JSON
 card. Use the edition-specific content kind returned by the current facade
 (`dnd5e_2014_statblock` for a 2014 campaign or `dnd5e_2024_statblock` for a
