@@ -344,6 +344,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    only when preflight reports the whole card invalid, a required capability for
    the intended action is disabled, or mechanically indispensable evidence is
    actually absent or conflicting.
+   When the scenario covers Agent-owned spell semantics, inspect the resulting
+   preflight `ruling_spell_ids` and hydrated source cards instead of avoiding
+   them. Choose one exact source-backed card, query and (when missing) compile
+   its persisted generic `content_solution`, cast it through the ordinary spell
+   facade so the engine pays its action and spell resource, then execute the
+   returned bound plan through `combat_choice`. The Agent supplies the
+   source-cited semantic decision; MCP owns validation, random results, resource
+   payment, and state mutation. A parser-damaged spell name that produced no
+   hydrated card remains a source-repair diagnostic and is never reconstructed
+   from memory.
    A corpus combat is not covered by starting an encounter containing only
    party PCs. Before `combat_start`, expand the exact encounter evidence,
    prepare and preflight every required source-backed combatant, and include at
