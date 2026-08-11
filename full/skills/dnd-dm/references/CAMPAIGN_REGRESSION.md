@@ -383,7 +383,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    declaration, read `combat_query(status)`. If another actor is current, call
    `combat_end_turn` only for that returned actor with the latest revision, then
    query status again after every committed turn write. Never guess, cache, or
-   count through the initiative sequence. Submit the declaration only when the
+   count through the initiative sequence. Treat actor, branch, encounter, and
+   spell ids as opaque exact values: copy them character-for-character from the
+   latest successful native result and never reconstruct, shorten, or retype
+   them from narration or memory. If a call reports that an actor does not
+   belong to the campaign, immediately re-read `combat_query(status)` and
+   `character_query(list)`, compare the complete returned ids, and retry only
+   with an exact returned value; a one-character mismatch is an Agent input
+   error, not an MCP identity conflict. Submit the declaration only when the
    selected caster is current and require `status="committed"`; do not end the
    encounter after a rejected or merely pending cast.
    On resume, before the first Combat mutation, compare the active encounter's
