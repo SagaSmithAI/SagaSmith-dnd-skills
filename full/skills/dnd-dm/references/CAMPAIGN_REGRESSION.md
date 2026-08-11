@@ -363,6 +363,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    qualify because it contains the wrong actor revision, lacks the required
    hydrated card, or used non-matching source evidence, end it through
    `combat_end` and rebuild the qualifying encounter once from current actors.
+   Search and load the exact `combat_end` tool, then close immediately with a
+   truthful structured `outcome.status="interrupted"` and a summary naming the
+   nonqualifying evidence. `combat_end_turn` is a different tool: it only passes
+   the current actor's turn and must not be repeated to simulate ending the
+   encounter. Resolve a genuinely blocking pending window first, but do not
+   play out otherwise irrelevant turns before this interrupted close.
    Do not spend later cycles resolving otherwise irrelevant turns merely to
    preserve an encounter that cannot satisfy the regression contract. Never
    replace participants inside active Combat or patch actor state directly.
