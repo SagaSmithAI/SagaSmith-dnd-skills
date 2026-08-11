@@ -87,6 +87,37 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    yourself, and resubmit the same review with the completed `agent_fill`.
    Do not query the entire draft to rediscover that bounded contract, and do
    not trust a parser-proposed Multiattack composition as authoritative.
+   Follow the returned `submission_schema`. A structured decision has this
+   nesting (copy the actual activity, excerpt, and weapon ids from the preview;
+   the example does not choose which attacks the source means):
+
+   ```json
+   {
+     "agent_fill": {
+       "multiattack_options": [{
+         "activity_id": "<returned activity_id>",
+         "source_excerpt": "<returned source_excerpt>",
+         "reason": "<Agent's source-based reason>",
+         "resolution": "structured",
+         "options": [{
+           "id": "<lowercase-option-slug>",
+           "attacks": [{
+             "weapon_id": "<returned weapon_id>",
+             "attack_mode": "melee",
+             "count": 1
+           }]
+         }]
+       }]
+     }
+   }
+   ```
+
+   Keep unrelated open rulings out of this bounded fill; use an evidence-bound
+   resolution plan or later ruling boundary when that separate mechanism is
+   actually exercised. An `img_*` id returned by page rendering identifies a
+   delivered media artifact, not a managed `source_asset_id`; omit it from the
+   content review unless the draft itself returned that exact id as a source
+   asset. Bind the review with the managed page and exact source chunks instead.
 3. An ending entry, dossier, encounter label, or `module_set_progress` value is
    narrative metadata and never substitutes for a mechanical content review.
 
