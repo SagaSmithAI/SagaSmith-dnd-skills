@@ -87,6 +87,13 @@ than rebuilding the card. A blocked 2014 candidate may route to
 `operation="statblock"` using its exact candidate name/scene/page, followed by
 the returned recovery/validation contract. A creature mentioned in encounter
 narrative does not prove that its statblock is printed on that narrative page.
+`content_key` is a Pack-local stable source-slot key, not an opaque database id.
+When an exact managed image page contains a complete printed card but no text
+candidate exists, the Agent creates the key deterministically from that exact
+printed identity using lowercase ASCII words joined by hyphens (for example,
+`Master of Souls` -> `master-of-souls`) and keeps it unchanged across retries.
+This names the reviewed Pack slot; it does not replace the required managed
+page, scene, printed name, OCR validation, or fresh idempotency key.
 If no candidate or rendered page contains that card, use another source-backed
 route opponent or discover the exact enabled standard rule source; never guess
 a statblock page from an encounter mention.

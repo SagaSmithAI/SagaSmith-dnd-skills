@@ -76,6 +76,11 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    missing review, re-read it, finalize it, import the new artifact, and
    activate only the module id returned by that import. Never edit a finalized
    Pack in place or guess a review id.
+   For an image-only card with no text candidate, `content_key` is the
+   Pack-local stable slot selected by the Agent from the exact printed identity
+   (lowercase ASCII words joined by hyphens, such as `master-of-souls`), not an
+   opaque server id. Keep the same key across OCR/Agent-fill retries and still
+   cite the exact managed page and scene.
 3. An ending entry, dossier, encounter label, or `module_set_progress` value is
    narrative metadata and never substitutes for a mechanical content review.
 
