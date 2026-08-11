@@ -1317,17 +1317,20 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     only the active revision.
     When operating through the native MCP facade instead of the regression
     driver's convenience action, first call
-    `playthrough_manifest(action="get")`, preserve the complete returned
-    manifest, and append each condition under `ending.conditions`. A condition
-    has exactly `id`, `label`, `source_ref`, and a non-empty `all_of`. Every
+    `playthrough_manifest(action="get")` and check the registered condition
+    ids. Submit each new condition with
+    `playthrough_manifest(action="configure_ending",
+    payload={"condition": <condition>}, ...)`; do not reconstruct and replace
+    the complete, potentially offloaded manifest merely to add one condition. A
+    condition has exactly `id`, `label`, `source_ref`, and a non-empty `all_of`. Every
     `all_of` entry has exactly `kind`, `path`, `actor_id`, `fact_key`,
     `operator`, and `value`; `kind` is one of `manifest_value`,
     `campaign_state_value`, `actor_value`, or `memory_fact`, and `operator` is
     one of `equals`, `not_equals`, `in`, `at_least`, `at_most`, or `truthy`.
     Supply the actor id only for `actor_value` and the fact key only for
-    `memory_fact`; retain the other fields as empty strings. Replace the full
-    manifest with the current `expected_revision`, current `branch_id`, and a
-    stable idempotency key. After a successful replace, refresh the campaign
+    `memory_fact`; retain the other fields as empty strings. Configure it with
+    the current `expected_revision`, current `branch_id`, and a stable
+    idempotency key. After a successful mutation, refresh the campaign
     revision and call `playthrough_manifest(action="verify_ending",
     payload={"condition_id": <exact registered id>}, ...)` with a new stable
     idempotency key. Never discover this schema by weakening checks or by
