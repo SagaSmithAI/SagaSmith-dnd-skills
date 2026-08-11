@@ -333,6 +333,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    with exact values from one returned source. A one-character mismatch or a
    UUID assembled from multiple results is an Agent input error, not missing
    source evidence and not grounds to weaken MCP validation.
+   If an exact localized rule hit is readable but its layout is not mechanically
+   hydratable, do not copy its numbers into a hand-built card and do not move the
+   standard creature into a module-specific review. When current module evidence
+   also prints the canonical English identity, query that exact identity once
+   against an enabled same-edition English canonical source (for example with
+   `filters={"edition": "2014", "locale": "en"}`), verify that the returned
+   heading is the same creature, and hydrate only from that one source's exact
+   ids. This is an explicit source selection, not permission to translate or
+   infer a different statblock from memory. If no mechanically usable equivalent
+   source exists, keep the source-repair diagnostic and use the reviewed
+   rulebook-draft lifecycle instead.
    If the exact creature is printed only in the
    active module, discover and complete its module content review and use
    `mode="module_statblock"` with the immutable `review_id` instead. Also pass
