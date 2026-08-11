@@ -15,10 +15,12 @@ After a process/session restart, recover authoring state before calling
 public draft handles. Resume an unfinished matching job with
 `module_draft(action="get", payload={"job_id":"..."})`, matching the managed
 artifact checksum/source identity and intended Pack revision. Do not assume an
-empty conversational context means no draft exists. If several unfinished jobs
-match and the public receipts do not identify which revision is intended, stop
-on that genuine source/version ambiguity instead of silently creating another
-draft or selecting by an internal database order.
+empty conversational context means no draft exists. The list receipt explicitly
+declares `order="newest_first"`; when several unfinished handles have the same
+artifact checksum, source identity, and intended revision, resume the first
+matching handle. If those identities or the intended Pack revision conflict,
+stop on that genuine source/version ambiguity instead of silently creating
+another draft.
 
 Before activation, retrieve draft evidence only through these exact shapes:
 
