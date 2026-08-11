@@ -224,10 +224,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    selected encounter. When the module provides only a narrative identity and no
    combat statblock, use the public driver's `prepare-narrative-npc` path: cite
    the active module/scene/chunk/page/hash and an excerpt containing the exact
-   name, assign the creation a stable `--occurrence-id`, and create
-   `character_create_from(mode="narrative_npc")` directly in Play,
-   verify `combat_eligible=false` plus the `narrative_only`/`source_bound` tags,
-   register the actor in the manifest, and verify its checkpoint.
+   name and assign the creation a stable `--occurrence-id`. Close or abort any
+   active NPC conversation, return to `lobby`, consume `tools/list_changed`, and
+   load `character_create_from` through the current exposure before creating the
+   actor with `mode="narrative_npc"`. Verify `combat_eligible=false` plus the
+   `narrative_only`/`source_bound` tags, register the actor in the manifest, then
+   return to `play`, consume the new native list, and verify its checkpoint.
    The exact payload requires `campaign_id`, `name`, `role`, `summary`, the
    complete active `source_ref`, and `source_excerpt`; use the stable occurrence
    identity as the top-level `idempotency_key`. Do not add separate module/scene
