@@ -1303,6 +1303,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `kind="memory_fact"`, the exact `fact_key`, empty `path`, and an exact
     content comparison. Do not reconstruct or replace the complete manifest to
     write one outcome or current-scene field.
+    Keep the indexed conclusion's Scene Atlas progress `status="current"`
+    through ending verification; its progress may be 100. Marking the only
+    selected scene `completed` removes the authoritative current-scene selector
+    and correctly blocks an otherwise active playthrough from ending.
 22. Configure each source-defined ending through the public regression driver's
     `configure-ending` action. Its `source_ref` must use the manifest source
     schema and preserve the asset/checksum, module, scene, chunk, page, content
