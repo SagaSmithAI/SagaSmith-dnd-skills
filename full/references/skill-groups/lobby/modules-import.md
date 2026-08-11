@@ -22,6 +22,14 @@ matching handle. If those identities or the intended Pack revision conflict,
 stop on that genuine source/version ambiguity instead of silently creating
 another draft.
 
+Before repairing or finalizing saved Pack decisions, use the bounded
+`module_draft(action="get", payload={"job_id":"...","view":"package"})`
+read. It returns the current draft handle and `pack_draft` without the large
+mechanical inspection payload. Preserve the whole returned decision object and
+replace only fields justified by current evidence; in particular, copy every
+`source_ref` verbatim from `module_draft(evidence)` rather than substituting a
+coverage-fixture hash or reconstructing a partial manifest.
+
 When the previous cycle already finalized the intended Pack and only import or
 activation remains, inspect every matching source job from that list until the
 job with a non-empty `finalized_package` is found, then import that exact
