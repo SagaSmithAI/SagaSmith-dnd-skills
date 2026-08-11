@@ -299,6 +299,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `mode="module_statblock"` with the immutable `review_id` instead. Restore the
    entry phase after preparation and consume the native tool-list change before
    continuing.
+   If that review is absent from a finalized Pack, create an explicit new
+   draft/version from the same managed source. An ending entry,
+   `content_summary`, dossier, or encounter label does not substitute for the
+   mechanical review. Add the evidence-backed content/statblock review while
+   the Pack is still a draft, re-read it to verify the returned `review_id`, and
+   only then finalize/import/activate the reviewed revision.
    A parser candidate marked `review_only`, `blocked`, or
    `missing_or_conflicting_source_review` is not by itself an external boundary.
    First determine whether the card is a standard creature whose exact enabled

@@ -39,6 +39,14 @@ executable; incomplete editorial coverage remains visible advice unless it
 causes structural corruption, missing/conflicting source identity, explicit
 test failure, or compilation failure.
 
+When a route must instantiate a creature or NPC whose exact statblock exists
+only in the module, a manifest `content_summary`, narrative dossier, or catalog
+label is not a mechanical card. Before finalization, submit an evidence-backed
+`operation="content"` or `operation="statblock"` edit for that source slot,
+then re-read the draft and retain the returned content `review_id`. Do not
+finalize a route-required opposition repair until the review is present and can
+be consumed later by `character_create_from(mode="module_statblock")`.
+
 Save manifest, catalogs, narrative, dependencies, and metadata with
 `module_draft(edit, operation="package")`. Each write enters the Pack edit
 history, so one-book Agent decisions travel with the draft instead of becoming
