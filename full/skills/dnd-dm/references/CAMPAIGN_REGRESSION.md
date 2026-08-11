@@ -54,6 +54,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    tools cannot be loaded and that module, continuity, and combat projections
    are player-safe.
 
+   Never issue `game_phase`, `combat_start`, `combat_end`, restore, checkout,
+   undo, or redo in the same parallel tool batch as an `exposure(set)` built
+   from the old native list. Wait for the authoritative transition, consume its
+   `tools/list_changed`, refresh `tools/list`, then search and set the next
+   phase's tools. Parallelizing the transition with stale exposure is a host
+   ordering bug, not a recoverable discovery shortcut.
+
    Before campaign creation, read the edition and selected advancement mode
    from the discovered inventory unit, current Pack descriptor, or source
    manifest. Pass both explicitly to `campaign_create`; never accept tool
@@ -82,6 +89,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    the Agent at this trust boundary, not a package-edit field. Import the
    returned archive through `content_pack(import, kind="module")`, then activate
    the module id returned by that import rather than the editable draft id.
+
+   On every fresh process that still has source review, opposition hydration,
+   ending evidence, or another Pack-authoring obligation, stay in or return to
+   `lobby`, load `module_draft`, and call `module_draft(action="get")` with no
+   payload before creating actors, starting another draft, or entering Play.
+   The result is newest-first: resume the matching unfinished job and preserve
+   its job/module/review ids. Start a new draft only when the public list proves
+   no matching resumable job exists or the supported lifecycle explicitly
+   requires a new version of a finalized Pack.
 
    After the finalized Pack is imported and its returned module id is active,
    initialize `playthrough_manifest` with schema version 2. Put the full object
