@@ -54,7 +54,12 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    enabled canonical source; it does not permit translation or a remembered
    substitute. If no mechanically usable equivalent exists, retain the source
    diagnostic and use the reviewed rulebook-draft lifecycle.
-5. Re-read every created actor and require `statblock.source_identity` to match
+5. If module evidence applies a narrow instance change to that canonical card,
+   pass it through the existing `variant` boundary. Cite the exact managed
+   `module-chunk:<id>` or immutable `module-review:<id>` in `variant.source_ref`
+   and include only the printed override, such as `creature_type`. Do not copy
+   the entire card into Pack data or use a generic sheet patch.
+6. Re-read every created actor and require `statblock.source_identity` to match
    the intended source card.
 
 ## Hydrate module-only opposition
