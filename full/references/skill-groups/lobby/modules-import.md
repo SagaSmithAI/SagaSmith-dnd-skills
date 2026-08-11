@@ -22,6 +22,13 @@ matching handle. If those identities or the intended Pack revision conflict,
 stop on that genuine source/version ambiguity instead of silently creating
 another draft.
 
+When the previous cycle already finalized the intended Pack and only import or
+activation remains, inspect every matching source job from that list until the
+job with a non-empty `finalized_package` is found, then import that exact
+artifact. Do not select a newer unfinished duplicate, repeat editorial review,
+or start another draft merely because the finalized job is not first in
+`newest_first` order.
+
 When a finalized Pack needs an explicit new revision from the same managed
 source, `start` returns a fresh editable `job_id`, but its mechanical first pass
 may reuse the same draft `module_id` and report an inner import as `skipped`.
