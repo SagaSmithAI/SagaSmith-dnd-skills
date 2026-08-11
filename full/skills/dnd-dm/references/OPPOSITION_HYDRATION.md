@@ -116,8 +116,12 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    resolution plan or later ruling boundary when that separate mechanism is
    actually exercised. An `img_*` id returned by page rendering identifies a
    delivered media artifact, not a managed `source_asset_id`; omit it from the
-   content review unless the draft itself returned that exact id as a source
-   asset. Bind the review with the managed page and exact source chunks instead.
+   content review. Call `module_query(view="assets")` for the draft module and
+   select the PDF asset whose checksum exactly matches the managed source; its
+   returned `id` is the valid `source_asset_id`. Bind an image-only review with
+   that asset id plus the exact managed page. Use source chunks as additional
+   evidence only when they actually contain the reviewed card; an encounter
+   paragraph naming the creature is not the card's mechanical transcription.
 3. An ending entry, dossier, encounter label, or `module_set_progress` value is
    narrative metadata and never substitutes for a mechanical content review.
 
