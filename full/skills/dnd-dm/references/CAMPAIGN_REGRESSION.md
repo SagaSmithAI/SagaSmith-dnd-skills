@@ -298,7 +298,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    module id, Pack id, module scene id, or document id is a different namespace
    and must never be substituted. If the exact creature is printed only in the
    active module, discover and complete its module content review and use
-   `mode="module_statblock"` with the immutable `review_id` instead. Restore the
+   `mode="module_statblock"` with the immutable `review_id` instead. Also pass
+   the exact printed card name as `payload.source_identity`; this is checked
+   against the immutable review even when `payload.name` gives repeated instances
+   distinct names such as `Giant Spider 1` through `Giant Spider 4`. Re-read every
+   result and require `statblock.source_identity` to match the intended source
+   card. A successful actor creation with the wrong source identity is not usable
+   opposition and must be replaced from the correct review. Restore the
    entry phase after preparation and consume the native tool-list change before
    continuing.
    If that review is absent from a finalized Pack, create an explicit new

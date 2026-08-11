@@ -65,7 +65,12 @@ label is not a mechanical card. Before finalization, submit an evidence-backed
 `operation="content"` or `operation="statblock"` edit for that source slot,
 then re-read the draft and retain the returned content `review_id`. Do not
 finalize a route-required opposition repair until the review is present and can
-be consumed later by `character_create_from(mode="module_statblock")`.
+be consumed later by `character_create_from(mode="module_statblock")`. On that
+creation call, pass the exact printed card name as `payload.source_identity` and
+verify the returned `statblock.source_identity`. `payload.name` is the runtime
+instance name and may differ; repeated creatures need distinct stable instance
+names. Do not pass ignored pseudo-evidence fields such as `content_id`, `role`,
+`scene_id`, `source_ref`, or `source_excerpt` to this mode.
 Before choosing a name, page, or source slot, call
 `module_query(view="candidates", payload={"module_id":"<editable draft module id>"})`.
 A `review_ready` candidate supplies the exact `scene_id`, `content_key`,
