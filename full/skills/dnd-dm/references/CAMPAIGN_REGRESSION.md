@@ -511,6 +511,25 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    active structured workflows.
 6. Before combat, read the exact encounter scene and its location. Call
    `module_query(view="preflight")` with every source/DM-established group.
+   The `participant_manifest` object has only `schema_version`, `groups`, and
+   optional `notes`. Each group uses this exact public shape; party PCs belong
+   in `combat_start.participant_ids`, not in a separate manifest field:
+
+   ```json
+   {
+     "schema_version": 1,
+     "groups": [{
+       "key": "stable-source-key",
+       "label": "Source group label",
+       "role": "combatant",
+       "required_count": 1,
+       "actor_ids": ["canonical-campaign-actor-id"],
+       "source_scene_id": "same-module-scene-id",
+       "source_excerpt": "Exact normalized source substring"
+     }]
+   }
+   ```
+
    `required_count` is the complete group count, not `len(actor_ids)`: derive it
    from an exact printed count, a persisted random-table roll, or an explicit
    branch-local DM composition fact, and prepare all required cards. Include other
