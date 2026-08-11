@@ -39,6 +39,9 @@ job with a non-empty `finalized_package` is found, then import that exact
 artifact. Do not select a newer unfinished duplicate, repeat editorial review,
 or start another draft merely because the finalized job is not first in
 `newest_first` order.
+The compact list now exposes `finalized_artifact` directly. For matching source
+identity/checksum, a non-empty value takes precedence over every newer
+`resumable=true` duplicate; pass that exact artifact to `content_pack(import)`.
 
 When a finalized Pack needs an explicit new revision from the same managed
 source, `start` returns a fresh editable `job_id`, but its mechanical first pass
