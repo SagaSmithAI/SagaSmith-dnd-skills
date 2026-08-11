@@ -1538,8 +1538,11 @@ action economy or accounting: it is the durable settlement of that exact card
 and is applied only through public engine operations.
 When a standard spell does have a persisted `agent_ruling` clause, its first
 `combat_cast_spell` call without a declaration returns the exact
-`agent_ruling_contract` before payment. Resubmit that same cast with the exact
-source excerpt and bounded Agent decision; MCP atomically pays the recorded
+`agent_ruling_contract` before payment. Its `submission_parameter` and
+`submission_shape` are authoritative: resubmit that same cast as
+`declaration={"agent_ruling": {...}}`, with the exact source excerpt and bounded
+Agent decision. Do not flatten those fields under `declaration` or use
+`component_ruling` for the spell effect. MCP atomically pays the recorded
 action/resource, starts any source-defined concentration, and returns
 `semantic_solution.status="agent_ruling_committed"`. An innate/statblock spell
 must omit `signature_free_cast` so its recorded innate resource is authoritative.

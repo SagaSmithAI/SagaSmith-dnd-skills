@@ -5,7 +5,9 @@ Use this group only for custom or imported cards that have exact source evidence
 Do not call `content_solution` for a standard spell whose card already carries a
 persisted `agent_ruling` clause. Its first ordinary cast returns the exact
 `agent_ruling_contract` without payment; resubmit that cast with an
-`agent_ruling` containing the returned source excerpt plus a bounded decision.
+exact `declaration={"agent_ruling": {...}}` object containing the returned
+source excerpt plus a bounded decision. Do not put those fields directly under
+`declaration` or send the effect decision through `component_ruling`.
 The successful response must record the action/resource payment and
 `semantic_solution.status="agent_ruling_committed"`. This is execution of an
 already reviewed standard clause, not first-use content authoring.

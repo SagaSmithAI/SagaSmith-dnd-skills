@@ -365,8 +365,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    them. Choose one exact source-backed card. A standard card with a persisted
    `agent_ruling` clause must not use `content_solution`: first call the ordinary
    spell facade without a declaration to read its exact ruling contract, then
-   resubmit the cast with that exact source excerpt and the Agent's bounded
-   decision. Require authoritative action/resource payment and
+   resubmit the cast as `declaration={"agent_ruling": {...}}`, with that exact
+   source excerpt and the Agent's bounded decision. Do not flatten the ruling
+   fields into `declaration` or place the effect ruling in `component_ruling`.
+   Require authoritative action/resource payment and
    `semantic_solution.status="agent_ruling_committed"`. For a statblock/innate
    spell, omit `signature_free_cast`; MCP consumes the recorded innate resource.
    A custom/imported card
