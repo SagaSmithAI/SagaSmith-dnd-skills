@@ -30,6 +30,13 @@ If the Host cannot enforce these guarantees, do not open a conversation.
 1. Call `npc_conversation(action="open")` once with explicit participants and
    an `idempotency_key`. Record `conversation_id` and
    `conversation_revision`.
+   On Host/Agent restart, reopen only the native MCP connection and exposure
+   binding. Discover current-branch public recovery handles with
+   `npc_conversation(action="list", payload={})`, then `get` the selected id;
+   never scrape a transcript or persist private transport state as campaign
+   authority. Recreate workers only from returned activation refs. If an
+   interrupted provider call cannot be safely resumed, release any local worker
+   context and `abort` the listed conversation using its current revision.
 2. For every player/scene stimulus, first rule `audience_facts`, then call
    `action="ingest"` with the current revision and a new idempotency key.
 3. Dispatch only returned activations with

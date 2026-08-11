@@ -953,7 +953,10 @@ revision refreshes only that actor runtime. Before an authoritative mechanic,
 scene mutation, phase transition, or combat, the Director closes or aborts the
 whole conversation and releases every worker. If dialogue continues after the
 public mechanic, it opens a new conversation and ingests the result as a new
-stimulus. MCP never owns the model or provider KV. See
+stimulus. After a process restart, public `list` returns only active handles
+owned by the authenticated principal on the checked-out branch; `get` expands
+one handle without exposing private capsules or proposals. MCP never owns the
+model or provider KV. See
 `host-integration-npc-conversation.md`.
 
 ### Isolated single NPC turn contract

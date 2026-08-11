@@ -10,6 +10,13 @@ multi-turn dialogue.
    with optional `scope_id`, `query`, and `branch_id`:
    `npc_conversation(campaign_id=..., action="open", payload={participant_actor_ids:[pc_id,npc_id,...], idempotency_key:...})`.
    There are no separate `npc_actor_ids` or `npc_ids` fields.
+   After a Host or Agent process restart, do not guess or recover the id from a
+   transcript artifact. Call `npc_conversation(action="list", payload={})` on
+   the retained campaign binding, select the current-branch conversation from
+   its public scope/scene/participants, then call `get` with that returned
+   `conversation_id`. If more than one public handle could match, re-read the
+   current scene and participants instead of choosing by list order. Resume the
+   workflow or explicitly `abort` it before any mechanic or phase transition.
 2. Rule `audience_facts` from current scene evidence before every `ingest`.
    Perception, comprehension, and response selection belong to the Agent; MCP
    never guesses them. Use the public payload shape exactly; do not invent
