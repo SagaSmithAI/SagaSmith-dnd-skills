@@ -78,6 +78,40 @@ its exact `agent_fill_requirements` and submit the required semantic declaration
 with a fresh idempotency key; an empty object and transcription-repair fields
 such as `source_text`, `abilities`, or `ocr_corrections` are not semantic fills.
 
+When `operation="statblock"` returns a partial `recovery.normalized_content`,
+use that returned canonical Markdown as the base for any evidence-backed
+`operation="content"` completion. Preserve its parser structure instead of
+rewriting it as plain text or an ad-hoc JSON card. In particular, a 2014 card
+uses a Markdown creature heading, italic identity, bold field labels, the
+six-column ability table, a real Markdown action heading, and bold-italic
+action names with italic attack/Hit markers, for example:
+
+```markdown
+# PRINTED CREATURE NAME
+
+*Medium humanoid, neutral evil*
+
+**Armor Class** 13
+**Hit Points** 22 (4d8 + 4)
+**Speed** 30 ft.
+
+| STR | DEX | CON | INT | WIS | CHA |
+|---:|---:|---:|---:|---:|---:|
+| 14 (+2) | 12 (+1) | 12 (+1) | 8 (-1) | 12 (+1) | 8 (-1) |
+
+## Actions
+
+***Printed Action.*** *Melee Weapon Attack:* +4 to hit, reach 5 ft., one target.
+*Hit:* 6 (1d8 + 2) damage.
+```
+
+Copy every completed fact from current draft evidence and retain the exact
+source spelling in the stored transcription. Do not turn `## Actions` into a
+bold paragraph, change `***Action.***` to `**Action.**`, or remove the italic
+attack markers: those transformations make a mechanically complete-looking
+card non-executable. If the exact evidence cannot complete a truncated action
+or spell, keep the opponent blocked rather than inventing it.
+
 Save manifest, catalogs, narrative, dependencies, and metadata with
 `module_draft(edit, operation="package")`. Each write enters the Pack edit
 history, so one-book Agent decisions travel with the draft instead of becoming
