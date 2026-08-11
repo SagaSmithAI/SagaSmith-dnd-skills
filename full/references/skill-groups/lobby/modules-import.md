@@ -22,6 +22,14 @@ matching handle. If those identities or the intended Pack revision conflict,
 stop on that genuine source/version ambiguity instead of silently creating
 another draft.
 
+When a finalized Pack needs an explicit new revision from the same managed
+source, `start` returns a fresh editable `job_id`, but its mechanical first pass
+may reuse the same draft `module_id` and report an inner import as `skipped`.
+That reuse does not finalize or block the new job. Re-read the returned fresh
+`job_id`; `status="editing"` without that job's own `finalized_package` is the
+authority to continue edits. Never retry an edit against the older finalized
+job merely because both jobs reference the same mechanically imported module.
+
 Before activation, retrieve draft evidence only through these exact shapes:
 
 ```json
