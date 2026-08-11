@@ -569,6 +569,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    release any worker, retry the same valid combat start at the refreshed
    revision, require success, and truthfully end that now-covered encounter as
    interrupted before returning to Play.
+   Before opening the probe conversation, rebuild every participant and manifest
+   actor id from a fresh `character_query(view="list")`; never copy an id from a
+   failed request or narration. Construct the combat payload once and reuse it
+   verbatim for the rejected and successful calls, changing only
+   `expected_revision` and `idempotency_key`.
    On every fresh Host or Agent process that resumes an existing campaign in
    Play, load `npc_conversation` and call `action="list"` before the first
    authoritative Play mutation. If it returns an active public handle, call
