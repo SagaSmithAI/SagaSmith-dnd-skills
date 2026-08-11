@@ -11,5 +11,13 @@ DM Agent on first use through `content_solution`. It must validate the current
 attack/event, operator, revision, and pending window. It is not a general
 free-form mutation tool.
 
+For a standard spell already classified with a persisted Agent-as-DM clause,
+use the exact `agent_ruling_contract` returned by its first `combat_cast_spell`
+attempt and resubmit through that same tool. Do not compile the standard card or
+route it through `combat_choice(execute_plan)`; the cast boundary atomically pays
+the action/resource and records the exact evidence-bound ruling.
+Omit `signature_free_cast` for statblock/innate spells so MCP consumes their
+recorded use resource.
+
 End the turn only after required action costs, saves, ongoing effects, death,
 and concentration consequences are settled.

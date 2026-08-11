@@ -2,6 +2,16 @@
 
 Use this group only for custom or imported cards that have exact source evidence but no locked standard mechanic or persisted `resolution_plan`.
 
+Do not call `content_solution` for a standard spell whose card already carries a
+persisted `agent_ruling` clause. Its first ordinary cast returns the exact
+`agent_ruling_contract` without payment; resubmit that cast with an
+`agent_ruling` containing the returned source excerpt plus a bounded decision.
+The successful response must record the action/resource payment and
+`semantic_solution.status="agent_ruling_committed"`. This is execution of an
+already reviewed standard clause, not first-use content authoring.
+For a statblock/innate spell, omit `signature_free_cast`; the spell card's
+recorded grant/resource is the payment authority.
+
 1. Query `content_solution` for the exact `actor_id`, `source_card_id`, and `source_card_kind`.
 2. If missing, read the complete card excerpt and only the relevant current-scene evidence. The Agent authors a bounded plan whose citations reproduce those managed source excerpts exactly. Do not infer semantics from a creature name, trait name, or lookalike prose.
 3. Compile once with `content_solution(action="compile")`, the actor revision, an idempotency key, the authored `resolution_plan`, and a bounded `agent_ruling`. Compilation is allowed in Lobby, Play, or Combat; it persists on the exact runtime actor card.

@@ -362,14 +362,20 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    actually absent or conflicting.
    When the scenario covers Agent-owned spell semantics, inspect the resulting
    preflight `ruling_spell_ids` and hydrated source cards instead of avoiding
-   them. Choose one exact source-backed card, query and (when missing) compile
-   its persisted generic `content_solution`, cast it through the ordinary spell
-   facade so the engine pays its action and spell resource, then execute the
-   returned bound plan through `combat_choice`. The Agent supplies the
-   source-cited semantic decision; MCP owns validation, random results, resource
-   payment, and state mutation. A parser-damaged spell name that produced no
-   hydrated card remains a source-repair diagnostic and is never reconstructed
-   from memory.
+   them. Choose one exact source-backed card. A standard card with a persisted
+   `agent_ruling` clause must not use `content_solution`: first call the ordinary
+   spell facade without a declaration to read its exact ruling contract, then
+   resubmit the cast with that exact source excerpt and the Agent's bounded
+   decision. Require authoritative action/resource payment and
+   `semantic_solution.status="agent_ruling_committed"`. For a statblock/innate
+   spell, omit `signature_free_cast`; MCP consumes the recorded innate resource.
+   A custom/imported card
+   with no persisted plan instead uses `content_solution(compile)`, pays through
+   the ordinary spell facade, and settles the returned bound plan through
+   `combat_choice(execute_plan)`. MCP owns validation, random results, resources,
+   revisions, and mechanical state. A parser-damaged spell name that produced
+   no hydrated card remains a source-repair diagnostic and is never
+   reconstructed from memory.
    On resume, before the first Combat mutation, compare the active encounter's
    immutable participants and source manifest with the still-unmet evidence.
    Take participant ids from `combat_query(status)`, then load

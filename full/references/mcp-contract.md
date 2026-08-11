@@ -37,7 +37,8 @@ consolidated calls include:
   effects use the latter;
 - `content_solution(action="query" | "compile")`; DM-only compilation is
   available in Lobby, Play, and Combat so a previously unseen custom card can
-  be compiled on first live use and then reused from its persisted card.
+  be compiled on first live use and then reused from its persisted card. It is
+  not an authoring path for locked standard content.
 
 For `chase(action="start")`, a module-authored contextual speed change belongs
 in that participant's `participant_config` as `speed_adjustment_ft` plus an
@@ -1535,6 +1536,13 @@ engine rather than compiling that standard rule as homebrew. A reviewed
 spell/item/creature-specific Agent clause is not a replacement for standard
 action economy or accounting: it is the durable settlement of that exact card
 and is applied only through public engine operations.
+When a standard spell does have a persisted `agent_ruling` clause, its first
+`combat_cast_spell` call without a declaration returns the exact
+`agent_ruling_contract` before payment. Resubmit that same cast with the exact
+source excerpt and bounded Agent decision; MCP atomically pays the recorded
+action/resource, starts any source-defined concentration, and returns
+`semantic_solution.status="agent_ruling_committed"`. An innate/statblock spell
+must omit `signature_free_cast` so its recorded innate resource is authoritative.
 For imported or homebrew content without such an implementation, import/review
 preserves the exact source evidence and may store a reviewed source-bound plan.
 If no plan exists, the first live use returns
