@@ -378,6 +378,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    revisions, and mechanical state. A parser-damaged spell name that produced
    no hydrated card remains a source-repair diagnostic and is never
    reconstructed from memory.
+   A `pending_ruling` response only supplies the declaration contract and spends
+   nothing; it is not a completed Combat action. Before submitting the corrected
+   declaration, read `combat_query(status)`. If another actor is current, call
+   `combat_end_turn` only for that returned actor with the latest revision, then
+   query status again after every committed turn write. Never guess, cache, or
+   count through the initiative sequence. Submit the declaration only when the
+   selected caster is current and require `status="committed"`; do not end the
+   encounter after a rejected or merely pending cast.
    On resume, before the first Combat mutation, compare the active encounter's
    immutable participants and source manifest with the still-unmet evidence.
    If Combat coverage and every remaining Combat-specific mechanism are already
