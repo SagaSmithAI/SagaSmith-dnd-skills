@@ -380,6 +380,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    reconstructed from memory.
    On resume, before the first Combat mutation, compare the active encounter's
    immutable participants and source manifest with the still-unmet evidence.
+   If Combat coverage and every remaining Combat-specific mechanism are already
+   satisfied, an encounter left active by an interrupted regression process is
+   no longer part of the route. Query its authoritative status, then immediately
+   call `combat_end` with a truthful `outcome.status="interrupted"`. Do not spend
+   actions, advance turns, or replay the completed encounter before returning to
+   the first remaining Play or ending gap.
    Take participant ids from `combat_query(status)`, then load
    `character_query` and read each required actor individually with `view=get`;
    do not assume a host's bounded summary of the nested encounter exposed every
