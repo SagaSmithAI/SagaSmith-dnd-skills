@@ -58,6 +58,18 @@ label is not a mechanical card. Before finalization, submit an evidence-backed
 then re-read the draft and retain the returned content `review_id`. Do not
 finalize a route-required opposition repair until the review is present and can
 be consumed later by `character_create_from(mode="module_statblock")`.
+Before choosing a name, page, or source slot, call
+`module_query(view="candidates", payload={"module_id":"<editable draft module id>"})`.
+A `review_ready` candidate supplies the exact `scene_id`, `content_key`,
+`normalized_content`, `source_chunk_ids`, edition content kind, validation, and
+Agent-fill requirements for `operation="content"`; copy those values rather
+than rebuilding the card. A blocked 2014 candidate may route to
+`operation="statblock"` using its exact candidate name/scene/page, followed by
+the returned recovery/validation contract. A creature mentioned in encounter
+narrative does not prove that its statblock is printed on that narrative page.
+If no candidate or rendered page contains that card, use another source-backed
+route opponent or discover the exact enabled standard rule source; never guess
+a statblock page from an encounter mention.
 Use the current facade shapes, with request controls outside `payload`:
 
 ```json
