@@ -1330,7 +1330,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     Supply the actor id only for `actor_value` and the fact key only for
     `memory_fact`; retain the other fields as empty strings. Configure it with
     the current `expected_revision`, current `branch_id`, and a stable
-    idempotency key. After a successful mutation, refresh the campaign
+    idempotency key. At least one check must prove a source-defined outcome
+    state; phase, inactive Combat, current position, and manifest readiness are
+    settlement prerequisites, not an ending. If a not-yet-completed condition
+    was registered incorrectly, submit the corrected condition under the same
+    id through `configure_ending` before verification. After a successful
+    mutation, refresh the campaign
     revision and call `playthrough_manifest(action="verify_ending",
     payload={"condition_id": <exact registered id>}, ...)` with a new stable
     idempotency key. Never discover this schema by weakening checks or by
