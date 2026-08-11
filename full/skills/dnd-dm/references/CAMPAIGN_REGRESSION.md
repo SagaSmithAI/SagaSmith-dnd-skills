@@ -354,8 +354,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    payment, and state mutation. A parser-damaged spell name that produced no
    hydrated card remains a source-repair diagnostic and is never reconstructed
    from memory.
-   On resume, first compare the active encounter's immutable participants and
-   source manifest with the still-unmet evidence. If that encounter cannot
+   On resume, before the first Combat mutation, compare the active encounter's
+   immutable participants and source manifest with the still-unmet evidence.
+   Take participant ids from `combat_query(status)`, then load
+   `character_query` and read each required actor individually with `view=get`;
+   do not assume a host's bounded summary of the nested encounter exposed every
+   hydrated card or `ruling_spell_ids` entry. If that encounter cannot
    qualify because it contains the wrong actor revision, lacks the required
    hydrated card, or used non-matching source evidence, end it through
    `combat_end` and rebuild the qualifying encounter once from current actors.
