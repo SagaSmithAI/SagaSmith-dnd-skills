@@ -22,6 +22,15 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    returned rule hit `source_id`, or the matching source inventory `id`, is the
    only valid rule-source id. Module, Pack, scene, and document ids are different
    namespaces.
+5. Compare the route's managed-source excerpt with the active Pack scene before
+   reusing an otherwise ready actor. If the Pack contains mojibake, replacement
+   characters, or other extraction-corrupted text absent from the managed
+   source, do not copy that corruption into `participant_manifest` merely to
+   pass preflight. Return to Lobby and create a new draft/version from the same
+   managed source. Repair only the bounded affected page through source review,
+   finalize/import/activate the corrected Pack, then rebuild the manifest from
+   the corrected scene. Keep exact replacements and evidence with the Pack;
+   never weaken the route comparison or add a book-specific parser heuristic.
 
 ## Hydrate from a canonical rule source
 
