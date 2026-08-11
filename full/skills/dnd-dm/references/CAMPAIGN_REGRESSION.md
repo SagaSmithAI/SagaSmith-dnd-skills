@@ -289,7 +289,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `rule_search(campaign_id=<campaign id>, query=<exact printed identity>)`; use
    no `page`, `source_ids`, `source_keys`, or publication filter unless exact
    source evidence supplies it. Omit an unknown optional filter instead of
-   sending an empty list or guessing a page.
+   sending an empty list or guessing a page. The first exact-identity lookup
+   sends only `campaign_id`, `query`, and an optional `top_k`; campaign binding
+   already scopes edition, locale, and enabled sources. If a filtered lookup
+   returns no hits, retry once with that minimal shape before inspecting module
+   reviews or starting a new Pack draft. A guessed publication label such as a
+   retail book title is not equivalent to the enabled source's authoritative
+   publication id.
    Use
    `rule_seed_status(campaign_id=<campaign id>, query=<source title>, limit=...)`
    when source-level inventory is needed. A returned hit `source_id` or source
