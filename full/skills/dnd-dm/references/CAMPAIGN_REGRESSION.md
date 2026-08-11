@@ -298,88 +298,12 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    add a generic engine implementation and source-backed test, relock the
    campaign's built-in Core pack explicitly, and retry. Never add a
    named-monster special case.
-   In a native Agent session, reproduce `discover-rule-sources` through the
-   public facade: while in `lobby`, use `exposure(search/set)` to load
-   `rule_search`, `rule_seed_status`, `rulebook_draft`, and
-   `character_create_from`. Search the exact creature with
-   `rule_search(campaign_id=<campaign id>, query=<exact printed identity>)`; use
-   no `filters` unless exact source evidence supplies them. The optional
-   `filters` object may contain only `edition`, `locale`, `publications`,
-   `source_ids`, `source_keys`, or a positive `page`; `{}` is explicitly
-   unfiltered. The first exact-identity lookup sends only `campaign_id`,
-   `query`, and an optional `top_k`; campaign binding already scopes edition,
-   locale, and enabled sources. If a filtered lookup returns no hits, retry once
-   with that minimal shape before inspecting module reviews or starting a new
-   Pack draft. A guessed publication label such as a retail book title is not
-   equivalent to the enabled source's authoritative publication id.
-   Use
-   `rule_seed_status(campaign_id=<campaign id>, query=<source title>, limit=...)`
-   when source-level inventory is needed. A returned hit `source_id` or source
-   inventory `id` is the only valid
-   `payload.source_id` for `character_create_from(mode="statblock")`; an active
-   module id, Pack id, module scene id, or document id is a different namespace
-   and must never be substituted. If the exact creature is printed only in the
-   enabled rule source, pass the exact printed identity as
-   `payload.source_statblock_name`, pass selected evidence only as
-   `payload.chunk_ids` (there is no `exact_chunks` field), give repeated runtime
-   instances distinct `payload.name` values, and verify the returned
-   `statblock.source_identity`.
-   Treat every returned `source_id` and `chunk_id` as an opaque exact value.
-   Copy each complete value character-for-character from the latest successful
-   `rule_search` result; never retype, normalize, splice, or reconstruct one
-   UUID from another result. If statblock creation reports that chunks do not
-   belong to the requested source, re-run the exact-identity search, compare
-   the complete source and chunk ids against the submitted JSON, and retry only
-   with exact values from one returned source. A one-character mismatch or a
-   UUID assembled from multiple results is an Agent input error, not missing
-   source evidence and not grounds to weaken MCP validation.
-   If an exact localized rule hit is readable but its layout is not mechanically
-   hydratable, do not copy its numbers into a hand-built card and do not move the
-   standard creature into a module-specific review. When current module evidence
-   also prints the canonical English identity, query that exact identity once
-   against an enabled same-edition English canonical source (for example with
-   `filters={"edition": "2014", "locale": "en"}`), verify that the returned
-   heading is the same creature, and hydrate only from that one source's exact
-   ids. This is an explicit source selection, not permission to translate or
-   infer a different statblock from memory. If no mechanically usable equivalent
-   source exists, keep the source-repair diagnostic and use the reviewed
-   rulebook-draft lifecycle instead.
-   If the exact creature is printed only in the
-   active module, discover and complete its module content review and use
-   `mode="module_statblock"` with the immutable `review_id` instead. Also pass
-   the exact printed card name as `payload.source_identity`; this is checked
-   against the immutable review even when `payload.name` gives repeated instances
-   distinct names such as `Giant Spider 1` through `Giant Spider 4`. Re-read every
-   result and require `statblock.source_identity` to match the intended source
-   card. A successful actor creation with the wrong source identity is not usable
-   opposition and must be replaced from the correct review. Restore the
-   entry phase after preparation and consume the native tool-list change before
-   continuing.
-   If that review is absent from a finalized Pack, create an explicit new
-   draft/version from the same managed source. An ending entry,
-   `content_summary`, dossier, or encounter label does not substitute for the
-   mechanical review. Add the evidence-backed content/statblock review while
-   the Pack is still a draft, re-read it to verify the returned `review_id`, and
-   only then finalize/import/activate the reviewed revision.
-   A parser candidate marked `review_only`, `blocked`, or
-   `missing_or_conflicting_source_review` is not by itself an external boundary.
-   First determine whether the card is a standard creature whose exact enabled
-   rule source can be discovered, or whether the module page can be reviewed
-   through the public page-render/content-review workflow. Move `play -> lobby`
-   before either preparation path, refresh the bound exposure with
-   `get/search/set`, and return to `play` only after the resulting actor passes
-   source preflight. Stop for external input only after those exact evidence
-   paths are absent, contradictory, or unavailable to the current reviewer.
-   Do not infer that an actor or encounter is blocked from the creation result's
-   aggregate `settlement="source_review_required"` label alone. Run the
-   source-grounded `module_query(view="preflight")` and use its `ready`,
-   `card_valid`, `hard_blockers`, and `disabled_capabilities` fields as the
-   authoritative combat gate. A complete attack remains usable when unresolved
-   source-backed spells are explicitly disabled; continue with the usable
-   capability and retain the spell diagnostics in the transcript. Repair first
-   only when preflight reports the whole card invalid, a required capability for
-   the intended action is disabled, or mechanically indispensable evidence is
-   actually absent or conflicting.
+   In a native Agent session, resolve any missing source-backed opposition with
+   the complete public-facade procedure in `OPPOSITION_HYDRATION.md`. Read that
+   focused reference in full before choosing rule-source hydration, reviewed
+   rulebook repair, or a new module Pack review. It owns the exact-id,
+   localized-canonical-source, module-only review, preflight, and phase-return
+   requirements; do not reconstruct the workflow from this larger section.
    When the scenario covers Agent-owned spell semantics, inspect the resulting
    preflight `ruling_spell_ids` and hydrated source cards instead of avoiding
    them. Choose one exact source-backed card. A standard card with a persisted

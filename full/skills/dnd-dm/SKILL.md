@@ -33,7 +33,7 @@ idempotency, source validation, and transactions remain authoritative.
 | Observe, turns, and actions | `combat_query`, `combat_turn`, `combat_*` | `references/DM_RULES.md` |
 | Tactical map or Agent spatial facts | map tools or action-specific Agent facts | `references/DM_MAP_SYS.md` |
 | Campaign/module preparation | `module_draft`, `content_pack`, `character_*` | `references/MODULE_INDEX.md`, `references/MODULE_ARC.md` |
-| Full campaign regression | tools required by the current phase | `references/CAMPAIGN_REGRESSION.md` |
+| Full campaign regression | tools required by the current phase | `references/CAMPAIGN_REGRESSION.md`; for missing mechanical opposition, read `references/OPPOSITION_HYDRATION.md` |
 
 Use `skill_query(action="search"|"section")` for these deep references; do not
 load a whole large document by default.
