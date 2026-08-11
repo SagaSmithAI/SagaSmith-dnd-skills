@@ -55,10 +55,13 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    substitute. If no mechanically usable equivalent exists, retain the source
    diagnostic and use the reviewed rulebook-draft lifecycle.
 5. If module evidence applies a narrow instance change to that canonical card,
-   pass it through the existing `variant` boundary. Cite the exact managed
-   `module-chunk:<id>` or immutable `module-review:<id>` in `variant.source_ref`
-   and include only the printed override, such as `creature_type`. Do not copy
-   the entire card into Pack data or use a generic sheet patch.
+   call `module_search` with a distinctive exact heading or printed phrase,
+   then `module_expand` on the selected hit. Copy the returned exact managed
+   chunk id into `variant.source_ref` as `module-chunk:<id>`, or cite an
+   immutable returned `module-review:<id>`. A route/scenario label, heading,
+   page number, scene id, or remembered token is not a chunk id. Include only
+   the printed override, such as `creature_type`; do not copy the entire card
+   into Pack data or use a generic sheet patch.
 6. Re-read every created actor and require `statblock.source_identity` to match
    the intended source card.
 
