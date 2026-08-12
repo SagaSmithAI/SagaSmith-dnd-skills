@@ -575,11 +575,15 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    starting-distance evidence. Seal the
    completed chase and its manifest/world-state update with one checkpoint;
    never checkpoint each chase turn or replace the chase with a fabricated
-   outcome event. Before `combat_start`, call `chase(action="end")`, re-query
-   and prove the chase inactive, consume the resulting native-list change, and
-   load the needed Play/combat transition tools. Assert that starting Combat
-   while a chase is active is rejected and that no state ever contains two
-   active structured workflows.
+   outcome event. A successful turn may itself return the authoritative chase
+   as inactive with a terminal outcome such as `caught` or `escaped`; that is
+   already the required end receipt and must not be followed by a redundant
+   `chase(action="end")`. If the authoritative chase remains active, call
+   `chase(action="end")` before `combat_start`. In either case, re-query and
+   prove the chase inactive, consume any resulting native-list change, and load
+   the needed Play/combat transition tools. Separately assert that starting
+   Combat while a chase is active is rejected and that no state ever contains
+   two active structured workflows.
 6. Before combat, read the exact encounter scene and its location. Call
    `module_query(view="preflight")` with every source/DM-established group.
    The `participant_manifest` object has only `schema_version`, `groups`, and
