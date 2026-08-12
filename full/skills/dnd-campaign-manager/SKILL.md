@@ -36,9 +36,10 @@ current native tool list remain the routing source of truth.
 
 - Choose and verify 2014/2024 edition, locale, advancement mode, and locked Core
   provider before importing content or building characters.
-- Use the module's source-backed recommended maximum party size. Prefer reviewed
-  pregenerated PCs; fill only shortages through legal, diverse character
-  creation.
+- Treat the module's party-size recommendation as advisory. Select any explicit
+  positive party size, prefer reviewed pregenerated PCs, and fill only that
+  selected number through legal character creation. Never block setup merely
+  because the selection is below or above a printed recommendation.
 - Keep PC/NPC/monster cards, actor access, and ActorKnowledge independent.
 - Use exact source references for module metadata, scene progress, rewards, and
   endings.

@@ -115,7 +115,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
      "source_refs": ["<exact validated module source reference>"],
      "current": {"module_id": "", "chapter_id": "", "chapter_title": "", "scene_id": "", "scene_title": "", "objective": ""},
      "traversal": {"reachable_scene_ids": [], "visited_scene_ids": [], "excluded_scenes": [], "branch_decisions": []},
-     "party": {"party_size_status": "source_confirmed", "recommended_minimum": "<source integer>", "recommended_maximum": "<source integer>", "selected_size": "<source maximum>", "party_size_review": {}, "use_pregenerated_first": true, "members": [], "replacements": []},
+     "party": {"party_size_status": "source_confirmed", "recommended_minimum": "<source integer>", "recommended_maximum": "<source integer>", "selected_size": "<positive Agent selection>", "party_size_review": {}, "use_pregenerated_first": true, "members": [], "replacements": []},
      "npcs": [],
      "quests": [],
      "clues": [],
@@ -127,7 +127,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    }
    ```
 
-   Replace quoted integer placeholders with JSON integers. A top-level source
+   Replace quoted integer placeholders with JSON integers. Recommended minimum
+   and maximum are advisory source facts: they never block a positive explicit
+   `selected_size`, even when the selection is outside that range. Require only
+   that the registered active member count equals the chosen positive size. A top-level source
    reference uses `purpose`, managed `asset_path`, `asset_sha256`, exact
    `page_start`/`page_end`, ordered `heading_path`, service-owned
    `content_sha256`, active `module_id`, required resolved `scene_id` and
