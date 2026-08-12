@@ -176,8 +176,11 @@ the campaign.
    manifest sync, narrative-NPC creation, source-item transfer,
    environmental-damage event, or activity use gets a new id. Narrative reason
    text is not an occurrence id.
-   At a source-defined conclusion, first record exact outcome/world/NPC state,
-   then use the public regression driver's `configure-ending` and
+   At a source-defined conclusion, first execute every source-defined item,
+   check, choice, and mechanic through its owning public facade and retain those
+   independent receipts. Only then record exact outcome/world/NPC state; an
+   Agent-authored fact or progress flag cannot certify the event it merely
+   asserts. Then use the public regression driver's `configure-ending` and
    `verify-ending` actions. Require every configured check to pass and a verified
    terminal checkpoint to become the manifest DAG head. Historical final combat
    evidence does not block an ending; only a combat record whose authoritative

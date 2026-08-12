@@ -91,7 +91,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    the module id returned by that import rather than the editable draft id.
 
    On every fresh process that still has source review, opposition hydration,
-   ending evidence, or another Pack-authoring obligation, stay in or return to
+   directly proven missing/corrupted ending source, or another Pack-authoring obligation, stay in or return to
    `lobby`, load `module_draft`, and call `module_draft(action="get")` with no
    payload before creating actors, starting another draft, or entering Play.
    The result is newest-first: resume the matching unfinished job and preserve
@@ -1294,6 +1294,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `kind="memory_fact"`, the exact `fact_key`, empty `path`, and an exact
     content comparison. Do not reconstruct or replace the complete manifest to
     write one outcome or current-scene field.
+    Treat a regression fixture's Pack-local `ending_prerequisites` as mandatory
+    receipt expectations. Re-read their managed source evidence, then perform
+    each prerequisite through its named public facade before recording the
+    conclusion: source items require ordered, committed source-bound acquisition
+    and surrender receipts, and source-defined checks require a committed
+    engine-owned check receipt with exact scene evidence, skill/DC, required
+    result, and authoritative random receipt. A fact, scene-progress
+    flag, or manifest field written by the Agent in the same conclusion batch
+    cannot prove the event that the Agent just asserted. Persist those
+    projections only after the independent receipt exists, and keep the receipt
+    in the regression transcript.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
@@ -1346,6 +1357,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     payload={"condition_id": <exact registered id>}, ...)` with a new stable
     idempotency key. Never discover this schema by weakening checks or by
     repeatedly guessing unsupported field names.
+    An indexed, resolvable source-defined ending in the active Pack is not
+    missing Pack content merely because runtime prerequisites or verification
+    are incomplete. Re-read and correct the runtime condition; do not start,
+    finalize, import, or activate another module draft unless a direct Pack
+    content query proves the cited ending itself is absent or corrupted.
 23. Call `verify-ending` without deferral. Require every returned check to pass,
     the selected ending id to be achieved, the manifest and ending state to be
     `completed`, and a verified terminal checkpoint to become the Snapshot DAG
