@@ -98,6 +98,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    its job/module/review ids. Start a new draft only when the public list proves
    no matching resumable job exists or the supported lifecycle explicitly
    requires a new version of a finalized Pack.
+   A package-view read does not enumerate content reviews stored on the editable
+   module. Verify a successful content edit with `module_query(view="content")`
+   on the retained module id; never interpret an empty package projection as a
+   lost edit or permission to start a duplicate job.
 
    After the finalized Pack is imported and its returned module id is active,
    initialize `playthrough_manifest` with schema version 2. Put the full object

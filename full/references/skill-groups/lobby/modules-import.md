@@ -33,6 +33,14 @@ in particular, copy every `source_ref` verbatim from `module_draft(evidence)`
 rather than substituting a coverage-fixture hash or reconstructing a partial
 manifest.
 
+The package view is an import-job/package-decision projection; it is not the
+authority for content reviews stored on the editable module. After a successful
+`module_draft(edit, operation="content")`, verify that review with
+`module_query(view="content", module_id=<returned editable module id>)`. An empty
+`statblock_reviews` or content-like field in the package view does not mean the
+content edit was lost and never authorizes another `start`. Continue the same
+job and editable module through package edit and finalization.
+
 When the previous cycle already finalized the intended Pack and only import or
 activation remains, inspect every matching source job from that list until the
 job with a non-empty `finalized_package` is found, then import that exact

@@ -85,6 +85,14 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    missing review, re-read it, finalize it, import the new artifact, and
    activate only the module id returned by that import. Never edit a finalized
    Pack in place or guess a review id.
+   Before `start`, list the public module-draft handles and resume the newest
+   matching unfinished job. If duplicate handles already exist, choose one
+   matching handle and create no more. Retain its job id and editable module id
+   through the whole lifecycle. After a successful content edit, verify the
+   stored review with `module_query(view="content")` on that editable module.
+   `module_draft(get, view="package")` reports import-job/package decisions; an
+   empty content-like field there is not evidence that the module content review
+   was lost and is not permission to call `start` again.
    For an image-only card with no text candidate, `content_key` is the
    Pack-local stable slot selected by the Agent from the exact printed identity
    (lowercase ASCII words joined by hyphens, such as `master-of-souls`), not an
