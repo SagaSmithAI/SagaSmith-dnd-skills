@@ -1312,6 +1312,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `revision_id`; then include that exact value as the fact's
     `expected_revision_id` in the same source-bound atomic commit. Do not switch
     to a different fact key, drop the fact, or fall back to an unlinked upsert.
+    For a standalone correction with `memory_change(action="revise")`, put both
+    `memory_id` (the returned stable fact `id`) and `expected_revision_id` (the
+    returned `revision_id`) inside `payload`; only the campaign CAS
+    `expected_revision` remains top-level. Campaign memory `content` is always a
+    string. If an ending uses a `kind="memory_fact"` equality condition, copy the
+    successful write's returned `fact.content` exactly as its value; string
+    `"True"` does not equal boolean `true`, and the verifier does not coerce it.
     Then calculate the check DC from the fixture's base DC and exactly
     those preceding reducer receipts. A bare added/upsert fact, an unreferenced
     narrative assertion, or a reducer recorded after the check is not evidence
