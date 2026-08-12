@@ -37,6 +37,7 @@ Chroma、artifact 文件或本地 D&D CLI。
 - 规则查询严格使用 `rule_search` → `rule_expand`。
 - 模组导入严格使用 `module_draft(start → evidence/edit → finalize)`，再由 `content_pack(activate, kind="module")` 激活。
 - `module_search` 只用于候选选择；叙事前必须通过 scene/chunk 读取。
-- scene visibility 使用 `public`、`party`、`keeper`，keeper 内容由服务端过滤。
+- scene visibility 使用 Core canonical `public`、`group`、`restricted`；
+  `restricted` 内容由服务端过滤。
 
 不属于 Full Runtime 执行路径。

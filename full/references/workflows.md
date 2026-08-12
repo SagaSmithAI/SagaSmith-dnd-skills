@@ -81,7 +81,7 @@ own exposure. Changing one session's native tools must not expose them to anothe
    an immutable Pack but never activates it; activate later through
    `content_pack(kind="module")`.
 5. Review `module_query(view="index")`. Search only selects candidates; expand the
-   chosen scene before using its facts. Verify scene boundaries, keeper/public
+   chosen scene before using its facts. Verify scene boundaries, restricted/public
    visibility, encounter participants, exact source excerpts, spatial locations,
    explicit-evidence spatial connections, and parser warnings. Never treat room
    heading order as connectivity; an empty `spatial.connections` list means the
@@ -573,7 +573,9 @@ continuity, and its authorized actor knowledge.
    There is no implicit merge of world facts or actor knowledge.
 5. `state_revision(action="history")` inspects audited mutation groups.
    `state_revision(action="undo" | "redo")` uses the latest history sequence and
-   does not delete snapshots.
+   does not delete snapshots. Mixed continuity groups containing events, facts,
+   ActorKnowledge, progress, or receipts are non-reversible; use a verified
+   snapshot or branch recovery when the server reports that boundary.
 
 For destructive or stateful regression, enter `lobby`, create and verify a source
 checkpoint, then create-and-checkout a disposable branch. Return to `play`, refresh

@@ -1473,6 +1473,15 @@ the branch has no head), and a fresh key. `state_revision(action="undo" | "redo"
 requires the current `expected_history_sequence` from
 `state_revision(action="history")` plus a fresh key.
 
+Branch creation advances the campaign revision even when it does not checkout
+the new branch. Use the returned `campaign_revision` or reread the campaign
+before the next guarded write; never reuse the pre-create revision.
+
+A continuity commit that combines campaign/character documents with events,
+facts, ActorKnowledge, progress, or rule receipts is deliberately
+non-reversible. `state_revision(action="undo" | "redo")` must refuse that
+mutation group; recover through a verified snapshot or branch instead.
+
 `branch_change(action="create", payload.checkout=true)` returns both the new branch and the materialized
 snapshot; pointer changes and state restoration are one transaction.
 `branch_change(action="create_core_upgrade")` likewise returns the converted
@@ -2145,6 +2154,6 @@ inside arbitrary scene-progress JSON, because that bypasses the duration engine.
 ## Player-safe module reads
 
 `module_query(view="scene" | "index")` and `module_search` accept `principal_id`.
-DM/owner reads may include keeper content; player reads are filtered to `public` or
-`party` visibility and keeper content is replaced with a redaction marker. A
+DM/owner reads may include restricted content; player reads are filtered to `public` or
+`group` visibility and restricted content is replaced with a redaction marker. A
 player cannot select another player or group scope merely by knowing its ID.

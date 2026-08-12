@@ -158,7 +158,7 @@ module_draft(start → Agent evidence/edit loop → finalize) → content_pack(a
 - 物理资产和 SHA-256；
 - 页码和解析质量；
 - module/chapter/scene/chunk；
-- keeper、party、public 可见性；
+- restricted、group、public 场景可见性；
 - Scene Index；
 - 可证明的地点和连接；
 - 内容候选、角色卡候选和 review block；
