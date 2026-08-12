@@ -74,10 +74,12 @@ invent missing sheet fields: complete and confirm them before build. Its
 arrays.
 
 When preparing an imported module, first verify whether the supplied artifact
-actually contains pregenerated PCs. When it does, import and use every applicable,
-complete pregenerated PC before generating any replacement; generate only the
-shortfall needed for the source-declared party size, and retain each actor's
-provenance. If it does not, do not attribute invented characters to the module:
+actually contains pregenerated PCs. When it does, import applicable, complete
+pregenerated PCs before generating replacements, retain each actor's provenance,
+and do not treat the printed recommendation or initial selected size as a fixed
+runtime count. Require at least one active PC; the party may gain or lose members
+during the campaign. If the artifact has no pregenerated PCs, do not attribute
+invented characters to the module:
 create player-confirmed or explicitly labeled regression PCs from the active
 content catalog, and retain that provenance in `notes`. For a named module NPC or
 monster, the module supplies identity, role, disposition, and scene-specific

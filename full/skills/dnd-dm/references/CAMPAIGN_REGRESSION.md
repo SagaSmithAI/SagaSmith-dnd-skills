@@ -130,7 +130,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    Replace quoted integer placeholders with JSON integers. Recommended minimum
    and maximum are advisory source facts: they never block a positive explicit
    `selected_size`, even when the selection is outside that range. Require only
-   that the registered active member count equals the chosen positive size. A top-level source
+   at least one active PC. `selected_size` records the initial plan, not a
+   permanent invariant: the active party may grow or shrink during the campaign.
+   A top-level source
    reference uses `purpose`, managed `asset_path`, `asset_sha256`, exact
    `page_start`/`page_end`, ordered `heading_path`, service-owned
    `content_sha256`, active `module_id`, required resolved `scene_id` and
@@ -141,7 +143,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `campaign_query(view="resume")` and rebuild against the returned revision;
    never copy the revision number out of an error string.
 
-   After creating the source-selected number of PCs, call
+   After establishing a non-empty active party, call
    `playthrough_manifest(action="replace")` with the complete manifest returned
    by `get`, adding one full `party.members` record per chosen PC. Each record
    carries `actor_id`, current `name`, `status="active"`, `source` (exactly
@@ -150,18 +152,17 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `wallet`, `equipment`, and `knowledge_scope_actor_id` equal to its
    `actor_id`. Preserve every unrelated manifest field and source reference.
    Then call `sync` without invented party fields and require the returned
-   manifest to become `ready` with exactly `party.selected_size` active members
+   manifest to become `ready` with at least one active member
    before entering Play. `sync` only refreshes actors already registered in the
    manifest; `payload.party_actor_ids` is not a registration mechanism and must
    not be used. An empty manifest is not evidence that no campaign actors exist.
-   Before any PC build, call `character_query(view="list")`, retain every
-   campaign-bound PC instance id, and calculate
-   `missing = selected_size - existing_campaign_pc_count`. Call build exactly
-   `max(0, missing)` times; when the count is already sufficient, call it zero
-   times and register the existing actors. Do not create a bench/reserve PC in a
-   fresh regression campaign. If `selected_size` came from a source-confirmed
-   recommendation, it remains the source maximum; create only genuinely missing
-   PCs rather than silently lowering it.
+   Before any PC build, call `character_query(view="list")` and retain every
+   campaign-bound PC instance id. When at least one suitable active PC already
+   exists, do not build another merely to match a recommendation or the initial
+   selected size; register the current active actors. A later join, departure,
+   death, missing status, reserve move, or replacement changes the active count
+   without invalidating the campaign. Do not create a bench/reserve PC solely to
+   satisfy a historical count.
 
    For every repeatable driver mutation whose authored content may legitimately
    be identical later, supply a non-empty stable `--occurrence-id`. Reuse it only
@@ -206,7 +207,7 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    then use the returned campaign instance id with the dedicated public tools.
    Classify and import every module-supplied PC document before building seats.
    Fill every applicable party seat from those pregenerated PCs first, up to the
-   module's source-cited maximum recommended party size; only then build the
+    positive initial party choice; only then build the
    remaining legal seats from active content catalog ids. A present applicable
    pregen may not be skipped for a generated optimization. Preserve each pregen's
    source reference and document checksum. If extraction cannot find a party-size

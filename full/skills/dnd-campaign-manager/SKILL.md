@@ -37,9 +37,12 @@ current native tool list remain the routing source of truth.
 - Choose and verify 2014/2024 edition, locale, advancement mode, and locked Core
   provider before importing content or building characters.
 - Treat the module's party-size recommendation as advisory. Select any explicit
-  positive party size, prefer reviewed pregenerated PCs, and fill only that
-  selected number through legal character creation. Never block setup merely
-  because the selection is below or above a printed recommendation.
+  positive initial party size and prefer reviewed pregenerated PCs. Never block
+  setup merely because the selection is below or above a printed recommendation.
+  The selection is planning metadata, not a permanent count: members may join,
+  leave, die, go missing, or move to reserve during the campaign. Require at
+  least one active PC, and require only the actors participating in a specific
+  mechanic to have that mechanic's indispensable data.
 - Keep PC/NPC/monster cards, actor access, and ActorKnowledge independent.
 - Use exact source references for module metadata, scene progress, rewards, and
   endings.

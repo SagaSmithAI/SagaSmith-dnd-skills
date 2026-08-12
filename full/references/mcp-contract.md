@@ -555,20 +555,20 @@ character documents. Never force such a document through the module parser.
 
 For the initial campaign party, classify all supplied character documents before
 creating any generated PC. Use every applicable module pregenerated character
-first and preserve its exact source reference/checksum; build only the seats still
-missing from the module's source-cited maximum recommended party size. This
-precedence is a quality gate, not a party-composition suggestion.
+first and preserve its exact source reference/checksum. Build a generated PC only
+when no suitable active PC exists or an explicit player choice calls for one;
+never build seats merely to reach a printed recommendation or initial plan. This
+precedence is a provenance quality gate, not a fixed party count.
 If complete text search plus visual review proves that the module states no
-party-size range, keep the gate blocked until the SagaSmith Agent acting as DM
-records the reviewed pages and searches, selected count, exact enabled-rule
-fallback and checksum, and
-`represented_as_module_recommendation=false`. A completed review may unblock
-party construction; a silent default to four or a semantically unrelated search
-hit may not.
+party-size range, record that absence and any Agent-selected positive initial
+plan, but do not block party construction or play on completing the recommendation
+review. Never silently present four, or a semantically unrelated search hit, as
+the module's recommendation.
 The manifest preserves this as `party_size_review` with
 `default_resolver="agent"` and `ruling_kind="source_or_scene_fact"` while the
-Agent performs the DM review. If the necessary page/source evidence is still
-unavailable, that evidence gap remains an external source-review boundary.
+Agent performs the DM review. Missing recommendation evidence is diagnostic, not
+an external play boundary; mechanically indispensable actor data remains subject
+to its ordinary validation.
 
 For a dead, missing, or departed PC, prefer an applicable unused module
 pregenerated character and otherwise create one new legal character through the
