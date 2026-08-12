@@ -1303,7 +1303,16 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     conclusion: source items require ordered, committed source-bound acquisition
     and surrender receipts, and source-defined checks require a committed
     engine-owned check receipt with exact scene evidence, skill/DC, required
-    result, and authoritative random receipt. A fact, scene-progress
+    result, and authoritative random receipt. When the source changes that DC
+    because an Agent-adjudicated condition is true, first commit each declared
+    semantic prerequisite as its own source-bound event and fact using
+    `memory_change(action="commit")`; the returned fact must cite that returned
+    event id. Then calculate the check DC from the fixture's base DC and exactly
+    those preceding reducer receipts. A bare added/upsert fact, an unreferenced
+    narrative assertion, or a reducer recorded after the check is not evidence
+    for the reduced DC. The event may establish source-defined presence,
+    alliance, presentation, or another semantic condition, but it cannot assert
+    that the later engine check succeeded. A fact, scene-progress
     flag, or manifest field written by the Agent in the same conclusion batch
     cannot prove the event that the Agent just asserted. Persist those
     projections only after the independent receipt exists, and keep the receipt

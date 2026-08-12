@@ -178,7 +178,11 @@ the campaign.
    text is not an occurrence id.
    At a source-defined conclusion, first execute every source-defined item,
    check, choice, and mechanic through its owning public facade and retain those
-   independent receipts. Only then record exact outcome/world/NPC state; an
+   independent receipts. Source-declared modifiers to a check require their own
+   earlier source-bound semantic event/fact commits; derive the final DC only
+   from the base DC and those exact receipts. A naked fact or prose assertion
+   cannot apply a modifier, and a semantic event cannot certify the mechanical
+   roll it precedes. Only then record exact outcome/world/NPC state; an
    Agent-authored fact or progress flag cannot certify the event it merely
    asserts. Then use the public regression driver's `configure-ending` and
    `verify-ending` actions. Require every configured check to pass and a verified
