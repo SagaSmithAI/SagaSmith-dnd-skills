@@ -84,11 +84,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
    `result.module_id` from `module_draft(start)`; never restart or guess after a
    host persists the large inspection payload. After evidence review and Pack
    edits, finalize with
-   `payload={job_id, pack_id, confirmation:{confirmed:true,note:...}}` and a
+   `payload={job_id, pack_id, version, confirmation:{confirmed:true,note:...}}`
+   and a
    top-level `idempotency_key`. `pack_id` is the stable Pack identity chosen by
    the Agent at this trust boundary, not a package-edit field. Import the
-   returned archive through `content_pack(import, kind="module")`, then activate
-   the module id returned by that import rather than the editable draft id.
+   returned archive through `content_pack(import, kind="module")`. For a revision
+   of an active Pack, require an explicit greater version and `skipped=false`;
+   otherwise stop on the identity/version conflict and do not activate the old
+   module. Activate the module id returned by that import rather than the editable draft id.
 
    On every fresh process that still has source review, opposition hydration,
    directly proven missing/corrupted ending source, or another Pack-authoring obligation, stay in or return to

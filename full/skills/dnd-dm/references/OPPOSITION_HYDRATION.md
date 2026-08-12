@@ -86,9 +86,13 @@ Do not treat that gap alone as proof that the active Pack needs a new review.
    `character_create_from(mode="module_statblock")` only with the returned
    `review_id`, and pass the exact printed card as `payload.source_identity`.
 2. If a finalized Pack lacks the required review, create an explicit new
-   draft/version from the same managed source. Add only the evidence-backed
+   draft/version from the same managed source. Select an explicit version greater
+   than the active Pack; never reuse its version or rely on the first-release
+   default. Add only the evidence-backed
    missing review, re-read it, finalize it, import the new artifact, and
-   activate only the module id returned by that import. Never edit a finalized
+   require the import to return `skipped=false`. Activate only the module id
+   returned by that import. If it returns `skipped=true`, stop on the
+   identity/version conflict and do not reactivate the old module. Never edit a finalized
    Pack in place or guess a review id.
    Before `start`, list the public module-draft handles and resume the newest
    matching unfinished job. If duplicate handles already exist, choose one

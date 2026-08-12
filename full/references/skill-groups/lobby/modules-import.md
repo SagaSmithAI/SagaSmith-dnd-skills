@@ -58,6 +58,12 @@ That reuse does not finalize or block the new job. Re-read the returned fresh
 `job_id`; `status="editing"` without that job's own `finalized_package` is the
 authority to continue edits. Never retry an edit against the older finalized
 job merely because both jobs reference the same mechanically imported module.
+Choose and persist an explicit version greater than the active finalized Pack
+before finalizing this revision; never rely on the `1.0.0` default for a changed
+Pack. After `content_pack(import)`, require `skipped=false` and retain the module
+id returned by that exact import. If import reports `skipped=true`, stop on the
+Pack identity/version conflict: do not activate the old module id or claim that
+the new review entered runtime.
 
 Before activation, retrieve draft evidence only through these exact shapes:
 
@@ -217,7 +223,8 @@ decision before finalization.
 After reviewing the current draft, its issues, evidence, imported scenes, and
 saved package decisions, call `module_draft(finalize)` with
 `payload={job_id, pack_id, confirmation:{confirmed:true, note:...}}`; `version`
-is optional and defaults to `1.0.0`. `pack_id` is the stable Agent-selected Pack
+is optional and defaults to `1.0.0` only for the first Pack release. A revision
+of an already finalized Pack must pass an explicit greater version. `pack_id` is the stable Agent-selected Pack
 identity (for example `dnd5e.module.<slug>`), is required only at finalization,
 and is not a package-edit field. Keep `idempotency_key` at the tool-call top
 level. The confirmation is the Agent's final editorial decision; do not
