@@ -1348,6 +1348,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     the ending as complete, and do not treat an older completed manifest as
     evidence. After the required source lookup, the first authoritative write
     must be the audit's exact `first_missing_id` receipt.
+    If the runner supplies a non-empty `MANDATORY_FIRST_ENDING_MUTATION`, treat
+    its machine-derived tool, action, expected object, and safe source query as
+    the current turn's binding execution target. Do not call any
+    `playthrough_manifest` action until that mutation succeeds.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
