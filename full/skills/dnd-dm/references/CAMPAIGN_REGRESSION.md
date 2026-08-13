@@ -1365,7 +1365,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     receipt chain—for example, requiring inventory to remain truthy after the
     source item was surrendered—never reacquire the item to satisfy it. Create
     a new condition id from an exact source-bound fact/content plus current
-    runtime checks, and verify that condition instead.
+    runtime checks, and verify that condition instead. After the required source
+    lookup, that replacement `configure_ending` is the first authoritative write;
+    do not verify the old condition or repeat any prerequisite receipt first.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
