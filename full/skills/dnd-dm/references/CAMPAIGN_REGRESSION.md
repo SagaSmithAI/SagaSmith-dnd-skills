@@ -1307,7 +1307,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     in `payload.source_scene_id` and `payload.source_excerpt`; a nested
     `payload.source_evidence` object is not a substitute for those public
     receipt fields. For a reduced check, also send `payload.base_dc` and the
-    fixture's exact `payload.applied_reducer_ids`. When the source changes that DC
+    fixture's exact `payload.applied_reducer_ids`. Preserve separate ability and
+    skill fields exactly; a Charisma (Persuasion) check uses
+    `payload.ability="Charisma"` and `payload.skill="Persuasion"`, not
+    `ability="persuasion"` with the skill omitted. When the source changes that DC
     because an Agent-adjudicated condition is true, first commit each declared
     semantic prerequisite as its own source-bound event and fact using
     `memory_change(action="commit")`; the returned fact must cite that returned
