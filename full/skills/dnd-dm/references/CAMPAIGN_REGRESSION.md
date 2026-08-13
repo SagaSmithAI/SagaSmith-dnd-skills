@@ -1308,7 +1308,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     semantic prerequisite as its own source-bound event and fact using
     `memory_change(action="commit")`; the returned fact must cite that returned
     event id. The atomic payload uses the plural array
-    `payload.facts=[{"kind":"memory_fact","fact_key":"...",...}]`; singular
+    `payload.event={"event_type":"source_semantic_event",
+    "audience_scope":"party","payload":{"reducer_id":"...",
+    "source_ref":{...}}}` plus
+    `payload.facts=[{"kind":"memory_fact","fact_key":"...",...}]`; put the
+    audience on `payload.event.audience_scope`, not on a fact. Singular
     `payload.fact` only commits the event and can never satisfy this receipt.
     If the stable fact key already exists from a prior rejected or
     superseded attempt, first use public `memory_query` to read its current
