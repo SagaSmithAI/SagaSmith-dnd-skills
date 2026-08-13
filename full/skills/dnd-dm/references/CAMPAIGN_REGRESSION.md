@@ -1307,7 +1307,10 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     because an Agent-adjudicated condition is true, first commit each declared
     semantic prerequisite as its own source-bound event and fact using
     `memory_change(action="commit")`; the returned fact must cite that returned
-    event id. If the stable fact key already exists from a prior rejected or
+    event id. The atomic payload uses the plural array
+    `payload.facts=[{"kind":"memory_fact","fact_key":"...",...}]`; singular
+    `payload.fact` only commits the event and can never satisfy this receipt.
+    If the stable fact key already exists from a prior rejected or
     superseded attempt, first use public `memory_query` to read its current
     `revision_id`; then include that exact value as the fact's
     `expected_revision_id` in the same source-bound atomic commit. Do not switch
