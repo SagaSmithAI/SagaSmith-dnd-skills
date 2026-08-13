@@ -1358,7 +1358,14 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     `playthrough_manifest` action until that mutation succeeds.
     When that object includes `write_ids`, copy its exact fresh
     `idempotency_key` and `spend_id`; do not derive them from a fixture receipt
-    id or reuse a historical attempt.
+    id or reuse a historical attempt. For `item_spend`, use the single
+    `matched_acquisition_item_ids` value as `payload.item_id`; never substitute
+    another same-named item from inventory or history.
+    If an immutable historical ending condition contradicts the completed
+    receipt chain—for example, requiring inventory to remain truthy after the
+    source item was surrendered—never reacquire the item to satisfy it. Create
+    a new condition id from an exact source-bound fact/content plus current
+    runtime checks, and verify that condition instead.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
