@@ -1368,6 +1368,13 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     runtime checks, and verify that condition instead. After the required source
     lookup, that replacement `configure_ending` is the first authoritative write;
     do not verify the old condition or repeat any prerequisite receipt first.
+    If the public facade rejects replacement because the invalid historical
+    ending already made that branch immutable, preserve it as negative evidence.
+    Enter Lobby, verify the latest source-branch snapshot from before that invalid
+    completion, and use `branch_change(create)` with `from_snapshot_id` and
+    `checkout=true` to make one recovery branch. After the binding refresh,
+    re-run the source prerequisites and configure/verify the corrected ending on
+    that branch; never patch storage or mutate/delete the historical branch.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
