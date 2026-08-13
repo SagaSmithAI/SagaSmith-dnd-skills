@@ -1301,7 +1301,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     receipt expectations. Re-read their managed source evidence, then perform
     each prerequisite through its named public facade before recording the
     conclusion: source items require ordered, committed source-bound acquisition
-    and surrender receipts, and source-defined checks require a committed
+    and surrender receipts. For an `item_spend` surrender, use a new top-level
+    idempotency key and put a new stable `spend_id`, the exact matched
+    acquisition `item_id`, quantity, reason, and the supported managed
+    `source_ref` inside `payload`. Do not put `excerpt` in that source ref or
+    reuse a spend id from a rejected attempt. Source-defined checks require a committed
     engine-owned check receipt with exact scene evidence, skill/DC, required
     result, and authoritative random receipt. Put that check evidence directly
     in `payload.source_scene_id` and `payload.source_excerpt`; a nested
