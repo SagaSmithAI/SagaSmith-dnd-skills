@@ -1356,6 +1356,9 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     its machine-derived tool, action, expected object, and safe source query as
     the current turn's binding execution target. Do not call any
     `playthrough_manifest` action until that mutation succeeds.
+    When that object includes `write_ids`, copy its exact fresh
+    `idempotency_key` and `spend_id`; do not derive them from a fixture receipt
+    id or reuse a historical attempt.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
