@@ -1305,7 +1305,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     idempotency key and put a new stable `spend_id`, the exact matched
     acquisition `item_id`, quantity, reason, and the supported managed
     `source_ref` inside `payload`. Do not put `excerpt` in that source ref or
-    reuse a spend id from a rejected attempt. Source-defined checks require a committed
+    reuse a spend id from a rejected attempt.
+    Resolve every receipt against its own declared page range and heading. Do
+    not reuse the acquisition source reference for a later presentation or
+    reducer event merely because the same item or ending is involved.
+    Source-defined checks require a committed
     engine-owned check receipt with exact scene evidence, skill/DC, required
     result, and authoritative random receipt. Put that check evidence directly
     in `payload.source_scene_id` and `payload.source_excerpt`; a nested
