@@ -1303,7 +1303,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     conclusion: source items require ordered, committed source-bound acquisition
     and surrender receipts, and source-defined checks require a committed
     engine-owned check receipt with exact scene evidence, skill/DC, required
-    result, and authoritative random receipt. When the source changes that DC
+    result, and authoritative random receipt. Put that check evidence directly
+    in `payload.source_scene_id` and `payload.source_excerpt`; a nested
+    `payload.source_evidence` object is not a substitute for those public
+    receipt fields. For a reduced check, also send `payload.base_dc` and the
+    fixture's exact `payload.applied_reducer_ids`. When the source changes that DC
     because an Agent-adjudicated condition is true, first commit each declared
     semantic prerequisite as its own source-bound event and fact using
     `memory_change(action="commit")`; the returned fact must cite that returned
