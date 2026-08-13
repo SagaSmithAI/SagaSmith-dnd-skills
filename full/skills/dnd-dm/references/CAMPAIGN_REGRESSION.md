@@ -1343,6 +1343,11 @@ Run every step through one campaign-bound MCP session/exposure at a time.
     cannot prove the event that the Agent just asserted. Persist those
     projections only after the independent receipt exists, and keep the receipt
     in the regression transcript.
+    While the current ordered receipt audit says
+    `ready_for_verification=false`, do not call `verify_ending`, do not narrate
+    the ending as complete, and do not treat an older completed manifest as
+    evidence. After the required source lookup, the first authoritative write
+    must be the audit's exact `first_missing_id` receipt.
     Keep the indexed conclusion's Scene Atlas progress `status="current"`
     through ending verification; its progress may be 100. Marking the only
     selected scene `completed` removes the authoritative current-scene selector
