@@ -50,9 +50,10 @@ multi-turn dialogue.
    `understood_actor_ids` and `response_actor_ids` must be subsets of
    `perceived_actor_ids`; response ids select NPC runtimes to activate, not
    every listener or addressed PC.
-3. Send only returned `activation_ref` descriptors to
-   `npc_conversation_worker(action="activate")`. Pass the returned descriptor
-   verbatim; do not reconstruct it or omit its revision/cursor fields.
+3. Let the authenticated Host dispatch only returned `activation_ref`
+   descriptors through its private, unlisted transport. Pass each descriptor
+   verbatim; do not reconstruct it or omit its revision/cursor fields. The
+   Director never receives a transport tool.
 4. Treat worker output as a candidate. Rule publication audience (per segment
    when necessary), call `publish` with the returned `publication_id`, current
    conversation revision, a new idempotency key, and the same complete

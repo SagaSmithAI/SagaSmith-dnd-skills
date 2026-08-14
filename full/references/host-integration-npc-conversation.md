@@ -7,8 +7,9 @@ workers and ephemeral provider caches.
 
 ## Required Host boundary
 
-Require `server_capabilities.npc_conversations.schema_version=2` and
-`execution_mode="client_subagents_required"`.
+Require `server_capabilities.npc_conversations.schema_version=3`,
+`proposal_contract="npc-conversation-proposal.v4"`, and
+`host_transport="private_authenticated_unlisted"`.
 
 - Keep one zero-tool message context per `conversation_id + actor_runtime_id`.
 - Never give an NPC worker parent history, workspace access, Skills, another
@@ -16,10 +17,10 @@ Require `server_capabilities.npc_conversations.schema_version=2` and
 - Keep `npc_conversation_transport` in Host code only. It must not appear in
   model tool definitions or prompts. Authenticate it with the per-connection
   Host token.
-- Give the Director only `npc_conversation` and
-  `npc_conversation_worker`. The worker tool accepts an opaque
-  `activation_ref`; it never returns bootstrap, lease, raw proposal, private
-  intent, truth posture, or basis refs.
+- Give the Director only the public MCP `npc_conversation` facade. The Host's
+  private dispatcher accepts an opaque `activation_ref`; neither its transport
+  nor bootstrap, lease, raw proposal, private intent, truth posture, or basis
+  refs enter Director tool definitions or context.
 - Dispose worker contexts after close/abort. KV cache is performance state,
   never campaign authority.
 
@@ -42,9 +43,9 @@ If the Host cannot enforce these guarantees, do not open a conversation.
    context and `abort` the listed conversation using its current revision.
 2. For every player/scene stimulus, first rule `audience_facts`, then call
    `action="ingest"` with the current revision and a new idempotency key.
-3. Dispatch only returned activations with
-   `npc_conversation_worker(action="activate")`. An observed NPC is not
-   automatically activated; only `response_actor_ids` produce work.
+3. Let the Host dispatch only returned activations through its authenticated,
+   unlisted transport. An observed NPC is not automatically activated; only
+   `response_actor_ids` produce work.
 4. A worker result with `publication_ready` is not yet public. Rule audience
    for the publication and call `npc_conversation(action="publish")`. For
    mixed delivery/language, provide `segment_audience_facts`, one entry per
