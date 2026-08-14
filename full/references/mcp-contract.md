@@ -376,8 +376,13 @@ the Agent evidence/edit loop, finalize it, then activate its immutable Pack and
 verify the inactive and active indexes before starting play.
 
 `combat_start` fixes one `positioning_mode` for the encounter. In `grid` mode,
-the server requires an encounter map and a position for every participant;
-movement, range, cover, visibility, areas, obstruction, and opportunity
+the server requires a position for every participant and exactly one map
+authority: `battle_map_template_id` from a finalized active Module Pack or an
+explicit `battle_map`, never both. A template is copied into a fresh
+encounter-local map and each participant is explicitly assigned to any declared
+deployment zone; actor ids never enter the portable Pack. Explicit mechanical
+overrides produce a DM authority receipt. Runtime map patches do not mutate the
+Pack. Movement, range, cover, visibility, areas, obstruction, and opportunity
 geometry are engine-owned. A missing map or coordinate is invalid input, never
 an Agent fallback. `combat_map_patch` records reviewed world changes in the
 encounter audit and scene runtime state. In `agent` mode, the request must

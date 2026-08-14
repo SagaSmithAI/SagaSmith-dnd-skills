@@ -87,12 +87,24 @@ in campaign progress, a playthrough manifest, continuity, or mechanics. Search
 the active runtime module with `module_search`, select a hit, and copy the exact
 runtime `source_ref` returned by `module_expand`.
 
-Use `module_draft(edit)` for reviewed content, statblocks, assets, and actor
-bindings. Extract party range, levels, advancement, endings, scenes,
+Use `module_draft(edit)` for reviewed content, statblocks, assets, actor
+bindings, and optional combat-grid templates. Extract party range, levels, advancement, endings, scenes,
 encounters, actors, items, maps, clues, and exact references. Prose is not
 executable; incomplete editorial coverage remains visible advice unless it
 causes structural corruption, missing/conflicting source identity, explicit
 test failure, or compilation failure.
+
+For a reusable combat grid, first inspect chunk or managed-page evidence, then
+submit `operation="combat_grid"` with `change="upsert"`, the exact draft
+`scene_id`, and the complete canonical candidate. It supports only stable
+id/title/location, square five-foot grid, bounds, blocked/difficult cells,
+deployment zones, optional managed-image `map_asset_key`, and copied draft
+`source_refs`. Re-read the scene and validate before finalization. Use
+`change="remove"` plus evidence-bound refs to remove one candidate. Every edit
+requires the current import-job revision and a fresh idempotency key. Never add
+a parallel map-authoring facade, participant actor ids, inferred image
+topology, walls, line of sight, cover, elevation, or module-specific mechanics.
+After finalization, create a new draft/version for any correction.
 
 When a route must instantiate a creature or NPC whose exact statblock exists
 only in the module, a manifest `content_summary`, narrative dossier, or catalog

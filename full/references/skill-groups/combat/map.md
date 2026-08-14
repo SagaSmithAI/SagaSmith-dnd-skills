@@ -3,8 +3,15 @@
 `combat_start` fixes `positioning_mode="grid"|"agent"` for the whole
 encounter. Never switch modes mid-combat.
 
-In grid mode, provide a compiled map and a coordinate for every participant.
-Patch it only through `combat_map_patch` from reviewed scene/map evidence or an
+In grid mode, provide a coordinate for every participant and choose exactly one
+map authority. Prefer `battle_map_template_id` when the finalized active Module
+Pack contains a reviewed combat-grid template. Otherwise provide a bounded
+explicit `battle_map`; its DM override must produce an authority receipt. Never
+send both sources. When a selected template declares deployment zones, give
+each runtime campaign actor an explicit `deployment_zone_id` and a position in
+that zone; portable templates never contain participant actor ids.
+
+Patch the encounter map only through `combat_map_patch` from reviewed scene/map evidence or an
 explicit bounded DM spatial ruling. The engine owns movement distance, range,
 line/area geometry, obstruction, cover, adjacency, threats, and friendly fire.
 Missing coordinates are invalid grid input.
@@ -18,6 +25,11 @@ economy, damage, resources, effects, and commits.
 Keep public and DM-only layers separate. Walls, blocking, difficult terrain,
 occupancy, elevation, cover, hazards, and actor placement must retain source or
 ruling provenance. A decorative image is not mechanical geometry.
+
+`combat_start` copies a Pack template into a fresh encounter-local map. Runtime
+patches, movement, snapshot/branch operations, undo, and redo affect encounter
+state only and never write back to the finalized Pack. Correct a released
+template by creating and finalizing a new Pack draft/version.
 
 In grid mode, map revision participates in movement and reaction validation.
 Re-query the map after any patch, join, restore, or movement conflict.
