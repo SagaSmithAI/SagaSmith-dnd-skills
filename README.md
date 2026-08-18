@@ -1,6 +1,6 @@
 # SagaSmith D&D Skills
 
-[平台总览](https://github.com/SagaSmithAI/.github/blob/main/profile/README.md) · [D&D MCP](https://github.com/SagaSmithAI/SagaSmith-dnd-mcp) · [D&D runtime](https://github.com/SagaSmithAI/Sagasmith-dnd)
+[官网](https://sagasmithai.github.io) · [平台总览](https://github.com/SagaSmithAI/.github/blob/main/profile/README.md) · [D&D MCP](https://github.com/SagaSmithAI/SagaSmith-dnd-mcp) · [D&D runtime](https://github.com/SagaSmithAI/Sagasmith-dnd) · [托管服务](https://github.com/SagaSmithAI/SagaSmith-service) · [内容目录](https://github.com/SagaSmithAI/SagaSmith-dnd-content-library)
 
 **让兼容 SKILL.md 的 Agent 学会完整主持 D&D 5e 2014/2024。** 本仓库保存主持策略、工具使用契约、规则参考和 workspace 模板；不拥有数据库，也不自行实现规则结算。
 
