@@ -9,6 +9,13 @@ Use the `sagasmith_dnd` MCP runtime. Do not emulate a successful state change,
 roll, rule settlement, or snapshot in prose or through direct database/CLI
 access.
 
+When the Host exposes `submit_room_turn`, also load and follow the system-neutral
+`room-host` Skill. Submit attacks, saves, checks, damage, initiative, death
+saves, and rerolls as `resolution_ref` blocks using only MCP-returned ids. A
+pending reaction, target choice, save, or damage settlement is a `prompt`, not
+a completed performance. In Grid mode narrate only authoritative coordinates;
+in Agent spatial mode present the DM ruling without inventing coordinates.
+
 ## Start with the runtime
 
 1. Read this Skill and only the task-relevant deep reference.
